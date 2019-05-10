@@ -1,7 +1,9 @@
 import csv
 import os
-from openpyxl import load_workbook 
+from openpyxl import load_workbook
 from g2p import exceptions
+from g2p.cors.langs import LANGS
+
 
 class Correspondence():
     def __init__(self, language, reverse: bool = False):
@@ -15,20 +17,25 @@ class Correspondence():
                 if all('from' in d for d in language) and all('to' in d for d in language):
                     if self.reverse:
                         language = self.reverse_cors(language)
+                    if not all('before' in cor for cor in language):
+                        for cor in language:
+                            cor['before'] = ''
+                    if not all('after' in cor for cor in language):
+                        for cor in language:
+                            cor['after'] = ''
                     self.cor_list = language
                 else:
                     raise exceptions.MalformedCorrespondence()
-            elif language.endswith('csv'):
-                self.cor_list = self.load_from_csv(language)
-            else:
-                if language.endswith('xlsx'):
-                    self.cor_list = self.load_from_workbook(language)
+            elif isinstance(language, object):
+                if not "lang" in language or not "table" in language:
+                    raise exceptions.MalformedLookup()
                 else:
-                    try_default = os.path.join(this_dir, "correspondence_spreadsheets", language + '.xlsx')
-                    if os.path.exists(try_default):
-                        self.cor_list = self.load_from_workbook(try_default)
-                    else:
+                    try:
+                        self.cor_list = self.load_from_file(LANGS[language['lang']][language['table']])
+                    except KeyError:
                         raise exceptions.CorrespondenceMissing(language)
+            else:
+                self.cor_list = self.load_from_file(language)
         else:
             raise exceptions.CorrespondenceMissing(language)
 
@@ -48,6 +55,12 @@ class Correspondence():
         for cor in cor_list:
             cor['from'], cor['to'] = cor['to'], cor['from']
         return cor_list
+
+    def load_from_file(self, path):
+        if path.endswith('csv'):
+            return self.load_from_csv(path)
+        elif path.endswith('xlsx'):
+            return self.load_from_workbook(path)
 
     def load_from_csv(self, language):
         ws = []
@@ -73,7 +86,7 @@ class Correspondence():
             for k in newCor:
                 if isinstance(newCor[k], float) or isinstance(newCor[k], int):
                     newCor[k] = str(newCor[k])
-        
+
             cor_list.append(newCor)
 
         if self.reverse:
@@ -118,4 +131,3 @@ class Correspondence():
             cor_list = self.reverse_cors(cor_list)
 
         return cor_list
-

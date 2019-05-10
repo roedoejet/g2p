@@ -63,7 +63,6 @@ class Transducer():
         return ruleRX    
 
     def apply_rules(self, to_parse: str):
-
         for cor in self.cor_list:
             if re.search(cor["match_pattern"], to_parse):
                 # if a temporary value was assigned
