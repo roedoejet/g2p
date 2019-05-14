@@ -1,12 +1,15 @@
 import csv
 import os
+import unicodedata as ud
 from openpyxl import load_workbook
 from g2p import exceptions
 from g2p.cors.langs import LANGS
 
 
 class Correspondence():
-    def __init__(self, language, reverse: bool = False):
+    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC"):
+        self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
+        self.norm_form = norm_form
         self.path = language
         self.reverse = reverse
         # Load workbook, either from correspondence spreadsheets, or user loaded
@@ -39,6 +42,11 @@ class Correspondence():
         else:
             raise exceptions.CorrespondenceMissing(language)
 
+        if self.norm_form in self.allowable_norm_forms:
+            for cor in self.cor_list:
+                for k, v in cor.items():
+                    cor[k] = self.normalize(v)
+
     def __len__(self):
         return len(self.cor_list)
 
@@ -50,6 +58,12 @@ class Correspondence():
 
     def __iter__(self):
         return iter(self.cor_list)
+    
+    def normalize(self, inp):
+        if self.norm_form not in self.allowable_norm_forms:
+            raise exceptions.InvalidNormalization(self.normalize)
+        else:
+            return ud.normalize(self.norm_form, inp)
 
     def reverse_cors(self, cor_list):
         for cor in cor_list:

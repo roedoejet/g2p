@@ -23,8 +23,8 @@ class Transducer():
         
         self.cor_list = cors
 
-    def __call__(self, to_parse):
-        return self.apply_rules(to_parse)
+    def __call__(self, to_parse: str, index: bool = False):
+        return self.apply_rules(to_parse, index)
         
     def process_intermediate(self, cor_list):
         # To prevent feeding
@@ -62,7 +62,10 @@ class Transducer():
             raise Exception('Your regex is malformed. Escape all regular expression special characters in your conversion table.')
         return ruleRX    
 
-    def apply_rules(self, to_parse: str):
+    def apply_rules(self, to_parse: str, index: bool = False):
+        input_index = 1
+        output_index = 1
+        indices = []
         for cor in self.cor_list:
             if re.search(cor["match_pattern"], to_parse):
                 # if a temporary value was assigned
@@ -71,7 +74,22 @@ class Transducer():
                     to_parse = re.sub(cor["match_pattern"], cor["temp"], to_parse)
                 else:
                     # else turn it into the final value
-                    to_parse = re.sub(cor["match_pattern"], cor["to"], to_parse)
+                    # breakpoint()
+                    # replace each one and preserve index
+                    if index:
+                        # find all characters to replace
+                        to_replace = re.findall(cor["match_pattern"], to_parse)
+                        for char in to_replace:
+                            print(char)
+                            input_index = to_parse.index(char) + 1
+                            print(input_index)
+                            to_parse = re.sub(cor["match_pattern"], cor["to"], to_parse)
+                            print(to_parse)
+                            output_index = to_parse.index(cor["to"]) + 1
+                            print(output_index)
+                            indices.append((input_index, output_index))
+                    else:
+                        to_parse = re.sub(cor["match_pattern"], cor["to"], to_parse)
         # transliterate temporary values
         for cor in self.cor_list:
             # transliterate temp value to final value if it exists, otherwise pass
@@ -82,4 +100,6 @@ class Transducer():
                     pass
             except KeyError:
                 pass
+        if index:
+            return (to_parse, indices)
         return to_parse

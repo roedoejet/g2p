@@ -24,6 +24,17 @@ class CorrespondenceMissing(CommandLineError):
             'https://github.com/roedoejet/g2p/ for a list of correspondences'
         ))
 
+class InvalidNormalization(CommandLineError):
+    def __init__(self, norm):
+        self.norm = norm
+    
+    def __str__(self):
+        return self.render((
+            '\n'
+            'You provided an invalid argument "%(norm)s" to normalize with. \n'
+            'Please use "none" or "NFC", "NFKC", "NFD", or "NFKD"\n'
+        ))
+
 class MalformedCorrespondence(CommandLineError):
     def __init__(self):
         pass
