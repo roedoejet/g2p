@@ -1,19 +1,20 @@
 import os
 from unittest import TestLoader, TextTestRunner, TestSuite
 # Unit tests
-from g2p.tests.test_transducer import TransducerTest
 from g2p.tests.test_correspondences import CorrespondenceTest
+from g2p.tests.test_indices import IndicesTest
+from g2p.tests.test_transducer import TransducerTest
 
 loader = TestLoader()
 
 dev_tests = [
     loader.loadTestsFromTestCase(test)
-    for test in [CorrespondenceTest, TransducerTest]
+    for test in [CorrespondenceTest, IndicesTest, TransducerTest]
 ]
 
 transducer_tests = [
     loader.loadTestsFromTestCase(test)
-    for test in [TransducerTest]
+    for test in [IndicesTest, TransducerTest]
 ]
 
 cors_tests = [

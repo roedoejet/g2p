@@ -24,13 +24,7 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_rev("a"), 'a')
     
     def test_lang_import(self):
-        self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnonnis')
-
-    def test_index(self):
-        self.assertTrue(isinstance(self.test_trans('a', True), tuple))
-        self.assertEqual(self.test_trans('a', True), ("b", [(1, 1)]))
-        self.assertEqual(self.test_trans_moh('kawennón:nis', True), ('kawẽnonnis', [(1, 1), (2, 2), (3, 3), (5, 5), (6, 6), (7, 7), (8, 8), (9, 8), (10, 9), (11, 10), (12, 11)]))
-
+        self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnonnis')
 
 if __name__ == "__main__":
     main()
