@@ -3,11 +3,32 @@ Class for performing transductions based on correspondences
 
 '''
 
-from typing import List, Pattern
+from typing import List, Pattern, Tuple
+from collections import Counter
 import random
 import re
 from g2p.cors import Correspondence
 
+class IOStates():
+    ''' Class containing input and output states along of a Transducer along with indices
+    ''' 
+    def __init__(self, indices: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
+        self.indices = indices
+        self._input_states = [io[0] for io in indices]
+        self._output_states = [io[1] for io in indices]
+        self._input_count = Counter(i[0] for i in self._output_states)
+        self._output_count = Counter(i[0] for i in self._output_states)
+        self.input_states = [io for io in self._input_states if self._input_count[io[0]] == 1]
+        self.output_states = [io for io in self._output_states if self._output_count[io[0]] == 1]
+
+    def __call__(self):
+        return self.indices
+
+    def down(self):
+        return ''.join([state[1] for state in self.output_states])
+        
+    def up(self):
+        return ''.join([state[1] for state in self.input_states])
 
 class Transducer():
     '''Class for performing transductions based on correspondences
@@ -68,13 +89,13 @@ class Transducer():
         return ruleRX
     
     def returnIndex(self, input_index: int, output_index: int, input_string: str, output: str):
-        # one-to-one
-        if len(input_string) == 1 and len(output) == 1:
+        # (n)one-to-(n)one
+        if len(input_string) <= 1 and len(output) <= 1:
             inp = (input_index, input_string)
             outp = (output_index, output)
             return [(inp, outp)]
-        # one-to-many
-        if len(input_string) == 1 and len(output) > 1:
+        # (n)one-to-many
+        if len(input_string) <= 1 and len(output) > 1:
             # breakpoint()
             new_index = []
             inp = (input_index, input_string)
@@ -82,8 +103,8 @@ class Transducer():
                 outp = (output_index + output.index(output_char), output_char)
                 new_index.append((inp, outp))
             return new_index
-        # many-to-one
-        if len(input_string) > 1 and len(output) == 1:
+        # many-to-(n)one
+        if len(input_string) > 1 and len(output) <= 1:
             new_index = []
             outp = (output_index, output)
             for input_char in input_string:
@@ -106,6 +127,8 @@ class Transducer():
                 for cor in self.cor_list:
                     # find all matches.
                     for match in cor['match_pattern'].finditer(parsed):
+                        # if cor['to'] == '' and input_index == 1:
+                        #     breakpoint()
                         match_index = match.start()
                         # if start index of match is equal to input index, then apply the rule and append the index-formatted tuple to the main indices list
                         if match_index == input_index:
@@ -121,12 +144,18 @@ class Transducer():
                             (input_index, to_parse[input_index]), # input
                             (output_index, to_parse[input_index])  # output
                             ))
-                    # parse the final output        
-                    parsed = re.sub(cor['match_pattern'], cor['to'], parsed)
                 # increase the index counters
                 if rule_applied:
-                    input_index += len(match.group())
-                    output_index += len(cor['to'])
+                    # parse the final output        
+                    parsed = re.sub(cor['match_pattern'], cor['to'], parsed)
+                    if len(match.group()) > 0:
+                        input_index += len(match.group())
+                    else:
+                        input_index += 1
+                    if len(cor['to']) > 0:
+                        output_index += len(cor['to'])
+                    else:
+                        output_index += 1
                 else:
                     input_index += 1
                     output_index += 1
@@ -151,7 +180,7 @@ class Transducer():
                 except KeyError:
                     pass
         if index:
-            if parsed != 'pest' and parsed != 'chest':
-                breakpoint()
-            return (parsed, indices)
+            # if parsed != 'pest' and parsed != 'chest':
+            #     breakpoint()
+            return (parsed, IOStates(indices))
         return parsed

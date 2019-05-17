@@ -32,9 +32,9 @@ class IndicesTest(TestCase):
         0 1 2
 
         [ ((0, 't'), (0, 't')),
-          ((1, 'e'), (-1, '')),
-          ((2, 's'), (1, 's')),
-          ((3, 't'), (2, 't')) ]
+          ((1, 'e'), (1, '')),
+          ((2, 's'), (2, 's')),
+          ((3, 't'), (3, 't')) ]
 
     Test Case #3
         # Allow for one-to-many
@@ -79,6 +79,19 @@ class IndicesTest(TestCase):
           ((2, 's'), (2, 's')),
           ((3, 't'), (3, 't')) ]
 
+     Test Case #6
+        # Allow metathesis
+         0 1 2 3
+         t e s t
+
+         t h i s
+         0 1 2 3
+
+        [ ((0, 't'), (0, 't')),
+          ((1, 'e'), (2, 'i')),
+          ((2, 's'), (1, 'h')),
+          ((3, 't'), (3, 's')) ]
+
     '''
 
     def setUp(self):
@@ -90,37 +103,47 @@ class IndicesTest(TestCase):
         self.test_cor_four = Correspondence([{'from': 'te', 'to': 'p'}])
         self.test_cor_five = Correspondence(
             [{'before': 't', 'after': '$', 'from': '', 'to': 'y'}])
+        self.test_cor_six = Correspondence(
+            [{"from": "e{1}s{2}t{3}", "to": "h{2}i{1}s{3}"}]
+        )
         self.trans_one = Transducer(self.test_cor_one)
         self.trans_two = Transducer(self.test_cor_two)
         self.trans_three = Transducer(self.test_cor_three)
         self.trans_four = Transducer(self.test_cor_four)
         self.trans_five = Transducer(self.test_cor_five)
+        self.trans_six = Transducer(self.test_cor_six)
 
     def test_case_one(self):
-        self.assertEqual(self.trans_one('test', True), ('pest', [((0, 't'), (0, 'p')),
-                                                                 ((1, 'e'),
-                                                                  (1, 'e')),
-                                                                 ((2, 's'),
-                                                                  (2, 's')),
-                                                                 ((3, 't'), (3, 't'))]))
+        transducer = self.trans_one('test', True)
+        self.assertEqual(transducer[0], 'pest')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
+                                           ((1, 'e'),
+                                            (1, 'e')),
+                                           ((2, 's'),
+                                            (2, 's')),
+                                           ((3, 't'), (3, 't'))])
 
-    # def test_case_two(self):
-    #     self.assertEqual(self.trans_two('test', True), ('tst', [((0, 't'), (0, 't')),
-    #                                                             ((1, 'e'),
-    #                                                              (-1, '')),
-    #                                                             ((2, 's'),
-    #                                                              (1, 's')),
-    #                                                             ((3, 't'), (2, 't'))]))
+    def test_case_two(self):
+        transducer = self.trans_two('test', True)
+        self.assertEqual(transducer[0], 'tst')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
+                                           ((1, 'e'),
+                                            (1, '')),
+                                           ((2, 's'),
+                                            (2, 's')),
+                                           ((3, 't'), (3, 't'))])
 
     def test_case_three(self):
-        self.assertEqual(self.trans_three('test', True), ('chest', [((0, 't'), (0, 'c')),
-                                                                    ((0, 't'),
-                                                                     (1, 'h')),
-                                                                    ((1, 'e'),
-                                                                     (2, 'e')),
-                                                                    ((2, 's'),
-                                                                     (3, 's')),
-                                                                    ((3, 't'), (4, 't'))]))
+        transducer = self.trans_three('test', True)
+        self.assertEqual(transducer[0], 'chest')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 'c')),
+                                           ((0, 't'),
+                                            (1, 'h')),
+                                           ((1, 'e'),
+                                            (2, 'e')),
+                                           ((2, 's'),
+                                            (3, 's')),
+                                           ((3, 't'), (4, 't'))])
 
     # def test_case_four(self):
     #     self.assertEqual(self.trans_four('test', True), ('pst', [((0, 't'), (0, 'p')),
@@ -129,6 +152,14 @@ class IndicesTest(TestCase):
     #                                                              ((2, 's'),
     #                                                               (1, 's')),
     #                                                              ((3, 't'), (2, 't'))]))
+
+    def test_case_six(self):
+        transducer = self.trans_six('test', True)
+        self.assertEqual(transducer[0], 'this')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
+                                           ((1, 'e'), (2, 'i')),
+                                           ((2, 's'), (1, 'h')),
+                                           ((3, 't'), (3, 's'))])
 
 
 if __name__ == "__main__":
