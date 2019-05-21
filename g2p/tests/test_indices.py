@@ -104,7 +104,7 @@ class IndicesTest(TestCase):
         self.test_cor_five = Correspondence(
             [{'before': 't', 'after': '$', 'from': '', 'to': 'y'}])
         self.test_cor_six = Correspondence(
-            [{"from": "e{1}s{2}t{3}", "to": "h{2}i{1}s{3}"}]
+            [{"from": "e{1}s{2}", "to": "s{2}e{1}"}]
         )
         self.trans_one = Transducer(self.test_cor_one)
         self.trans_two = Transducer(self.test_cor_two)
@@ -155,7 +155,7 @@ class IndicesTest(TestCase):
 
     def test_case_six(self):
         transducer = self.trans_six('test', True)
-        self.assertEqual(transducer[0], 'this')
+        self.assertEqual(transducer[0], 'tset')
         self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
                                            ((1, 'e'), (2, 'e')),
                                            ((2, 's'), (1, 's')),

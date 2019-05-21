@@ -45,6 +45,8 @@ class Transducer():
             cor['match_pattern'] = self.rule_to_regex(cor)
 
         self.cor_list = cors
+        self._index_match_pattern = re.compile('(?<={)\d+(?=})')
+        self._char_match_pattern = re.compile('\w+(?={\d+})')
 
     def __call__(self, to_parse: str, index: bool = False):
         return self.apply_rules(to_parse, index)
@@ -80,7 +82,7 @@ class Transducer():
             after = rule["after"]
         else:
             after = ''
-        fromMatch = rule["from"]
+        fromMatch = re.sub(re.compile('{\d+}'), "", rule["from"])
         try:
             ruleRX = re.compile(f"(?<={before})" + fromMatch + f"(?={after})")
         except:
@@ -113,7 +115,27 @@ class Transducer():
             return new_index
         # many-to-many
         if len(input_string) > 1 and len(output) > 1:
-            pass
+            # pattern for finding indices
+            index_pattern = self._index_match_pattern
+            # pattern for finding chars before indices
+            char_pattern = self._char_match_pattern
+            # for input, zip the matching indices, the actual indices relative to the string, and the chars together
+            input_chars = [x.group() for x in char_pattern.finditer(input_string)]
+            input_match_indices = [x.group() for x in index_pattern.finditer(input_string)]
+            zipped_input = zip(input_match_indices, input_chars)
+            inputs = sorted([(imi, input_index + input_match_indices.index(imi), ic) for imi, ic in zipped_input], key=lambda x: x[0])
+            # for output, zip the matching indices, the actual indices relative to the string, and the chars together
+            output_chars = [x.group() for x in char_pattern.finditer(output)]
+            output_match_indices = [x.group() for x in index_pattern.finditer(output)]
+            zipped_output = zip(output_match_indices, output_chars)
+            outputs = sorted([(omi, output_index + output_match_indices.index(omi), oc) for omi, oc in zipped_output], key=lambda x: x[0])
+            # zip i/o according to match index and remove match index
+            relations = []
+            for i in inputs:
+                index = inputs.index(i)
+                relation = (i[1:], outputs[index][1:])
+                relations.append(relation)
+            return relations
 
     def apply_rules(self, to_parse: str, index: bool = False):
         indices = []
@@ -122,18 +144,19 @@ class Transducer():
             input_index = 0
             output_index = 0
             for char in range(len(parsed)):
+                # account for many-to-many rules making the input index outpace the char-by-char parsing
+                if char < input_index:
+                    continue
                 rule_applied = False
                 # go through rules
                 for cor in self.cor_list:
                     # find all matches.
                     for match in cor['match_pattern'].finditer(parsed):
-                        # if cor['to'] == '' and input_index == 1:
-                        #     breakpoint()
                         match_index = match.start()
                         # if start index of match is equal to input index, then apply the rule and append the index-formatted tuple to the main indices list
                         if match_index == input_index:
                             rule_applied = True
-                            new_index = self.returnIndex(input_index, output_index, match.group(), cor['to'])
+                            new_index = self.returnIndex(input_index, output_index, cor['from'], cor['to'])
                             indices += new_index
                         # if you've gone past the input_index, you can safely break from the loop
                         elif match_index > input_index:
@@ -146,14 +169,15 @@ class Transducer():
                             ))
                 # increase the index counters
                 if rule_applied:
+                    output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
                     # parse the final output        
-                    parsed = re.sub(cor['match_pattern'], cor['to'], parsed)
+                    parsed = re.sub(cor['match_pattern'], output_sub, parsed)
                     if len(match.group()) > 0:
                         input_index += len(match.group())
                     else:
                         input_index += 1
-                    if len(cor['to']) > 0:
-                        output_index += len(cor['to'])
+                    if len(output_sub) > 0:
+                        output_index += len(output_sub)
                     else:
                         output_index += 1
                 else:
