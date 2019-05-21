@@ -84,7 +84,7 @@ class IndicesTest(TestCase):
          0 1 2 3
          t e s t
 
-         t h i s
+         t s e t
          0 1 2 3
 
         [ ((0, 't'), (0, 't')),
