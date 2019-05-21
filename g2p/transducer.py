@@ -98,7 +98,6 @@ class Transducer():
             return [(inp, outp)]
         # (n)one-to-many
         if len(input_string) <= 1 and len(output) > 1:
-            # breakpoint()
             new_index = []
             inp = (input_index, input_string)
             for output_char in output:
@@ -110,10 +109,10 @@ class Transducer():
             new_index = []
             outp = (output_index, output)
             for input_char in input_string:
-                inp = (input_index, input_char)
+                inp = (input_index + input_string.index(input_char), input_char)
                 new_index.append((inp, outp))
             return new_index
-        # many-to-many
+        # many-to-many - TODO: should allow for default many-to-many indexing if no explicit, curly-bracket indexing is provided
         if len(input_string) > 1 and len(output) > 1:
             # pattern for finding indices
             index_pattern = self._index_match_pattern
@@ -204,7 +203,5 @@ class Transducer():
                 except KeyError:
                     pass
         if index:
-            # if parsed != 'pest' and parsed != 'chest':
-            #     breakpoint()
             return (parsed, IOStates(indices))
         return parsed

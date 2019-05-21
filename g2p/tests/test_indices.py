@@ -145,13 +145,15 @@ class IndicesTest(TestCase):
                                             (3, 's')),
                                            ((3, 't'), (4, 't'))])
 
-    # def test_case_four(self):
-    #     self.assertEqual(self.trans_four('test', True), ('pst', [((0, 't'), (0, 'p')),
-    #                                                              ((1, 'e'),
-    #                                                               (0, 'p')),
-    #                                                              ((2, 's'),
-    #                                                               (1, 's')),
-    #                                                              ((3, 't'), (2, 't'))]))
+    def test_case_four(self):
+        transducer = self.trans_four('test', True)
+        self.assertEqual(transducer[0], 'pst')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
+                                         ((1, 'e'),
+                                          (0, 'p')),
+                                         ((2, 's'),
+                                          (1, 's')),
+                                         ((3, 't'), (2, 't'))])
 
     def test_case_six(self):
         transducer = self.trans_six('test', True)
