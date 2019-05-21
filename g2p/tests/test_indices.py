@@ -108,6 +108,13 @@ class IndicesTest(TestCase):
         )
         self.test_cor_combining = Correspondence(
             [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
+        self.test_cor_wacky = Correspondence(
+            [{"from": "\U0001f603\U0001f604{2}\U0001f600{1}\U0001f604{3}",
+                "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
+        )
+        self.test_cor_circum = Correspondence(
+            [{'from': 'a{1}c{2}', 'to': 'c{2}a{1}c{2}'}]
+        )
         self.trans_one = Transducer(self.test_cor_one)
         self.trans_two = Transducer(self.test_cor_two)
         self.trans_three = Transducer(self.test_cor_three)
@@ -115,6 +122,8 @@ class IndicesTest(TestCase):
         self.trans_five = Transducer(self.test_cor_five)
         self.trans_six = Transducer(self.test_cor_six)
         self.trans_combining = Transducer(self.test_cor_combining)
+        self.trans_wacky = Transducer(self.test_cor_wacky)
+        self.trans_circum = Transducer(self.test_cor_circum)
 
     def test_no_indices(self):
         transducer = self.trans_combining('k\u0313am')
@@ -129,6 +138,24 @@ class IndicesTest(TestCase):
                                            ((2, 'a'),
                                             (2, 'a')),
                                            ((3, 'm'), (3, 'm'))])
+
+    def test_wacky(self):
+        transducer = self.trans_wacky(
+            '\U0001f603\U0001f604\U0001f600\U0001f604', index=True)
+        self.assertEqual(
+            transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
+        self.assertEqual(transducer[1](), [
+            ((1, "\U0001f600"), (2, "\U0001f604")),
+            ((0, "\U0001f603\U0001f604"), (0, "\U0001f604\U0001f604\U0001f604")),
+            ((2, "\U0001f604"), (1, "\U0001f604"))
+        ])
+
+    def test_circum(self):
+        transducer = self.trans_circum('ac', index=True)
+        self.assertEqual(transducer[0], 'cac')
+        self.assertEqual(transducer[1](), [((0, 'a'), (1, 'a')),
+                                           ((1, 'c'), (0, 'c')),
+                                           ((1, 'c'), (2, 'c'))])
 
     def test_case_one(self):
         transducer = self.trans_one('test', True)
