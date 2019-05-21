@@ -88,9 +88,9 @@ class IndicesTest(TestCase):
          0 1 2 3
 
         [ ((0, 't'), (0, 't')),
-          ((1, 'e'), (2, 'i')),
-          ((2, 's'), (1, 'h')),
-          ((3, 't'), (3, 's')) ]
+          ((1, 'e'), (2, 'e')),
+          ((2, 's'), (1, 's')),
+          ((3, 't'), (3, 't')) ]
 
     '''
 
@@ -157,9 +157,9 @@ class IndicesTest(TestCase):
         transducer = self.trans_six('test', True)
         self.assertEqual(transducer[0], 'this')
         self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
-                                           ((1, 'e'), (2, 'i')),
-                                           ((2, 's'), (1, 'h')),
-                                           ((3, 't'), (3, 's'))])
+                                           ((1, 'e'), (2, 'e')),
+                                           ((2, 's'), (1, 's')),
+                                           ((3, 't'), (3, 't'))])
 
 
 if __name__ == "__main__":
