@@ -46,7 +46,7 @@ class Transducer():
 
         self.cor_list = cors
         self._index_match_pattern = re.compile('(?<={)\d+(?=})')
-        self._char_match_pattern = re.compile('\w+(?={\d+})')
+        self._char_match_pattern = re.compile('[^0-9\{\}]+(?={\d+})', re.U)
 
     def __call__(self, to_parse: str, index: bool = False):
         return self.apply_rules(to_parse, index)
@@ -114,18 +114,14 @@ class Transducer():
             return new_index
         # many-to-many - TODO: should allow for default many-to-many indexing if no explicit, curly-bracket indexing is provided
         if len(input_string) > 1 and len(output) > 1:
-            # pattern for finding indices
-            index_pattern = self._index_match_pattern
-            # pattern for finding chars before indices
-            char_pattern = self._char_match_pattern
             # for input, zip the matching indices, the actual indices relative to the string, and the chars together
-            input_chars = [x.group() for x in char_pattern.finditer(input_string)]
-            input_match_indices = [x.group() for x in index_pattern.finditer(input_string)]
+            input_chars = [x.group() for x in self._char_match_pattern.finditer(input_string)]
+            input_match_indices = [x.group() for x in self._index_match_pattern.finditer(input_string)]
             zipped_input = zip(input_match_indices, input_chars)
             inputs = sorted([(imi, input_index + input_match_indices.index(imi), ic) for imi, ic in zipped_input], key=lambda x: x[0])
             # for output, zip the matching indices, the actual indices relative to the string, and the chars together
-            output_chars = [x.group() for x in char_pattern.finditer(output)]
-            output_match_indices = [x.group() for x in index_pattern.finditer(output)]
+            output_chars = [x.group() for x in self._char_match_pattern.finditer(output)]
+            output_match_indices = [x.group() for x in self._index_match_pattern.finditer(output)]
             zipped_output = zip(output_match_indices, output_chars)
             outputs = sorted([(omi, output_index + output_match_indices.index(omi), oc) for omi, oc in zipped_output], key=lambda x: x[0])
             # zip i/o according to match index and remove match index
@@ -184,6 +180,7 @@ class Transducer():
                     output_index += 1
         else:
             for cor in self.cor_list:
+                output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
                 if re.search(cor["match_pattern"], parsed):
                     # if a temporary value was assigned
                     if 'temp' in list(cor.keys()):
@@ -191,13 +188,14 @@ class Transducer():
                         parsed = re.sub(cor["match_pattern"], cor["temp"], parsed)
                     else:
                         parsed = re.sub(
-                            cor["match_pattern"], cor["to"], parsed)
+                            cor["match_pattern"], output_sub, parsed)
             # transliterate temporary values
             for cor in self.cor_list:
+                output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
                 # transliterate temp value to final value if it exists, otherwise pass
                 try:
                     if "temp" in cor and cor['temp'] and re.search(cor['temp'], parsed):
-                        parsed = re.sub(cor['temp'], cor['to'], parsed)
+                        parsed = re.sub(cor['temp'], output_sub, parsed)
                     else:
                         pass
                 except KeyError:

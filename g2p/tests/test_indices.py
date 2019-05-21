@@ -106,12 +106,29 @@ class IndicesTest(TestCase):
         self.test_cor_six = Correspondence(
             [{"from": "e{1}s{2}", "to": "s{2}e{1}"}]
         )
+        self.test_cor_combining = Correspondence(
+            [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
         self.trans_one = Transducer(self.test_cor_one)
         self.trans_two = Transducer(self.test_cor_two)
         self.trans_three = Transducer(self.test_cor_three)
         self.trans_four = Transducer(self.test_cor_four)
         self.trans_five = Transducer(self.test_cor_five)
         self.trans_six = Transducer(self.test_cor_six)
+        self.trans_combining = Transducer(self.test_cor_combining)
+
+    def test_no_indices(self):
+        transducer = self.trans_combining('k\u0313am')
+        self.assertEqual(transducer, "'kam")
+
+    def test_combining(self):
+        transducer = self.trans_combining('k\u0313am', index=True)
+        self.assertEqual(transducer[0], "'kam")
+        self.assertEqual(transducer[1](), [((0, "k"), (1, 'k')),
+                                           ((1, '\u0313'),
+                                            (0, "'")),
+                                           ((2, 'a'),
+                                            (2, 'a')),
+                                           ((3, 'm'), (3, 'm'))])
 
     def test_case_one(self):
         transducer = self.trans_one('test', True)
@@ -149,11 +166,11 @@ class IndicesTest(TestCase):
         transducer = self.trans_four('test', True)
         self.assertEqual(transducer[0], 'pst')
         self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
-                                         ((1, 'e'),
-                                          (0, 'p')),
-                                         ((2, 's'),
-                                          (1, 's')),
-                                         ((3, 't'), (2, 't'))])
+                                           ((1, 'e'),
+                                            (0, 'p')),
+                                           ((2, 's'),
+                                            (1, 's')),
+                                           ((3, 't'), (2, 't'))])
 
     def test_case_six(self):
         transducer = self.trans_six('test', True)
