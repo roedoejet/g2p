@@ -1,0 +1,61 @@
+
+voiceless_stop{1},voiced_stop{1} preceding vowel and following vowel
+voiceless_stop{1}|ʦ{2},voiceless_stop{1}ʰ{3}|ʦ{2}ʰ{3} preceding $
+voiceless_stop{1}ˀ{2}|t{3}\u0361{4}ɬ{5}ˀ{2}|ʦ{6}ˀ{2},ʔ{2}voiceless_stop|ʔ{2}t{3}\u0361{4}ɬ{5}|ʔ{2}ʦ{6} preceding $
+voiceless_stop{1}ˀ{2},voiceless_stop{1}ʷ{3}ˀ{2} following ^
+voiceless_stop{1}ˀ{2},ʔvoiceless_stop{1}ʷ{2} preceding consonant
+voiceless_stop{1}ˀ{2},ʔ{2}voiceless_stop{1} preceding 'ɬ' or 's'
+t{1}x{2},t{1}ʰ{2}j{3} preceding $
+t{1}x{2}ʷ{3},t{1}ʰ{2}w{3} preceding $
+t{1}x{2}u{3},t{1}ʰ{2}u{3} preceding $
+p{1},p{1}ʰ{2} preceding 'h'
+t{1},t{1}ʰ{2} preceding 'h'
+t{1}s{2}s{3},ʦ{1}
+ʦ{1}s{2},ʦ{1}
+ɢ{1},ʁ{1}
+q{1},q{1}ʷ{2} following 'o' or 'oː' and preceding consonant
+χ{1},χ{1}ʷ{2} following 'o' or 'oː' and preceding consonant
+q{1},q{1}ʷ{2} following 'o' or 'oː' and preceding $
+χ{1},χ{1}ʷ{2} following 'o' or 'oː' and preceding $
+x{1},j{1} following vowel and preceding vowel
+χ{1},w{2} following vowel and preceding vowel
+x{1}ʷ{2},h{1} following vowel and preceding vowel
+n{1},ŋ{1} following vowel and preceding 'k'
+j{1}ˀ{2},ʔ{2}i{1} preceding consonant
+j{1}ˀ{2},ʔ{2}\u2071{1} preceding $
+i{1}j{2}ˀ{3},{1}{2}{3}
+resonant{1}ˀ{2}resonant{3},resonant{1}resonant{3}
+h{1},{1} following vowel and preceding vowel
+h{1},{1} following consonant
+h{1},{1} following consonant$^
+{1},ɛ{1} following 'iʔ' or 'iːʔ' and preceding $
+{1},ɛ{1} following 'iʔ' or 'iːʔ' and preceding consonant
+{1},e{1}|ɛ{1} following 'eʔ' or 'eːʔ' and preceding $
+{1},a{1} following 'aʔ' or 'aːʔ' and preceding $
+{1},o{1} following 'oʔ' or 'oːʔ' and preceding $
+{1},e{1}|ɛ{1} following 'eʔ' or 'eːʔ' and preceding consonant
+{1},a{1} following 'aʔ' or 'aːʔ' and preceding consonant
+{1},o{1} following 'oʔ' or 'oːʔ' and preceding consonant
+vowel{1}ː{2},vowel{1} preceding resonant$
+vowel{1}ː{2},vowel{1} consonant
+i{1},ɛ{1} preceding 'q' or 'ʔ' or 'χ' or 'qˀ' or 'h'
+u{1},ɔ{1} preceding 'q' or 'ʔ' or 'χ' or 'qˀ' or 'h'
+aː|ʌː,a|ʌ preceding resonant
+æ{1},a{1}|ʌ{1} following uvular and preceding uvular
+e{1},ɛ{1} preceding 'χ' or 'ʔ'
+e{1}ː{2},ɛ{1}ː{2} preceding 'm' or 'w'
+i{1}ː{2},e{1}ː{2} following 'q' or 'qˀ'
+voiceless_stop{1},voiced_stop{1} preceding vowel
+e{1}ː{2},ɪ{1}|ɨ{1} preceding 'n'
+ʔ{1}m{2},m{2}ˀ{1} following ^
+ʔ{1}n{2},n{2}ˀ{1} following ^
+ʔ{1}m{2},m{2}ˀ{1} following consonant
+w{1}ˀ{2},ʔ{2}w{1} following vowel and preceding vowel
+w{1}ˀ{2},ʔ{2}u{1}|ʔ{2}ʊ{1} preceding consonant
+w{1}ˀ{2},ʔ{2}ᵘ{1}|ʔ{2}ᶷ{1} preceding $
+j{1}ˀ{2},ʔ{2}j{1} following vowel and preceding vowel
+u{1}|ʊ{1},ʊ{1}\u031E{2} following 'ʔ' or 'h'
+o{1}ː{2},u{1}|ʊ{1} preceding 'n'
+o{1}ː{2},u{1}ː{2} preceding 'ʔq' or 'q'
+i{1},e{1} following 'q'
+i{1},e{1}|ɛ{1} preceding 'ʔ' or 'h'
