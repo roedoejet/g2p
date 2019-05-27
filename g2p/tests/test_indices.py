@@ -92,6 +92,32 @@ class IndicesTest(TestCase):
           ((2, 's'), (1, 's')),
           ((3, 't'), (3, 't')) ]
 
+    Test Case #7
+        # Allow order-sensitive operations
+        0 1 2 3
+        t e s t
+
+        t e s h t
+        0 1 2 3 4
+
+        t e s t
+        0 1 2 3
+
+        AS IS
+
+        [ ((0, 't'), (0, 't')),
+          ((1, 'e'), (1, 'e')),
+          ((2, 's'), (2, 's')),
+          ((3, 't'), (3, 't')) ]
+
+          or not
+
+        [ ((0, 't'), (0, 't')),
+          ((1, 'e'), (1, 'e')),
+          ((2, 's'), (2, 's')),
+          ((2, 's'), (3, 'h')),
+          ((3, 't'), (4, 't')) ]
+
     '''
 
     def setUp(self):
@@ -105,6 +131,9 @@ class IndicesTest(TestCase):
             [{'before': 't', 'after': '$', 'from': '', 'to': 'y'}])
         self.test_cor_six = Correspondence(
             [{"from": "e{1}s{2}", "to": "s{2}e{1}"}]
+        )
+        self.test_cor_seven = Correspondence(
+            [{"from": "s", "to": "sh"}, {"from": "sh", "to": "s"}]
         )
         self.test_cor_combining = Correspondence(
             [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
@@ -121,6 +150,8 @@ class IndicesTest(TestCase):
         self.trans_four = Transducer(self.test_cor_four)
         self.trans_five = Transducer(self.test_cor_five)
         self.trans_six = Transducer(self.test_cor_six)
+        self.trans_seven = Transducer(self.test_cor_seven)
+        self.trans_seven_as_is = Transducer(self.test_cor_seven, True)
         self.trans_combining = Transducer(self.test_cor_combining)
         self.trans_wacky = Transducer(self.test_cor_wacky)
         self.trans_circum = Transducer(self.test_cor_circum)
@@ -206,6 +237,21 @@ class IndicesTest(TestCase):
                                            ((1, 'e'), (2, 'e')),
                                            ((2, 's'), (1, 's')),
                                            ((3, 't'), (3, 't'))])
+
+    def test_case_seven(self):
+        transducer_as_is = self.trans_seven_as_is('test', True)
+        self.assertEqual(transducer_as_is[0], 'test')
+        self.assertEqual(transducer_as_is[1](), [((0, 't'), (0, 't')),
+                                                 ((1, 'e'), (1, 'e')),
+                                                 ((2, 's'), (2, 's')),
+                                                 ((3, 't'), (3, 't'))])
+        transducer = self.trans_seven('test', True)
+        self.assertEqual(transducer[0], 'tesht')
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
+                                           ((1, 'e'), (1, 'e')),
+                                           ((2, 's'), (2, 's')),
+                                           ((2, 's'), (3, 'h')),
+                                           ((3, 't'), (4, 't'))])
 
 
 if __name__ == "__main__":
