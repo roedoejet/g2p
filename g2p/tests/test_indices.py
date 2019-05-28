@@ -138,7 +138,7 @@ class IndicesTest(TestCase):
         self.test_cor_combining = Correspondence(
             [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
         self.test_cor_wacky = Correspondence(
-            [{"from": "\U0001f603\U0001f604{2}\U0001f600{1}\U0001f604{3}",
+            [{"from": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
                 "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
         self.test_cor_circum = Correspondence(
@@ -240,6 +240,7 @@ class IndicesTest(TestCase):
 
     def test_case_seven(self):
         transducer_as_is = self.trans_seven_as_is('test', True)
+        transducer_as_is[1]()
         self.assertEqual(transducer_as_is[0], 'test')
         self.assertEqual(transducer_as_is[1](), [((0, 't'), (0, 't')),
                                                  ((1, 'e'), (1, 'e')),

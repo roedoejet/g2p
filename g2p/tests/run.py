@@ -3,6 +3,7 @@ from unittest import TestLoader, TextTestRunner, TestSuite
 # Unit tests
 from g2p.tests.test_correspondences import CorrespondenceTest
 from g2p.tests.test_indices import IndicesTest
+from g2p.tests.test_langs import LangTest
 from g2p.tests.test_transducer import TransducerTest
 
 loader = TestLoader()
@@ -22,12 +23,18 @@ cors_tests = [
     for test in [CorrespondenceTest]
 ]
 
+langs_tests = [
+    loader.loadTestsFromTestCase(test) for test in [LangTest]
+]
+
 
 def run_tests(suite):
     if suite == 'all':
         suite = loader.discover(os.path.dirname(__file__))
     if suite == 'trans':
         suite = TestSuite(transducer_tests)
+    if suite == 'langs':
+        suite = TestSuite(langs_tests)
     if suite == 'cors':
         suite = TestSuite(cors_tests)
     elif suite == 'dev':

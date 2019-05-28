@@ -41,11 +41,9 @@ class Transducer():
 
     def __init__(self, cors: List[Correspondence], as_is: bool = False):
         if not as_is:
-            # process intermediate to prevent feeding
-            cors = self.process_intermediate(cors)
             # sort by reverse len
-            cors.sort(key=len, reverse=True)
-
+            cors = sorted(cors(), key=lambda x: len(x["from"]), reverse=True)
+    
         for cor in cors:
             cor['match_pattern'] = self.rule_to_regex(cor)
         self.as_is = as_is
@@ -55,28 +53,6 @@ class Transducer():
 
     def __call__(self, to_parse: str, index: bool = False):
         return self.apply_rules(to_parse, index)
-
-    def process_intermediate(self, cor_list):
-        # To prevent feeding
-        for cor in cor_list:
-            # if output exists as input for another cor
-            if cor['to'] in [temp_cor['from'] for temp_cor in cor_list]:
-                # assign a random, unique character as a temporary value. this could be more efficient
-                random_char = chr(random.randrange(9632, 9727))
-                # make sure character is unique
-                if [temp_char for temp_char in cor_list if 'temp' in list(temp_char.keys())]:
-                    while random_char in [temp_char['temp'] for temp_char in cor_list if 'temp' in list(temp_char.keys())]:
-                        random_char = chr(random.randrange(9632, 9727))
-                cor['temp'] = random_char
-
-        # preserve rule ordering with regex, then apply context free changes from largest to smallest
-        context_sensitive_rules = [x for x in cor_list if (
-            x['before'] != '' or x['after'] != "")]
-        context_free_rules = [
-            x for x in cor_list if x['before'] == "" and x["after"] == ""]
-        context_free_rules.sort(key=lambda x: len(x["from"]), reverse=True)
-        cor_list = context_sensitive_rules + context_free_rules
-        return cor_list
 
     def rule_to_regex(self, rule):
         if rule['before'] is not None:
@@ -95,27 +71,39 @@ class Transducer():
                 'Your regex is malformed. Escape all regular expression special characters in your conversion table.')
         return ruleRX
 
-    def returnIndex(self, input_index: int, output_index: int, input_string: str, output: str):
+    def returnIndex(self, input_index: int, output_index: int, input_string: str, output: str, original_str: str, intermediate_index: List[Tuple[Tuple[int, str]]]):
         # (n)one-to-(n)one
         if len(input_string) <= 1 and len(output) <= 1:
             inp = (input_index, input_string)
             outp = (output_index, output)
-            return [(inp, outp)]
+            if not original_str[inp[0]] == inp[1]:
+                return [(intermediate_index[0][0], outp)]
+            else:
+                return [(inp, outp)]
         # (n)one-to-many
         if len(input_string) <= 1 and len(output) > 1:
             new_index = []
             inp = (input_index, input_string)
+            if not original_str[inp[0]] == inp[1]:
+                inp = intermediate_index[0][0]
             for output_char in output:
                 outp = (output_index + output.index(output_char), output_char)
                 new_index.append((inp, outp))
+            # return [x for x in new_index if original_str[x[0][0]] == x[0][1]]
             return new_index
         # many-to-(n)one
         if len(input_string) > 1 and len(output) <= 1:
+            # breakpoint()
             new_index = []
             outp = (output_index, output)
-            for input_char in input_string:
-                inp = (input_index + input_string.index(input_char), input_char)
+            if not original_str[input_index:].startswith(input_string):
+                inp = intermediate_index[0][0]
                 new_index.append((inp, outp))
+            else:
+                for input_char in input_string:
+                    inp = (input_index + input_string.index(input_char), input_char)
+                    new_index.append((inp, outp))
+            # return [x for x in new_index if original_str[x[0][0]] == x[0][1]]
             return new_index
         # many-to-many - TODO: should allow for default many-to-many indexing if no explicit, curly-bracket indexing is provided
         if len(input_string) > 1 and len(output) > 1:
@@ -138,24 +126,35 @@ class Transducer():
                               for omi, oi, oc in zipped_output], key=lambda x: x[0])
             # zip i/o according to match index and remove match index
             relations = []
-            
             if len(inputs) >= len(outputs):
-                for i in inputs:
-                    index = inputs.index(i)
+                for inp in inputs:
+                    index = inputs.index(inp)
                     try:
-                        relation = (i[1:], outputs[index][1:])
+                        outp = outputs[index]
                     except IndexError:
-                        relation = (i[1:], outputs[len(outputs)-1][1:])
+                        outp = outputs[len(outputs)-1]
+                    if not original_str[inp[1]] == inp[2]:
+                        if not intermediate_index:
+                            breakpoint()
+                        inp = ('intermediate', intermediate_index[0][0][0], intermediate_index[0][0][1])
+                    relation = (inp[1:], outp[1:])
                     relations.append(relation)
             else:
-                for i in outputs:
-                    index = outputs.index(i)
+                for outp in outputs:
+                    index = outputs.index(outp)
                     try:
-                        relation = (inputs[index][1:], i[1:])
+                        inp = inputs[index][1:]
                     except IndexError:
-                        relation = (inputs[len(inputs)-1][1:], i[1:])
+                        inp = inputs[len(inputs)-1][1:]
+                    if not original_str[inp[0]] == inp[1]:
+                        inp = intermediate_index[0][0]
+                    relation = (inp, outp[1:])
                     relations.append(relation)
+            # return [x for x in relations if original_str[x[0][0]] == x[0][1]]
             return relations
+    
+    def get_index_length(self, new_index):
+        return (len(set([x[0] for x in new_index])), len(set([x[1] for x in new_index])))
 
     def apply_rules(self, to_parse: str, index: bool = False):
         indices = []
@@ -175,59 +174,48 @@ class Transducer():
                         match_index = match.start()
                         # if start index of match is equal to input index, then apply the rule and append the index-formatted tuple to the main indices list
                         if match_index == input_index:
-                            rule_applied = True
-                            new_index = self.returnIndex(
-                                input_index, output_index, cor['from'], cor['to'])
-                            indices += new_index
+                            output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
+                            # parse the final output
+                            parsed = re.sub(cor['match_pattern'], output_sub, parsed)
+                            if not rule_applied:
+                                new_index = []
+                            non_null_index = self.returnIndex(
+                                input_index, output_index, cor['from'], cor['to'], to_parse, new_index)
+                            if non_null_index:
+                                rule_applied = True
+                                new_index = non_null_index
+                            else:
+                                breakpoint()
                         # if you've gone past the input_index, you can safely break from the loop
                         elif match_index > input_index:
                             break
-                    # if a rule wasn't applied, just add on the input character as the next input and output character
-                    if not rule_applied:
-                        indices.append((
-                            (input_index, to_parse[input_index]),  # input
-                            (output_index, to_parse[input_index])  # output
-                        ))
+                
                 # increase the index counters
-                if rule_applied:
-                    output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
-                    # parse the final output
-                    parsed = re.sub(cor['match_pattern'], output_sub, parsed)
+                if rule_applied and len(new_index) > 0:
+                    indices += new_index
+                    index_lengths = self.get_index_length(new_index)
                     if len(match.group()) > 0:
-                        input_index += len(match.group())
+                        input_index += index_lengths[0]
                     else:
                         input_index += 1
                     if len(output_sub) > 0:
-                        output_index += len(output_sub)
+                        output_index += index_lengths[1]
                     else:
                         output_index += 1
                 else:
+                    # if a rule wasn't applied, just add on the input character as the next input and output character
+                    indices.append((
+                        (input_index, to_parse[input_index]),  # input
+                        (output_index, to_parse[input_index])  # output
+                    ))
                     input_index += 1
                     output_index += 1
         else:
             for cor in self.cor_list:
                 output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
                 if re.search(cor["match_pattern"], parsed):
-                    # if a temporary value was assigned
-                    if 'temp' in list(cor.keys()) and not self.as_is:
-                        # turn the original value into the temporary one
-                        parsed = re.sub(cor["match_pattern"],
-                                        cor["temp"], parsed)
-                    else:
-                        parsed = re.sub(
-                            cor["match_pattern"], output_sub, parsed)
-            # transliterate temporary values
-            if not self.as_is:
-                for cor in self.cor_list:
-                    output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
-                    # transliterate temp value to final value if it exists, otherwise pass
-                    try:
-                        if "temp" in cor and cor['temp'] and re.search(cor['temp'], parsed):
-                            parsed = re.sub(cor['temp'], output_sub, parsed)
-                        else:
-                            pass
-                    except KeyError:
-                        pass
+                    parsed = re.sub(
+                        cor["match_pattern"], output_sub, parsed)
         if index:
             return (parsed, IOStates(indices))
         return parsed
