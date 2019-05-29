@@ -172,7 +172,7 @@ class IndicesTest(TestCase):
 
     def test_wacky(self):
         transducer = self.trans_wacky(
-            '\U0001f603\U0001f604\U0001f600\U0001f604', index=True)
+            '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
         self.assertEqual(transducer[1](), [

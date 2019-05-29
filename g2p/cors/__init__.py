@@ -4,6 +4,7 @@ import unicodedata as ud
 from openpyxl import load_workbook
 from g2p import exceptions
 from g2p.cors.langs import LANGS
+from g2p.log import LOGGER
 
 
 class Correspondence():
@@ -50,19 +51,19 @@ class Correspondence():
     def __len__(self):
         return len(self.cor_list)
 
-    def __repr__(self):
-        return f"g2p.cors.Correspondence object containing unordered, parsed correspondences from {self.path}"
-
     def __call__(self):
         return self.cor_list
 
     def __iter__(self):
         return iter(self.cor_list)
     
-    def normalize(self, inp):
+    def normalize(self, inp: str):
         if self.norm_form not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
         else:
+            normalized = ud.normalize(self.norm_form, inp)
+            if normalized != inp:
+                LOGGER.info(f'The string {inp} was normalized to {normalized} using the {self.norm_form} standard')
             return ud.normalize(self.norm_form, inp)
 
     def reverse_cors(self, cor_list):
