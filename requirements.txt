@@ -1,2 +1,4 @@
 openpyxl
 coloredlogs
+Flask
+flask_socketio

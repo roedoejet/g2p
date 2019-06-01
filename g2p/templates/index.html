@@ -1,0 +1,78 @@
+<!DOCTYPE doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>G2P Studio</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
+    <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+
+</head>
+
+<body>
+    <div id="hot"></div>
+    <script>var dataObject = [
+            {
+                from: 'a',
+                to: 'b',
+                before: '',
+                after: ''
+            },
+            {
+                from: 'a',
+                to: 'b',
+                before: '',
+                after: ''
+            },
+        ];
+
+        var hotElement = document.querySelector('#hot');
+        var hotElementContainer = hotElement.parentNode;
+        var hotSettings = {
+            data: dataObject,
+            columns: [
+                {
+                    data: 'before',
+                    type: 'text'
+                },
+                {
+                    data: 'from',
+                    type: 'text'
+                },
+                {
+                    data: 'after',
+                    type: 'text'
+                },
+                {
+                    data: 'to',
+                    type: 'text'
+                },
+            ],
+            stretchH: 'all',
+            width: 880,
+            autoWrapRow: true,
+            height: 487,
+            maxRows: 22,
+            rowHeaders: true,
+            colHeaders: [
+                'Context Before',
+                'From',
+                'Context After',
+                'To'
+            ],
+            manualRowMove: true,
+            manualColumnMove: true,
+            exportFile: true,
+            licenseKey: 'non-commercial-and-evaluation'
+        };
+        var hot = new Handsontable(hotElement, hotSettings);
+    </script>
+    <textarea id='input'></textarea>
+    <textarea id='output'></textarea>
+</body>
+
+</html>
