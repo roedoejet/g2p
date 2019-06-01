@@ -15,6 +15,11 @@
 
 <body>
     <div id="hot"></div>
+    <div id="export-buttons" class="visible"><button id="export-csv"
+            class="btn size-medium bg-blue text-white shadow hover-moveup" style="margin-right: 5px;">Export to a .csv
+            file</button></div>
+    <textarea id='input'></textarea>
+    <textarea id='output'></textarea>
     <script>var dataObject = [
             {
                 from: 'a',
@@ -70,9 +75,9 @@
             licenseKey: 'non-commercial-and-evaluation'
         };
         var hot = new Handsontable(hotElement, hotSettings);
+        var hot = new Handsontable(hotElement, hotSettings);
+        document.getElementById("export-csv").addEventListener("click", function (event) { hot.getPlugin("exportFile").downloadFile("csv", { filename: "Cors CSV Export example" }); })
     </script>
-    <textarea id='input'></textarea>
-    <textarea id='output'></textarea>
 </body>
 
 </html>
