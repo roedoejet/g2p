@@ -9,8 +9,9 @@
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
     <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
 </head>
 
 <body>
@@ -60,7 +61,7 @@
             stretchH: 'all',
             width: 880,
             autoWrapRow: true,
-            height: 487,
+            height: 87,
             maxRows: 22,
             rowHeaders: true,
             colHeaders: [
@@ -75,9 +76,28 @@
             licenseKey: 'non-commercial-and-evaluation'
         };
         var hot = new Handsontable(hotElement, hotSettings);
-        var hot = new Handsontable(hotElement, hotSettings);
         document.getElementById("export-csv").addEventListener("click", function (event) { hot.getPlugin("exportFile").downloadFile("csv", { filename: "Cors CSV Export example" }); })
     </script>
+    <h1>Flask-SocketIO Test</h1>
+    <div id="log"></div>
+    <script>
+        $(document).ready(function () {
+            var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+            socket.on('conversion response', function (msg) {
+                $('#output').text(msg['output_string']);
+            });
+            socket.on('connection response', function (msg) {
+                $('#log').append('<p>' + msg.data + '</p>')
+            })
+            $('#input').on('keyup', function (event) {
+                socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData() } });
+                return false;
+            })
+            $('#hot').on('change', function (event) {
+                socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData() } });
+                return false;
+            })
+        });</script>
 </body>
 
 </html>
