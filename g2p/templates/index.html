@@ -6,97 +6,86 @@
     <meta charset="utf-8" />
     <title>G2P Studio</title>
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <link rel="stylesheet" type="text/css"
-        href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
-    <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
+    <!-- <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.full.min.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='handsontable.full.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='socket.io.slim.js') }}"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script> -->
 </head>
 
 <body>
-    <div id="hot"></div>
-    <div id="export-buttons" class="visible"><button id="export-csv"
-            class="btn size-medium bg-blue text-white shadow hover-moveup" style="margin-right: 5px;">Export to a .csv
-            file</button></div>
-    <textarea id='input'></textarea>
-    <textarea id='output'></textarea>
-    <script>var dataObject = [
-            {
-                from: 'a',
-                to: 'b',
-                before: '',
-                after: ''
-            },
-            {
-                from: 'a',
-                to: 'b',
-                before: '',
-                after: ''
-            },
-        ];
-        var hotElement = document.querySelector('#hot');
-        var hotElementContainer = hotElement.parentNode;
-        var hotSettings = {
-            data: dataObject,
-            columns: [
-                {
-                    data: 'before',
-                    type: 'text'
-                },
-                {
-                    data: 'from',
-                    type: 'text'
-                },
-                {
-                    data: 'after',
-                    type: 'text'
-                },
-                {
-                    data: 'to',
-                    type: 'text'
-                },
-            ],
-            stretchH: 'all',
-            width: 880,
-            autoWrapRow: true,
-            height: 87,
-            maxRows: 22,
-            rowHeaders: true,
-            colHeaders: [
-                'Context Before',
-                'From',
-                'Context After',
-                'To'
-            ],
-            manualRowMove: true,
-            manualColumnMove: true,
-            exportFile: true,
-            licenseKey: 'non-commercial-and-evaluation'
-        };
-        var hot = new Handsontable(hotElement, hotSettings);
-        document.getElementById("export-csv").addEventListener("click", function (event) { hot.getPlugin("exportFile").downloadFile("csv", { filename: "Cors CSV Export example" }); })
+    <div class="container">
+        <div class='row'>
+            <div class='columns twelve center-text'>
+                <h4 id='title'>Gⁱ-to-Pⁱ Studio
+                    <span id="log">(Disconnected)</span></h4>
+                <hr>
+                <p>Welcome to the G2P Studio. Here, you can try out new lookup tables and export them to csv for use
+                    with either <a href='//github.com/roedoejet/g2p'>g2p</a> or <a
+                        href='//github.com/roedoejet/convertextract'>convertextract</a>. If you write a lookup table
+                    that you want to add to the main g2p repo, please make a <a href='//github.com/roedoejet/g2p'>pull
+                        request</a>.</p>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='columns twelve'>
+                <div id="hot"></div>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='columns six'>
+                <h4>Languages</h4>
+                <select id="langselect">
+                    <option value="custom">Custom</option>
+                    {% for lang in langs.keys() %}
+                    {% for table in langs[lang].keys() %}
+                    <option value="{{ lang }}-{{ table }}">{{ lang }}-{{ table }}</option>
+                    {% endfor %}
+                    {% endfor %}
+                </select>
+
+            </div>
+            <div class='columns six'>
+                <form id='settings-form'>
+                    <fieldset>
+                        <legend>Settings</legend>
+                        <div>
+                            <input checked id='as_is' type='checkbox' name='setting' value='as_is'>
+                            <label for='as_is'>Leave order as is</label>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+
+        <div class='row'>
+            <div class='columns six center-text'>
+                <textarea id='input'></textarea>
+            </div>
+            <div class='columns six center-text'>
+                <textarea id='output'></textarea>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='columns twelve center-text'>
+                <div id="export-buttons" class="visible">
+                    <button id="export-csv">
+                        Export to csv</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='custom.js') }}">
     </script>
-    <h1>Flask-SocketIO Test</h1>
-    <div id="log"></div>
-    <script>
-        $(document).ready(function () {
-            var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-            socket.on('conversion response', function (msg) {
-                $('#output').text(msg['output_string']);
-            });
-            socket.on('connection response', function (msg) {
-                $('#log').append('<p>' + msg.data + '</p>')
-            })
-            $('#input').on('keyup', function (event) {
-                socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData() } });
-                return false;
-            })
-            $('#hot').on('change', function (event) {
-                socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData() } });
-                return false;
-            })
-        });</script>
 </body>
 
 </html>
