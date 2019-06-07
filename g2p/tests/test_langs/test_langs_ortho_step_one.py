@@ -15,10 +15,15 @@ class LangTest(TestCase):
                "tables": {
                    "Ortho_step_1": [
                        ('gwiila', '\u025fwiːlæ'),
-                       ("eji'i'n", "i\u02a3i\u0294i\u0294n")
+                       ("eji'i'n", "i\u02a3i\u0294i\u0294n"),
+                       ("li'lp'en", "lil\u0294p\u0294in"),
+                       ("hlik\u0332'sxw", "ɬiq\u0294sxw"),
+                       ("wets'utsetl'e", "wiʦ\u0294uʦit\u0361ɬ\u0294i"),
+                       ("x\u0332uu'w", "χuː\u0294w"),
+                       ("gyee'eg", "\u025fe\u02d0\u0294i\u025f")
                    ]}
                }
-               
+
         self.langs_to_test = [git]
 
     def test_io(self):
