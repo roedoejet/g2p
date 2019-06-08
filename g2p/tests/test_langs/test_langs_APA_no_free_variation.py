@@ -14,7 +14,7 @@ class LangTest(TestCase):
         git = {"name": "git",
                "tables": {
                    "APA_no_free_variation": [
-                       ("ekʰek\u0313qen", "\u0259kʰek\u2C0qen"),
+                       ("ekʰek\u0313qen", "\u0259kʰek\u02C0qen"),
                        ("ʔyeːʔqʰ", "ʔyeːʔqʰ"),
                        ("æʒiʔbiʔtʰ", "æʣiʔbiʔtʰ"),
                        ("weʔƛuce", "weʔt\u0361ɬuce"),
