@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+from flask_talisman import Talisman
 from g2p.cors import Correspondence
 from g2p.cors.langs import LANGS
 from g2p.transducer import Transducer
@@ -8,7 +9,7 @@ from g2p.transducer import Transducer
 VERSION = '0.0.1'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'test!'
+# app.config['SECRET_KEY'] = 'test!'
 socketio = SocketIO(app)
 DEFAULT_N = 10
 

@@ -91,4 +91,13 @@ $(document).ready(function () {
             socket.emit('table event', { lang: 'custom', table: 'custom' })
         }
     })
+
+    $('#animate').change(function () {
+        var selected = $("#animate")[0].checked
+        if (selected) {
+            $('#echart').css({ 'display': 'inherit' })
+        } else {
+            $('#echart').css({ 'display': 'none' })
+        }
+    })
 });

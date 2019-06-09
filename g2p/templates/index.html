@@ -6,20 +6,30 @@
     <meta charset="utf-8" />
     <title>G2P Studio</title>
     <meta content="width=device-width, initial-scale=1" name="viewport" />
-    <!-- <link rel="stylesheet" type="text/css"
-        href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css"> -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.full.min.css') }}">
-    <!-- <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css"> -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.main.css') }}">
+
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
+    <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.full.min.css') }}"> -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.main.css') }}"> -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='skeleton.css') }}">
+    <!-- <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"> -->
+
     <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
-    <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='handsontable.full.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='socket.io.slim.js') }}"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script> -->
+    
+    <!-- <script src="{{ url_for('static', filename='jquery.min.js') }}"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <!-- <script src="{{ url_for('static', filename='handsontable.full.min.js') }}"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
+
+    <!-- <script src="{{ url_for('static', filename='socket.io.slim.js') }}"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script>
 </head>
 
 <body>
@@ -32,15 +42,23 @@
                 <p>Welcome to the G2P Studio. Here, you can try out new lookup tables and export them to csv for use
                     with either <a href='//github.com/roedoejet/g2p'>g2p</a> or <a
                         href='//github.com/roedoejet/convertextract'>convertextract</a>. If you write a lookup table
-                    that you want to add to the main g2p repo, please make a <a href='//github.com/roedoejet/g2p'>pull
+                    that you want to add to the main g2p repo, please make a <a
+                        href='//github.com/roedoejet/g2p/pulls'>pull
                         request</a>.</p>
             </div>
         </div>
+
         <div class='row'>
-            <div class='columns twelve'>
-                <div id="hot"></div>
+            <div class='columns six center-text'>
+                <textarea id='input'></textarea>
+            </div>
+            <div class='columns six center-text'>
+                <textarea id='output'></textarea>
             </div>
         </div>
+        <!-- <div class='row'>
+            <div id="echart" style="width:100%; height:400px;"></div>
+        </div> -->
         <div class='row'>
             <div class='columns six'>
                 <h4>Languages</h4>
@@ -59,20 +77,20 @@
                     <fieldset>
                         <legend>Settings</legend>
                         <div>
-                            <input checked id='as_is' type='checkbox' name='setting' value='as_is'>
+                            <input checked id='as_is' type='checkbox' name='as_is' value='as_is'>
                             <label for='as_is'>Leave order as is</label>
                         </div>
+                        <!-- <div>
+                            <input checked id='animate' type='checkbox' name='animate' value='animate'>
+                            <label for='as_is'>Animate Indices</label>
+                        </div> -->
                     </fieldset>
                 </form>
             </div>
         </div>
-
         <div class='row'>
-            <div class='columns six center-text'>
-                <textarea id='input'></textarea>
-            </div>
-            <div class='columns six center-text'>
-                <textarea id='output'></textarea>
+            <div class='columns twelve'>
+                <div id="hot"></div>
             </div>
         </div>
         <div class='row'>
@@ -86,6 +104,8 @@
     </div>
     <script src="{{ url_for('static', filename='custom.js') }}">
     </script>
+
+    <!-- <script src="{{ url_for('static', filename='echart_custom.js') }}"></script> -->
 </body>
 
 </html>
