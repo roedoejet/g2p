@@ -1,4 +1,6 @@
 recursive-include g2p/cors/langs *
+include g2p/static/*.css
+include g2p/static/*.js
 include MANIFEST.in
 exclude .gitignore
 recursive-exclude * *.py[co]

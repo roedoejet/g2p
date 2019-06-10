@@ -1,0 +1,30 @@
+.center-text {
+    text-align: center;
+}
+
+label {
+    display: -webkit-inline-box;
+    font-weight: 300;
+}
+
+#input, #output {
+    width: 100%;
+    height: 25%;
+}
+
+#export-buttons {
+    margin-top: 10px;
+}
+
+#title {
+    margin-top: 10px;
+    margin-left: 5vw;
+}
+
+.ht_master .wtHolder {
+    overflow-x: hidden;
+}
+
+#settings-form {
+    margin-top: 40px;
+}

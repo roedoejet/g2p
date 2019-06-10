@@ -15,6 +15,7 @@ This library is for handling arbitrary transductions between input and output se
   - [Usage](#usage)
     - [Correspondence](#correspondence)
     - [Transducer](#transducer)
+  - [Studio](#studio)
   - [Maintainers](#maintainers)
   - [Contributing](#contributing)
     - [Contributors](#contributors)
@@ -76,6 +77,18 @@ transducer('a', index=True)
 ```
 
 To make sense of the `IOStates` object that is produced, you can either call it, and produce a list of each character. Doing that for the above produces `[((0, 'a'), (0, 'b'))]` - a list of relation tuples where each relation tuple is comprised of an input and output. Each input and output is in turn comprised of an index and a corresponding character. You can also call `up()` and `down()` to see the output and input respectively.
+
+## Studio
+
+You can also run the `G2P Studio` which is a web interface for creating custom lookup tables to be used with G2P. To run the `G2P Studio` either visit ***** or run it locally using `python run_studio.py`. 
+
+You can also import the app directly from the package:
+
+```python
+from g2p import app
+
+app.run(host='0.0.0.0', port=5000, debug=True)
+```
 
 
 ## Maintainers
