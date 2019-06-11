@@ -16,9 +16,15 @@ class LangTest(TestCase):
                    "Ortho_step_1": [
                     #  ('gwiila', '\u025fwiːlæ'), # gave ɟʷiːl�' instead - change rule ordering
                        ("eji'i'n", "i\u02a3i\u0294i\u0294n"),
+<<<<<<< HEAD
                     #    ("li'lp'en", "lil\u0294p\u0294in"), # gave lilʔpʔin instead - seems to be an issue with indices/metathesis
                        ("hlik\u0332'sxw", "ɬiq\u0294sx\u02b7"),
                     #   ("wets'utsetl'e", "wiʦ\u0294uʦit\u0361ɬ\u0294i"), # gave wi\u02a6\u0294u\u02a6itl\u0294i' instead - change rule ordering
+=======
+                       ("li'lp'en", "lil\u02C0p\u02C0in"), # gave lilʔpʔin instead - seems to be an issue with indices/metathesis
+                       ("hlik\u0332'sxw", "ɬiq\u02C0sx\u02B7"),
+                       ("wets'utsetl'e", "wiʦ\u0294uʦit\u0361ɬ\u0294i"),
+>>>>>>> 9d6378349205e51b2965bc79a6781150879ffcbf
                        ("x\u0332uu'w", "χuː\u0294w"),
                     #   ("gyee'eg", "\u025fe\u02d0\u0294i\u025f") # gave '\u025fji\u02d0\u0294i\u025f' instead
                    ],
