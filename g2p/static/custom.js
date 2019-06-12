@@ -2,16 +2,21 @@
 $(document).ready(function () {
     var size = 10;
     var dataObject = []
+    var varsObject = []
     for (var j = 0; j < size; j++) {
         dataObject.push({
             from: '',
             to: '',
             before: '',
             after: ''
-        })
+        });
+        if (j === 0) {
+            varsObject.push(['Vowels', 'a', 'e', 'i', 'o', 'u'])
+        }
+        varsObject.push(['', '', '', '', '', ''])
     };
     var hotElement = document.querySelector('#hot');
-    var hotElementContainer = hotElement.parentNode;
+    var hotVarElement = document.querySelector('#varhot');
     var hotSettings = {
         data: dataObject,
         columns: [
@@ -52,12 +57,35 @@ $(document).ready(function () {
         exportFile: true,
         licenseKey: 'non-commercial-and-evaluation'
     };
+    var hotVarSettings = {
+        data: varsObject,
+        stretchH: 'all',
+        // width: 880,
+        autoWrapRow: true,
+        height: 287,
+        maxRows: 22,
+        rowHeaders: true,
+        colHeaders: true,
+        afterRowMove: (rows, target) => {
+            convert()
+        },
+        manualRowMove: true,
+        manualColumnMove: false,
+        exportFile: true,
+        licenseKey: 'non-commercial-and-evaluation'
+    };
     var hot = new Handsontable(hotElement, hotSettings);
-    document.getElementById("export-csv").addEventListener("click", function (event) { hot.getPlugin("exportFile").downloadFile("csv", { filename: "Cors CSV Export example" }); })
+    var varhot = new Handsontable(hotVarElement, hotVarSettings);
+    document.getElementById("export-rules").addEventListener("click", function (event) {
+        hot.getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
+    })
+    document.getElementById("export-abbs").addEventListener("click", function (event) {
+        varhot.getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
+    })
 
     var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
     var convert = function () {
-        socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData() } });
+        socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData(), abbreviations: varhot.getData() } });
     }
     socket.on('conversion response', function (msg) {
         $('#output').text(msg['output_string']);
@@ -78,6 +106,18 @@ $(document).ready(function () {
     $('#hot').on('change', function (event) {
         convert()
         return false;
+    })
+    $('#hot-add').click(function (event) {
+        rows = hot.countRows()
+        hot.alter('insert_row', rows)
+    })
+    $('#varhot-add-col').click(function (event) {
+        cols = varhot.countCols()
+        varhot.alter('insert_col', cols)
+    })
+    $('#varhot-add-row').click(function (event) {
+        rows = varhot.countRows()
+        varhot.alter('insert_row', rows)
     })
 
     $('#langselect').change(function () {
