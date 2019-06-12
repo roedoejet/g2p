@@ -2,8 +2,11 @@ import csv
 import os
 import unicodedata as ud
 import re
-from typing import Dict, List, Union
+from typing import DefaultDict, List, Union
 from openpyxl import load_workbook
+from collections import defaultdict
+from itertools import chain
+from operator import methodcaller
 from g2p import exceptions
 from g2p.cors.langs import LANGS
 from g2p.cors.utils import flatten_abbreviations
@@ -11,18 +14,18 @@ from g2p.log import LOGGER
 
 
 class Correspondence():
-    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC", abbreviations: Union[str, List[Dict[str, str]]] = []):
+    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC", abbreviations: Union[str, DefaultDict[str, List[str]]] = []):
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.norm_form = norm_form
         self.path = language
         self.reverse = reverse
 
-        if isinstance(abbreviations, list):
+        if isinstance(abbreviations, defaultdict):
             self.abbreviations = abbreviations
         else:
             self.abbreviations = self.load_abbreviations_from_file(
                 abbreviations)
-
+                
         # Load workbook, either from correspondence spreadsheets, or user loaded
         this_dir = os.path.dirname(os.path.abspath(__file__))
         if not isinstance(language, type(None)):
@@ -58,19 +61,17 @@ class Correspondence():
             for cor in self.cor_list:
                 for k, v in cor.items():
                     cor[k] = self.normalize(v)
-            for abb in self.abbreviations:
-                abb['abbreviation'] = self.normalize(abb['abbreviation'])
-                abb['stands_for'] = [self.normalize(
-                    x) for x in abb['stands_for']]
 
-        for abb in self.abbreviations:
-            abb_match = re.compile(abb['abbreviation'])
-            abb_repl = '|'.join(abb['stands_for'])
+            self.abbreviations = {self.normalize(abb): [self.normalize(
+                x) for x in sf] for abb, sf in self.abbreviations.items()}
+
+        for abb, sf in self.abbreviations.items():
+            abb_match = re.compile(abb)
+            abb_repl = '|'.join(sf)
             for cor in self.cor_list:
                 for key in cor.keys():
                     if re.search(abb_match, cor[key]):
                         cor[key] = re.sub(abb_match, abb_repl, cor[key])
-        print(self.cor_list)
 
     def __len__(self):
         return len(self.cor_list)
@@ -101,6 +102,8 @@ class Correspondence():
 
         {'from': 'a', 'to': 'b', 'before': 'V', 'after': '' }
         {'abbreviation': 'V', 'stands_for': ['a','b','c']}
+        ->
+        {'from': 'a', 'to': 'b', 'before': 'a|b|c', 'after': ''}
         '''
         for abb in abbs:
             for cor in cors:
@@ -118,7 +121,6 @@ class Correspondence():
         else:
             raise exceptions.IncorrectFileType(
                 f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
-        # TODO: add += semantics
         return abbs
 
     def load_from_file(self, path):
