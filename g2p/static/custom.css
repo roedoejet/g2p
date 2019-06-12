@@ -12,8 +12,9 @@ label {
     height: 25%;
 }
 
-#export-buttons {
-    margin-top: 10px;
+.export-buttons {
+    display: inline;
+    margin: 1rem;
 }
 
 #title {

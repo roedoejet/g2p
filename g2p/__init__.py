@@ -4,6 +4,7 @@ from flask_talisman import Talisman
 from g2p.cors import Correspondence
 from g2p.cors.langs import LANGS
 from g2p.transducer import Transducer
+from g2p.cors.utils import flatten_abbreviations
 
 
 VERSION = '0.0.1'
@@ -38,8 +39,7 @@ def home():
 
 @socketio.on('conversion event', namespace='/test')
 def convert(message):
-    print(message)
-    cors = Correspondence(hotToCors(message['data']['cors']))
+    cors = Correspondence(hotToCors(message['data']['cors']), abbreviations=flatten_abbreviations(message['data']['abbreviations']))
     transducer = Transducer(cors)
     output_string = transducer(message['data']['input_string'])
     emit('conversion response', {'output_string': output_string})
@@ -47,7 +47,6 @@ def convert(message):
 
 @socketio.on('table event', namespace='/test')
 def change_table(message):
-    print(message)
     if message['lang'] == 'custom':
         cors = Correspondence(returnEmptyCors())
     else:

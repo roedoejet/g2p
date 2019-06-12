@@ -58,3 +58,9 @@ class MalformedLookup(CommandLineError):
             'the Correspondence class with a dictionary containing two keys: "lang" and "table". \n'
             'Please try again.'
         ))
+
+class IncorrectFileType(CommandLineError):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.render(self.msg)
