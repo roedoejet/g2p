@@ -111,9 +111,13 @@ $(document).ready(function () {
         rows = hot.countRows()
         hot.alter('insert_row', rows)
     })
-    $('#varhot-add').click(function (event) {
+    $('#varhot-add-col').click(function (event) {
         cols = varhot.countCols()
         varhot.alter('insert_col', cols)
+    })
+    $('#varhot-add-row').click(function (event) {
+        rows = varhot.countRows()
+        varhot.alter('insert_row', rows)
     })
 
     $('#langselect').change(function () {
