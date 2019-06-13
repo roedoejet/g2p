@@ -9,10 +9,21 @@
       abbreviations: Ortho_variables.csv
     - name: Rigsby APA (free variation)
       table: RAPA_free_variation.csv
+    - name: Rigsby APA (no free variation)
+      table: RAPA_no_free_variation.csv
+    - name: APA (free variation)
+      table: APA_free_variation.csv
+    - name: APA (no free variation)
+      table: APA_free_variation.csv
 - name: Heiltsuk
   code: hei
   tables:
     - name: Doulos
       table: doulos.csv
+- name: Mohawk
+  code: moh
+  tables:
+    - name: Orthography
+      table: orth.csv
 
   
