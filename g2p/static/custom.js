@@ -41,7 +41,7 @@ $(document).ready(function () {
         // width: 880,
         autoWrapRow: true,
         height: 287,
-        maxRows: 22,
+        maxRows: 100,
         rowHeaders: true,
         colHeaders: [
             'From',
@@ -63,7 +63,7 @@ $(document).ready(function () {
         // width: 880,
         autoWrapRow: true,
         height: 287,
-        maxRows: 22,
+        maxRows: 100,
         rowHeaders: true,
         colHeaders: true,
         afterRowMove: (rows, target) => {
