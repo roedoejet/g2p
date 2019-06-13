@@ -1,4 +1,3 @@
-
 voiceless_stop{1},voiced_stop{1} preceding vowel and following vowel
 voiceless_stop{1}|ʦ{2},voiceless_stop{1}ʰ{3}|ʦ{2}ʰ{3} preceding $
 voiceless_stop{1}ˀ{2}|t{3}\u0361{4}ɬ{5}ˀ{2}|ʦ{6}ˀ{2},ʔ{2}voiceless_stop|ʔ{2}t{3}\u0361{4}ɬ{5}|ʔ{2}ʦ{6} preceding $
