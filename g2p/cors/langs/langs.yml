@@ -7,6 +7,8 @@
     - name: Orthography (Step 2)
       table: Ortho_step_2.csv
       abbreviations: Ortho_variables.csv
+    - name: Rigsby APA (free variation)
+      table: RAPA_free_variation.csv
 - name: Heiltsuk
   code: hei
   tables:
