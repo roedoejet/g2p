@@ -20,9 +20,9 @@ class Correspondence():
         self.path = language
         self.reverse = reverse
 
-        if isinstance(abbreviations, defaultdict):
+        if isinstance(abbreviations, defaultdict) or not abbreviations:
             self.abbreviations = abbreviations
-        else:
+        elif abbreviations:
             self.abbreviations = self.load_abbreviations_from_file(
                 abbreviations)
                 
@@ -61,17 +61,17 @@ class Correspondence():
             for cor in self.cor_list:
                 for k, v in cor.items():
                     cor[k] = self.normalize(v)
-
-            self.abbreviations = {self.normalize(abb): [self.normalize(
-                x) for x in sf] for abb, sf in self.abbreviations.items()}
-
-        for abb, sf in self.abbreviations.items():
-            abb_match = re.compile(abb)
-            abb_repl = '|'.join(sf)
-            for cor in self.cor_list:
-                for key in cor.keys():
-                    if re.search(abb_match, cor[key]):
-                        cor[key] = re.sub(abb_match, abb_repl, cor[key])
+            if self.abbreviations:
+                self.abbreviations = {self.normalize(abb): [self.normalize(
+                    x) for x in sf] for abb, sf in self.abbreviations.items()}
+        if self.abbreviations:
+            for abb, sf in self.abbreviations.items():
+                abb_match = re.compile(abb)
+                abb_repl = '|'.join(sf)
+                for cor in self.cor_list:
+                    for key in cor.keys():
+                        if re.search(abb_match, cor[key]):
+                            cor[key] = re.sub(abb_match, abb_repl, cor[key])
 
     def __len__(self):
         return len(self.cor_list)
