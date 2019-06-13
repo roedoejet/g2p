@@ -9,8 +9,10 @@ from itertools import chain
 from operator import methodcaller
 from g2p import exceptions
 from g2p.cors.langs import LANGS
+from g2p.cors.langs import __file__ as LANGS_FILE
 from g2p.cors.utils import flatten_abbreviations
 from g2p.log import LOGGER
+
 
 
 class Correspondence():
@@ -19,7 +21,6 @@ class Correspondence():
         self.norm_form = norm_form
         self.path = language
         self.reverse = reverse
-
         if isinstance(abbreviations, defaultdict) or not abbreviations:
             self.abbreviations = abbreviations
         elif abbreviations:
@@ -48,8 +49,11 @@ class Correspondence():
                     raise exceptions.MalformedLookup()
                 else:
                     try:
-                        self.cor_list = self.load_from_file(
-                            LANGS[language['lang']][language['table']])
+                        lang = [lang for lang in LANGS if lang['name'] == language['lang'] or lang['code'] == language['lang']][0]
+                        table = [table for table in lang['tables'] if table['name'] == language['table']][0]
+                        self.cor_list = self.load_from_file(os.path.join(os.path.dirname(LANGS_FILE), lang['code'], table['table']))
+                        if "abbreviations" in table and table['abbreviations']:
+                            self.abbreviations = self.load_abbreviations_from_file(os.path.join(os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
                     except KeyError:
                         raise exceptions.CorrespondenceMissing(language)
             else:

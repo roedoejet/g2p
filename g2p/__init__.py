@@ -4,7 +4,7 @@ from flask_talisman import Talisman
 from g2p.cors import Correspondence
 from g2p.cors.langs import LANGS
 from g2p.transducer import Transducer
-from g2p.cors.utils import flatten_abbreviations
+from g2p.cors.utils import expand_abbreviations, flatten_abbreviations
 
 
 VERSION = '0.0.1'
@@ -51,7 +51,7 @@ def change_table(message):
         cors = Correspondence(returnEmptyCors())
     else:
         cors = Correspondence(language={'lang': message['lang'], 'table': message['table']})
-    emit('table response', {'cors': cors()})
+    emit('table response', {'cors': cors(), 'abbs': expand_abbreviations(cors.abbreviations)})
 
 
 @socketio.on('connect', namespace='/test')

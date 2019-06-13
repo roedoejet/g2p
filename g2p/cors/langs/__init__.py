@@ -1,9 +1,10 @@
 import os
+import yaml
 
-LANGS = {}
+# LANGS = {}
 
-for root, dirs, files in os.walk(os.path.dirname(__file__)):
-    for folder in dirs:
-        if folder != "__pycache__":
-            for subroot, subdirs, subfiles in os.walk(os.path.join(root, folder)):
-                LANGS[folder] = {os.path.splitext(f)[0]: os.path.join(subroot, f) for f in subfiles}
+with open(os.path.join(os.path.dirname(__file__), 'langs.yml'), encoding='utf-8') as f:
+    try:
+        LANGS = yaml.safe_load(f)
+    except yaml.YAMLError as exc:
+        print(exc)

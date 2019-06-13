@@ -64,9 +64,9 @@
                 <h4>Languages</h4>
                 <select id="langselect">
                     <option value="custom">Custom</option>
-                    {% for lang in langs.keys() %}
-                    {% for table in langs[lang].keys() %}
-                    <option value="{{ lang }}-{{ table }}">{{ lang }}-{{ table }}</option>
+                    {% for lang in langs %}
+                    {% for table in lang['tables'] %}
+                    <option value="{{ lang['name'] }}-{{ table['name'] }}">{{ lang['name'] }} - {{ table['name'] }}</option>
                     {% endfor %}
                     {% endfor %}
                 </select>

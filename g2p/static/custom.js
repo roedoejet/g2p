@@ -101,6 +101,7 @@ $(document).ready(function () {
     socket.on('table response', function (msg) {
         console.log(msg)
         hot.loadData(msg['cors'])
+        varhot.loadData(msg['abbs'])
         convert()
     })
     $('#input').on('keyup', function (event) {

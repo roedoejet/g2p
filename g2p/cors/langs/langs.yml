@@ -1,0 +1,16 @@
+- name: Gitksan
+  code: git
+  tables:
+    - name: Orthography (Step 1)
+      table: Ortho_step_1.csv
+      abbreviations: Ortho_variables.csv
+    - name: Orthography (Step 2)
+      table: Ortho_step_2.csv
+      abbreviations: Ortho_variables.csv
+- name: Heiltsuk
+  code: hei
+  tables:
+    - name: Doulos
+      table: doulos.csv
+
+  
