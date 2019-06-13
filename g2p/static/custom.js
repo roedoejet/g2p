@@ -54,6 +54,8 @@ $(document).ready(function () {
         },
         manualRowMove: true,
         manualColumnMove: false,
+        manualColumnResize: true,
+        manualRowResize: true,
         exportFile: true,
         licenseKey: 'non-commercial-and-evaluation'
     };
@@ -71,6 +73,8 @@ $(document).ready(function () {
         },
         manualRowMove: true,
         manualColumnMove: false,
+        manualColumnResize: true,
+        manualRowResize: true,
         exportFile: true,
         licenseKey: 'non-commercial-and-evaluation'
     };
