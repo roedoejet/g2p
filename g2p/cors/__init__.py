@@ -10,7 +10,7 @@ from operator import methodcaller
 from g2p import exceptions
 from g2p.cors.langs import LANGS
 from g2p.cors.langs import __file__ as LANGS_FILE
-from g2p.cors.utils import flatten_abbreviations
+from g2p.cors.utils import flatten_abbreviations, unicode_escape
 from g2p.log import LOGGER
 
 
@@ -87,14 +87,16 @@ class Correspondence():
         return iter(self.cor_list)
 
     def normalize(self, inp: str):
+        ''' Normalize to NFC(omposed) or NFD(ecomposed). Find any Unicode Escapes and decode them!
+        '''
         if self.norm_form not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
         else:
-            normalized = ud.normalize(self.norm_form, inp)
+            normalized = ud.normalize(self.norm_form, unicode_escape(inp))
             if normalized != inp:
                 LOGGER.info(
                     f'The string {inp} was normalized to {normalized} using the {self.norm_form} standard')
-            return ud.normalize(self.norm_form, inp)
+            return normalized
 
     def reverse_cors(self, cor_list):
         for cor in cor_list:

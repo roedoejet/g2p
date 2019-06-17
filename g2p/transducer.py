@@ -8,6 +8,7 @@ from collections import Counter
 import random
 import re
 from g2p.cors import Correspondence
+from g2p.cors.utils import create_fixed_width_lookbehind
 
 
 class IOStates():
@@ -38,7 +39,7 @@ class IOStates():
 class Transducer():
     ''' A class for performing transductions based on correspondences
 
-    
+
     Attributes
     ----------
 
@@ -58,10 +59,10 @@ class Transducer():
 
     Methods
     -------
-    
+
     rule_to_regex(rule: str) -> Pattern:
         Turns an input string (and the context) from an input/output pair into a regular expression pattern
-    
+
 
 
     '''
@@ -69,8 +70,9 @@ class Transducer():
     def __init__(self, cor_list: Correspondence, as_is: bool = False):
         if not as_is:
             # sort by reverse len
-            cor_list = sorted(cor_list(), key=lambda x: len(x["from"]), reverse=True)
-    
+            cor_list = sorted(cor_list(), key=lambda x: len(
+                x["from"]), reverse=True)
+
         # turn "from" in to Regex
         for cor in cor_list:
             cor['match_pattern'] = self.rule_to_regex(cor)
@@ -95,18 +97,18 @@ class Transducer():
             after = ''
         fromMatch = re.sub(re.compile('{\d+}'), "", rule["from"])
         try:
-            ruleRX = re.compile(f"(?<={before})" + fromMatch + f"(?={after})")
+            ruleRX = re.compile(create_fixed_width_lookbehind(before) + fromMatch + f"(?={after})")
         except:
             raise Exception(
-                'Your regex is malformed. Escape all regular expression special characters in your conversion table.')
+                'Your regex is malformed.')
         return ruleRX
 
     def returnIndex(self, input_index: int, output_index: int, input_string: str, output: str, original_str: str, intermediate_index: List[Tuple[Tuple[int, str]]]):
         """ Return a list of new index tuples.
-        
+
         @param input_index: int
             This is where the input is currently at in the parent loop
-        
+
         @param output_index: int
             This is where the output is currently at in the parent loop
 
@@ -122,7 +124,7 @@ class Transducer():
         @param intermediate_index: List[Tuple[Tuple[int, str]]]
             This is a list of any intermediate indices for the current input character in the parent loop
 
-        
+
         There are four main cases. Empty strings are still treated as having indices, which is why the cases
         are written as (n)one. This deals for index-preserving epenthesis and deletion.
 
@@ -132,7 +134,7 @@ class Transducer():
 
         (1) (n)one-to-(n)one
             Given input x and output y, produce an index tuple of (x,y)
-        
+
         (2) (n)one-to-many
             Given input x and outputs y, z, produce tuples (x, y) and (x, z)
 
@@ -205,7 +207,8 @@ class Transducer():
                     except IndexError:
                         outp = outputs[len(outputs)-1]
                     if not original_str[inp[1]:].startswith(inp[2]):
-                        inp = ('intermediate', intermediate_index[0][0][0], intermediate_index[0][0][1])
+                        inp = (
+                            'intermediate', intermediate_index[0][0][0], intermediate_index[0][0][1])
                     relation = (inp[1:], outp[1:])
                     relations.append(relation)
             else:
@@ -220,7 +223,7 @@ class Transducer():
                     relation = (inp, outp[1:])
                     relations.append(relation)
             return relations
-    
+
     def get_index_length(self, new_index: List[Tuple[Tuple[int, str]]]) -> Tuple[int, int]:
         """ Return how many unique input characters and output characters there are in a given index tuple. 
 
@@ -232,7 +235,7 @@ class Transducer():
 
         @param to_parse: str
             This is the string to convert
-        
+
         @param index: bool
             This is whether to preserve indices, default is False
 
@@ -255,8 +258,10 @@ class Transducer():
                         # if start index of match is equal to input index, then apply the rule and append the index-formatted tuple to the main indices list
                         if match_index == input_index:
                             # parse the final output
-                            output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
-                            parsed = re.sub(cor['match_pattern'], output_sub, parsed)
+                            output_sub = re.sub(
+                                re.compile('{\d+}'), '', cor['to'])
+                            parsed = re.sub(
+                                cor['match_pattern'], output_sub, parsed)
                             # if no rule has yet applied, the new index is empty
                             if not rule_applied:
                                 new_index = []
@@ -270,7 +275,7 @@ class Transducer():
                         # if you've gone past the input_index, you can safely break from the loop
                         elif match_index > input_index:
                             break
-                
+
                 # increase the index counters
                 # if the rule applied
                 if rule_applied and len(new_index) > 0:
