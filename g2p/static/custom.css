@@ -7,7 +7,8 @@ label {
     font-weight: 300;
 }
 
-#input, #output {
+#input,
+#output {
     width: 100%;
     height: 25%;
 }
@@ -26,6 +27,6 @@ label {
     overflow-x: hidden;
 }
 
-#settings-form {
+.mg-top {
     margin-top: 40px;
 }
