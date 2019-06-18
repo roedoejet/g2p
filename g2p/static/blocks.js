@@ -1,11 +1,15 @@
 
-function returnValueFromBlockInput(block, key) {
-    let val = Blockly.JavaScript.valueToCode(block, key, Blockly.JavaScript.ORDER_ATOMIC)
+function returnValueFromBlockInput(block, key, lang = 'js') {
+    let val;
+    if (lang === 'js') {
+        val = Blockly.JavaScript.valueToCode(block, key, Blockly.JavaScript.ORDER_ATOMIC)
+    } else if (lang === 'py') {
+        val = Blockly.Python.valueToCode(block, key, Blockly.Python.ORDER_ATOMIC)
+    }
     if (val) {
         return val
     } else {
         return "''"
-        // return ""
     }
 }
 
@@ -86,6 +90,11 @@ Blockly.JavaScript['abbreviations'] = function (block) {
     return [JSON.stringify(ABBS[value]), Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.Python['abbreviations'] = function (block) {
+    var value = block.getFieldValue('VALUE');
+    return [JSON.stringify(ABBS[value]), Blockly.JavaScript.ORDER_ATOMIC];
+};
+
 Blockly.JavaScript['create_rule'] = function (block) {
     code = 'let rule = {};\n';
     let from = returnValueFromBlockInput(block, "FROM")
@@ -107,4 +116,16 @@ Blockly.JavaScript['create_rule'] = function (block) {
     return code;
 }
 
-document.querySelector('#update-abbs').addEventListener('click', setAbbreviations);
+Blockly.Python['create_rule'] = function (block) {
+    code = 'rule = {}\n';
+    let from = returnValueFromBlockInput(block, "FROM", lang = 'py')
+    code += "rule['from'] = " + from + "\n"
+    let to = returnValueFromBlockInput(block, "TO", lang = 'py')
+    code += "rule['to'] = " + to + "\n"
+    let before = returnValueFromBlockInput(block, "BEFORE", lang = 'py')
+    code += "rule['before'] = " + before + "\n"
+    let after = returnValueFromBlockInput(block, "AFTER", lang = 'py')
+    code += "rule['after'] = " + after + "\n"
+    code += 'print(rule)\n'
+    return code;
+}

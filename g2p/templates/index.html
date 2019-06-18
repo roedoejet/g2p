@@ -82,6 +82,8 @@
                 <h4>Rule Creator</h4>
                 <button id='clear'>Clear</button>
                 <button id='add'>Add to Rules</button>
+                <button id='exportJS'>Export JavaScript</button>
+                <button id='exportPY'>Export Python</button>
                 <div id="blockly-container" class="blockly-editor">
                     <div id="blockly-div" style="height: 480px; width: 100%;"></div>
                     <xml id="toolbox" style="display: none">
@@ -148,6 +150,7 @@
 <script src="{{ url_for('static', filename='blocks_compressed.js') }}"></script>
 <script src="{{ url_for('static', filename='en.js') }}"></script>
 <script src="{{ url_for('static', filename='javascript_compressed.js') }}"></script>
+<script src="{{ url_for('static', filename='python_compressed.js') }}"></script>
 
 <script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
 
