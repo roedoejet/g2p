@@ -15,6 +15,8 @@
       table: APA_free_variation.csv
     - name: APA (no free variation)
       table: APA_free_variation.csv
+    - name: Unicode Normalization
+      table: norm.csv
 - name: Heiltsuk
   code: hei
   tables:
