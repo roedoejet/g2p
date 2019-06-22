@@ -10,7 +10,7 @@ class TransducerTest(TestCase):
     def setUp(self):
         self.test_cor = Correspondence([{'from': 'a', "to": 'b'}])
         self.test_cor_rev = Correspondence([{"from": 'a', "to": 'b'}], True)
-        self.test_cor_moh = Correspondence(language={"lang": "moh", "table": "orth"})
+        self.test_cor_moh = Correspondence(language={"lang": "moh", "table": "Orthography"})
         self.test_cor_ordered_feed = Correspondence([{"from": "a", "to": "b"}, {"from": "b", "to": "c"}])
         self.test_cor_ordered_counter_feed = Correspondence([{"from": "b", "to": "c"}, {"from": "a", "to": "b"}])
         self.test_trans = Transducer(self.test_cor)

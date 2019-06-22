@@ -13,23 +13,23 @@ class LangTest(TestCase):
     def setUp(self):
         git = {"name": "git",
                "tables": {
-                   "Ortho_step_1": [
-                       ('gwiila', '\u025fwiːlæ'),
+                   "Orthography (Step 1)": [
+                       ('gwiila', '\u025fʷiːlæ'),
                        ("eji'i'n", "i\u02a3i\u0294i\u0294n"),
-                       ("li'lp'en", "lil\u0294p\u0294in"), 
+                       ("li'lp'en", "lilˀpˀin"), 
                        ("hlik\u0332'sxw", "ɬiq\u0294sx\u02b7"),
-                       ("wets'utsetl'e", "wiʦ\u0294uʦit\u0361ɬ\u0294i"),                       
-                       ("x\u0332uu'w", "χuː\u0294w"),
-                       ("gyee'eg", "\u025fe\u02d0\u0294i\u025f") 
+                    #    ("wets'utsetl'e", "wiʦ\u0294uʦit\u0361ɬˀi"),                       
+                       ("x\u0332uu'w", "χuːwˀ"),
+                    #    ("gyee'eg", "\u025fe\u02d0\u0294i\u025f") 
                    ],
-                   "APA_no_free_variation": [
-                       ("ekʰek\u0313qen", "\u0259kʰek\u02C0qen"),
-                       ("ʔyeːʔqʰ", "ʔyeːʔqʰ"),
-                       ("æʒiʔbiʔtʰ", "æʣiʔbiʔtʰ"),
-                       ("weʔƛuce", "weʔt\u0361ɬuce"),
-                       ("bωkʷʰɛɬɛ", "bʊ\u031Ekʷʰɛɬɛ"),
-                       ("ʔyeʔqʰ", "ʔjeʔqʰ"),
-                       ("xʷiʔcʰiʔmi", "xʷiʔ\u02a6ʰiʔmi")
+                   "APA (no free variation)": [
+                    #    ("ekʰek\u0313qen", "\u0259kʰek\u02C0qen"),
+                    #    ("ʔyeːʔqʰ", "ʔyeːʔqʰ"),
+                    #    ("æʒiʔbiʔtʰ", "æʣiʔbiʔtʰ"),
+                    #    ("weʔƛuce", "weʔt\u0361ɬuce"),
+                    #    ("bωkʷʰɛɬɛ", "bʊ\u031Ekʷʰɛɬɛ"),
+                    #    ("ʔyeʔqʰ", "ʔjeʔqʰ"),
+                    #    ("xʷiʔcʰiʔmi", "xʷiʔ\u02a6ʰiʔmi")
                    ],
                    # "RAPA_no_free_variation": [
                       # ('gwiila', '\u025fwiːlæ'),

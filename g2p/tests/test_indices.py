@@ -176,9 +176,9 @@ class IndicesTest(TestCase):
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
         self.assertEqual(transducer[1](), [
-            ((1, "\U0001f600"), (2, "\U0001f604")),
-            ((0, "\U0001f603\U0001f604"), (0, "\U0001f604\U0001f604\U0001f604")),
-            ((2, "\U0001f604"), (1, "\U0001f604")) # AssertionError: Lists differ #
+            ((0, "\U0001f600"), (2, "\U0001f604")),
+            ((1, "\U0001f603\U0001f604"), (0, "\U0001f604\U0001f604\U0001f604")),
+            ((2, "\U0001f604"), (1, "\U0001f604")) # AssertionError: Lists differ # Giving extra ((3, '😄'), (3, '😄'))
         ])
 
     def test_circum(self):
