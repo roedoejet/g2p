@@ -97,7 +97,8 @@ class Transducer():
             after = ''
         fromMatch = re.sub(re.compile('{\d+}'), "", rule["from"])
         try:
-            ruleRX = re.compile(create_fixed_width_lookbehind(before) + fromMatch + f"(?={after})")
+            ruleRX = re.compile(create_fixed_width_lookbehind(
+                before) + fromMatch + f"(?={after})")
         except:
             raise Exception(
                 'Your regex is malformed.')
@@ -228,7 +229,11 @@ class Transducer():
         """ Return how many unique input characters and output characters there are in a given index tuple. 
 
         """
-        return (len(set([x[0] for x in new_index])), len(set([x[1] for x in new_index])))
+        # Use set to remove duplicate inputs/outputs (ie for many-to-one)
+        input_indices = set([x[0] for x in new_index])
+        output_indices = set([x[1] for x in new_index])
+        # Sum the length of the inputs/outputs
+        return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
     def apply_rules(self, to_parse: str, index: bool = False) -> Union[str, Tuple[str, IOStates]]:
         """ Apply all the rules in self.cor_list sequentially. 
@@ -242,6 +247,7 @@ class Transducer():
         """
         indices = []
         parsed = to_parse
+
         if index:
             input_index = 0
             output_index = 0
@@ -275,7 +281,6 @@ class Transducer():
                         # if you've gone past the input_index, you can safely break from the loop
                         elif match_index > input_index:
                             break
-
                 # increase the index counters
                 # if the rule applied
                 if rule_applied and len(new_index) > 0:

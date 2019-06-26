@@ -87,7 +87,7 @@ class Correspondence():
         return iter(self.cor_list)
 
     def normalize(self, inp: str):
-        ''' Normalize to NFC(omposed) or NFD(ecomposed). Find any Unicode Escapes and decode them!
+        ''' Normalize to NFC(omposed) or NFD(ecomposed). Also, find any Unicode Escapes and decode them!
         '''
         if self.norm_form not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
@@ -99,6 +99,8 @@ class Correspondence():
             return normalized
 
     def reverse_cors(self, cor_list):
+        ''' Reverse the table
+        '''
         for cor in cor_list:
             cor['from'], cor['to'] = cor['to'], cor['from']
         return cor_list
@@ -119,6 +121,8 @@ class Correspondence():
         return cors
 
     def load_abbreviations_from_file(self, path):
+        ''' Helper method to load abbreviations from file.
+        '''
         if path.endswith('csv'):
             abbs = []
             with open(path, encoding='utf8') as f:
@@ -130,12 +134,16 @@ class Correspondence():
         return abbs
 
     def load_from_file(self, path):
+        ''' Helper method to load table from file.
+        '''
         if path.endswith('csv'):
             return self.load_from_csv(path)
         elif path.endswith('xlsx'):
             return self.load_from_workbook(path)
 
     def load_from_csv(self, language):
+        ''' Parse table from csv
+        '''
         ws = []
         with open(language, encoding='utf8') as f:
             reader = csv.reader(f)
@@ -168,6 +176,8 @@ class Correspondence():
         return cor_list
 
     def load_from_workbook(self, language):
+        ''' Parse table from Excel workbook
+        '''
         wb = load_workbook(language)
         ws = wb.active
         # Create wordlist

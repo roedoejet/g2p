@@ -40,6 +40,8 @@ def create_fixed_width_lookbehind(pattern):
     return re.sub(re.compile("""(?<=\(?)[\p{L}\p{M}|]+(?=\)?)""", re.U), pattern_to_fixed_width_lookbehinds, pattern)
 
 def pattern_to_fixed_width_lookbehinds(match):
+    ''' Python must have fixed-width lookbehinds.
+    '''
     pattern = match.group()
     pattern = sorted(pattern.split('|'), key=len, reverse=True)
     current_len = len(pattern[0])
