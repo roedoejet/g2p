@@ -5,7 +5,6 @@ Class for performing transductions based on correspondences
 
 from typing import List, Pattern, Tuple, Union
 from collections import Counter
-import random
 import re
 from g2p.cors import Correspondence
 from g2p.cors.utils import create_fixed_width_lookbehind
@@ -30,9 +29,13 @@ class IOStates():
         return self.indices
 
     def down(self):
+        """ Return the output of a given transduction
+        """
         return ''.join([state[1] for state in self.output_states])
 
     def up(self):
+        """ Return the input of a given transduction
+        """
         return ''.join([state[1] for state in self.input_states])
 
 
@@ -61,7 +64,8 @@ class Transducer():
     -------
 
     rule_to_regex(rule: str) -> Pattern:
-        Turns an input string (and the context) from an input/output pair into a regular expression pattern
+        Turns an input string (and the context) from an input/output pair
+        into a regular expression pattern
 
 
 
@@ -79,14 +83,15 @@ class Transducer():
 
         self.as_is = as_is
         self.cor_list = cor_list
-        self._index_match_pattern = re.compile('(?<={)\d+(?=})')
-        self._char_match_pattern = re.compile('[^0-9\{\}]+(?={\d+})', re.U)
+        self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
+        self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
     def __call__(self, to_parse: str, index: bool = False):
         return self.apply_rules(to_parse, index)
 
     def rule_to_regex(self, rule: str) -> Pattern:
-        """Turns an input string (and the context) from an input/output pair into a regular expression pattern"""
+        """Turns an input string (and the context) from an input/output pair
+        into a regular expression pattern"""
         if rule['before'] is not None:
             before = rule["before"]
         else:
@@ -95,16 +100,18 @@ class Transducer():
             after = rule["after"]
         else:
             after = ''
-        fromMatch = re.sub(re.compile('{\d+}'), "", rule["from"])
+        from_match = re.sub(re.compile(r'{\d+}'), "", rule["from"])
         try:
-            ruleRX = re.compile(create_fixed_width_lookbehind(
-                before) + fromMatch + f"(?={after})")
+            rule_regex = re.compile(create_fixed_width_lookbehind(
+                before) + from_match + f"(?={after})")
         except:
             raise Exception(
                 'Your regex is malformed.')
-        return ruleRX
+        return rule_regex
 
-    def returnIndex(self, input_index: int, output_index: int, input_string: str, output: str, original_str: str, intermediate_index: List[Tuple[Tuple[int, str]]]):
+    def return_index(self, input_index: int, output_index: int,
+                     input_string: str, output: str, original_str: str,
+                     intermediate_index: List[Tuple[Tuple[int, str]]]):
         """ Return a list of new index tuples.
 
         @param input_index: int
@@ -123,15 +130,17 @@ class Transducer():
             This is the original input
 
         @param intermediate_index: List[Tuple[Tuple[int, str]]]
-            This is a list of any intermediate indices for the current input character in the parent loop
+            This is a list of any intermediate indices for the current
+            input character in the parent loop
 
 
-        There are four main cases. Empty strings are still treated as having indices, which is why the cases
-        are written as (n)one. This deals for index-preserving epenthesis and deletion.
+        There are four main cases. Empty strings are still treated as having indices,
+        which is why the cases are written as (n)one.
+        This deals for index-preserving epenthesis and deletion.
 
         An "index tuple" is a tuple containing an input tuple and an output tuple. (input, output)
-        Input/Output tuples contain their index as the first item and the character as the second, ie (0, 'x')
-        "x" -> "y" would therefore be ((0, "x"), (0, "y"))
+        Input/Output tuples contain their index as the first item and the character as the second,
+        ie (0, 'x') "x" -> "y" would therefore be ((0, "x"), (0, "y"))
 
         (1) (n)one-to-(n)one
             Given input x and output y, produce an index tuple of (x,y)
@@ -144,7 +153,7 @@ class Transducer():
 
         (4) many-to-many
             Given inputs w{1} and x{2} and outputs y{2}, z{1},
-            produce tuples (w, z) and (x, y). 
+            produce tuples (w, z) and (x, y).
 
          """
         # (n)one-to-(n)one
@@ -179,9 +188,12 @@ class Transducer():
                     new_index.append((inp, outp))
             # return [x for x in new_index if original_str[x[0][0]] == x[0][1]]
             return new_index
-        # many-to-many - TODO: should allow for default many-to-many indexing if no explicit, curly-bracket indexing is provided
+        # many-to-many -
+        # TODO: should allow for default many-to-many indexing if no explicit,
+        # curly-bracket indexing is provided
         if len(input_string) > 1 and len(output) > 1:
-            # for input, zip the matching indices, the actual indices relative to the string, and the chars together
+            # for input, zip the matching indices, the actual indices relative to the string,
+            # and the chars together
             input_chars = [x.group()
                            for x in self._char_match_pattern.finditer(input_string)]
             input_match_indices = [
@@ -189,7 +201,8 @@ class Transducer():
             zipped_input = zip(input_match_indices, input_chars)
             inputs = sorted([(imi, input_index + input_match_indices.index(imi), ic)
                              for imi, ic in zipped_input], key=lambda x: x[0])
-            # for output, zip the matching indices, the actual indices relative to the string, and the chars together
+            # for output, zip the matching indices, the actual indices relative to the string,
+            # and the chars together
             output_chars = [x.group()
                             for x in self._char_match_pattern.finditer(output)]
             output_match_indices = [
@@ -208,8 +221,8 @@ class Transducer():
                     except IndexError:
                         outp = outputs[len(outputs)-1]
                     if not original_str[inp[1]:].startswith(inp[2]):
-                        inp = (
-                            'intermediate', intermediate_index[0][0][0], intermediate_index[0][0][1])
+                        inp = ('intermediate', intermediate_index[0][0][0],
+                               intermediate_index[0][0][1])
                     relation = (inp[1:], outp[1:])
                     relations.append(relation)
             else:
@@ -226,8 +239,8 @@ class Transducer():
             return relations
 
     def get_index_length(self, new_index: List[Tuple[Tuple[int, str]]]) -> Tuple[int, int]:
-        """ Return how many unique input characters and output characters there are in a given index tuple. 
-
+        """ Return how many unique input characters and output characters
+            there are in a given index tuple.
         """
         # Use set to remove duplicate inputs/outputs (ie for many-to-one)
         input_indices = set([x[0] for x in new_index])
@@ -236,7 +249,7 @@ class Transducer():
         return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
     def apply_rules(self, to_parse: str, index: bool = False) -> Union[str, Tuple[str, IOStates]]:
-        """ Apply all the rules in self.cor_list sequentially. 
+        """ Apply all the rules in self.cor_list sequentially.
 
         @param to_parse: str
             This is the string to convert
@@ -252,7 +265,8 @@ class Transducer():
             input_index = 0
             output_index = 0
             for char in range(len(parsed)):
-                # account for many-to-many rules making the input index outpace the char-by-char parsing
+                # account for many-to-many rules making the input index
+                # outpace the char-by-char parsing
                 if char < input_index:
                     continue
                 rule_applied = False
@@ -261,20 +275,24 @@ class Transducer():
                     # find all matches.
                     for match in cor['match_pattern'].finditer(parsed):
                         match_index = match.start()
-                        # if start index of match is equal to input index, then apply the rule and append the index-formatted tuple to the main indices list
+                        # if start index of match is equal to input index,
+                        # then apply the rule and append the index-formatted tuple
+                        # to the main indices list
                         if match_index == input_index:
                             # parse the final output
                             output_sub = re.sub(
-                                re.compile('{\d+}'), '', cor['to'])
+                                re.compile(r'{\d+}'), '', cor['to'])
                             parsed = re.sub(
                                 cor['match_pattern'], output_sub, parsed)
                             # if no rule has yet applied, the new index is empty
                             if not rule_applied:
                                 new_index = []
                             # get the new index tuple
-                            non_null_index = self.returnIndex(
-                                input_index, output_index, cor['from'], cor['to'], to_parse, new_index)
-                            # if it's not empty, then a rule has applied and it can overwrite the previous intermediate index tuple
+                            non_null_index = self.return_index(
+                                input_index, output_index, cor['from'], cor['to'],
+                                to_parse, new_index)
+                            # if it's not empty, then a rule has applied and it can overwrite
+                            # the previous intermediate index tuple
                             if non_null_index:
                                 rule_applied = True
                                 new_index = non_null_index
@@ -283,23 +301,24 @@ class Transducer():
                             break
                 # increase the index counters
                 # if the rule applied
-                if rule_applied and len(new_index) > 0:
+                if rule_applied and new_index:
                     # add the new index to the list of indices
                     indices += new_index
                     # get the length of the new index inputs and outputs
                     index_lengths = self.get_index_length(new_index)
                     # increase the input counter by the length of the input
-                    if len(match.group()) > 0:
+                    if match.group():
                         input_index += index_lengths[0]
                     else:
                         input_index += 1
                     # increase the output counter by the length of the input
-                    if len(output_sub) > 0:
+                    if output_sub:
                         output_index += index_lengths[1]
                     else:
                         output_index += 1
                 else:
-                    # if a rule wasn't applied, just add on the input character as the next input and output character
+                    # if a rule wasn't applied, just add on the input character
+                    # as the next input and output character
                     indices.append((
                         (input_index, to_parse[input_index]),  # input
                         (output_index, to_parse[input_index])  # output
@@ -309,7 +328,7 @@ class Transducer():
         else:
             # if not worrying about indices, just do the conversion rule-by-rule
             for cor in self.cor_list:
-                output_sub = re.sub(re.compile('{\d+}'), '', cor['to'])
+                output_sub = re.sub(re.compile(r'{\d+}'), '', cor['to'])
                 if re.search(cor["match_pattern"], parsed):
                     parsed = re.sub(
                         cor["match_pattern"], output_sub, parsed)

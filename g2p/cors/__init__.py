@@ -1,12 +1,20 @@
+"""
+
+Module for all things related to lookup tables
+
+"""
+
 import csv
 import os
 import unicodedata as ud
 import re
 from typing import DefaultDict, List, Union
-from openpyxl import load_workbook
 from collections import defaultdict
 from itertools import chain
 from operator import methodcaller
+
+from openpyxl import load_workbook
+
 from g2p import exceptions
 from g2p.cors.langs import LANGS
 from g2p.cors.langs import __file__ as LANGS_FILE
@@ -14,9 +22,12 @@ from g2p.cors.utils import flatten_abbreviations, unicode_escape
 from g2p.log import LOGGER
 
 
-
 class Correspondence():
-    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC", abbreviations: Union[str, DefaultDict[str, List[str]]] = []):
+    """ Class for lookup tables
+    """
+
+    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC",
+                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False):
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.norm_form = norm_form
         self.path = language
@@ -26,9 +37,8 @@ class Correspondence():
         elif abbreviations:
             self.abbreviations = self.load_abbreviations_from_file(
                 abbreviations)
-                
+
         # Load workbook, either from correspondence spreadsheets, or user loaded
-        this_dir = os.path.dirname(os.path.abspath(__file__))
         if not isinstance(language, type(None)):
             if isinstance(language, list):
                 self.path = 'user supplied data'
@@ -49,11 +59,15 @@ class Correspondence():
                     raise exceptions.MalformedLookup()
                 else:
                     try:
-                        lang = [lang for lang in LANGS if lang['name'] == language['lang'] or lang['code'] == language['lang']][0]
-                        table = [table for table in lang['tables'] if table['name'] == language['table']][0]
-                        self.cor_list = self.load_from_file(os.path.join(os.path.dirname(LANGS_FILE), lang['code'], table['table']))
+                        lang = [lang for lang in LANGS if lang['name'] ==
+                                language['lang'] or lang['code'] == language['lang']][0]
+                        table = [table for table in lang['tables']
+                                 if table['name'] == language['table']][0]
+                        self.cor_list = self.load_from_file(os.path.join(
+                            os.path.dirname(LANGS_FILE), lang['code'], table['table']))
                         if "abbreviations" in table and table['abbreviations']:
-                            self.abbreviations = self.load_abbreviations_from_file(os.path.join(os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
+                            self.abbreviations = self.load_abbreviations_from_file(os.path.join(
+                                os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
                     except KeyError:
                         raise exceptions.CorrespondenceMissing(language)
             else:
@@ -67,11 +81,11 @@ class Correspondence():
                     cor[k] = self.normalize(v)
             if self.abbreviations:
                 self.abbreviations = {self.normalize(abb): [self.normalize(
-                    x) for x in sf] for abb, sf in self.abbreviations.items()}
+                    x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
         if self.abbreviations:
-            for abb, sf in self.abbreviations.items():
+            for abb, stands_for in self.abbreviations.items():
                 abb_match = re.compile(abb)
-                abb_repl = '|'.join(sf)
+                abb_repl = '|'.join(stands_for)
                 for cor in self.cor_list:
                     for key in cor.keys():
                         if re.search(abb_match, cor[key]):
@@ -87,7 +101,8 @@ class Correspondence():
         return iter(self.cor_list)
 
     def normalize(self, inp: str):
-        ''' Normalize to NFC(omposed) or NFD(ecomposed). Also, find any Unicode Escapes and decode them!
+        ''' Normalize to NFC(omposed) or NFD(ecomposed).
+            Also, find any Unicode Escapes & decode 'em!
         '''
         if self.norm_form not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
@@ -95,7 +110,8 @@ class Correspondence():
             normalized = ud.normalize(self.norm_form, unicode_escape(inp))
             if normalized != inp:
                 LOGGER.info(
-                    f'The string {inp} was normalized to {normalized} using the {self.norm_form} standard')
+                    'The string %s was normalized to %s using the %s standard',
+                    inp, normalized, self.norm_form)
             return normalized
 
     def reverse_cors(self, cor_list):
@@ -130,7 +146,8 @@ class Correspondence():
                 abbs = flatten_abbreviations(reader)
         else:
             raise exceptions.IncorrectFileType(
-                f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
+                '''Sorry, abbreviations must be stored as CSV files.
+                You provided the following: %s''' % path)
         return abbs
 
     def load_from_file(self, path):
@@ -144,31 +161,32 @@ class Correspondence():
     def load_from_csv(self, language):
         ''' Parse table from csv
         '''
-        ws = []
+        work_sheet = []
         with open(language, encoding='utf8') as f:
             reader = csv.reader(f)
             for line in reader:
-                ws.append(line)
+                work_sheet.append(line)
         # Create wordlist
         cor_list = []
-        # Loop through rows in worksheet, create if statements for different columns and append Cors to cor_list.
-        for entry in ws:
-            newCor = {"from": "", "to": "", "before": "", "after": ""}
-            newCor['from'] = entry[0]
-            newCor['to'] = entry[1]
+        # Loop through rows in worksheet, create if statements for different columns
+        # and append Cors to cor_list.
+        for entry in work_sheet:
+            new_cor = {"from": "", "to": "", "before": "", "after": ""}
+            new_cor['from'] = entry[0]
+            new_cor['to'] = entry[1]
             try:
-                newCor['before'] = entry[2]
+                new_cor['before'] = entry[2]
             except IndexError:
-                newCor['before'] = ''
+                new_cor['before'] = ''
             try:
-                newCor['after'] = entry[3]
+                new_cor['after'] = entry[3]
             except IndexError:
-                newCor['after'] = ''
-            for k in newCor:
-                if isinstance(newCor[k], float) or isinstance(newCor[k], int):
-                    newCor[k] = str(newCor[k])
+                new_cor['after'] = ''
+            for k in new_cor:
+                if isinstance(new_cor[k], float) or isinstance(new_cor[k], int):
+                    new_cor[k] = str(new_cor[k])
 
-            cor_list.append(newCor)
+            cor_list.append(new_cor)
 
         if self.reverse:
             cor_list = self.reverse_cors(cor_list)
@@ -178,37 +196,38 @@ class Correspondence():
     def load_from_workbook(self, language):
         ''' Parse table from Excel workbook
         '''
-        wb = load_workbook(language)
-        ws = wb.active
+        work_book = load_workbook(language)
+        work_sheet = work_book.active
         # Create wordlist
         cor_list = []
-        # Loop through rows in worksheet, create if statements for different columns and append Cors to cor_list.
-        for entry in ws:
-            newCor = {"from": "", "to": "", "before": "", "after": ""}
+        # Loop through rows in worksheet, create if statements for different columns
+        # and append Cors to cor_list.
+        for entry in work_sheet:
+            new_cor = {"from": "", "to": "", "before": "", "after": ""}
             for col in entry:
                 if col.column == 'A':
                     value = col.value
-                    if type(value) == float or int:
+                    if isinstance(value, (float, int)):
                         value = str(value)
-                    newCor["from"] = value
+                    new_cor["from"] = value
                 if col.column == 'B':
                     value = col.value
-                    if type(value) == float or int:
+                    if isinstance(value, (float, int)):
                         value = str(value)
-                    newCor["to"] = value
+                    new_cor["to"] = value
                 if col.column == 'C':
                     if col.value is not None:
                         value = col.value
-                        if type(value) == float or int:
+                        if isinstance(value, (float, int)):
                             value = str(value)
-                        newCor["before"] = value
+                        new_cor["before"] = value
                 if col.column == 'D':
                     if col.value is not None:
                         value = col.value
-                        if type(value) == float or int:
+                        if isinstance(value, (float, int)):
                             value = str(value)
-                        newCor["after"] = value
-            cor_list.append(newCor)
+                        new_cor["after"] = value
+            cor_list.append(new_cor)
 
         if self.reverse:
             cor_list = self.reverse_cors(cor_list)

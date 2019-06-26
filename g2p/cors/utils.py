@@ -1,14 +1,22 @@
+"""
+
+Utilities used by other classes
+
+"""
+
 from collections import defaultdict
 import regex as re
+
 
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
     '''
-    dd = defaultdict(list)
+    default_dict = defaultdict(list)
     for line in data:
         if line[0]:
-            dd[line[0]].extend([l for l in line[1:] if l])
-    return dd
+            default_dict[line[0]].extend([l for l in line[1:] if l])
+    return default_dict
+
 
 def expand_abbreviations(data):
     ''' Exapand a flattened DefaultDict into a CSV-formatted list of lists
@@ -22,10 +30,12 @@ def expand_abbreviations(data):
             lines.append(line)
     return lines
 
+
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints
     '''
     return re.sub(r"""\\(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{6})""", escape_to_codepoint, text)
+
 
 def escape_to_codepoint(match):
     ''' Turn escape into codepoint
@@ -37,7 +47,9 @@ def escape_to_codepoint(match):
 def create_fixed_width_lookbehind(pattern):
     '''Turn all characters into fixed width lookbehinds
     '''
-    return re.sub(re.compile("""(?<=\(?)[\p{L}\p{M}|]+(?=\)?)""", re.U), pattern_to_fixed_width_lookbehinds, pattern)
+    return re.sub(re.compile(r"""(?<=\(?)[\p{L}\p{M}|]+(?=\)?)""", re.U),
+                  pattern_to_fixed_width_lookbehinds, pattern)
+
 
 def pattern_to_fixed_width_lookbehinds(match):
     ''' Python must have fixed-width lookbehinds.

@@ -1,5 +1,9 @@
+"""
+    Unittests for index preservation
+
+"""
+
 from unittest import main, TestCase
-import os
 from g2p.cors import Correspondence
 from g2p.transducer import Transducer
 
@@ -139,7 +143,7 @@ class IndicesTest(TestCase):
             [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
         self.test_cor_wacky = Correspondence(
             [{"from": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
-                "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
+              "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
         self.test_cor_circum = Correspondence(
             [{'from': 'a{1}c{2}', 'to': 'c{2}a{1}c{2}'}]
@@ -157,10 +161,14 @@ class IndicesTest(TestCase):
         self.trans_circum = Transducer(self.test_cor_circum)
 
     def test_no_indices(self):
+        """ Test straightforward conversion without returning indices.
+        """
         transducer = self.trans_combining('k\u0313am')
         self.assertEqual(transducer, "'kam")
 
     def test_combining(self):
+        """ Test index preserving combining characters
+        """
         transducer = self.trans_combining('k\u0313am', index=True)
         self.assertEqual(transducer[0], "'kam")
         self.assertEqual(transducer[1](), [((0, "k"), (1, 'k')),
@@ -171,6 +179,8 @@ class IndicesTest(TestCase):
                                            ((3, 'm'), (3, 'm'))])
 
     def test_wacky(self):
+        """ Test weird Unicode emoji transformation...
+        """
         transducer = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
         self.assertEqual(
@@ -178,10 +188,13 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer[1](), [
             ((0, "\U0001f600"), (2, "\U0001f604")),
             ((1, "\U0001f603\U0001f604"), (0, "\U0001f604\U0001f604\U0001f604")),
-            ((2, "\U0001f604"), (1, "\U0001f604")) # AssertionError: Lists differ # Giving extra ((3, '😄'), (3, '😄'))
+            # AssertionError: Lists differ # Giving extra ((3, '😄'), (3, '😄'))
+            ((2, "\U0001f604"), (1, "\U0001f604"))
         ])
 
     def test_circum(self):
+        """ Test circumfixing
+        """
         transducer = self.trans_circum('ac', index=True)
         self.assertEqual(transducer[0], 'cac')
         self.assertEqual(transducer[1](), [((0, 'a'), (1, 'a')),
@@ -189,6 +202,8 @@ class IndicesTest(TestCase):
                                            ((1, 'c'), (2, 'c'))])
 
     def test_case_one(self):
+        """ Test case one
+        """
         transducer = self.trans_one('test', True)
         self.assertEqual(transducer[0], 'pest')
         self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
