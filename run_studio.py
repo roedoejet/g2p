@@ -1,3 +1,3 @@
-from g2p import app
+from g2p import APP
 
-app.run(host='0.0.0.0', port=5000, debug=True)
+APP.run(host='0.0.0.0', port=5000, debug=True)

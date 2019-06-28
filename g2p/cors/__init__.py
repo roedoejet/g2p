@@ -110,7 +110,7 @@ class Correspondence():
             normalized = ud.normalize(self.norm_form, unicode_escape(inp))
             if normalized != inp:
                 LOGGER.info(
-                    'The string %s was normalized to %s using the %s standard',
+                    'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
                     inp, normalized, self.norm_form)
             return normalized
 
