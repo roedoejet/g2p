@@ -34,7 +34,7 @@ for (var i = 0; i < ABB_KEYS.length; i++) {
 }
 
 Blockly.defineBlocksWithJsonArray([
-    // Block for colour picker.
+    // Block for rule creator.
     {
         "type": "create_rule",
         "message0": "set \"from\" to: %1\nset \"to\" to: %2\nset \"before\" to: %3\nset \"after\" to: %4",
@@ -57,6 +57,7 @@ Blockly.defineBlocksWithJsonArray([
             }
         ],
         "previousStatement": null,
+        "nextStatement": null,
         "colour": 355,
         "tooltip": "",
         "helpUrl": ""
@@ -92,7 +93,7 @@ Blockly.JavaScript['abbreviations'] = function (block) {
 
 Blockly.Python['abbreviations'] = function (block) {
     var value = block.getFieldValue('VALUE');
-    return [JSON.stringify(ABBS[value]), Blockly.JavaScript.ORDER_ATOMIC];
+    return [JSON.stringify(ABBS[value]), Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['create_rule'] = function (block) {
