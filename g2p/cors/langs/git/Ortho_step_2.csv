@@ -1,4 +1,4 @@
-VCLS_STOP{1},VCD_STOP{1},VOWEL,VOWEL
+VCLS_STOP{1},VCD_STOP{1},VOWEL
 VCLS_STOP{1}|ʦ{2},VCLS_STOP{1}ʰ{3}|ʦ{2}ʰ{3},,$
 VCLS_STOP{1}ˀ{2}|t{3}\u0361{4}ɬ{5}ˀ{2}|ʦ{6}ˀ{2},ʔ{2}VCLS_STOP|ʔ{2}t{3}\u0361{4}ɬ{5}|ʔ{2}ʦ{6},,$
 VCLS_STOP{1}ˀ{2},VCLS_STOP{1}ʷ{3}ˀ{2},^
@@ -44,7 +44,6 @@ aː|ʌː,a|ʌ,,RESONANT
 e{1},ɛ{1},,χ|ʔ
 e{1}ː{2},ɛ{1}ː{2},,m|w
 i{1}ː{2},e{1}ː{2},q|qˀ
-VCLS_STOP{1},VCD_STOP{1},,VOWEL
 e{1}ː{2},ɪ{1}|ɨ{1},,n
 ʔ{1}m{2},m{2}ˀ{1},^
 ʔ{1}n{2},n{2}ˀ{1},^
