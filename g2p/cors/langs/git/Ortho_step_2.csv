@@ -1,5 +1,6 @@
-VCLS_STOP{1},VCD_STOP{1},VOWEL
-VCLS_STOP{1}|ʦ{2},VCLS_STOP{1}ʰ{3}|ʦ{2}ʰ{3},,$
+### VCLS_STOP{1},VCD_STOP{1},VOWEL
+VCLS_STOP{1},VCLS_STOP{1}ʰ{2},,$
+ʦ{1},ʦ{1}ʰ{2},,$
 VCLS_STOP{1}ˀ{2}|t{3}\u0361{4}ɬ{5}ˀ{2}|ʦ{6}ˀ{2},ʔ{2}VCLS_STOP|ʔ{2}t{3}\u0361{4}ɬ{5}|ʔ{2}ʦ{6},,$
 VCLS_STOP{1}ˀ{2},VCLS_STOP{1}ʷ{3}ˀ{2},^
 VCLS_STOP{1}ˀ{2},ʔVCLS_STOP{1}ʷ{2},,CONSONANT
@@ -23,7 +24,13 @@ n{1},ŋ{1},VOWEL,k
 j{1}ˀ{2},ʔ{2}i{1},,CONSONANT
 j{1}ˀ{2},ʔ{2}\u2071{1},,$
 i{1}j{2}ˀ{3},{1}{2}{3}
-RESONANT{1}ˀ{2}RESONANT{3},RESONANT{1}RESONANT{3}
+### RESONANT{1}ˀ{2}RESONANT{3},RESONANT{1}RESONANT{3}
+jˀ,j,,j|w|l|m|n
+wˀ,w,,j|w|l|m|n
+lˀ,l,,j|w|l|m|n
+mˀ,m,,j|w|l|m|n
+nˀ,n,,j|w|l|m|n
+
 h{1},{1},VOWEL,VOWEL
 h{1},{1},CONSONANT
 h{1},{1},CONSONANT$
@@ -35,7 +42,20 @@ h{1},{1},CONSONANT$
 {1},e{1}|ɛ{1},eʔ|eːʔ,CONSONANT
 {1},a{1},aʔ|aːʔ,CONSONANT
 {1},o{1},oʔ|oːʔ,CONSONANT
-VOWEL{1}ː{2},VOWEL{1},,RESONANT$
+### VOWEL{1}ː{2},VOWEL{1},,RESONANT$
+aː,a,,j|w|l|m|n
+ʌː,ʌ,,j|w|l|m|n
+eː,e,,j|w|l|m|n
+ɛː,ɛ,,j|w|l|m|n
+ɪː,ɪ,,j|w|l|m|n
+ɨː,ɨ,,j|w|l|m|n
+iː,i,,j|w|l|m|n
+ɔː,ɔ,,j|w|l|m|n
+oː,o,,j|w|l|m|n
+ʊː,ʊ,,j|w|l|m|n
+uː,u,,j|w|l|m|n
+ʊ̞ː,ʊ̞,,j|w|l|m|n
+
 VOWEL{1}ː{2},VOWEL{1},,CONSONANT$
 i{1},ɛ{1},,q|ʔ|χ|qˀ|h
 u{1},ɔ{1},,q|ʔ|χ|qˀ|h
@@ -57,3 +77,4 @@ o{1}ː{2},u{1}|ʊ{1},,n
 o{1}ː{2},u{1}ː{2},,ʔq|q
 i{1},e{1},q
 i{1},e{1}|ɛ{1},,ʔ|h
+
