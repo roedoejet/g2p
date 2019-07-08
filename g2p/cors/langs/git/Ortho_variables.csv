@@ -2,5 +2,5 @@ VOWEL,a,ʌ,aː,ʌː,æː,e,ɛ,eː,ɪ,ɨ,i,iː,ɔ,o,oː,ʊ,u,ʊ\u031E,uː
 CONSONANT,ʔ,b,d,g,ʁ,ɢ,ɟ,h,ɬ,ʣ,k,q,l,m,n,p,s,t,ʔt\u0361ɬ,t\u0361s,w,x,χ,j
 RESONANT,j,w,l,m,n
 UVULAR,q,ʁ,ɢ,χ
-VCLS_STOP,k,q,p,t
+VCLS_STOP,p,y,k,q
 VCD_STOP,b,d,g,ɢ,ɟ
