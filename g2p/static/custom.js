@@ -41,7 +41,7 @@ var hotSettings = {
     // width: 880,
     autoWrapRow: true,
     height: 287,
-    maxRows: 100,
+    maxRows: 150,
     rowHeaders: true,
     colHeaders: [
         'From',
@@ -65,7 +65,7 @@ var hotVarSettings = {
     // width: 880,
     autoWrapRow: true,
     height: 287,
-    maxRows: 100,
+    maxRows: 150,
     rowHeaders: true,
     colHeaders: true,
     afterRowMove: (rows, target) => {
