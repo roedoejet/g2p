@@ -13,7 +13,7 @@ class LangTest(TestCase):
     def setUp(self):
         git = {"name": "git",
                "tables": {
-                   "Orthography (Step 1)": [
+                   "Orthography (Deterministic)": [
                        ('gwiila', '\u025fʷiːlæ'),
                        ("eji'i'n", "i\u02a3i\u0294i\u0294n"),
                        ("li'lp'en", "lilˀpˀin"), 
@@ -22,7 +22,7 @@ class LangTest(TestCase):
                        ("x\u0332uu'w", "χuːwˀ"),
                     #    ("gyee'eg", "\u025fe\u02d0\u0294i\u025f") 
                    ],
-                   "APA (no free variation)": [
+                   "APA (Deterministic)": [
                     #    ("ekʰek\u0313qen", "\u0259kʰek\u02C0qen"),
                     #    ("ʔyeːʔqʰ", "ʔyeːʔqʰ"),
                     #    ("æʒiʔbiʔtʰ", "æʣiʔbiʔtʰ"),

@@ -1,20 +1,20 @@
 - name: Gitksan
   code: git
   tables:
-    - name: Orthography (Step 1)
-      table: Ortho_step_1.csv
+    - name: Orthography 
+      table: Orthography.csv
       abbreviations: Ortho_variables.csv
-    - name: Orthography (Step 2)
-      table: Ortho_step_2.csv
+    - name: Orthography (Deterministic)
+      table: Orthography_Deterministic.csv
       abbreviations: Ortho_variables.csv
-    - name: Rigsby APA (free variation)
-      table: RAPA_free_variation.csv
-    - name: Rigsby APA (no free variation)
-      table: RAPA_no_free_variation.csv
-    - name: APA (free variation)
-      table: APA_free_variation.csv
-    - name: APA (no free variation)
-      table: APA_free_variation.csv
+    - name: Rigsby APA 
+      table: RAPA.csv
+    - name: Rigsby APA (Deterministic)
+      table: RAPA_Deterministic.csv
+    - name: APA 
+      table: APA.csv
+    - name: APA (Deterministic)
+      table: APA_Deterministic.csv
     - name: Unicode Normalization
       table: norm.csv
 - name: Heiltsuk
