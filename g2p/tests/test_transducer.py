@@ -1,7 +1,6 @@
 from unittest import main, TestCase
-import os
 from g2p.cors import Correspondence
-from g2p.transducer import Transducer
+from g2p.transducer import CompositeTransducer, Transducer
 
 class TransducerTest(TestCase):
     ''' Basic Transducer Test
@@ -18,6 +17,8 @@ class TransducerTest(TestCase):
         self.test_trans_ordered_counter_feed = Transducer(self.test_cor_ordered_counter_feed, True)
         self.test_trans_rev = Transducer(self.test_cor_rev)
         self.test_trans_moh = Transducer(self.test_cor_moh, True)
+        self.test_trans_composite = CompositeTransducer([self.test_trans, self.test_trans_rev])
+        self.test_trans_composite_2 = CompositeTransducer([self.test_trans_rev, self.test_trans])
 
     def test_ordered(self):
         transducer_i_feed = self.test_trans_ordered_feed('a', True)
@@ -41,6 +42,11 @@ class TransducerTest(TestCase):
     
     def test_lang_import(self):
         self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnonnis')
+    
+    def test_composite(self):
+        self.assertEqual(self.test_trans_composite('aba'), 'aaa')
+        self.assertEqual(self.test_trans_composite_2('aba'), 'bbb')
+
 
 if __name__ == "__main__":
     main()

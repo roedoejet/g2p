@@ -38,7 +38,6 @@ class IOStates():
         """
         return ''.join([state[1] for state in self.input_states])
 
-
 class Transducer():
     ''' A class for performing transductions based on correspondences
 
@@ -334,4 +333,24 @@ class Transducer():
                         cor["match_pattern"], output_sub, parsed)
         if index:
             return (parsed, IOStates(indices))
+        return parsed
+
+class CompositeTransducer():
+    ''' Class containing one or more Transducers
+    
+    Attributes
+    ----------
+
+    transducers: List[Transducer]
+        Ordered list of Transducer objects to concatenate.
+
+    '''
+
+    def __init__(self, transducers: List[Transducer]):
+        self._transducers = transducers
+
+    def __call__(self, to_parse: str, index: bool = False):
+        parsed = to_parse
+        for transducer in self._transducers:
+            parsed = transducer.apply_rules(parsed, index)
         return parsed
