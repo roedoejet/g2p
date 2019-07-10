@@ -25,13 +25,13 @@ class GitTest(TestCase):
     def setUp(self):
         git = {"name": "git",
                "tables": {
-                   "Orthography (Step 1)": [
+                   "Orthography (Deterministic)": [
                        ("Hli dii ap wehl Gitwinhlguu'l, Git-anyaaw, wil mig\u0332oontxw Git-anyaaw.",
                         "Hli diː æb wiɬ Gidwinɬɟulˀ, Gid-ænjæː|ʌw, wil miɟ\u0332ɔ|ontxʷ Gid-ænjæː|ʌw"),
                        ("Ii 'nithl sim'oogit Gwaas Hlaa'm 'nii ksg\u0332oog\u0332at ahl lax\u0332 g\u0332alts'ap tun.",
                         "Ii ʔnidɬ simʔɔ|oːɟid Gwæː|ʌːs Hlæː|ʌːʔm ʔniː ksɟ\u0332ɔ|oːɟ\u0332æd æɬ læx\u0332 ɟ\u0332ælʦˀæb tun.")
                    ],
-                   "APA (no free variation)": [
+                   "APA (Deterministic)": [
                        ("", "\u026c\u0259 ti: \u0294\u0259p we=\u026c k\u0259tw\u0259n\u026ck\u02b7u:l\u0313 k\u0259t\u0294\u0259nya:w w\u0259l m\u0259qo:ntx\u02b7 k\u0259t-\u0294\u0259n-ya:w"),
                        ("", "\u0294i: n\u0313it=\u026c s\u0259m\u0294o:k\u0259t k\u02b7a:s-\u026ca:m\u0313 n\u0313i: ksqo:q-\u0259t \u0294\u0259=\u026c l\u0259\u03c7 q\u0259lc\u0313ap t=x\u02b7\u0259n")
                    ],
