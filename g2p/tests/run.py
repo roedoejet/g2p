@@ -2,9 +2,11 @@ import os
 from unittest import TestLoader, TextTestRunner, TestSuite
 # Unit tests
 from g2p.tests.test_correspondences import CorrespondenceTest
+from g2p.tests.test_git import GitTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_transducer import TransducerTest
+
 
 loader = TestLoader()
 
@@ -24,7 +26,10 @@ cors_tests = [
 ]
 
 langs_tests = [
-    loader.loadTestsFromTestCase(test) for test in [LangTest]
+    loader.loadTestsFromTestCase(test) for test in [
+        # LangTest,
+        GitTest
+    ]
 ]
 
 

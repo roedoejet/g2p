@@ -104,6 +104,7 @@ class Transducer():
             rule_regex = re.compile(create_fixed_width_lookbehind(
                 before) + from_match + f"(?={after})")
         except:
+            breakpoint()
             raise Exception(
                 'Your regex is malformed.')
         return rule_regex

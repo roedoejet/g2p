@@ -25,3 +25,9 @@ def setup_logger(name):
 
 
 LOGGER = setup_logger('root')
+
+TEST_LOGGER = setup_logger('test')
+
+FH = logging.FileHandler('test.log')
+
+TEST_LOGGER.addHandler(FH)

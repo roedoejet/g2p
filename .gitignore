@@ -13,3 +13,5 @@ g2p/tests/private
 
 .DS_Store
 .vscode
+
+*.log
