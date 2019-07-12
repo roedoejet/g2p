@@ -64,6 +64,10 @@ class GitTest(TestCase):
             language={"lang": "git", "table": "Orthography (Step 1)"})
         self.orth_to_ipa_transducer = Transducer(self.orth_to_ipa)
 
+        self.ipa_to_orth = Correspondence(
+            language={"lang": "git", "table": "Orthography (Step 1)"}, reverse=True)
+        self.ipa_to_orth_transducer = Transducer(self.ipa_to_orth)
+
         self.apa_to_ipa = Correspondence(
             language={"lang": "git", "table": "APA (free variation)"})
         self.apa_to_ipa_transducer = Transducer(self.apa_to_ipa)
@@ -77,6 +81,12 @@ class GitTest(TestCase):
             for line in story:
                 self.assertEqual(self.ipa_to_apa_transducer(
                     self.orth_to_ipa_transducer(line['ortho'])), scrub_text(line['apa']))
+
+    def test_apa_to_orth(self):
+        for story in self.formatted_data:
+            for line in story:
+                self.assertEqual(self.apa_to_ipa_transducer(
+                    self.ipa_to_orth_transducer(scrub_text(line['apa']),line['ortho'])))
 
 if __name__ == "__main__":
     main()
