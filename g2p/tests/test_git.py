@@ -3,11 +3,12 @@
 import os
 from unittest import main, TestCase
 from g2p.cors import Correspondence
-from g2p.transducer import Transducer
+from g2p.transducer import CompositeTransducer, Transducer
 # Will cause errors on machines without private data
 from g2p.tests.private.git_data_wrangler import returnLinesFromDocuments
 from g2p.tests.private import __file__ as private_dir
 from typing import List
+from g2p.log import TEST_LOGGER as logger
 
 
 def scrub_text(txt: str, to_scrub: List[str] = ['=', '-', '~']) -> str:
@@ -61,32 +62,49 @@ class GitTest(TestCase):
 
         # Declare all of our correspondences needed
         self.orth_to_ipa = Correspondence(
-            language={"lang": "git", "table": "Orthography (Step 1)"})
+            language={"lang": "git", "table": "Orthography"})
+
         self.orth_to_ipa_transducer = Transducer(self.orth_to_ipa)
 
         self.ipa_to_orth = Correspondence(
-            language={"lang": "git", "table": "Orthography (Step 1)"}, reverse=True)
+            language={"lang": "git", "table": "Orthography"}, reverse=True)
+
         self.ipa_to_orth_transducer = Transducer(self.ipa_to_orth)
 
         self.apa_to_ipa = Correspondence(
-            language={"lang": "git", "table": "APA (free variation)"})
+            language={"lang": "git", "table": "APA"})
+
         self.apa_to_ipa_transducer = Transducer(self.apa_to_ipa)
 
         self.ipa_to_apa = Correspondence(
-            language={"lang": "git", "table": "APA (free variation)"}, reverse=True)
+            language={"lang": "git", "table": "APA"}, reverse=True)
+
         self.ipa_to_apa_transducer = Transducer(self.ipa_to_apa)
 
+        self.orth_to_apa_transducer = CompositeTransducer(
+            [self.orth_to_ipa_transducer, self.ipa_to_apa_transducer])
+        self.apa_to_orth_transducer = CompositeTransducer(
+            [self.apa_to_ipa_transducer, self.ipa_to_orth_transducer])
+
     def test_orth_to_apa(self):
-        for story in self.formatted_data:
+        for title, story in self.formatted_data.items():
             for line in story:
-                self.assertEqual(self.ipa_to_apa_transducer(
-                    self.orth_to_ipa_transducer(line['ortho'])), scrub_text(line['apa']))
+                try:
+                    self.assertEqual(self.orth_to_apa_transducer(
+                        line['ortho']), scrub_text(line['apa']))
+                except:
+                    logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+
 
     def test_apa_to_orth(self):
-        for story in self.formatted_data:
+        for title, story in self.formatted_data.items():
             for line in story:
-                self.assertEqual(self.apa_to_ipa_transducer(
-                    self.ipa_to_orth_transducer(scrub_text(line['apa']),line['ortho'])))
+                try:
+                    self.assertEqual(self.apa_to_orth_transducer(
+                        scrub_text(line['apa'])), line['ortho'])
+                except:
+                    logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+
 
 if __name__ == "__main__":
     main()

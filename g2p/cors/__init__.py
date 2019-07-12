@@ -59,16 +59,18 @@ class Correspondence():
                     raise exceptions.MalformedLookup()
                 else:
                     try:
-                        lang = [lang for lang in LANGS if lang['name'] ==
-                                language['lang'] or lang['code'] == language['lang']][0]
+                        lang = [lang for lang in LANGS if lang['name'].strip() ==
+                                language['lang'].strip() or lang['code'].strip() == language['lang'].strip()][0]
                         table = [table for table in lang['tables']
-                                 if table['name'] == language['table']][0]
+                                 if table['name'].strip() == language['table'].strip()][0]
                         self.cor_list = self.load_from_file(os.path.join(
                             os.path.dirname(LANGS_FILE), lang['code'], table['table']))
                         if "abbreviations" in table and table['abbreviations']:
                             self.abbreviations = self.load_abbreviations_from_file(os.path.join(
                                 os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
                     except KeyError:
+                        raise exceptions.CorrespondenceMissing(language)
+                    except IndexError:
                         raise exceptions.CorrespondenceMissing(language)
             else:
                 self.cor_list = self.load_from_file(language)

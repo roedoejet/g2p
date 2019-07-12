@@ -22,7 +22,7 @@ class LangTest(TestCase):
                        ("x\u0332uu'w", "χuːwˀ"),
                     #    ("gyee'eg", "\u025fe\u02d0\u0294i\u025f") 
                    ],
-                   "APA (Deterministic)": [
+                #    "APA (Deterministic)": [
                     #    ("ekʰek\u0313qen", "\u0259kʰek\u02C0qen"),
                     #    ("ʔyeːʔqʰ", "ʔyeːʔqʰ"),
                     #    ("æʒiʔbiʔtʰ", "æʣiʔbiʔtʰ"),
@@ -30,7 +30,7 @@ class LangTest(TestCase):
                     #    ("bωkʷʰɛɬɛ", "bʊ\u031Ekʷʰɛɬɛ"),
                     #    ("ʔyeʔqʰ", "ʔjeʔqʰ"),
                     #    ("xʷiʔcʰiʔmi", "xʷiʔ\u02a6ʰiʔmi")
-                   ],
+                #    ],
                    # "RAPA_no_free_variation": [
                       # ('gwiila', '\u025fwiːlæ'),
                       # ("eji'i'n", "i\u02a3i\u0294i\u0294n")
