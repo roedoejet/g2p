@@ -13,8 +13,6 @@
       table: RAPA_Deterministic.csv
     - name: APA 
       table: APA.csv
-    - name: APA (Deterministic)
-      table: APA_Deterministic.csv
     - name: Unicode Normalization
       table: norm.csv
 - name: Heiltsuk
