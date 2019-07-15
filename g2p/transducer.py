@@ -28,6 +28,9 @@ class IOStates():
     def __call__(self):
         return self.indices
 
+    def __iadd__(self, other):
+        return IOStates(self.indices + other.indices)
+
     def down(self):
         """ Return the output of a given transduction
         """
@@ -37,6 +40,7 @@ class IOStates():
         """ Return the input of a given transduction
         """
         return ''.join([state[1] for state in self.input_states])
+
 
 class Transducer():
     ''' A class for performing transductions based on correspondences
@@ -75,7 +79,6 @@ class Transducer():
             # sort by reverse len
             cor_list = sorted(cor_list(), key=lambda x: len(
                 x["from"]), reverse=True)
-
         # turn "from" in to Regex
         for cor in cor_list:
             cor['match_pattern'] = self.rule_to_regex(cor)
@@ -85,8 +88,8 @@ class Transducer():
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
-    def __call__(self, to_parse: str, index: bool = False):
-        return self.apply_rules(to_parse, index)
+    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False):
+        return self.apply_rules(to_parse, index, debugger)
 
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -248,7 +251,7 @@ class Transducer():
         # Sum the length of the inputs/outputs
         return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
-    def apply_rules(self, to_parse: str, index: bool = False) -> Union[str, Tuple[str, IOStates]]:
+    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False) -> Union[str, Tuple[str, IOStates]]:
         """ Apply all the rules in self.cor_list sequentially.
 
         @param to_parse: str
@@ -257,9 +260,13 @@ class Transducer():
         @param index: bool
             This is whether to preserve indices, default is False
 
+        @param debugger: bool
+            This is whether to show intermediary steps, default is False
+
         """
         indices = []
         parsed = to_parse
+        rules_applied = []
 
         if index:
             input_index = 0
@@ -282,8 +289,13 @@ class Transducer():
                             # parse the final output
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', cor['to'])
-                            parsed = re.sub(
-                                cor['match_pattern'], output_sub, parsed)
+                            inp = parsed
+                            outp = re.sub(cor["match_pattern"], output_sub, parsed)
+                            if debugger and inp != outp:
+                                applied_rule = {"input": inp,
+                                                "rule": cor, "output": outp}
+                                rules_applied.append(applied_rule)
+                            parsed = outp
                             # if no rule has yet applied, the new index is empty
                             if not rule_applied:
                                 new_index = []
@@ -330,15 +342,26 @@ class Transducer():
             for cor in self.cor_list:
                 output_sub = re.sub(re.compile(r'{\d+}'), '', cor['to'])
                 if re.search(cor["match_pattern"], parsed):
-                    parsed = re.sub(
+                    inp = parsed
+                    outp = re.sub(
                         cor["match_pattern"], output_sub, parsed)
+                    if debugger and inp != outp:
+                        applied_rule = {"input": inp,
+                                        "rule": cor, "output": outp}
+                        rules_applied.append(applied_rule)
+                    parsed = outp
+        if index and debugger:
+            return (parsed, IOStates(indices), rules_applied)
+        if debugger:
+            return (parsed, rules_applied)
         if index:
             return (parsed, IOStates(indices))
         return parsed
 
+
 class CompositeTransducer():
     ''' Class containing one or more Transducers
-    
+
     Attributes
     ----------
 
@@ -350,8 +373,29 @@ class CompositeTransducer():
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
 
-    def __call__(self, to_parse: str, index: bool = False):
+    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False):
+        return self.apply_rules(to_parse, index, debugger)
+
+    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False):
         parsed = to_parse
+        indexed = []
+        debugged = []
         for transducer in self._transducers:
-            parsed = transducer.apply_rules(parsed, index)
+            response = transducer(parsed, index, debugger)
+            if index:
+                indexed += response[1]
+                if debugger:
+                    debugged += response[2]
+            if debugger:
+                debugged += response[1]
+            if index or debugger:
+                parsed = response[0]
+            else:
+                parsed = response
+        if index and debugger:
+            return (parsed, indexed, debugged)
+        if index:
+            return (parsed, indexed)
+        if debugger:
+            return (parsed, debugged)
         return parsed
