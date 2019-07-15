@@ -68,7 +68,6 @@ x{1},j{1},VOWEL,VOWEL
 x{1}ʷ{2},h{1},VOWEL,VOWEL
 n{1},ŋ{1},VOWEL,k
 j{1}ˀ{2},ʔ{2}i{1},,CONSONANT
-j{1}ˀ{2},ʔ{2}\u2071{1},,$
 i{1}j{2}ˀ{3},{1}{2}{3}
 jˀ,j,,j|w|l|m|n
 wˀ,w,,j|w|l|m|n
