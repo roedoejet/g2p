@@ -88,31 +88,26 @@ class GitTest(TestCase):
         self.apa_to_orth_transducer = CompositeTransducer(
             [self.apa_to_ipa_transducer, self.ipa_to_orth_transducer])
 
-    def test_orth_to_apa(self):
-        test = self.orth_to_apa_transducer("'y", debugger=True)
-        print(test)
-        self.assertEqual(self.orth_to_apa_transducer("'y", debugger=True)[0], "y\u0313")
-        
-    #     breakpoint()
-        # for title, story in self.formatted_data.items():
-        #     for line in story:
-        #         try:
-        #             self.assertEqual(self.orth_to_apa_transducer(
-        #                 line['ortho']), scrub_text(line['apa']))
-        #         except:
-        #             logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
-        # print(f"The logger came across {logger.exception.count} exceptions")
+    def test_orth_to_apa(self):     
+        for title, story in self.formatted_data.items():
+            for line in story:
+                try:
+                    self.assertEqual(self.orth_to_apa_transducer(
+                        line['ortho']), scrub_text(line['apa']))
+                except:
+                    logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+        print(f"The logger came across {logger.exception.count} exceptions")
 
 
-    # def test_apa_to_orth(self):
-    #     for title, story in self.formatted_data.items():
-    #         for line in story:
-    #             try:
-    #                 self.assertEqual(self.apa_to_orth_transducer(
-    #                     scrub_text(line['apa'])), line['ortho'])
-    #             except:
-    #                 logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
-    #     print(f"The logger came across {logger.exception.count} exceptions")
+    def test_apa_to_orth(self):
+        for title, story in self.formatted_data.items():
+            for line in story:
+                try:
+                    self.assertEqual(self.apa_to_orth_transducer(
+                        scrub_text(line['apa'])), line['ortho'])
+                except:
+                    logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+        print(f"The logger came across {logger.exception.count} exceptions")
 
 if __name__ == "__main__":
     main()
