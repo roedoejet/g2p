@@ -8,7 +8,7 @@ from g2p.transducer import CompositeTransducer, Transducer
 from g2p.tests.private.git_data_wrangler import returnLinesFromDocuments
 from g2p.tests.private import __file__ as private_dir
 from typing import List
-from g2p.log import TEST_LOGGER as logger
+from g2p.log import LogCounter, TEST_LOGGER as logger
 
 
 def scrub_text(txt: str, to_scrub: List[str] = ['=', '-', '~']) -> str:
@@ -24,6 +24,8 @@ class GitTest(TestCase):
     '''
 
     def setUp(self):
+        # set up log counter
+        logger.exception = LogCounter(logger.exception)
        # git = {"name": "git",
        #        "tables": {
        #            "Orthography (Deterministic)": [
@@ -94,6 +96,7 @@ class GitTest(TestCase):
                         line['ortho']), scrub_text(line['apa']))
                 except:
                     logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+        print(f"The logger came across {logger.exception.count} exceptions")
 
 
     def test_apa_to_orth(self):
@@ -104,6 +107,7 @@ class GitTest(TestCase):
                         scrub_text(line['apa'])), line['ortho'])
                 except:
                     logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
+        print(f"The logger came across {logger.exception.count} exceptions")
 
 if __name__ == "__main__":
     main()
