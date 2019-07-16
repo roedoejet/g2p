@@ -16,8 +16,8 @@ class IOStates():
 
     def __init__(self, indices: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
         self.indices = indices
-        self._input_states = [io[0] for io in indices]
-        self._output_states = [io[1] for io in indices]
+        self._input_states = sorted([io[0] for io in indices], key=lambda x: x[0])
+        self._output_states = sorted([io[1] for io in indices], key=lambda x: x[0])
         self._input_count = Counter(i[0] for i in self._output_states)
         self._output_count = Counter(i[0] for i in self._output_states)
         self.input_states = [
