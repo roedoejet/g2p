@@ -96,7 +96,7 @@ class GitTest(TestCase):
                         line['ortho']), scrub_text(line['apa']))
                 except:
                     logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
-        print(f"The logger came across {logger.exception.count} exceptions")
+        logger.info("The logger came across %s exceptions", logger.exception.count)
 
 
     def test_apa_to_orth(self):
@@ -107,7 +107,7 @@ class GitTest(TestCase):
                         scrub_text(line['apa'])), line['ortho'])
                 except:
                     logger.exception(f"{self.orth_to_apa_transducer(line['ortho'])} is not equal to {scrub_text(line['apa'])}")
-        print(f"The logger came across {logger.exception.count} exceptions")
+        logger.info("The logger came across %s exceptions", logger.exception.count)
 
 if __name__ == "__main__":
     main()

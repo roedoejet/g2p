@@ -5,17 +5,21 @@
 
 import logging
 import coloredlogs
+import sys
+import codecs
 
 FIELD_STYLES = dict(
     levelname=dict(color='green', bold=coloredlogs.CAN_USE_BOLD_FONT),
 )
 
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 def setup_logger(name):
     """ Create logger and configure with cool colors!
     """
     logging.basicConfig(
-        level=logging.INFO
+        level=logging.INFO,
+        handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler('log.txt', 'w', 'utf-8')]
         # filename="logger.log"
     )
     logger = logging.getLogger(name)
