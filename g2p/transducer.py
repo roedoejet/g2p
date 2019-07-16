@@ -88,8 +88,8 @@ class Transducer():
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
-    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False):
-        return self.apply_rules(to_parse, index, debugger)
+    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False, case_sensitive: bool = True):
+        return self.apply_rules(to_parse, index, debugger, case_sensitive)
 
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -251,7 +251,7 @@ class Transducer():
         # Sum the length of the inputs/outputs
         return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
-    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False) -> Union[str, Tuple[str, IOStates]]:
+    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False, case_sensitive: bool = True) -> Union[str, Tuple[str, IOStates]]:
         """ Apply all the rules in self.cor_list sequentially.
 
         @param to_parse: str
@@ -265,7 +265,10 @@ class Transducer():
 
         """
         indices = []
-        parsed = to_parse
+        if not case_sensitive:
+            parsed = to_parse.lower()
+        else:
+            parsed = to_parse
         rules_applied = []
 
         if index:
@@ -290,7 +293,10 @@ class Transducer():
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', cor['to'])
                             inp = parsed
-                            outp = re.sub(cor["match_pattern"], output_sub, parsed)
+                            if not case_sensitive:
+                                outp = re.sub(cor["match_pattern"], output_sub, parsed, flags=re.I)
+                            else:
+                                outp = re.sub(cor["match_pattern"], output_sub, parsed)
                             if debugger and inp != outp:
                                 applied_rule = {"input": inp,
                                                 "rule": cor, "output": outp}
@@ -343,8 +349,12 @@ class Transducer():
                 output_sub = re.sub(re.compile(r'{\d+}'), '', cor['to'])
                 if re.search(cor["match_pattern"], parsed):
                     inp = parsed
-                    outp = re.sub(
-                        cor["match_pattern"], output_sub, parsed)
+                    if not case_sensitive:
+                        outp = re.sub(
+                            cor["match_pattern"], output_sub, parsed, re.I)
+                    else:
+                        outp = re.sub(
+                            cor["match_pattern"], output_sub, parsed)
                     if debugger and inp != outp:
                         applied_rule = {"input": inp,
                                         "rule": cor, "output": outp}

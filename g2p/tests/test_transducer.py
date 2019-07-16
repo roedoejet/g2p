@@ -18,6 +18,8 @@ class TransducerTest(TestCase):
             [{"from": "b", "to": "c"}, {"from": "a", "to": "b"}])
         self.test_as_is_cor = Correspondence(
             [{"from": "j", "to": "ʣ"}, {"from": "'y", "to": "jˀ"}])
+        self.test_case_sensitive_cor = Correspondence([{"from": "'n", "to": "n̓"}])
+        self.test_case_sensitive_transducer = Transducer(self.test_case_sensitive_cor)
         self.test_trans_as_is = Transducer(self.test_as_is_cor, as_is=True)
         self.test_trans_not_as_is = Transducer(self.test_as_is_cor)
         self.test_trans = Transducer(self.test_cor)
@@ -65,6 +67,11 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_as_is("'y"), "jˀ")
         self.assertEqual(self.test_trans_not_as_is("'y"), "ʣˀ")
 
+    def test_case_sensitive(self):
+        self.assertEqual(self.test_case_sensitive_transducer("'N"), "'N")
+        self.assertEqual(self.test_case_sensitive_transducer("'n"), "n̓")
+        self.assertEqual(self.test_case_sensitive_transducer("'N", case_sensitive=False), "n̓")
+        self.assertEqual(self.test_case_sensitive_transducer("'n", case_sensitive=False), "n̓")
 
 if __name__ == "__main__":
     main()
