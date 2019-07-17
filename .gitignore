@@ -4,6 +4,7 @@
 # Setuptools distribution folder.
 /dist/
 build
+mypython
 
 # Ignore private test data
 g2p/tests/private

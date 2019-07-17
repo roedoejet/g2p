@@ -4,3 +4,4 @@ Flask
 flask_socketio
 flask-talisman
 pyyaml
+regex
