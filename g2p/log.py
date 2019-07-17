@@ -6,13 +6,13 @@
 import logging
 import coloredlogs
 import sys
-import codecs
 
 FIELD_STYLES = dict(
     levelname=dict(color='green', bold=coloredlogs.CAN_USE_BOLD_FONT),
 )
 
-sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+if sys.stdout.encoding != 'UTF-8':
+    sys.stdout = sys.stdout.reconfigure(encoding='UTF-8')
 
 def setup_logger(name):
     """ Create logger and configure with cool colors!
