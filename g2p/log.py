@@ -14,12 +14,14 @@ FIELD_STYLES = dict(
 if sys.stdout.encoding != 'UTF-8':
     sys.stdout = sys.stdout.reconfigure(encoding='UTF-8')
 
+if sys.stderr.encoding != 'UTF-8':
+    sys.stderr = sys.stderr.reconfigure(encoding='UTF-8')
+
 def setup_logger(name):
     """ Create logger and configure with cool colors!
     """
     logging.basicConfig(
-        level=logging.INFO,
-        handlers=[logging.StreamHandler(sys.stdout), logging.FileHandler('log.txt', 'w', 'utf-8')]
+        level=logging.INFO
         # filename="logger.log"
     )
     logger = logging.getLogger(name)
