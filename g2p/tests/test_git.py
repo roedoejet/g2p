@@ -2,7 +2,7 @@
 
 import os
 from unittest import main, TestCase
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 from g2p.transducer import CompositeTransducer, Transducer
 # Will cause errors on machines without private data
 from g2p.tests.private.git_data_wrangler import returnLinesFromDocuments
@@ -62,23 +62,23 @@ class GitTest(TestCase):
                 #             "Dihlxw Story 2013-04-29 for HD copy - clean.docx"),
             ])
 
-        # Declare all of our correspondences needed
-        self.orth_to_ipa = Correspondence(
+        # Declare all of our mappings needed
+        self.orth_to_ipa = Mapping(
             language={"lang": "git", "table": "Orthography (Deterministic)"})
 
         self.orth_to_ipa_transducer = Transducer(self.orth_to_ipa, as_is=True)
 
-        self.ipa_to_orth = Correspondence(
+        self.ipa_to_orth = Mapping(
             language={"lang": "git", "table": "Orthography (Deterministic)"}, reverse=True)
 
         self.ipa_to_orth_transducer = Transducer(self.ipa_to_orth)
 
-        self.apa_to_ipa = Correspondence(
+        self.apa_to_ipa = Mapping(
             language={"lang": "git", "table": "APA"})
 
         self.apa_to_ipa_transducer = Transducer(self.apa_to_ipa, as_is=True)
 
-        self.ipa_to_apa = Correspondence(
+        self.ipa_to_apa = Mapping(
             language={"lang": "git", "table": "APA"}, reverse=True)
 
         self.ipa_to_apa_transducer = Transducer(self.ipa_to_apa)

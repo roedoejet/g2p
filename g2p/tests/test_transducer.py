@@ -1,5 +1,5 @@
 from unittest import main, TestCase
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 from g2p.transducer import CompositeTransducer, Transducer
 
 
@@ -8,17 +8,17 @@ class TransducerTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_cor = Correspondence([{'from': 'a', "to": 'b'}])
-        self.test_cor_rev = Correspondence([{"from": 'a', "to": 'b'}], True)
-        self.test_cor_moh = Correspondence(
+        self.test_cor = Mapping([{'from': 'a', "to": 'b'}])
+        self.test_cor_rev = Mapping([{"from": 'a', "to": 'b'}], True)
+        self.test_cor_moh = Mapping(
             language={"lang": "moh", "table": "Orthography"})
-        self.test_cor_ordered_feed = Correspondence(
+        self.test_cor_ordered_feed = Mapping(
             [{"from": "a", "to": "b"}, {"from": "b", "to": "c"}])
-        self.test_cor_ordered_counter_feed = Correspondence(
+        self.test_cor_ordered_counter_feed = Mapping(
             [{"from": "b", "to": "c"}, {"from": "a", "to": "b"}])
-        self.test_as_is_cor = Correspondence(
+        self.test_as_is_cor = Mapping(
             [{"from": "j", "to": "ʣ"}, {"from": "'y", "to": "jˀ"}])
-        self.test_case_sensitive_cor = Correspondence([{"from": "'n", "to": "n̓"}])
+        self.test_case_sensitive_cor = Mapping([{"from": "'n", "to": "n̓"}])
         self.test_case_sensitive_transducer = Transducer(self.test_case_sensitive_cor)
         self.test_trans_as_is = Transducer(self.test_as_is_cor, as_is=True)
         self.test_trans_not_as_is = Transducer(self.test_as_is_cor)

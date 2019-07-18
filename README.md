@@ -8,18 +8,18 @@ This library is for handling arbitrary transductions between input and output se
 
 ## Table of Contents
 
-- [G2P](#g2p)
-  - [Table of Contents](#table-of-contents)
-  - [Background](#background)
-  - [Install](#install)
-  - [Usage](#usage)
-    - [Correspondence](#correspondence)
-    - [Transducer](#transducer)
-  - [Studio](#studio)
-  - [Maintainers](#maintainers)
-  - [Contributing](#contributing)
-    - [Contributors](#contributors)
-  - [License](#license)
+- [G2P](#G2P)
+  - [Table of Contents](#Table-of-Contents)
+  - [Background](#Background)
+  - [Install](#Install)
+  - [Usage](#Usage)
+    - [Mapping](#Mapping)
+    - [Transducer](#Transducer)
+  - [Studio](#Studio)
+  - [Maintainers](#Maintainers)
+  - [Contributing](#Contributing)
+    - [Contributors](#Contributors)
+  - [License](#License)
 
 ## Background
 
@@ -37,38 +37,38 @@ $ pip install -e .
 
 ## Usage
 
-In order to initialize a `Transducer`, you must first create a `Correspondence` object.
+In order to initialize a `Transducer`, you must first create a `Mapping` object.
 
-### Correspondence
+### Mapping
 
-You can create correspondences either by initializing them directly with a list:
+You can create mappings either by initializing them directly with a list:
 
 ```python
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 
-cors = Correspondence([{"from": 'a', "to": 'b'}])
+mappings = Mapping([{"from": 'a', "to": 'b'}])
 
 ```
 
-Alternatively, you can add a CSV file to g2p/cors/langs/<YourLang>/<YourLookupTable>
+Alternatively, you can add a CSV file to g2p/mappings/langs/<YourLang>/<YourLookupTable>
 
 ```python
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 
-cors = Correspondence(language={"lang": "<YourLang>", "table": "<YourLookupTable>"})
+mappings = Mapping(language={"lang": "<YourLang>", "table": "<YourLookupTable>"})
 
 ```
 
 ### Transducer
 
-Initialize a `Transducer` with a `Correspondence` object. Calling the `Transducer` then produces the output. In order to preserve the indices, pass index=True when calling the `Transducer`.
+Initialize a `Transducer` with a `Mapping` object. Calling the `Transducer` then produces the output. In order to preserve the indices, pass index=True when calling the `Transducer`.
 
 ```python
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
-cors = Correspondence([{"from": 'a', "to": 'b'}])
-transducer = Transducer(cors)
+mappings = Mapping([{"from": 'a', "to": 'b'}])
+transducer = Transducer(mappings)
 transducer('a')
 # 'b'
 transducer('a', index=True)

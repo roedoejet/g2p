@@ -1,14 +1,14 @@
 from unittest import main, TestCase
 import os
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 import unicodedata as ud
 
-class CorrespondenceTest(TestCase):
-    ''' Basic Correspondence Test
+class MappingTest(TestCase):
+    ''' Basic Mapping Test
     '''
 
     def setUp(self):
-        self.test_cor_norm = Correspondence([{'from': '\u0061\u0301', 'to': '\u0061\u0301'}])
+        self.test_cor_norm = Mapping([{'from': '\u0061\u0301', 'to': '\u0061\u0301'}])
     
     def test_normalization(self):
         self.assertEqual(ud.normalize('NFC', '\u0061\u0301'), self.test_cor_norm.cor_list[0]['from'])

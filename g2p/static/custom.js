@@ -89,7 +89,7 @@ document.getElementById("export-abbs").addEventListener("click", function (event
 
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
 var convert = function () {
-    socket.emit('conversion event', { data: { input_string: $('#input').val(), cors: hot.getData(), abbreviations: varhot.getData() } });
+    socket.emit('conversion event', { data: { input_string: $('#input').val(), mappings: hot.getData(), abbreviations: varhot.getData() } });
 }
 socket.on('conversion response', function (msg) {
     $('#output').text(msg['output_string']);
@@ -100,7 +100,7 @@ socket.on('connection response', function (msg) {
 })
 socket.on('table response', function (msg) {
     console.log(msg)
-    hot.loadData(msg['cors'])
+    hot.loadData(msg['mappings'])
     varhot.loadData(msg['abbs'])
     convert()
 })

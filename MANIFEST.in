@@ -1,4 +1,4 @@
-recursive-include g2p/cors/langs *
+recursive-include g2p/mappings/langs *
 include g2p/static/*.css
 include g2p/static/*.js
 include MANIFEST.in

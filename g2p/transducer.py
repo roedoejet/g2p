@@ -1,13 +1,13 @@
 '''
-Class for performing transductions based on correspondences
+Class for performing transductions based on mappings
 
 '''
 
 from typing import List, Pattern, Tuple, Union
 from collections import Counter
 import re
-from g2p.cors import Correspondence
-from g2p.cors.utils import create_fixed_width_lookbehind
+from g2p.mappings import Mapping
+from g2p.mappings.utils import create_fixed_width_lookbehind
 
 
 class IOStates():
@@ -43,17 +43,17 @@ class IOStates():
 
 
 class Transducer():
-    ''' A class for performing transductions based on correspondences
+    ''' A class for performing transductions based on mappings
 
 
     Attributes
     ----------
 
-    cors: Correspondence
-        Formatted input/output pairs using the g2p.cors.Correspondence class
+    mapping: Mapping
+        Formatted input/output pairs using the g2p.mappings.Mapping class
 
     as_is: bool
-        Determines whether to evaluate g2p rules in cors in the order they are, or
+        Determines whether to evaluate g2p rules in mapping in the order they are, or
         to reverse sort them by length
 
     _index_match_pattern: Pattern
@@ -74,7 +74,7 @@ class Transducer():
 
     '''
 
-    def __init__(self, cor_list: Correspondence, as_is: bool = False):
+    def __init__(self, cor_list: Mapping, as_is: bool = False):
         if not as_is:
             # sort by reverse len
             cor_list = sorted(cor_list(), key=lambda x: len(

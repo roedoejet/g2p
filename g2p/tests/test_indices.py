@@ -4,13 +4,13 @@
 """
 
 from unittest import main, TestCase
-from g2p.cors import Correspondence
+from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
 
 class IndicesTest(TestCase):
     ''' Basic Transducer Test
-    Preserve character-level correspondences:
+    Preserve character-level mappings:
 
     Test Case #1
         # Simple conversion
@@ -125,27 +125,27 @@ class IndicesTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_cor_one = Correspondence(
+        self.test_cor_one = Mapping(
             [{'from': 't', "to": 'p', 'after': 'e'}])
-        self.test_cor_two = Correspondence([{"from": 'e', "to": ""}])
-        self.test_cor_three = Correspondence(
+        self.test_cor_two = Mapping([{"from": 'e', "to": ""}])
+        self.test_cor_three = Mapping(
             [{"from": 't', 'to': 'ch', 'after': 'e'}])
-        self.test_cor_four = Correspondence([{'from': 'te', 'to': 'p'}])
-        self.test_cor_five = Correspondence(
+        self.test_cor_four = Mapping([{'from': 'te', 'to': 'p'}])
+        self.test_cor_five = Mapping(
             [{'before': 't', 'after': '$', 'from': '', 'to': 'y'}])
-        self.test_cor_six = Correspondence(
+        self.test_cor_six = Mapping(
             [{"from": "e{1}s{2}", "to": "s{2}e{1}"}]
         )
-        self.test_cor_seven = Correspondence(
+        self.test_cor_seven = Mapping(
             [{"from": "s", "to": "sh"}, {"from": "sh", "to": "s"}]
         )
-        self.test_cor_combining = Correspondence(
+        self.test_cor_combining = Mapping(
             [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
-        self.test_cor_wacky = Correspondence(
+        self.test_cor_wacky = Mapping(
             [{"from": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
               "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
-        self.test_cor_circum = Correspondence(
+        self.test_cor_circum = Mapping(
             [{'from': 'a{1}c{2}', 'to': 'c{2}a{1}c{2}'}]
         )
         self.trans_one = Transducer(self.test_cor_one)

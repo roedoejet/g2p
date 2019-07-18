@@ -11,7 +11,7 @@ class CommandLineError(Exception):
     def render(self, msg):
         return msg % vars(self)
 
-class CorrespondenceMissing(CommandLineError):
+class MappingMissing(CommandLineError):
     def __init__(self, language):
         self.language = language['lang']
         self.table = language['table']
@@ -19,9 +19,9 @@ class CorrespondenceMissing(CommandLineError):
     def __str__(self):
         return self.render((
             '\n'
-            'There is no correspondence with the name "%(table)s" for the language "%(language)s", please\n'
+            'There is no mapping with the name "%(table)s" for the language "%(language)s", please\n'
             'make sure you spelled the name correctly or go to\n'
-            'https://github.com/roedoejet/g2p/ for a list of correspondences'
+            'https://github.com/roedoejet/g2p/ for a list of mappings'
         ))
 
 class InvalidNormalization(CommandLineError):
@@ -35,16 +35,16 @@ class InvalidNormalization(CommandLineError):
             'Please use "none" or "NFC", "NFKC", "NFD", or "NFKD"\n'
         ))
 
-class MalformedCorrespondence(CommandLineError):
+class MalformedMapping(CommandLineError):
     def __init__(self):
         pass
     
     def __str__(self):
         return self.render((
             '\n'
-            'You provided a list as your correspondences. \n'
-            'Not all of your correspondences have values for "from" and "to"\n'
-            'Please fix your correspondences.'
+            'You provided a list as your mapping. \n'
+            'Not all of the input and output pairs in your mapping have values for "from" and "to"\n'
+            'Please fix your mapping.'
         ))
 
 class MalformedLookup(CommandLineError):
@@ -55,7 +55,7 @@ class MalformedLookup(CommandLineError):
         return self.render((
             '\n'
             'In order to use a default lookup table, you need to initialize \n'
-            'the Correspondence class with a dictionary containing two keys: "lang" and "table". \n'
+            'the Mapping class with a dictionary containing two keys: "lang" and "table". \n'
             'Please try again.'
         ))
 

@@ -7,10 +7,10 @@ Views and config to the G2P Studio web app
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
-from g2p.cors import Correspondence
-from g2p.cors.langs import LANGS
+from g2p.mappings import Mapping
+from g2p.mappings.langs import LANGS
 from g2p.transducer import Transducer
-from g2p.cors.utils import expand_abbreviations, flatten_abbreviations
+from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 
 
 VERSION = '0.0.1'
@@ -20,24 +20,24 @@ SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
 
 
-def return_empty_cors(n=DEFAULT_N):
-    ''' Return 'n' * empty cors
+def return_empty_mappings(n=DEFAULT_N):
+    ''' Return 'n' * empty mappings
     '''
     y = 0
-    cors = []
+    mappings = []
     while y < n:
-        cors.append({
+        mappings.append({
             "from": '',
             "to": '',
             "before": '',
             "after": ''
         })
         y += 1
-    return cors
+    return mappings
 
 
-def hot_to_cors(hot_data):
-    ''' Parse data from HandsOnTable to Correspondence format
+def hot_to_mappings(hot_data):
+    ''' Parse data from HandsOnTable to Mapping format
     '''
     return [{"before": x[2], "from": x[0], "after": x[3],
              "to": x[1]} for x in hot_data if x[0] and x[1]]
@@ -54,9 +54,9 @@ def home():
 def convert(message):
     """ Convert input text and return output
     """
-    cors = Correspondence(hot_to_cors(message['data']['cors']), abbreviations=flatten_abbreviations(
+    mappings = Mapping(hot_to_mappings(message['data']['mappings']), abbreviations=flatten_abbreviations(
         message['data']['abbreviations']))
-    transducer = Transducer(cors)
+    transducer = Transducer(mappings)
     output_string = transducer(message['data']['input_string'])
     emit('conversion response', {'output_string': output_string})
 
@@ -66,12 +66,12 @@ def change_table(message):
     """ Change the lookup table
     """
     if message['lang'] == 'custom':
-        cors = Correspondence(return_empty_cors())
+        mappings = Mapping(return_empty_mappings())
     else:
-        cors = Correspondence(
+        mappings = Mapping(
             language={'lang': message['lang'], 'table': message['table']})
-    emit('table response', {'cors': cors(),
-                            'abbs': expand_abbreviations(cors.abbreviations)})
+    emit('table response', {'mappings': mappings(),
+                            'abbs': expand_abbreviations(mappings.abbreviations)})
 
 
 @SOCKETIO.on('connect', namespace='/test')

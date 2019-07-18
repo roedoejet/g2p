@@ -16,13 +16,13 @@ from operator import methodcaller
 from openpyxl import load_workbook
 
 from g2p import exceptions
-from g2p.cors.langs import LANGS
-from g2p.cors.langs import __file__ as LANGS_FILE
-from g2p.cors.utils import flatten_abbreviations, unicode_escape
+from g2p.mappings.langs import LANGS
+from g2p.mappings.langs import __file__ as LANGS_FILE
+from g2p.mappings.utils import flatten_abbreviations, unicode_escape
 from g2p.log import LOGGER
 
 
-class Correspondence():
+class Mapping():
     """ Class for lookup tables
     """
 
@@ -38,13 +38,13 @@ class Correspondence():
             self.abbreviations = self.load_abbreviations_from_file(
                 abbreviations)
 
-        # Load workbook, either from correspondence spreadsheets, or user loaded
+        # Load workbook, either from mapping spreadsheets, or user loaded
         if not isinstance(language, type(None)):
             if isinstance(language, list):
                 self.path = 'user supplied data'
                 if all('from' in d for d in language) and all('to' in d for d in language):
                     if self.reverse:
-                        language = self.reverse_cors(language)
+                        language = self.reverse_mappings(language)
                     if not all('before' in cor for cor in language):
                         for cor in language:
                             cor['before'] = ''
@@ -53,7 +53,7 @@ class Correspondence():
                             cor['after'] = ''
                     self.cor_list = language
                 else:
-                    raise exceptions.MalformedCorrespondence()
+                    raise exceptions.MalformedMapping()
             elif isinstance(language, object):
                 if not "lang" in language or not "table" in language:
                     raise exceptions.MalformedLookup()
@@ -69,13 +69,13 @@ class Correspondence():
                             self.abbreviations = self.load_abbreviations_from_file(os.path.join(
                                 os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
                     except KeyError:
-                        raise exceptions.CorrespondenceMissing(language)
+                        raise exceptions.MappingMissing(language)
                     except IndexError:
-                        raise exceptions.CorrespondenceMissing(language)
+                        raise exceptions.MappingMissing(language)
             else:
                 self.cor_list = self.load_from_file(language)
         else:
-            raise exceptions.CorrespondenceMissing(language)
+            raise exceptions.MappingMissing(language)
 
         if self.norm_form in self.allowable_norm_forms:
             for cor in self.cor_list:
@@ -116,14 +116,14 @@ class Correspondence():
                     inp, normalized, self.norm_form)
             return normalized
 
-    def reverse_cors(self, cor_list):
+    def reverse_mappings(self, cor_list):
         ''' Reverse the table
         '''
         for cor in cor_list:
             cor['from'], cor['to'] = cor['to'], cor['from']
         return cor_list
 
-    def add_abbreviations(self, abbs, cors):
+    def add_abbreviations(self, abbs, mappings):
         ''' Return abbreviated forms, given a list of abbreviations.
 
         {'from': 'a', 'to': 'b', 'before': 'V', 'after': '' }
@@ -132,11 +132,11 @@ class Correspondence():
         {'from': 'a', 'to': 'b', 'before': 'a|b|c', 'after': ''}
         '''
         for abb in abbs:
-            for cor in cors:
+            for cor in mappings:
                 for key in cor.keys():
                     if cor[key] == abb['abbreviation']:
                         cor[key] = abb['stands_for']
-        return cors
+        return mappings
 
     def load_abbreviations_from_file(self, path):
         ''' Helper method to load abbreviations from file.
@@ -171,7 +171,7 @@ class Correspondence():
         # Create wordlist
         cor_list = []
         # Loop through rows in worksheet, create if statements for different columns
-        # and append Cors to cor_list.
+        # and append mappings to cor_list.
         for entry in work_sheet:
             new_cor = {"from": "", "to": "", "before": "", "after": ""}
             new_cor['from'] = entry[0]
@@ -191,7 +191,7 @@ class Correspondence():
             cor_list.append(new_cor)
 
         if self.reverse:
-            cor_list = self.reverse_cors(cor_list)
+            cor_list = self.reverse_mappings(cor_list)
 
         return cor_list
 
@@ -203,7 +203,7 @@ class Correspondence():
         # Create wordlist
         cor_list = []
         # Loop through rows in worksheet, create if statements for different columns
-        # and append Cors to cor_list.
+        # and append mappings to cor_list.
         for entry in work_sheet:
             new_cor = {"from": "", "to": "", "before": "", "after": ""}
             for col in entry:
@@ -232,6 +232,6 @@ class Correspondence():
             cor_list.append(new_cor)
 
         if self.reverse:
-            cor_list = self.reverse_cors(cor_list)
+            cor_list = self.reverse_mappings(cor_list)
 
         return cor_list
