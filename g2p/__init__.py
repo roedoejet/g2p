@@ -11,9 +11,8 @@ from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS
 from g2p.transducer import Transducer
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
+from g2p.__version__ import VERSION
 
-
-VERSION = '0.0.1'
 
 APP = Flask(__name__)
 SOCKETIO = SocketIO(APP)
