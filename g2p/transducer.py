@@ -31,12 +31,12 @@ class IOStates():
     def __iadd__(self, other):
         return IOStates(self.indices + other.indices)
 
-    def down(self):
+    def output(self):
         """ Return the output of a given transduction
         """
         return ''.join([state[1] for state in self.output_states])
 
-    def up(self):
+    def input(self):
         """ Return the input of a given transduction
         """
         return ''.join([state[1] for state in self.input_states])
