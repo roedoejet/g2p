@@ -16,12 +16,12 @@ setup(
     long_description='indexed grapheme to phoneme conversion',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['openpyxl'
-                      'coloredlogs'
-                      'Flask'
-                      'flask_socketio'
-                      'flask-talisman'
-                      'pyyaml'
+    install_requires=['openpyxl',
+                      'coloredlogs',
+                      'Flask',
+                      'flask_socketio',
+                      'flask-talisman',
+                      'pyyaml',
                       'regex'],
     zip_safe=False
 )
