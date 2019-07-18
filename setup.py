@@ -13,5 +13,6 @@ setup(
     long_description='indexed grapheme to phoneme conversion',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=install_requires
+    install_requires=install_requires,
+    zip_safe=False
 )
