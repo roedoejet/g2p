@@ -78,8 +78,8 @@ class Transducer():
         if not as_is:
             # sort by reverse len
             cor_list = sorted(cor_list(), key=lambda x: len(
-                x["from"]), reverse=True)
-        # turn "from" in to Regex
+                x["in"]), reverse=True)
+        # turn "in" in to Regex
         for cor in cor_list:
             cor['match_pattern'] = self.rule_to_regex(cor)
 
@@ -94,18 +94,18 @@ class Transducer():
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"""
-        if rule['before'] is not None:
-            before = rule["before"]
+        if rule['context_before'] is not None:
+            before = rule["context_before"]
         else:
             before = ''
-        if rule['after'] is not None:
-            after = rule["after"]
+        if rule['context_after'] is not None:
+            after = rule["context_after"]
         else:
             after = ''
-        from_match = re.sub(re.compile(r'{\d+}'), "", rule["from"])
+        input_match = re.sub(re.compile(r'{\d+}'), "", rule["in"])
         try:
             rule_regex = re.compile(create_fixed_width_lookbehind(
-                before) + from_match + f"(?={after})")
+                before) + input_match + f"(?={after})")
         except:
             breakpoint()
             raise Exception(
@@ -291,7 +291,7 @@ class Transducer():
                         if match_index == input_index:
                             # parse the final output
                             output_sub = re.sub(
-                                re.compile(r'{\d+}'), '', cor['to'])
+                                re.compile(r'{\d+}'), '', cor['out'])
                             inp = parsed
                             if not case_sensitive:
                                 outp = re.sub(cor["match_pattern"], output_sub, parsed, flags=re.I)
@@ -307,7 +307,7 @@ class Transducer():
                                 new_index = []
                             # get the new index tuple
                             non_null_index = self.return_index(
-                                input_index, output_index, cor['from'], cor['to'],
+                                input_index, output_index, cor['in'], cor['out'],
                                 to_parse, new_index)
                             # if it's not empty, then a rule has applied and it can overwrite
                             # the previous intermediate index tuple
@@ -346,7 +346,7 @@ class Transducer():
         else:
             # if not worrying about indices, just do the conversion rule-by-rule
             for cor in self.cor_list:
-                output_sub = re.sub(re.compile(r'{\d+}'), '', cor['to'])
+                output_sub = re.sub(re.compile(r'{\d+}'), '', cor['out'])
                 if re.search(cor["match_pattern"], parsed):
                     inp = parsed
                     if not case_sensitive:

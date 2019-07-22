@@ -126,27 +126,27 @@ class IndicesTest(TestCase):
 
     def setUp(self):
         self.test_cor_one = Mapping(
-            [{'from': 't', "to": 'p', 'after': 'e'}])
-        self.test_cor_two = Mapping([{"from": 'e', "to": ""}])
+            [{'in': 't', "out": 'p', 'context_after': 'e'}])
+        self.test_cor_two = Mapping([{"in": 'e', "out": ""}])
         self.test_cor_three = Mapping(
-            [{"from": 't', 'to': 'ch', 'after': 'e'}])
-        self.test_cor_four = Mapping([{'from': 'te', 'to': 'p'}])
+            [{"in": 't', 'out': 'ch', 'context_after': 'e'}])
+        self.test_cor_four = Mapping([{'in': 'te', 'out': 'p'}])
         self.test_cor_five = Mapping(
-            [{'before': 't', 'after': '$', 'from': '', 'to': 'y'}])
+            [{'context_before': 't', 'context_after': '$', 'in': '', 'out': 'y'}])
         self.test_cor_six = Mapping(
-            [{"from": "e{1}s{2}", "to": "s{2}e{1}"}]
+            [{"in": "e{1}s{2}", "out": "s{2}e{1}"}]
         )
         self.test_cor_seven = Mapping(
-            [{"from": "s", "to": "sh"}, {"from": "sh", "to": "s"}]
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
         )
         self.test_cor_combining = Mapping(
-            [{'from': 'k{1}\u0313{2}', 'to': "'{2}k{1}"}])
+            [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}])
         self.test_cor_wacky = Mapping(
-            [{"from": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
-              "to": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
+            [{"in": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
+              "out": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
         self.test_cor_circum = Mapping(
-            [{'from': 'a{1}c{2}', 'to': 'c{2}a{1}c{2}'}]
+            [{'in': 'a{1}c{2}', 'out': 'c{2}a{1}c{2}'}]
         )
         self.trans_one = Transducer(self.test_cor_one)
         self.trans_two = Transducer(self.test_cor_two)

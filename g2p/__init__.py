@@ -26,10 +26,10 @@ def return_empty_mappings(n=DEFAULT_N):
     mappings = []
     while y < n:
         mappings.append({
-            "from": '',
-            "to": '',
-            "before": '',
-            "after": ''
+            "in": '',
+            "out": '',
+            "context_before": '',
+            "context_after": ''
         })
         y += 1
     return mappings
@@ -38,8 +38,8 @@ def return_empty_mappings(n=DEFAULT_N):
 def hot_to_mappings(hot_data):
     ''' Parse data from HandsOnTable to Mapping format
     '''
-    return [{"before": x[2], "from": x[0], "after": x[3],
-             "to": x[1]} for x in hot_data if x[0] and x[1]]
+    return [{"context_before": x[2], "in": x[0], "context_after": x[3],
+             "out": x[1]} for x in hot_data if x[0] and x[1]]
 
 
 @APP.route('/')

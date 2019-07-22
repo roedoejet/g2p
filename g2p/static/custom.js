@@ -5,10 +5,10 @@ var dataObject = []
 var varsObject = []
 for (var j = 0; j < size; j++) {
     dataObject.push({
-        from: '',
-        to: '',
-        before: '',
-        after: ''
+        "in": '',
+        "out": '',
+        "context_before": '',
+        "context_after": ''
     });
     if (j === 0) {
         varsObject.push(['Vowels', 'a', 'e', 'i', 'o', 'u'])
@@ -21,19 +21,19 @@ var hotSettings = {
     data: dataObject,
     columns: [
         {
-            data: 'from',
+            data: 'in',
             type: 'text'
         },
         {
-            data: 'to',
+            data: 'out',
             type: 'text'
         },
         {
-            data: 'before',
+            data: 'context_before',
             type: 'text'
         },
         {
-            data: 'after',
+            data: 'context_after',
             type: 'text'
         }
     ],
@@ -44,8 +44,8 @@ var hotSettings = {
     maxRows: 150,
     rowHeaders: true,
     colHeaders: [
-        'From',
-        'To',
+        'In',
+        'Out',
         'Context Before',
         'Context After'
     ],

@@ -43,7 +43,7 @@ class MalformedMapping(CommandLineError):
         return self.render((
             '\n'
             'You provided a list as your mapping. \n'
-            'Not all of the input and output pairs in your mapping have values for "from" and "to"\n'
+            'Not all of the input and output pairs in your mapping have values for "in" and "out"\n'
             'Please fix your mapping.'
         ))
 

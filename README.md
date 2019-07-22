@@ -8,18 +8,18 @@ This library is for handling arbitrary transductions between input and output se
 
 ## Table of Contents
 
-- [G2P](#G2P)
-  - [Table of Contents](#Table-of-Contents)
-  - [Background](#Background)
-  - [Install](#Install)
-  - [Usage](#Usage)
-    - [Mapping](#Mapping)
-    - [Transducer](#Transducer)
-  - [Studio](#Studio)
-  - [Maintainers](#Maintainers)
-  - [Contributing](#Contributing)
-    - [Contributors](#Contributors)
-  - [License](#License)
+- [G2P](#g2p)
+  - [Table of Contents](#table-of-contents)
+  - [Background](#background)
+  - [Install](#install)
+  - [Usage](#usage)
+    - [Mapping](#mapping)
+    - [Transducer](#transducer)
+  - [Studio](#studio)
+  - [Maintainers](#maintainers)
+  - [Contributing](#contributing)
+    - [Contributors](#contributors)
+  - [License](#license)
 
 ## Background
 
@@ -46,7 +46,7 @@ You can create mappings either by initializing them directly with a list:
 ```python
 from g2p.mappings import Mapping
 
-mappings = Mapping([{"from": 'a', "to": 'b'}])
+mappings = Mapping([{"in": 'a', "out": 'b'}])
 
 ```
 
@@ -67,7 +67,7 @@ Initialize a `Transducer` with a `Mapping` object. Calling the `Transducer` then
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
-mappings = Mapping([{"from": 'a', "to": 'b'}])
+mappings = Mapping([{"in": 'a', "out": 'b'}])
 transducer = Transducer(mappings)
 transducer('a')
 # 'b'

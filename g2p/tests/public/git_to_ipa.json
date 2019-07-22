@@ -1,0 +1,160 @@
+{
+    "type": "mapping",
+    "authors": [
+      "Aidan Pine"
+    ],
+    "created": "2019-06-23",
+    "last_modified": "2019-06-23",
+    "in_metadata": {
+      "display_name": "Gitksan",
+      "display": true,
+      "lang": "git",
+      "format": "custom",
+      "delimiter": "",
+      "case_insensitive": true
+    },
+    "out_metadata": {
+      "lang": "git-ipa",
+      "format": "ipa",
+      "delimiter": ""
+    },
+    "map": [
+      {
+        "in": "a",
+        "out": "æ"
+      },
+      {
+        "in": "aa",
+        "out": "aː"
+      },
+      {
+        "in": "ee",
+        "out": "eː"
+      },
+      {
+        "in": "p",
+        "out": "b"
+      },
+      {
+        "in": "t",
+        "out": "d"
+      },
+      {
+        "in": "kw",
+        "out": "kʷ"
+      },
+      {
+        "in": "s",
+        "out": "s"
+      },
+      {
+        "in": "k",
+        "out": "k"
+      },
+      {
+        "in": "g",
+        "out": "ɟ"
+      },
+      {
+        "in": "gy",
+        "out": "ɟ"
+      },
+      {
+        "in": "gw",
+        "out": "ɡʷ"
+      },
+      {
+        "in": "d",
+        "out": "d"
+      },
+      {
+        "in": "b",
+        "out": "b"
+      },
+      {
+        "in": "l",
+        "out": "l"
+      },
+      {
+        "in": "r",
+        "out": "l"
+      },
+      {
+        "in": "m",
+        "out": "m"
+      },
+      {
+        "in": "n",
+        "out": "n"
+      },
+      {
+        "in": "x",
+        "out": "x"
+      },
+      {
+        "in": "w",
+        "out": "w"
+      },
+      {
+        "in": "o",
+        "out": "ɔ"
+      },
+      {
+        "in": "oo",
+        "out": "oː"
+      },
+      {
+        "in": "u",
+        "out": "u"
+      },
+      {
+        "in": "'",
+        "out": "ʔ"
+      },
+      {
+        "in": "y",
+        "out": "j"
+      },
+      {
+        "in": "k\u0332",
+        "out": "q"
+      },
+      {
+        "in": "ts",
+        "out": "t͡s"
+      },
+      {
+        "in": "g\u0332",
+        "out": "ʁ"
+      },
+      {
+        "in": "hl",
+        "out": "ɬ"
+      },
+      {
+        "in": "j",
+        "out": "d͡ʒ"
+      },
+      {
+        "in": "x\u0332",
+        "out": "χ"
+      },
+      {
+        "in": "xw",
+        "out": "xʷ"
+      },
+      {
+        "in": "e",
+        "out": "i"
+      },
+      {
+        "in": "uu",
+        "out": "uː"
+      },
+      {
+        "in": "ii",
+        "out": "iː"
+      }
+    ],
+    "comments": []
+  }

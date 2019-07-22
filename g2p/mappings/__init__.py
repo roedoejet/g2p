@@ -27,7 +27,8 @@ class Mapping():
     """
 
     def __init__(self, language, reverse: bool = False, norm_form: str = "NFC",
-                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False):
+                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
+        self.kwargs = kwargs
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.norm_form = norm_form
         self.path = language
@@ -42,15 +43,17 @@ class Mapping():
         if not isinstance(language, type(None)):
             if isinstance(language, list):
                 self.path = 'user supplied data'
-                if all('from' in d for d in language) and all('to' in d for d in language):
+                if all('in' in d for d in language) and all('out' in d for d in language):
                     if self.reverse:
                         language = self.reverse_mappings(language)
-                    if not all('before' in cor for cor in language):
+                    if not all('context_before' in cor for cor in language):
                         for cor in language:
-                            cor['before'] = ''
-                    if not all('after' in cor for cor in language):
+                            if not 'context_before' in cor:
+                                cor['context_before'] = ''
+                    if not all('context_after' in cor for cor in language):
                         for cor in language:
-                            cor['after'] = ''
+                            if not 'context_after' in cor:
+                                cor['context_after'] = ''
                     self.cor_list = language
                 else:
                     raise exceptions.MalformedMapping()
@@ -120,16 +123,16 @@ class Mapping():
         ''' Reverse the table
         '''
         for cor in cor_list:
-            cor['from'], cor['to'] = cor['to'], cor['from']
+            cor['in'], cor['out'] = cor['out'], cor['in']
         return cor_list
 
     def add_abbreviations(self, abbs, mappings):
         ''' Return abbreviated forms, given a list of abbreviations.
 
-        {'from': 'a', 'to': 'b', 'before': 'V', 'after': '' }
+        {'in': 'a', 'out': 'b', 'context_before': 'V', 'context_after': '' }
         {'abbreviation': 'V', 'stands_for': ['a','b','c']}
         ->
-        {'from': 'a', 'to': 'b', 'before': 'a|b|c', 'after': ''}
+        {'in': 'a', 'out': 'b', 'context_before': 'a|b|c', 'context_after': ''}
         '''
         for abb in abbs:
             for cor in mappings:
@@ -173,17 +176,17 @@ class Mapping():
         # Loop through rows in worksheet, create if statements for different columns
         # and append mappings to cor_list.
         for entry in work_sheet:
-            new_cor = {"from": "", "to": "", "before": "", "after": ""}
-            new_cor['from'] = entry[0]
-            new_cor['to'] = entry[1]
+            new_cor = {"in": "", "out": "", "context_before": "", "context_after": ""}
+            new_cor['in'] = entry[0]
+            new_cor['out'] = entry[1]
             try:
-                new_cor['before'] = entry[2]
+                new_cor['context_before'] = entry[2]
             except IndexError:
-                new_cor['before'] = ''
+                new_cor['context_before'] = ''
             try:
-                new_cor['after'] = entry[3]
+                new_cor['context_after'] = entry[3]
             except IndexError:
-                new_cor['after'] = ''
+                new_cor['context_after'] = ''
             for k in new_cor:
                 if isinstance(new_cor[k], float) or isinstance(new_cor[k], int):
                     new_cor[k] = str(new_cor[k])
@@ -205,30 +208,30 @@ class Mapping():
         # Loop through rows in worksheet, create if statements for different columns
         # and append mappings to cor_list.
         for entry in work_sheet:
-            new_cor = {"from": "", "to": "", "before": "", "after": ""}
+            new_cor = {"in": "", "out": "", "context_before": "", "context_after": ""}
             for col in entry:
                 if col.column == 'A':
                     value = col.value
                     if isinstance(value, (float, int)):
                         value = str(value)
-                    new_cor["from"] = value
+                    new_cor["in"] = value
                 if col.column == 'B':
                     value = col.value
                     if isinstance(value, (float, int)):
                         value = str(value)
-                    new_cor["to"] = value
+                    new_cor["out"] = value
                 if col.column == 'C':
                     if col.value is not None:
                         value = col.value
                         if isinstance(value, (float, int)):
                             value = str(value)
-                        new_cor["before"] = value
+                        new_cor["context_before"] = value
                 if col.column == 'D':
                     if col.value is not None:
                         value = col.value
                         if isinstance(value, (float, int)):
                             value = str(value)
-                        new_cor["after"] = value
+                        new_cor["context_after"] = value
             cor_list.append(new_cor)
 
         if self.reverse:

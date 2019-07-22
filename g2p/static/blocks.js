@@ -37,23 +37,23 @@ Blockly.defineBlocksWithJsonArray([
     // Block for rule creator.
     {
         "type": "create_rule",
-        "message0": "set \"from\" to: %1\nset \"to\" to: %2\nset \"before\" to: %3\nset \"after\" to: %4",
+        "message0": "set \"in\" to: %1\nset \"out\" to: %2\nset \"context_before\" to: %3\nset \"context_after\" to: %4",
         "args0": [
             {
                 "type": "input_value",
-                "name": "FROM",
+                "name": "IN",
             },
             {
                 "type": "input_value",
-                "name": "TO",
+                "name": "OUT",
             },
             {
                 "type": "input_value",
-                "name": "BEFORE",
+                "name": "CONTEXT_BEFORE",
             },
             {
                 "type": "input_value",
-                "name": "AFTER",
+                "name": "CONTEXT_AFTER",
             }
         ],
         "previousStatement": null,
@@ -98,35 +98,35 @@ Blockly.Python['abbreviations'] = function (block) {
 
 Blockly.JavaScript['create_rule'] = function (block) {
     code = 'let rule = {};\n';
-    let from = returnValueFromBlockInput(block, "FROM")
-    code += "rule['from'] = " + from + ";\n"
-    let to = returnValueFromBlockInput(block, "TO")
-    code += "rule['to'] = " + to + ";\n"
-    let before = returnValueFromBlockInput(block, "BEFORE")
-    code += "rule['before'] = " + before + ";\n"
-    let after = returnValueFromBlockInput(block, "AFTER")
-    code += "rule['after'] = " + after + ";\n"
+    let input = returnValueFromBlockInput(block, "IN")
+    code += "rule['in'] = " + input + ";\n"
+    let output = returnValueFromBlockInput(block, "OUT")
+    code += "rule['out'] = " + output + ";\n"
+    let before = returnValueFromBlockInput(block, "CONTEXT_BEFORE")
+    code += "rule['context_before'] = " + before + ";\n"
+    let after = returnValueFromBlockInput(block, "CONTEXTAFTER")
+    code += "rule['context_after'] = " + after + ";\n"
     code += 'console.log(rule);\n'
     code += 'let hot = window["hot"];\n'
     code += 'let rows = hot.countRows();\n'
     code += "hot.alter('insert_row', rows, 1);\n"
-    code += "hot.setDataAtCell(rows, 0, rule['from']);\n"
-    code += "hot.setDataAtCell(rows, 1, rule['to']);\n"
-    code += "hot.setDataAtCell(rows, 2, rule['before']);\n"
-    code += "hot.setDataAtCell(rows, 3, rule['after']);\n"
+    code += "hot.setDataAtCell(rows, 0, rule['in']);\n"
+    code += "hot.setDataAtCell(rows, 1, rule['out']);\n"
+    code += "hot.setDataAtCell(rows, 2, rule['context_before']);\n"
+    code += "hot.setDataAtCell(rows, 3, rule['context_after']);\n"
     return code;
 }
 
 Blockly.Python['create_rule'] = function (block) {
     code = 'rule = {}\n';
-    let from = returnValueFromBlockInput(block, "FROM", lang = 'py')
-    code += "rule['from'] = " + from + "\n"
-    let to = returnValueFromBlockInput(block, "TO", lang = 'py')
-    code += "rule['to'] = " + to + "\n"
-    let before = returnValueFromBlockInput(block, "BEFORE", lang = 'py')
-    code += "rule['before'] = " + before + "\n"
-    let after = returnValueFromBlockInput(block, "AFTER", lang = 'py')
-    code += "rule['after'] = " + after + "\n"
+    let input = returnValueFromBlockInput(block, "IN", lang = 'py')
+    code += "rule['in'] = " + input + "\n"
+    let output = returnValueFromBlockInput(block, "OUT", lang = 'py')
+    code += "rule['out'] = " + output + "\n"
+    let before = returnValueFromBlockInput(block, "CONTEXT_BEFORE", lang = 'py')
+    code += "rule['context_before'] = " + before + "\n"
+    let after = returnValueFromBlockInput(block, "CONTEXT_AFTER", lang = 'py')
+    code += "rule['context_after'] = " + after + "\n"
     code += 'print(rule)\n'
     return code;
 }
