@@ -20,7 +20,9 @@ class MappingTest(TestCase):
         self.assertNotEqual(self.test_cor_norm.cor_list[0]['in'], '\u0061\u0301')
 
     def test_json_map(self):
-        json_map = Mapping(self.json_map['map'])
+        json_map = Mapping(self.json_map['map'], **{k:v for k,v in self.json_map.items() if k != 'map'})
+        self.assertEqual(len(json_map), 34)
+        self.assertTrue(json_map.kwargs['in_metadata']['case_insensitive'])
 
 if __name__ == "__main__":
     main()
