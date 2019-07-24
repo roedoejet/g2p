@@ -125,40 +125,40 @@ class IndicesTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_cor_one = Mapping(
+        self.test_mapping_one = Mapping(
             [{'in': 't', "out": 'p', 'context_after': 'e'}])
-        self.test_cor_two = Mapping([{"in": 'e', "out": ""}])
-        self.test_cor_three = Mapping(
+        self.test_mapping_two = Mapping([{"in": 'e', "out": ""}])
+        self.test_mapping_three = Mapping(
             [{"in": 't', 'out': 'ch', 'context_after': 'e'}])
-        self.test_cor_four = Mapping([{'in': 'te', 'out': 'p'}])
-        self.test_cor_five = Mapping(
+        self.test_mapping_four = Mapping([{'in': 'te', 'out': 'p'}])
+        self.test_mapping_five = Mapping(
             [{'context_before': 't', 'context_after': '$', 'in': '', 'out': 'y'}])
-        self.test_cor_six = Mapping(
+        self.test_mapping_six = Mapping(
             [{"in": "e{1}s{2}", "out": "s{2}e{1}"}]
         )
-        self.test_cor_seven = Mapping(
+        self.test_mapping_seven = Mapping(
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
         )
-        self.test_cor_combining = Mapping(
+        self.test_mapping_combining = Mapping(
             [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}])
-        self.test_cor_wacky = Mapping(
+        self.test_mapping_wacky = Mapping(
             [{"in": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
               "out": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
-        self.test_cor_circum = Mapping(
+        self.test_mapping_circum = Mapping(
             [{'in': 'a{1}c{2}', 'out': 'c{2}a{1}c{2}'}]
         )
-        self.trans_one = Transducer(self.test_cor_one)
-        self.trans_two = Transducer(self.test_cor_two)
-        self.trans_three = Transducer(self.test_cor_three)
-        self.trans_four = Transducer(self.test_cor_four)
-        self.trans_five = Transducer(self.test_cor_five)
-        self.trans_six = Transducer(self.test_cor_six)
-        self.trans_seven = Transducer(self.test_cor_seven)
-        self.trans_seven_as_is = Transducer(self.test_cor_seven, True)
-        self.trans_combining = Transducer(self.test_cor_combining)
-        self.trans_wacky = Transducer(self.test_cor_wacky)
-        self.trans_circum = Transducer(self.test_cor_circum)
+        self.trans_one = Transducer(self.test_mapping_one)
+        self.trans_two = Transducer(self.test_mapping_two)
+        self.trans_three = Transducer(self.test_mapping_three)
+        self.trans_four = Transducer(self.test_mapping_four)
+        self.trans_five = Transducer(self.test_mapping_five)
+        self.trans_six = Transducer(self.test_mapping_six)
+        self.trans_seven = Transducer(self.test_mapping_seven)
+        self.trans_seven_as_is = Transducer(self.test_mapping_seven, as_is=True)
+        self.trans_combining = Transducer(self.test_mapping_combining)
+        self.trans_wacky = Transducer(self.test_mapping_wacky)
+        self.trans_circum = Transducer(self.test_mapping_circum)
 
     def test_no_indices(self):
         """ Test straightforward conversion without returning indices.
@@ -263,6 +263,7 @@ class IndicesTest(TestCase):
                                                  ((3, 't'), (3, 't'))])
         transducer = self.trans_seven('test', True)
         self.assertEqual(transducer[0], 'tesht')
+     
         self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
                                            ((1, 'e'), (1, 'e')),
                                            ((2, 's'), (2, 's')),

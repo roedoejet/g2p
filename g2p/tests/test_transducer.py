@@ -8,27 +8,29 @@ class TransducerTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_cor = Mapping([{'in': 'a', "out": 'b'}])
-        self.test_cor_rev = Mapping([{"in": 'a', "out": 'b'}], True)
-        self.test_cor_moh = Mapping(
+        self.test_mapping = Mapping([{'in': 'a', "out": 'b'}])
+        self.test_mapping_rev = Mapping([{"in": 'a', "out": 'b'}], reverse=True)
+        self.test_mapping_moh = Mapping(
             language={"lang": "moh", "table": "Orthography"})
-        self.test_cor_ordered_feed = Mapping(
+        self.test_mapping_ordered_feed = Mapping(
             [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}])
-        self.test_cor_ordered_counter_feed = Mapping(
+        self.test_mapping_ordered_counter_feed = Mapping(
             [{"in": "b", "out": "c"}, {"in": "a", "out": "b"}])
-        self.test_as_is_cor = Mapping(
+        self.test_as_is_mapping = Mapping(
             [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}])
-        self.test_case_sensitive_cor = Mapping([{"in": "'n", "out": "n̓"}])
-        self.test_case_sensitive_transducer = Transducer(self.test_case_sensitive_cor)
-        self.test_trans_as_is = Transducer(self.test_as_is_cor, as_is=True)
-        self.test_trans_not_as_is = Transducer(self.test_as_is_cor)
-        self.test_trans = Transducer(self.test_cor)
+        self.test_case_sensitive_mapping = Mapping([{"in": "'n", "out": "n̓"}], case_sensitive=True)
+        self.test_case_insensitive_mapping = Mapping([{"in": "'n", "out": "n̓"}], case_sensitive=False)
+        self.test_case_sensitive_transducer = Transducer(self.test_case_sensitive_mapping)
+        self.test_case_insensitive_transducer = Transducer(self.test_case_insensitive_mapping)
+        self.test_trans_as_is = Transducer(self.test_as_is_mapping, as_is=True)
+        self.test_trans_not_as_is = Transducer(self.test_as_is_mapping)
+        self.test_trans = Transducer(self.test_mapping)
         self.test_trans_ordered_feed = Transducer(
-            self.test_cor_ordered_feed, True)
+            self.test_mapping_ordered_feed, True)
         self.test_trans_ordered_counter_feed = Transducer(
-            self.test_cor_ordered_counter_feed, True)
-        self.test_trans_rev = Transducer(self.test_cor_rev)
-        self.test_trans_moh = Transducer(self.test_cor_moh, True)
+            self.test_mapping_ordered_counter_feed, True)
+        self.test_trans_rev = Transducer(self.test_mapping_rev)
+        self.test_trans_moh = Transducer(self.test_mapping_moh, True)
         self.test_trans_composite = CompositeTransducer(
             [self.test_trans, self.test_trans_rev])
         self.test_trans_composite_2 = CompositeTransducer(
@@ -70,8 +72,8 @@ class TransducerTest(TestCase):
     def test_case_sensitive(self):
         self.assertEqual(self.test_case_sensitive_transducer("'N"), "'N")
         self.assertEqual(self.test_case_sensitive_transducer("'n"), "n̓")
-        self.assertEqual(self.test_case_sensitive_transducer("'N", case_sensitive=False), "n̓")
-        self.assertEqual(self.test_case_sensitive_transducer("'n", case_sensitive=False), "n̓")
+        self.assertEqual(self.test_case_insensitive_transducer("'N"), "n̓")
+        self.assertEqual(self.test_case_insensitive_transducer("'n"), "n̓")
 
 if __name__ == "__main__":
     main()

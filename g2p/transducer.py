@@ -4,11 +4,12 @@ Class for performing transductions based on mappings
 '''
 
 from typing import List, Pattern, Tuple, Union
-from collections import Counter
+from collections import Counter, OrderedDict
+from collections.abc import Iterable
+from copy import deepcopy
 import re
 from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind
-
 
 class IOStates():
     ''' Class containing input and output states along of a Transducer along with indices
@@ -16,31 +17,89 @@ class IOStates():
 
     def __init__(self, indices: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
         self.indices = indices
-        self._input_states = sorted([io[0] for io in indices], key=lambda x: x[0])
-        self._output_states = sorted([io[1] for io in indices], key=lambda x: x[0])
-        self._input_count = Counter(i[0] for i in self._output_states)
-        self._output_count = Counter(i[0] for i in self._output_states)
-        self.input_states = [
-            io for io in self._input_states if self._input_count[io[0]] == 1]
-        self.output_states = [
-            io for io in self._output_states if self._output_count[io[0]] == 1]
+        self._input_states = sorted(
+            [io[0] for io in indices], key=lambda x: x[0])
+        self._output_states = sorted(
+            [io[1] for io in indices], key=lambda x: x[0])
+        self.condensed_input_states = [
+            list(v) for v in dict(self._input_states).items()]
+        self.condensed_output_states = [
+            list(v) for v in dict(self._output_states).items()]
 
     def __call__(self):
         return self.indices
+    
+    def __add__(self, other):
+        return IOStates(self.indices + other.indices)
 
     def __iadd__(self, other):
         return IOStates(self.indices + other.indices)
 
-    def output(self):
-        """ Return the output of a given transduction
-        """
-        return ''.join([state[1] for state in self.output_states])
+    def __iter__(self):
+        return iter(self.indices)
 
     def input(self):
         """ Return the input of a given transduction
         """
-        return ''.join([state[1] for state in self.input_states])
+        return ''.join([state[1] for state in self.condensed_input_states])
 
+    def output(self):
+        """ Return the output of a given transduction
+        """
+        return ''.join([state[1] for state in self.condensed_output_states])
+
+class IOStateSequence():
+    '''Class containing a sequence of IO States
+    '''
+    def __init__(self, *args: IOStates):
+        self.states = []
+        for arg in args:
+            if isinstance(arg, IOStates):
+                self.states.append(arg)
+            if isinstance(arg, IOStateSequence):
+                self.states += self.unpack_states(arg)
+
+    def __iter__(self):
+        return iter(self.states)
+
+    def unpack_states(self, seq):
+        states = []
+        for state in seq.states:
+            if isinstance(state, IOStates):
+                states.append(state)
+            if isinstance(state, Iterable) and any([isinstance(x, IOStates) for x in state]):
+                states += self.unpack_states(state)
+        return states
+
+    def compose_states(self, s1, s2):
+        inputs = []
+        output_i = 0
+        for io in s1:
+            if io[1][0] != output_i:
+                inputs.append(io[0][0])
+                output_i = io[1][0]
+        inputs.append(len(s1.condensed_input_states))
+        outputs = []
+        input_i = 0
+        output_i = 0
+        for io in s2:
+            if io[0][0] != input_i:
+                outputs.append(output_i)
+                input_i = io[0][0]
+            output_i = io[1][0]
+        outputs.append(len(s2.condensed_output_states))
+        if len(inputs) != len(outputs):
+            raise TypeError("Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
+        return list(zip(inputs, outputs))
+
+    def input(self):
+        return self.states[0].input()
+    
+    def output(self):
+        return self.states[-1].output()
+    
+    def composed(self):
+        return self.compose_states(self.states[0], self.states[-1])
 
 class Transducer():
     ''' A class for performing transductions based on mappings
@@ -74,40 +133,47 @@ class Transducer():
 
     '''
 
-    def __init__(self, cor_list: Mapping, as_is: bool = False):
-        if not as_is:
+    def __init__(self, mapping: Mapping, as_is: bool = False):
+        self.mapping = mapping
+        self.case_sensitive = mapping.case_sensitive
+        self.as_is = as_is
+        if not self.as_is:
             # sort by reverse len
-            cor_list = sorted(cor_list(), key=lambda x: len(
+            self.mapping = sorted(self.mapping(), key=lambda x: len(
                 x["in"]), reverse=True)
         # turn "in" in to Regex
-        for cor in cor_list:
-            cor['match_pattern'] = self.rule_to_regex(cor)
+        for io in self.mapping:
+            io['match_pattern'] = self.rule_to_regex(io)
 
-        self.as_is = as_is
-        self.cor_list = cor_list
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
-    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False, case_sensitive: bool = True):
-        return self.apply_rules(to_parse, index, debugger, case_sensitive)
+    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
+        return self.apply_rules(to_parse, index, debugger, output_delimiter)
 
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"""
-        if rule['context_before'] is not None:
+        if "context_before" in rule and rule['context_before']:
             before = rule["context_before"]
         else:
             before = ''
-        if rule['context_after'] is not None:
+        if 'context_after' in rule and rule['context_after']:
             after = rule["context_after"]
         else:
             after = ''
         input_match = re.sub(re.compile(r'{\d+}'), "", rule["in"])
         try:
-            rule_regex = re.compile(create_fixed_width_lookbehind(
-                before) + input_match + f"(?={after})")
+            inp = create_fixed_width_lookbehind(before) + input_match
+            if after:
+                inp += f"(?={after})"
+
+            if not self.case_sensitive:
+                rule_regex = re.compile(inp, re.I)
+            else:
+                rule_regex = re.compile(inp)
+
         except:
-            breakpoint()
             raise Exception(
                 'Your regex is malformed.')
         return rule_regex
@@ -159,37 +225,54 @@ class Transducer():
             produce tuples (w, z) and (x, y).
 
          """
+        if not self.case_sensitive:
+            original_str = original_str.lower()
         # (n)one-to-(n)one
         if len(input_string) <= 1 and len(output) <= 1:
             inp = (input_index, input_string)
             outp = (output_index, output)
             if not original_str[inp[0]] == inp[1]:
-                return [(intermediate_index[0][0], outp)]
+                try:
+                    return [(intermediate_index[0][0], outp)]
+                except:
+                    breakpoint()
             else:
                 return [(inp, outp)]
         # (n)one-to-many
         if len(input_string) <= 1 and len(output) > 1:
             new_index = []
+            # when an output character is added to the index, remove it
+            # so that it doesn't index the wrong letter if it's a duplicate
+            # ie. t -> TT will mistakenly produce [((0,t),(0,T)), ((0,t),(0,T))]
+            # instead of [((0,t),(0,T)), ((0,t),(1,T))] unless it is removed
+            chars_removed = []
             inp = (input_index, input_string)
             if not original_str[inp[0]] == inp[1]:
                 inp = intermediate_index[0][0]
             for output_char in output:
-                outp = (output_index + output.index(output_char), output_char)
+                outp_char_index = output.index(output_char)
+                outp = (output_index + outp_char_index + len(chars_removed), output_char)
+                # outp = (output_index + outp_char_index, output_char)
                 new_index.append((inp, outp))
-            # return [x for x in new_index if original_str[x[0][0]] == x[0][1]]
+                chars_removed.append(output[outp_char_index])
+                output = output[:outp_char_index] + output[outp_char_index+1:]
             return new_index
         # many-to-(n)one
         if len(input_string) > 1 and len(output) <= 1:
             new_index = []
+            chars_removed = []
             outp = (output_index, output)
             if not original_str[input_index:].startswith(input_string):
                 inp = intermediate_index[0][0]
                 new_index.append((inp, outp))
             else:
                 for input_char in input_string:
-                    inp = (input_index + input_string.index(input_char), input_char)
+                    inp_char_index = input_string.index(input_char)
+                    inp = (input_index + inp_char_index + len(chars_removed), input_char)
+                    # inp = (input_index + inp_char_index, input_char)
                     new_index.append((inp, outp))
-            # return [x for x in new_index if original_str[x[0][0]] == x[0][1]]
+                    chars_removed.append(input_string[inp_char_index])
+                    input_string = input_string[:inp_char_index] + input_string[inp_char_index+1:]
             return new_index
         # many-to-many -
         # TODO: should allow for default many-to-many indexing if no explicit,
@@ -251,8 +334,23 @@ class Transducer():
         # Sum the length of the inputs/outputs
         return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
-    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False, case_sensitive: bool = True) -> Union[str, Tuple[str, IOStates]]:
-        """ Apply all the rules in self.cor_list sequentially.
+    def splice_from_index(self, to_splice, index: Tuple[Tuple[int, str]]) -> str:
+        splicing_block = {}
+        for io in index:
+            key = io[0][0]
+            new_value = io[1][1]
+            if key in splicing_block:
+                splicing_block[key] += new_value
+            else:
+                splicing_block[key] = new_value
+        reverse_sorted = OrderedDict(
+            sorted(splicing_block.items(), key=lambda x: x[0]))
+        for index, string in reverse_sorted.items():
+            to_splice = to_splice[:index] + string + to_splice[index + 1:]
+        return to_splice
+
+    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False, output_delimiter: str = '') -> Union[str, Tuple[str, IOStates]]:
+        """ Apply all the rules in self.mapping sequentially.
 
         @param to_parse: str
             This is the string to convert
@@ -263,51 +361,62 @@ class Transducer():
         @param debugger: bool
             This is whether to show intermediary steps, default is False
 
+         @param output_delimiter: str
+            This is whether to insert a delimiter between each conversion, default is an empty string
+
         """
         indices = []
-        if not case_sensitive:
-            parsed = to_parse.lower()
-        else:
-            parsed = to_parse
+        # if not self.case_sensitive:
+        #     to_parse = to_parse.lower()
         rules_applied = []
+
+        # initialized parsed
+        parsed = to_parse
 
         if index:
             input_index = 0
             output_index = 0
-            for char in range(len(parsed)):
+            for char in range(len(to_parse)):
+                # set intermediate parsed
+                intermediate_parsed = to_parse
                 # account for many-to-many rules making the input index
                 # outpace the char-by-char parsing
                 if char < input_index:
                     continue
                 rule_applied = False
                 # go through rules
-                for cor in self.cor_list:
+                for io in self.mapping:
+                    io_copy = deepcopy(io)
                     # find all matches.
-                    for match in cor['match_pattern'].finditer(parsed):
+                    for match in io_copy['match_pattern'].finditer(intermediate_parsed):
                         match_index = match.start()
                         # if start index of match is equal to input index,
                         # then apply the rule and append the index-formatted tuple
                         # to the main indices list
                         if match_index == input_index:
+                            if output_delimiter:
+                                # Don't add the delimiter to the last segment
+                                if not char >= len(to_parse) -1:
+                                    io_copy['out'] += output_delimiter
+                            #     breakpoint()
                             # parse the final output
                             output_sub = re.sub(
-                                re.compile(r'{\d+}'), '', cor['out'])
-                            inp = parsed
-                            if not case_sensitive:
-                                outp = re.sub(cor["match_pattern"], output_sub, parsed, flags=re.I)
-                            else:
-                                outp = re.sub(cor["match_pattern"], output_sub, parsed)
+                                re.compile(r'{\d+}'), '', io_copy['out'])
+                            # breakpoint()
+                            inp = intermediate_parsed
+                            outp = re.sub(
+                                io_copy["match_pattern"], output_sub, intermediate_parsed)
                             if debugger and inp != outp:
                                 applied_rule = {"input": inp,
-                                                "rule": cor, "output": outp}
+                                                "rule": io_copy, "output": outp}
                                 rules_applied.append(applied_rule)
-                            parsed = outp
+                            intermediate_parsed = outp
                             # if no rule has yet applied, the new index is empty
                             if not rule_applied:
                                 new_index = []
                             # get the new index tuple
                             non_null_index = self.return_index(
-                                input_index, output_index, cor['in'], cor['out'],
+                                input_index, output_index, io_copy['in'], io_copy['out'],
                                 to_parse, new_index)
                             # if it's not empty, then a rule has applied and it can overwrite
                             # the previous intermediate index tuple
@@ -345,27 +454,30 @@ class Transducer():
                     output_index += 1
         else:
             # if not worrying about indices, just do the conversion rule-by-rule
-            for cor in self.cor_list:
-                output_sub = re.sub(re.compile(r'{\d+}'), '', cor['out'])
-                if re.search(cor["match_pattern"], parsed):
+            for io in self.mapping:
+                io_copy = deepcopy(io)
+                if output_delimiter:
+                    # Don't add the delimiter to the last segment
+                    if not char >= len(to_parse) -1:
+                        io_copy['out'] += output_delimiter
+                output_sub = re.sub(re.compile(r'{\d+}'), '', io_copy['out'])
+                if re.search(io_copy["match_pattern"], parsed):
                     inp = parsed
-                    if not case_sensitive:
-                        outp = re.sub(
-                            cor["match_pattern"], output_sub, parsed, re.I)
-                    else:
-                        outp = re.sub(
-                            cor["match_pattern"], output_sub, parsed)
+                    outp = re.sub(
+                        io_copy["match_pattern"], output_sub, parsed)
                     if debugger and inp != outp:
                         applied_rule = {"input": inp,
-                                        "rule": cor, "output": outp}
+                                        "rule": io_copy, "output": outp}
                         rules_applied.append(applied_rule)
                     parsed = outp
         if index and debugger:
-            return (parsed, IOStates(indices), rules_applied)
+            io_states = IOStates(indices)
+            return (io_states.output(), io_states, rules_applied)
         if debugger:
             return (parsed, rules_applied)
         if index:
-            return (parsed, IOStates(indices))
+            io_states = IOStates(indices)
+            return (io_states.output(), io_states)
         return parsed
 
 

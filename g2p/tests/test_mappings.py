@@ -10,14 +10,14 @@ class MappingTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_cor_norm = Mapping([{'in': '\u0061\u0301', 'out': '\u0061\u0301'}])
+        self.test_mapping_norm = Mapping([{'in': '\u0061\u0301', 'out': '\u0061\u0301'}])
         with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json')) as f:
             self.json_map = json.load(f)
     
     def test_normalization(self):
-        self.assertEqual(ud.normalize('NFC', '\u0061\u0301'), self.test_cor_norm.cor_list[0]['in'])
-        self.assertEqual(self.test_cor_norm.cor_list[0]['in'], '\u00e1')
-        self.assertNotEqual(self.test_cor_norm.cor_list[0]['in'], '\u0061\u0301')
+        self.assertEqual(ud.normalize('NFC', '\u0061\u0301'), self.test_mapping_norm.mapping[0]['in'])
+        self.assertEqual(self.test_mapping_norm.mapping[0]['in'], '\u00e1')
+        self.assertNotEqual(self.test_mapping_norm.mapping[0]['in'], '\u0061\u0301')
 
     def test_json_map(self):
         json_map = Mapping(self.json_map['map'], **{k:v for k,v in self.json_map.items() if k != 'map'})

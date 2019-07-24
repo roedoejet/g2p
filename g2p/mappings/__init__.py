@@ -27,10 +27,12 @@ class Mapping():
     """
 
     def __init__(self, language, reverse: bool = False, norm_form: str = "NFC",
-                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
+                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False,
+                 case_sensitive: bool = True, **kwargs):
         self.kwargs = kwargs
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.norm_form = norm_form
+        self.case_sensitive = case_sensitive
         self.path = language
         self.reverse = reverse
         if isinstance(abbreviations, defaultdict) or not abbreviations:
@@ -46,15 +48,15 @@ class Mapping():
                 if all('in' in d for d in language) and all('out' in d for d in language):
                     if self.reverse:
                         language = self.reverse_mappings(language)
-                    if not all('context_before' in cor for cor in language):
-                        for cor in language:
-                            if not 'context_before' in cor:
-                                cor['context_before'] = ''
-                    if not all('context_after' in cor for cor in language):
-                        for cor in language:
-                            if not 'context_after' in cor:
-                                cor['context_after'] = ''
-                    self.cor_list = language
+                    if not all('context_before' in io for io in language):
+                        for io in language:
+                            if not 'context_before' in io:
+                                io['context_before'] = ''
+                    if not all('context_after' in io for io in language):
+                        for io in language:
+                            if not 'context_after' in io:
+                                io['context_after'] = ''
+                    self.mapping = language
                 else:
                     raise exceptions.MalformedMapping()
             elif isinstance(language, object):
@@ -66,7 +68,7 @@ class Mapping():
                                 language['lang'].strip() or lang['code'].strip() == language['lang'].strip()][0]
                         table = [table for table in lang['tables']
                                  if table['name'].strip() == language['table'].strip()][0]
-                        self.cor_list = self.load_from_file(os.path.join(
+                        self.mapping = self.load_from_file(os.path.join(
                             os.path.dirname(LANGS_FILE), lang['code'], table['table']))
                         if "abbreviations" in table and table['abbreviations']:
                             self.abbreviations = self.load_abbreviations_from_file(os.path.join(
@@ -76,14 +78,14 @@ class Mapping():
                     except IndexError:
                         raise exceptions.MappingMissing(language)
             else:
-                self.cor_list = self.load_from_file(language)
+                self.mapping = self.load_from_file(language)
         else:
             raise exceptions.MappingMissing(language)
 
         if self.norm_form in self.allowable_norm_forms:
-            for cor in self.cor_list:
-                for k, v in cor.items():
-                    cor[k] = self.normalize(v)
+            for io in self.mapping:
+                for k, v in io.items():
+                    io[k] = self.normalize(v)
             if self.abbreviations:
                 self.abbreviations = {self.normalize(abb): [self.normalize(
                     x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
@@ -91,19 +93,21 @@ class Mapping():
             for abb, stands_for in self.abbreviations.items():
                 abb_match = re.compile(abb)
                 abb_repl = '|'.join(stands_for)
-                for cor in self.cor_list:
-                    for key in cor.keys():
-                        if re.search(abb_match, cor[key]):
-                            cor[key] = re.sub(abb_match, abb_repl, cor[key])
+                for io in self.mapping:
+                    for key in io.keys():
+                        if re.search(abb_match, io[key]):
+                            io[key] = re.sub(abb_match, abb_repl, io[key])
+        if not self.case_sensitive:
+            self.lower_mappings(self.mapping)
 
     def __len__(self):
-        return len(self.cor_list)
+        return len(self.mapping)
 
     def __call__(self):
-        return self.cor_list
+        return self.mapping
 
     def __iter__(self):
-        return iter(self.cor_list)
+        return iter(self.mapping)
 
     def normalize(self, inp: str):
         ''' Normalize to NFC(omposed) or NFD(ecomposed).
@@ -119,12 +123,20 @@ class Mapping():
                     inp, normalized, self.norm_form)
             return normalized
 
-    def reverse_mappings(self, cor_list):
+    def reverse_mappings(self, mapping):
         ''' Reverse the table
         '''
-        for cor in cor_list:
-            cor['in'], cor['out'] = cor['out'], cor['in']
-        return cor_list
+        for io in mapping:
+            io['in'], io['out'] = io['out'], io['in']
+        return mapping
+
+    def lower_mappings(self, mapping):
+        ''' Lower the table
+        '''
+        for io in mapping:
+            for k, v in io.items():
+                io[k] = v.lower()
+        return mapping
 
     def add_abbreviations(self, abbs, mappings):
         ''' Return abbreviated forms, given a list of abbreviations.
@@ -135,10 +147,10 @@ class Mapping():
         {'in': 'a', 'out': 'b', 'context_before': 'a|b|c', 'context_after': ''}
         '''
         for abb in abbs:
-            for cor in mappings:
-                for key in cor.keys():
-                    if cor[key] == abb['abbreviation']:
-                        cor[key] = abb['stands_for']
+            for io in mappings:
+                for key in io.keys():
+                    if io[key] == abb['abbreviation']:
+                        io[key] = abb['stands_for']
         return mappings
 
     def load_abbreviations_from_file(self, path):
@@ -172,31 +184,32 @@ class Mapping():
             for line in reader:
                 work_sheet.append(line)
         # Create wordlist
-        cor_list = []
+        mapping = []
         # Loop through rows in worksheet, create if statements for different columns
-        # and append mappings to cor_list.
+        # and append mappings to self.mapping.
         for entry in work_sheet:
-            new_cor = {"in": "", "out": "", "context_before": "", "context_after": ""}
-            new_cor['in'] = entry[0]
-            new_cor['out'] = entry[1]
+            new_io = {"in": "", "out": "",
+                      "context_before": "", "context_after": ""}
+            new_io['in'] = entry[0]
+            new_io['out'] = entry[1]
             try:
-                new_cor['context_before'] = entry[2]
+                new_io['context_before'] = entry[2]
             except IndexError:
-                new_cor['context_before'] = ''
+                new_io['context_before'] = ''
             try:
-                new_cor['context_after'] = entry[3]
+                new_io['context_after'] = entry[3]
             except IndexError:
-                new_cor['context_after'] = ''
-            for k in new_cor:
-                if isinstance(new_cor[k], float) or isinstance(new_cor[k], int):
-                    new_cor[k] = str(new_cor[k])
+                new_io['context_after'] = ''
+            for k in new_io:
+                if isinstance(new_io[k], float) or isinstance(new_io[k], int):
+                    new_io[k] = str(new_io[k])
 
-            cor_list.append(new_cor)
+            mapping.append(new_io)
 
         if self.reverse:
-            cor_list = self.reverse_mappings(cor_list)
+            mapping = self.reverse_mappings(mapping)
 
-        return cor_list
+        return mapping
 
     def load_from_workbook(self, language):
         ''' Parse table from Excel workbook
@@ -204,37 +217,38 @@ class Mapping():
         work_book = load_workbook(language)
         work_sheet = work_book.active
         # Create wordlist
-        cor_list = []
+        mapping = []
         # Loop through rows in worksheet, create if statements for different columns
-        # and append mappings to cor_list.
+        # and append mappings to self.mapping.
         for entry in work_sheet:
-            new_cor = {"in": "", "out": "", "context_before": "", "context_after": ""}
+            new_io = {"in": "", "out": "",
+                      "context_before": "", "context_after": ""}
             for col in entry:
                 if col.column == 'A':
                     value = col.value
                     if isinstance(value, (float, int)):
                         value = str(value)
-                    new_cor["in"] = value
+                    new_io["in"] = value
                 if col.column == 'B':
                     value = col.value
                     if isinstance(value, (float, int)):
                         value = str(value)
-                    new_cor["out"] = value
+                    new_io["out"] = value
                 if col.column == 'C':
                     if col.value is not None:
                         value = col.value
                         if isinstance(value, (float, int)):
                             value = str(value)
-                        new_cor["context_before"] = value
+                        new_io["context_before"] = value
                 if col.column == 'D':
                     if col.value is not None:
                         value = col.value
                         if isinstance(value, (float, int)):
                             value = str(value)
-                        new_cor["context_after"] = value
-            cor_list.append(new_cor)
+                        new_io["context_after"] = value
+            mapping.append(new_io)
 
         if self.reverse:
-            cor_list = self.reverse_mappings(cor_list)
+            mapping = self.reverse_mappings(mapping)
 
-        return cor_list
+        return mapping
