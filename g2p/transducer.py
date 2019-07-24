@@ -252,7 +252,6 @@ class Transducer():
             for output_char in output:
                 outp_char_index = output.index(output_char)
                 outp = (output_index + outp_char_index + len(chars_removed), output_char)
-                # outp = (output_index + outp_char_index, output_char)
                 new_index.append((inp, outp))
                 chars_removed.append(output[outp_char_index])
                 output = output[:outp_char_index] + output[outp_char_index+1:]
@@ -269,7 +268,6 @@ class Transducer():
                 for input_char in input_string:
                     inp_char_index = input_string.index(input_char)
                     inp = (input_index + inp_char_index + len(chars_removed), input_char)
-                    # inp = (input_index + inp_char_index, input_char)
                     new_index.append((inp, outp))
                     chars_removed.append(input_string[inp_char_index])
                     input_string = input_string[:inp_char_index] + input_string[inp_char_index+1:]
@@ -366,8 +364,6 @@ class Transducer():
 
         """
         indices = []
-        # if not self.case_sensitive:
-        #     to_parse = to_parse.lower()
         rules_applied = []
 
         # initialized parsed
@@ -398,11 +394,9 @@ class Transducer():
                                 # Don't add the delimiter to the last segment
                                 if not char >= len(to_parse) -1:
                                     io_copy['out'] += output_delimiter
-                            #     breakpoint()
                             # parse the final output
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', io_copy['out'])
-                            # breakpoint()
                             inp = intermediate_parsed
                             outp = re.sub(
                                 io_copy["match_pattern"], output_sub, intermediate_parsed)
