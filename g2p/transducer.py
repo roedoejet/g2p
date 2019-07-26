@@ -11,6 +11,7 @@ import re
 from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind
 from g2p.exceptions import MalformedMapping
+from g2p.log import LOGGER
 
 
 class IOStates():
@@ -27,6 +28,9 @@ class IOStates():
             list(v) for v in dict(self._input_states).items()]
         self.condensed_output_states = [
             list(v) for v in dict(self._output_states).items()]
+    
+    def __repr__(self):
+        return f"{self.__class__} object with input '{self.input()}' and output '{self.output()}'"
 
     def __call__(self):
         return self.indices
@@ -74,9 +78,13 @@ class IOStateSequence():
                 self.states.append(arg)
             if isinstance(arg, IOStateSequence):
                 self.states += self.unpack_states(arg)
+        # breakpoint()
 
     def __iter__(self):
         return iter(self.states)
+    
+    def __repr__(self):
+        return f"{self.__class__} object with input '{self.input()}' and output '{self.output()}'"
 
     def unpack_states(self, seq):
         states = []
@@ -88,6 +96,7 @@ class IOStateSequence():
         return states
 
     def compose_states(self, s1, s2):
+        breakpoint()
         inputs = []
         output_i = 0
         for io in s1:
@@ -105,8 +114,7 @@ class IOStateSequence():
             output_i = io[1][0]
         outputs.append(len(s2.condensed_output_states))
         if len(inputs) != len(outputs):
-            breakpoint()
-            raise TypeError(
+            LOGGER.warning(
                 "Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
         return list(zip(inputs, outputs))
 
@@ -288,6 +296,8 @@ class Transducer():
 
         TODO: potentially refactor this to lean more on the return_default_mapping method
          """
+        # if input_index == 5 and input_string == 's':
+        #     breakpoint()
         intermediate_index = deepcopy(intermediate_index)
         # if input_string == 'ʁ':
         if not self.case_sensitive:
@@ -316,8 +326,9 @@ class Transducer():
                 new_output[output_index + index] = output_char
 
             # attach it to intermediate_index and merge output
-            intermediate_index[input_index]['output'] = {**intermediate_output,
-                                                         **new_output}
+            if new_output:
+                intermediate_index[input_index]['output'] = {**intermediate_output,
+                                                            **new_output}
             return intermediate_index
 
         # many-to-(n)one
@@ -460,8 +471,8 @@ class Transducer():
                             # convert the final output
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', io_copy['out'])
-                            intermediate_output = re.sub(
-                                io_copy["match_pattern"], output_sub, intermediate_conversion)
+                            intermediate_output = intermediate_conversion[:char] + re.sub(
+                                io_copy["match_pattern"], output_sub, intermediate_conversion[char:])
                             if debugger and intermediate_conversion != intermediate_output:
                                 applied_rule = {"input": intermediate_conversion,
                                                 "rule": io_copy, "output": intermediate_output}
