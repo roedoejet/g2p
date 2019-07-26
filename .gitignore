@@ -17,3 +17,5 @@ g2p/tests/private
 
 *.log
 log.txt
+
+.coverage

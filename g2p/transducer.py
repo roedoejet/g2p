@@ -10,17 +10,19 @@ from copy import deepcopy
 import re
 from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind
+from g2p.exceptions import MalformedMapping
+
 
 class IOStates():
     ''' Class containing input and output states along of a Transducer along with indices
     '''
 
-    def __init__(self, indices: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
-        self.indices = indices
+    def __init__(self, index: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
+        self.indices = self.convert_index_to_tuples(index)
         self._input_states = sorted(
-            [io[0] for io in indices], key=lambda x: x[0])
+            [io[0] for io in self.indices], key=lambda x: x[0])
         self._output_states = sorted(
-            [io[1] for io in indices], key=lambda x: x[0])
+            [io[1] for io in self.indices], key=lambda x: x[0])
         self.condensed_input_states = [
             list(v) for v in dict(self._input_states).items()]
         self.condensed_output_states = [
@@ -28,7 +30,7 @@ class IOStates():
 
     def __call__(self):
         return self.indices
-    
+
     def __add__(self, other):
         return IOStates(self.indices + other.indices)
 
@@ -37,6 +39,18 @@ class IOStates():
 
     def __iter__(self):
         return iter(self.indices)
+
+    def convert_index_to_tuples(self, index):
+        try:
+            container = []
+            for input_index, val in index.items():
+                input_string = val['input_string']
+                for output_index, output_string in val['output'].items():
+                    container.append(((input_index, input_string),
+                                      (output_index, output_string)))
+            return container
+        except:
+            breakpoint()
 
     def input(self):
         """ Return the input of a given transduction
@@ -48,9 +62,11 @@ class IOStates():
         """
         return ''.join([state[1] for state in self.condensed_output_states])
 
+
 class IOStateSequence():
     '''Class containing a sequence of IO States
     '''
+
     def __init__(self, *args: IOStates):
         self.states = []
         for arg in args:
@@ -89,17 +105,20 @@ class IOStateSequence():
             output_i = io[1][0]
         outputs.append(len(s2.condensed_output_states))
         if len(inputs) != len(outputs):
-            raise TypeError("Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
+            breakpoint()
+            raise TypeError(
+                "Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
         return list(zip(inputs, outputs))
 
     def input(self):
         return self.states[0].input()
-    
+
     def output(self):
         return self.states[-1].output()
-    
+
     def composed(self):
         return self.compose_states(self.states[0], self.states[-1])
+
 
 class Transducer():
     ''' A class for performing transductions based on mappings
@@ -148,8 +167,8 @@ class Transducer():
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
-    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
-        return self.apply_rules(to_parse, index, debugger, output_delimiter)
+    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
+        return self.apply_rules(to_convert, index, debugger, output_delimiter)
 
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -178,9 +197,53 @@ class Transducer():
                 'Your regex is malformed.')
         return rule_regex
 
+    def return_match_starting_indices(self, match_object_list, match_indices):
+        indices = []
+        all_matches = [x['match_index'] for x in match_object_list]
+        for match_index in match_indices:
+            indices.append(len(''.join([match_object_list[i]['string'] for i, v in enumerate(
+                all_matches[:match_index])])))
+        return indices
+
+    def return_default_mapping(self, input_strings: List[str], output_strings: List[str],
+                               input_index_offsets: List[int], output_index_offsets: List[int]):
+        ''' This function takes an arbitrary number of input & output strings and their corresponding index offsets.
+            It then zips them up 1 by 1. If the input is longer than the output or vice versa, it continues zipping
+            using the last item of either input or output respectively.
+        '''
+        new_input = {}
+        # go through each input or output whichever is longer
+        for i, v in enumerate(range(0, max(len(input_strings), len(output_strings)))):
+            try:
+                input_i = i + input_index_offsets[i]
+            except IndexError:
+                input_i = i + input_index_offsets[-1]
+            try:
+                output_i = i + output_index_offsets[i]
+            except IndexError:
+                output_i = i + output_index_offsets[-1]
+            try:
+                # if inputs and outputs are the same length, just zip them up
+                new_input[input_i] = {'input_string': input_strings[i],
+                                      'output': {output_i: output_strings[i]}}
+            except IndexError:
+                # but if the input is longer than output, use the last output character
+                if len(input_strings) > len(output_strings):
+                    new_input[input_i - 1] = {'input_string': input_strings[i],
+                                              'output': {output_i - 1: output_strings[-1]}}
+                # conversely if the output is longer than input, use the last input character
+                elif len(input_strings) < len(output_strings):
+                    if input_i - 1 in new_input:
+                        intermediate_output = new_input[input_i - 1]['output']
+                    else:
+                        intermediate_output = {}
+                    new_input[input_i - 1] = {'input_string': input_strings[-1],
+                                              'output': {**intermediate_output, **{output_i - 1: output_strings[i]}}}
+        return new_input
+
     def return_index(self, input_index: int, output_index: int,
-                     input_string: str, output: str, original_str: str,
-                     intermediate_index: List[Tuple[Tuple[int, str]]]):
+                     input_string: str, output_string: str, original_str: str,
+                     intermediate_index: dict):
         """ Return a list of new index tuples.
 
         @param input_index: int
@@ -198,9 +261,8 @@ class Transducer():
         @param original_str: str
             This is the original input
 
-        @param intermediate_index: List[Tuple[Tuple[int, str]]]
-            This is a list of any intermediate indices for the current
-            input character in the parent loop
+        @param intermediate_index: dict
+            This is a dict containing the intermediate form of the index
 
 
         There are four main cases. Empty strings are still treated as having indices,
@@ -224,103 +286,109 @@ class Transducer():
             Given inputs w{1} and x{2} and outputs y{2}, z{1},
             produce tuples (w, z) and (x, y).
 
+        TODO: potentially refactor this to lean more on the return_default_mapping method
          """
+        intermediate_index = deepcopy(intermediate_index)
+        # if input_string == 'ʁ':
         if not self.case_sensitive:
             original_str = original_str.lower()
         # (n)one-to-(n)one
-        if len(input_string) <= 1 and len(output) <= 1:
-            inp = (input_index, input_string)
-            outp = (output_index, output)
-            if not original_str[inp[0]] == inp[1]:
-                try:
-                    return [(intermediate_index[0][0], outp)]
-                except:
-                    breakpoint()
-            else:
-                return [(inp, outp)]
+        if len(input_string) <= 1 and len(output_string) <= 1:
+            # create output dictionary
+            new_output = {}
+            new_output[output_index] = output_string
+            # attach it to intermediate_index and merge output
+            try:
+                intermediate_output = intermediate_index[input_index].get('output', {
+                })
+            except IndexError:
+                breakpoint()
+            intermediate_index[input_index]['output'] = {**intermediate_output,
+                                                         **new_output}
+            return intermediate_index
+
         # (n)one-to-many
-        if len(input_string) <= 1 and len(output) > 1:
-            new_index = []
-            # when an output character is added to the index, remove it
-            # so that it doesn't index the wrong letter if it's a duplicate
-            # ie. t -> TT will mistakenly produce [((0,t),(0,T)), ((0,t),(0,T))]
-            # instead of [((0,t),(0,T)), ((0,t),(1,T))] unless it is removed
-            chars_removed = []
-            inp = (input_index, input_string)
-            if not original_str[inp[0]] == inp[1]:
-                inp = intermediate_index[0][0]
-            for output_char in output:
-                outp_char_index = output.index(output_char)
-                outp = (output_index + outp_char_index + len(chars_removed), output_char)
-                new_index.append((inp, outp))
-                chars_removed.append(output[outp_char_index])
-                output = output[:outp_char_index] + output[outp_char_index+1:]
-            return new_index
+        if len(input_string) <= 1 and len(output_string) > 1:
+            new_output = {}
+            intermediate_output = intermediate_index[input_index].get(
+                'output', {})
+            for index, output_char in enumerate(output_string):
+                new_output[output_index + index] = output_char
+
+            # attach it to intermediate_index and merge output
+            intermediate_index[input_index]['output'] = {**intermediate_output,
+                                                         **new_output}
+            return intermediate_index
+
         # many-to-(n)one
-        if len(input_string) > 1 and len(output) <= 1:
-            new_index = []
-            chars_removed = []
-            outp = (output_index, output)
-            if not original_str[input_index:].startswith(input_string):
-                inp = intermediate_index[0][0]
-                new_index.append((inp, outp))
+        if len(input_string) > 1 and len(output_string) <= 1:
+            new_input = {}
+            new_output = {output_index: output_string}
+            # TODO: do we need intermediate output?
+            for index, input_char in enumerate(input_string):
+                # prevent feeding rules from leaving traces
+                if original_str[index + input_index] == input_char:
+                    new_input[input_index + index] = {'input_string': input_char,
+                                                      'output': new_output}
+
+            return {**intermediate_index, **new_input}
+
+        # many-to-many
+        if len(input_string) > 1 and len(output_string) > 1:
+            new_input = {}
+            if any(self._char_match_pattern.finditer(input_string)) and any(self._char_match_pattern.finditer(output_string)):
+                input_char_matches = [x.group()
+                                      for x in self._char_match_pattern.finditer(input_string)]
+
+                input_match_indices = [
+                    x.group() for x in self._index_match_pattern.finditer(input_string)]
+                inputs = [{'match_index': m, 'string': input_char_matches[i]}
+                          for i, m in enumerate(input_match_indices)]
+                output_char_matches = [x.group()
+                                       for x in self._char_match_pattern.finditer(output_string)]
+                output_match_indices = [
+                    x.group() for x in self._index_match_pattern.finditer(output_string)]
+                outputs = [{'match_index': m, 'string': output_char_matches[i]}
+                           for i, m in enumerate(output_match_indices)]
+
+                for match_index in input_match_indices:
+                    default_inputs = [x['string']
+                                      for x in inputs if x['match_index'] == match_index]
+                    default_outputs = [x['string']
+                                       for x in outputs if x['match_index'] == match_index]
+                    default_input_offsets = self.return_match_starting_indices(
+                        inputs, [i + input_index for i, v in enumerate(inputs) if v['match_index'] == match_index])
+                    default_output_offsets = self.return_match_starting_indices(
+                        outputs, [i + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index])
+                    default_index = self.return_default_mapping(
+                        default_inputs, default_outputs, default_input_offsets, default_output_offsets)
+                    new_input = {**new_input, **default_index}
+            elif any(self._char_match_pattern.finditer(input_string)) or any(self._char_match_pattern.finditer(output_string)):
+                raise MalformedMapping()
+            # if there are no explicit inputs or outputs
+            # then just use default many-to-many indexing
             else:
-                for input_char in input_string:
-                    inp_char_index = input_string.index(input_char)
-                    inp = (input_index + inp_char_index + len(chars_removed), input_char)
-                    new_index.append((inp, outp))
-                    chars_removed.append(input_string[inp_char_index])
-                    input_string = input_string[:inp_char_index] + input_string[inp_char_index+1:]
-            return new_index
-        # many-to-many -
-        # TODO: should allow for default many-to-many indexing if no explicit,
-        # curly-bracket indexing is provided
-        if len(input_string) > 1 and len(output) > 1:
-            # for input, zip the matching indices, the actual indices relative to the string,
-            # and the chars together
-            input_chars = [x.group()
-                           for x in self._char_match_pattern.finditer(input_string)]
-            input_match_indices = [
-                x.group() for x in self._index_match_pattern.finditer(input_string)]
-            zipped_input = zip(input_match_indices, input_chars)
-            inputs = sorted([(imi, input_index + input_match_indices.index(imi), ic)
-                             for imi, ic in zipped_input], key=lambda x: x[0])
-            # for output, zip the matching indices, the actual indices relative to the string,
-            # and the chars together
-            output_chars = [x.group()
-                            for x in self._char_match_pattern.finditer(output)]
-            output_match_indices = [
-                x.group() for x in self._index_match_pattern.finditer(output)]
-            zipped_output = zip(output_match_indices, range(
-                len(output_chars)), output_chars)
-            outputs = sorted([(omi, output_index + oi, oc)
-                              for omi, oi, oc in zipped_output], key=lambda x: x[0])
-            # zip i/o according to match index and remove match index
-            relations = []
-            if len(inputs) >= len(outputs):
-                for inp in inputs:
-                    index = inputs.index(inp)
+                # go through each input or output whichever is longer
+                for i, v in enumerate(range(0, max(len(input_string), len(output_string)))):
                     try:
-                        outp = outputs[index]
+                        # if inputs and outputs are the same length, just zip them up
+                        new_input[i] = {'input_string': input_string[i],
+                                        'output': {i: output_string[i]}}
                     except IndexError:
-                        outp = outputs[len(outputs)-1]
-                    if not original_str[inp[1]:].startswith(inp[2]):
-                        inp = ('intermediate', intermediate_index[0][0][0],
-                               intermediate_index[0][0][1])
-                    relation = (inp[1:], outp[1:])
-                    relations.append(relation)
-            else:
-                for outp in outputs:
-                    index = outputs.index(outp)
-                    try:
-                        inp = inputs[index][1:]
-                    except IndexError:
-                        inp = inputs[len(inputs)-1][1:]
-                    if not original_str[inp[0]:].startswith(inp[1]):
-                        inp = intermediate_index[0][0]
-                    relation = (inp, outp[1:])
-                    relations.append(relation)
-            return relations
+                        # but if the input is longer than output, use the last output character
+                        if len(input_string) > len(output_string):
+                            new_input[i] = {'input_string': input_string[i],
+                                            'output': {len(output_string) - 1: output_string[-1]}}
+                        # conversely if the output is longer than input, use the last input character
+                        elif len(input_string) < len(output_string):
+                            if len(input_string) - 1 in new_input:
+                                intermediate_output = new_input[len(
+                                    input_string) - 1]['output']
+                            else:
+                                intermediate_output = {}
+                            new_input[len(input_string) - 1] = {'input_string': input_string[-1],
+                                                                'output': {**intermediate_output, **{i: output_string[i]}}}
+            return {**intermediate_index, **new_input}
 
     def get_index_length(self, new_index: List[Tuple[Tuple[int, str]]]) -> Tuple[int, int]:
         """ Return how many unique input characters and output characters
@@ -347,10 +415,10 @@ class Transducer():
             to_splice = to_splice[:index] + string + to_splice[index + 1:]
         return to_splice
 
-    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False, output_delimiter: str = '') -> Union[str, Tuple[str, IOStates]]:
+    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = '') -> Union[str, Tuple[str, IOStates]]:
         """ Apply all the rules in self.mapping sequentially.
 
-        @param to_parse: str
+        @param to_convert: str
             This is the string to convert
 
         @param index: bool
@@ -363,87 +431,90 @@ class Transducer():
             This is whether to insert a delimiter between each conversion, default is an empty string
 
         """
-        indices = []
+        indices = {}
         rules_applied = []
 
-        # initialized parsed
-        parsed = to_parse
+        # initialized converted
+        converted = to_convert
 
         if index:
             input_index = 0
             output_index = 0
-            for char in range(len(to_parse)):
-                # set intermediate parsed
-                intermediate_parsed = to_parse
+            new_index = {}
+            for char in range(len(to_convert)):
                 # account for many-to-many rules making the input index
-                # outpace the char-by-char parsing
+                # outpace the char-by-char conversion
                 if char < input_index:
                     continue
+                if not char in new_index or new_index[char]['input_string'] != to_convert[char]:
+                    input_index = char
+                    new_index[char] = {'input_string': to_convert[char],
+                                       'output': {}}
+                # intermediate form refreshes on each new char
+                intermediate_conversion = to_convert
                 rule_applied = False
                 # go through rules
                 for io in self.mapping:
                     io_copy = deepcopy(io)
                     # find all matches.
-                    for match in io_copy['match_pattern'].finditer(intermediate_parsed):
+                    for match in io_copy['match_pattern'].finditer(intermediate_conversion):
                         match_index = match.start()
                         # if start index of match is equal to input index,
                         # then apply the rule and append the index-formatted tuple
                         # to the main indices list
                         if match_index == input_index:
+                            # breakpoint()
                             if output_delimiter:
                                 # Don't add the delimiter to the last segment
-                                if not char >= len(to_parse) -1:
+                                if not char >= len(to_convert) - 1:
                                     io_copy['out'] += output_delimiter
-                            # parse the final output
+                            # convert the final output
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', io_copy['out'])
-                            inp = intermediate_parsed
-                            outp = re.sub(
-                                io_copy["match_pattern"], output_sub, intermediate_parsed)
-                            if debugger and inp != outp:
-                                applied_rule = {"input": inp,
-                                                "rule": io_copy, "output": outp}
+                            intermediate_output = re.sub(
+                                io_copy["match_pattern"], output_sub, intermediate_conversion)
+                            if debugger and intermediate_conversion != intermediate_output:
+                                applied_rule = {"input": intermediate_conversion,
+                                                "rule": io_copy, "output": intermediate_output}
                                 rules_applied.append(applied_rule)
-                            intermediate_parsed = outp
-                            # if no rule has yet applied, the new index is empty
-                            if not rule_applied:
-                                new_index = []
+                            # update intermediate converted form
+                            intermediate_conversion = intermediate_output
                             # get the new index tuple
                             non_null_index = self.return_index(
                                 input_index, output_index, io_copy['in'], io_copy['out'],
-                                to_parse, new_index)
+                                to_convert, new_index)
                             # if it's not empty, then a rule has applied and it can overwrite
                             # the previous intermediate index tuple
                             if non_null_index:
                                 rule_applied = True
-                                new_index = non_null_index
+                                new_index = {**new_index, **non_null_index}
                         # if you've gone past the input_index, you can safely break from the loop
                         elif match_index > input_index:
                             break
                 # increase the index counters
+                # new_index = self.convert_index_to_tuples(new_index)
                 # if the rule applied
-                if rule_applied and new_index:
+                if rule_applied and new_index[char]['output']:
                     # add the new index to the list of indices
-                    indices += new_index
+                    indices = {**indices, **new_index}
                     # get the length of the new index inputs and outputs
-                    index_lengths = self.get_index_length(new_index)
-                    # increase the input counter by the length of the input
-                    if match.group():
-                        input_index += index_lengths[0]
-                    else:
-                        input_index += 1
-                    # increase the output counter by the length of the input
-                    if output_sub:
-                        output_index += index_lengths[1]
-                    else:
-                        output_index += 1
+                    # and increase the input counter by the length of the input
+                    input_index = max(new_index.keys())
+                    input_index += 1
+                    # do the same with outputs
+                    outputs = {}
+                    for k, v in new_index.items():
+                        outputs = {**outputs, **v['output']}
+                    output_index = max(outputs.keys())
+                    output_index += 1
                 else:
                     # if a rule wasn't applied, just add on the input character
                     # as the next input and output character
-                    indices.append((
-                        (input_index, to_parse[input_index]),  # input
-                        (output_index, to_parse[input_index])  # output
-                    ))
+                    new_index = {**new_index, **{input_index: {'input_string': to_convert[input_index],
+                                                               'output': {output_index: to_convert[input_index]}}}}
+                    # merge it
+                    indices = {**indices, **new_index}
+                    # add one to input and output
                     input_index += 1
                     output_index += 1
         else:
@@ -452,27 +523,27 @@ class Transducer():
                 io_copy = deepcopy(io)
                 if output_delimiter:
                     # Don't add the delimiter to the last segment
-                    if not char >= len(to_parse) -1:
+                    if not char >= len(to_convert) - 1:
                         io_copy['out'] += output_delimiter
                 output_sub = re.sub(re.compile(r'{\d+}'), '', io_copy['out'])
-                if re.search(io_copy["match_pattern"], parsed):
-                    inp = parsed
+                if re.search(io_copy["match_pattern"], converted):
+                    inp = converted
                     outp = re.sub(
-                        io_copy["match_pattern"], output_sub, parsed)
+                        io_copy["match_pattern"], output_sub, converted)
                     if debugger and inp != outp:
                         applied_rule = {"input": inp,
                                         "rule": io_copy, "output": outp}
                         rules_applied.append(applied_rule)
-                    parsed = outp
+                    converted = outp
         if index and debugger:
             io_states = IOStates(indices)
             return (io_states.output(), io_states, rules_applied)
         if debugger:
-            return (parsed, rules_applied)
+            return (converted, rules_applied)
         if index:
             io_states = IOStates(indices)
             return (io_states.output(), io_states)
-        return parsed
+        return converted
 
 
 class CompositeTransducer():
@@ -489,15 +560,15 @@ class CompositeTransducer():
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
 
-    def __call__(self, to_parse: str, index: bool = False, debugger: bool = False):
-        return self.apply_rules(to_parse, index, debugger)
+    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
+        return self.apply_rules(to_convert, index, debugger)
 
-    def apply_rules(self, to_parse: str, index: bool = False, debugger: bool = False):
-        parsed = to_parse
+    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False):
+        converted = to_convert
         indexed = []
         debugged = []
         for transducer in self._transducers:
-            response = transducer(parsed, index, debugger)
+            response = transducer(converted, index, debugger)
             if index:
                 indexed += response[1]
                 if debugger:
@@ -505,13 +576,13 @@ class CompositeTransducer():
             if debugger:
                 debugged += response[1]
             if index or debugger:
-                parsed = response[0]
+                converted = response[0]
             else:
-                parsed = response
+                converted = response
         if index and debugger:
-            return (parsed, indexed, debugged)
+            return (converted, indexed, debugged)
         if index:
-            return (parsed, indexed)
+            return (converted, indexed)
         if debugger:
-            return (parsed, debugged)
-        return parsed
+            return (converted, debugged)
+        return converted
