@@ -213,15 +213,15 @@ class Transducer():
         '''
         new_input = {}
         # go through each input or output whichever is longer
-        for i, v in enumerate(range(0, max(len(input_strings), len(output_strings)))):
+        for i in range(0, max(len(input_strings), len(output_strings))):
             try:
-                input_i = i + input_index_offsets[i]
+                input_i = input_index_offsets[i]
             except IndexError:
-                input_i = i + input_index_offsets[-1]
+                input_i = input_index_offsets[-1]
             try:
-                output_i = i + output_index_offsets[i]
+                output_i = output_index_offsets[i]
             except IndexError:
-                output_i = i + output_index_offsets[-1]
+                output_i = output_index_offsets[-1]
             try:
                 # if inputs and outputs are the same length, just zip them up
                 new_input[input_i] = {'input_string': input_strings[i],
@@ -229,16 +229,16 @@ class Transducer():
             except IndexError:
                 # but if the input is longer than output, use the last output character
                 if len(input_strings) > len(output_strings):
-                    new_input[input_i - 1] = {'input_string': input_strings[i],
-                                              'output': {output_i - 1: output_strings[-1]}}
+                    new_input[input_i] = {'input_string': input_strings[i],
+                                              'output': {output_i: output_strings[-1]}}
                 # conversely if the output is longer than input, use the last input character
                 elif len(input_strings) < len(output_strings):
-                    if input_i - 1 in new_input:
-                        intermediate_output = new_input[input_i - 1]['output']
+                    if input_i in new_input:
+                        intermediate_output = new_input[input_i]['output']
                     else:
                         intermediate_output = {}
-                    new_input[input_i - 1] = {'input_string': input_strings[-1],
-                                              'output': {**intermediate_output, **{output_i - 1: output_strings[i]}}}
+                    new_input[input_i] = {'input_string': input_strings[-1],
+                                              'output': {**intermediate_output, **{output_i: output_strings[i]}}}
         return new_input
 
     def return_index(self, input_index: int, output_index: int,
@@ -362,6 +362,7 @@ class Transducer():
                         outputs, [i + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index])
                     default_index = self.return_default_mapping(
                         default_inputs, default_outputs, default_input_offsets, default_output_offsets)
+                    
                     new_input = {**new_input, **default_index}
             elif any(self._char_match_pattern.finditer(input_string)) or any(self._char_match_pattern.finditer(output_string)):
                 raise MalformedMapping()
@@ -369,25 +370,14 @@ class Transducer():
             # then just use default many-to-many indexing
             else:
                 # go through each input or output whichever is longer
-                for i, v in enumerate(range(0, max(len(input_string), len(output_string)))):
-                    try:
-                        # if inputs and outputs are the same length, just zip them up
-                        new_input[i] = {'input_string': input_string[i],
-                                        'output': {i: output_string[i]}}
-                    except IndexError:
-                        # but if the input is longer than output, use the last output character
-                        if len(input_string) > len(output_string):
-                            new_input[i] = {'input_string': input_string[i],
-                                            'output': {len(output_string) - 1: output_string[-1]}}
-                        # conversely if the output is longer than input, use the last input character
-                        elif len(input_string) < len(output_string):
-                            if len(input_string) - 1 in new_input:
-                                intermediate_output = new_input[len(
-                                    input_string) - 1]['output']
-                            else:
-                                intermediate_output = {}
-                            new_input[len(input_string) - 1] = {'input_string': input_string[-1],
-                                                                'output': {**intermediate_output, **{i: output_string[i]}}}
+                # for i in range(0, max(len(input_string), len(output_string))):
+                default_inputs = [x for x in input_string]
+                default_outputs = [x for x in output_string]
+                default_input_offsets = [i + input_index for i, v in enumerate(default_inputs)]
+                default_output_offsets = [i + output_index for i, v in enumerate(default_outputs)]
+                default_index = self.return_default_mapping(
+                    default_inputs, default_outputs, default_input_offsets, default_output_offsets)
+                new_input = {**new_input, **default_index}
             return {**intermediate_index, **new_input}
 
     def get_index_length(self, new_index: List[Tuple[Tuple[int, str]]]) -> Tuple[int, int]:
@@ -463,7 +453,6 @@ class Transducer():
                         # then apply the rule and append the index-formatted tuple
                         # to the main indices list
                         if match_index == input_index:
-                            # breakpoint()
                             if output_delimiter:
                                 # Don't add the delimiter to the last segment
                                 if not char >= len(to_convert) - 1:
