@@ -4,6 +4,8 @@ import os
 import json
 from g2p.tests.private.git_data_wrangler import returnLinesFromDocuments
 from g2p.tests.private import __file__ as private_dir_f
+from g2p.mappings import Mapping
+from g2p.transducer import Transducer
 from typing import List, Union
 
 
@@ -14,6 +16,7 @@ class Stats:
         self.compare_string = compare_string 
     
     def 
+
 
 class Story:
     '''
@@ -37,7 +40,17 @@ class Story:
         
         else:
             raise TypeError("Not a supported file type")
-    
+
+    def __iter__(self):
+        return iter(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
+    # TODO: Document or delete!
+    def length_of_line(self, line_index, line_key):
+        return len(self.data[line_index][line_key])
+
     def parse_word(self, path: str):
         '''
         Takes the path to a word document.
@@ -54,18 +67,18 @@ class Story:
             json_data = json.load(f)
         return json_data
 
-
 if __name__ == '__main__':
+    mapping = Mapping(language={"lang": "git", "table": "Orthography (Deterministic)"}, case_sensitive=False)
+    transducer = Transducer(mapping)
     private_dir = os.path.dirname(private_dir_f)
     story_json = Story(os.path.join(private_dir, 'BS - Dihlxw', 'Dihlxw Story 2013-04-29 for HD copy - clean.json'))  
     story_docx = Story(os.path.join(private_dir, 'BS - Dihlxw', 'Dihlxw Story 2013-04-29 for HD copy - clean.docx')) 
     breakpoint()
 
 
-#Compare characters
-        
+# Compare characters
 
 
-#RETURN
-#Failure percentage as an integer
-#Count failures of the same type
+# RETURN
+# Failure percentage as an integer
+# Count failures of the same type
