@@ -18,8 +18,11 @@ class IOStates():
     ''' Class containing input and output states along of a Transducer along with indices
     '''
 
-    def __init__(self, index: List[Tuple[Tuple[int, str], Tuple[int, str]]]):
-        self.indices = self.convert_index_to_tuples(index)
+    def __init__(self, index: Union[dict, List[Tuple[Tuple[int, str], Tuple[int, str]]]]):
+        if isinstance(index, dict):
+            self.indices = self.convert_index_to_tuples(index)
+        else:
+            self.indices = index
         self._input_states = sorted(
             [io[0] for io in self.indices], key=lambda x: x[0])
         self._output_states = sorted(
@@ -28,7 +31,7 @@ class IOStates():
             list(v) for v in dict(self._input_states).items()]
         self.condensed_output_states = [
             list(v) for v in dict(self._output_states).items()]
-    
+
     def __repr__(self):
         return f"{self.__class__} object with input '{self.input()}' and output '{self.output()}'"
 
@@ -56,6 +59,42 @@ class IOStates():
         except:
             breakpoint()
 
+    def convert_tuples_to_index(self, tuples, reverse=False):
+        indices = {}
+        for tup in tuples:
+            if reverse:
+                inp = tup[1]
+                outp = tup[0]
+            else:
+                inp = tup[0]
+                outp = tup[1]
+            if inp[0] in indices:
+                intermediate_output = indices[inp[0]].get('output', {})
+            else:
+                intermediate_output = {}
+            indices[inp[0]] = {'input_string': inp[1],
+                               'output': {**intermediate_output, **{outp[0]: outp[1]}}}
+        return indices
+
+    def reduced(self):
+        reduced = []
+        intermediate_index = {
+            'in': self.indices[0][0][0], 'out': self.indices[0][1][0]}
+        for io in self.indices:
+            inp = io[0][0] + 1
+            outp = io[1][0]
+            if inp == intermediate_index['in'] and outp > intermediate_index['out']:
+                intermediate_index['out'] = outp
+            if inp > intermediate_index['in'] and outp <= intermediate_index['out']:
+                intermediate_index['in'] = inp
+            if inp > intermediate_index['in'] and outp > intermediate_index['out']:
+                reduced.append(intermediate_index)
+                intermediate_index = {'in': inp, 'out': outp}
+        reduced.append({"in": len(self.condensed_input_states),
+                        "out": len(self.condensed_output_states)})
+        reduced = [(x['in'], x['out']) for x in reduced]
+        return reduced
+
     def input(self):
         """ Return the input of a given transduction
         """
@@ -82,7 +121,7 @@ class IOStateSequence():
 
     def __iter__(self):
         return iter(self.states)
-    
+
     def __repr__(self):
         return f"{self.__class__} object with input '{self.input()}' and output '{self.output()}'"
 
@@ -95,28 +134,21 @@ class IOStateSequence():
                 states += self.unpack_states(state)
         return states
 
-    def compose_states(self, s1, s2):
-        breakpoint()
-        inputs = []
-        output_i = 0
-        for io in s1:
-            if io[1][0] != output_i:
-                inputs.append(io[0][0])
-                output_i = io[1][0]
-        inputs.append(len(s1.condensed_input_states))
-        outputs = []
-        input_i = 0
-        output_i = 0
-        for io in s2:
-            if io[0][0] != input_i:
-                outputs.append(output_i)
-                input_i = io[0][0]
-            output_i = io[1][0]
-        outputs.append(len(s2.condensed_output_states))
-        if len(inputs) != len(outputs):
+    def composed(self, s1, s2):
+        # the two states being composed must match
+        if len(s1.condensed_output_states) != len(s2.condensed_input_states):
             LOGGER.warning(
                 "Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
-        return list(zip(inputs, outputs))
+        composed = []
+        for io_1 in s1:
+            s1_in = io_1[0]
+            s1_out = io_1[1]
+            for io_2 in s2:
+                s2_in = io_2[0]
+                s2_out = io_2[1]
+                if s2_in[0] == s1_out[0]:
+                    composed.append((s1_in, s2_out))
+        return IOStates(composed)
 
     def input(self):
         return self.states[0].input()
@@ -124,8 +156,19 @@ class IOStateSequence():
     def output(self):
         return self.states[-1].output()
 
-    def composed(self):
-        return self.compose_states(self.states[0], self.states[-1])
+    def reduced(self):
+        ''' This is a reduced tuple-based format for indices. It requires that IOStates in the
+        IOStateSequence be composed, and then they can be reduced to a list of tuples where each
+        tuple contains an input and output index corresponding with that character. The list is equal
+        to the length of unique characters
+        '''
+        composed_states = self.composed(self.states[0], self.states[1])
+        counter = 2
+        while counter < len(self.states):
+            composed_states = self.composed(
+                composed_states, self.states[counter])
+            counter += 1
+        return composed_states.reduced()
 
 
 class Transducer():
@@ -238,7 +281,7 @@ class Transducer():
                 # but if the input is longer than output, use the last output character
                 if len(input_strings) > len(output_strings):
                     new_input[input_i] = {'input_string': input_strings[i],
-                                              'output': {output_i: output_strings[-1]}}
+                                          'output': {output_i: output_strings[-1]}}
                 # conversely if the output is longer than input, use the last input character
                 elif len(input_strings) < len(output_strings):
                     if input_i in new_input:
@@ -246,7 +289,7 @@ class Transducer():
                     else:
                         intermediate_output = {}
                     new_input[input_i] = {'input_string': input_strings[-1],
-                                              'output': {**intermediate_output, **{output_i: output_strings[i]}}}
+                                          'output': {**intermediate_output, **{output_i: output_strings[i]}}}
         return new_input
 
     def return_index(self, input_index: int, output_index: int,
@@ -328,7 +371,7 @@ class Transducer():
             # attach it to intermediate_index and merge output
             if new_output:
                 intermediate_index[input_index]['output'] = {**intermediate_output,
-                                                            **new_output}
+                                                             **new_output}
             return intermediate_index
 
         # many-to-(n)one
@@ -373,7 +416,7 @@ class Transducer():
                         outputs, [i + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index])
                     default_index = self.return_default_mapping(
                         default_inputs, default_outputs, default_input_offsets, default_output_offsets)
-                    
+
                     new_input = {**new_input, **default_index}
             elif any(self._char_match_pattern.finditer(input_string)) or any(self._char_match_pattern.finditer(output_string)):
                 raise MalformedMapping()
@@ -384,8 +427,10 @@ class Transducer():
                 # for i in range(0, max(len(input_string), len(output_string))):
                 default_inputs = [x for x in input_string]
                 default_outputs = [x for x in output_string]
-                default_input_offsets = [i + input_index for i, v in enumerate(default_inputs)]
-                default_output_offsets = [i + output_index for i, v in enumerate(default_outputs)]
+                default_input_offsets = [
+                    i + input_index for i, v in enumerate(default_inputs)]
+                default_output_offsets = [
+                    i + output_index for i, v in enumerate(default_outputs)]
                 default_index = self.return_default_mapping(
                     default_inputs, default_outputs, default_input_offsets, default_output_offsets)
                 new_input = {**new_input, **default_index}
@@ -564,6 +609,7 @@ class CompositeTransducer():
         return self.apply_rules(to_convert, index, debugger)
 
     def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False):
+        #TODO: should turn indexed into IOStateSequence
         converted = to_convert
         indexed = []
         debugged = []
