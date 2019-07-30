@@ -11,15 +11,10 @@ FIELD_STYLES = dict(
     levelname=dict(color='green', bold=coloredlogs.CAN_USE_BOLD_FONT),
 )
 
-# if sys.stdout.encoding != 'UTF-8':
-#     sys.stdout = sys.stdout.reconfigure(encoding='UTF-8')
-
-# if sys.stderr.encoding != 'UTF-8':
-#     sys.stderr = sys.stderr.reconfigure(encoding='UTF-8')
-
 def setup_logger(name):
     """ Create logger and configure with cool colors!
     """
+
     logging.basicConfig(
         level=logging.INFO
         # filename="logger.log"
