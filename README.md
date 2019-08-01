@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # gi2pi
+=======
+# Gⁱ-2-Pⁱ
+>>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
 
 [![Coverage Status](https://coveralls.io/repos/github/roedoejet/gi2pi/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/gi2pi?branch=master)
 [![Build Status](https://travis-ci.org/roedoejet/gi2pi.svg?branch=master)](https://travis-ci.org/roedoejet/gi2pi)
@@ -11,7 +15,11 @@ This library is for handling arbitrary transductions between input and output se
 
 ## Table of Contents
 
+<<<<<<< HEAD
 - [gi2pi](#gi2pi)
+=======
+- [G2P](#gi2pi)
+>>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
   - [Table of Contents](#table-of-contents)
   - [Background](#background)
   - [Install](#install)
@@ -30,7 +38,9 @@ The initial version of this package was developed by [Patrick Littell](https://g
 
 ## Install
 
-The best thing to do is clone the repo and pip install it locally.
+The best thing to do is install with pip `pip install gi2pi`. 
+
+Otherwise, clone the repo and pip install it locally.
 
 ```sh
 $ git clone https://github.com/roedoejet/gi2pi.git
