@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# gi2pi
-=======
 # Gⁱ-2-Pⁱ
->>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
 
 [![Coverage Status](https://coveralls.io/repos/github/roedoejet/gi2pi/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/gi2pi?branch=master)
 [![Build Status](https://travis-ci.org/roedoejet/gi2pi.svg?branch=master)](https://travis-ci.org/roedoejet/gi2pi)
@@ -14,12 +10,7 @@
 This library is for handling arbitrary transductions between input and output segments while preserving indices.
 
 ## Table of Contents
-
-<<<<<<< HEAD
-- [gi2pi](#gi2pi)
-=======
 - [G2P](#gi2pi)
->>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
   - [Table of Contents](#table-of-contents)
   - [Background](#background)
   - [Install](#install)
