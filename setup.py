@@ -1,13 +1,16 @@
 ''' Setup for gi2pi
 '''
 from setuptools import setup, find_packages
+import datetime as dt
+
+build_no = dt.datetime.today().strftime('%Y%m%d')
 
 # Ugly hack to read the current version number without importing gi2pi:
 # (works by )
 with open("gi2pi/__version__.py", "r", encoding="UTF-8") as version_file:
     namespace = {}
     exec(version_file.read(), namespace)
-    VERSION = namespace['VERSION']
+    VERSION = namespace['VERSION'] + "." + build_no
 
 setup(
     name='gi2pi',
