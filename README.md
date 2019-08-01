@@ -11,7 +11,7 @@ This library is for handling arbitrary transductions between input and output se
 
 ## Table of Contents
 
-- [Gⁱ2Pⁱ](#gi2pi)
+- [G2P](#gi2pi)
   - [Table of Contents](#table-of-contents)
   - [Background](#background)
   - [Install](#install)
