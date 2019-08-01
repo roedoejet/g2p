@@ -2,6 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/roedoejet/gi2pi/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/gi2pi?branch=master)
 [![Build Status](https://travis-ci.org/roedoejet/gi2pi.svg?branch=master)](https://travis-ci.org/roedoejet/gi2pi)
+[![PyPI package](https://img.shields.io/pypi/v/gi2pi.svg)](https://pypi.org/project/gi2pi/)
 [![license](https://img.shields.io/github/license/roedoejet/gi2pi.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/gi2pi)
 
