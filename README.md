@@ -1,5 +1,8 @@
 # G2P
 
+[![Coverage Status](https://coveralls.io/repos/github/roedoejet/g2p/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/g2p?branch=master)
+[![Build Status](https://travis-ci.org/roedoejet/g2p.svg?branch=master)](https://travis-ci.org/roedoejet/g2p)
+[![license](https://img.shields.io/github/license/roedoejet/g2p.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/g2p)
 
 > Grapheme-to-Phoneme transductions that preserve input and output indices!
