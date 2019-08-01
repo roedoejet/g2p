@@ -7,7 +7,7 @@ build
 venv
 
 # Ignore private test data
-g2p/tests/private
+gi2pi/tests/private
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info

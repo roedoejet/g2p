@@ -2,8 +2,8 @@
 
 from unittest import main, TestCase
 import os
-from g2p.mappings import Mapping
-from g2p.transducer import Transducer
+from gi2pi.mappings import Mapping
+from gi2pi.transducer import Transducer
 
 
 class LangTest(TestCase):

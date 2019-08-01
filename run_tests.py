@@ -1,4 +1,4 @@
-from g2p.tests.run import run_tests
+from gi2pi.tests.run import run_tests
 import sys
 
 try:

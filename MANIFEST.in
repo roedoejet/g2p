@@ -1,6 +1,6 @@
-recursive-include g2p/mappings/langs *
-include g2p/static/*.css
-include g2p/static/*.js
+recursive-include gi2pi/mappings/langs *
+include gi2pi/static/*.css
+include gi2pi/static/*.js
 include MANIFEST.in
 exclude .gitignore
 recursive-exclude * *.py[co]

@@ -1,10 +1,10 @@
 import os
 from unittest import TestLoader, TextTestRunner, TestSuite
 # Unit tests
-from g2p.tests.test_mappings import MappingTest
-from g2p.tests.test_indices import IndicesTest
-from g2p.tests.test_langs import LangTest
-from g2p.tests.test_transducer import TransducerTest
+from gi2pi.tests.test_mappings import MappingTest
+from gi2pi.tests.test_indices import IndicesTest
+from gi2pi.tests.test_langs import LangTest
+from gi2pi.tests.test_transducer import TransducerTest
 
 
 loader = TestLoader()

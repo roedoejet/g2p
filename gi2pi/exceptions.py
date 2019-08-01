@@ -21,7 +21,7 @@ class MappingMissing(CommandLineError):
             '\n'
             'There is no mapping with the name "%(table)s" for the language "%(language)s", please\n'
             'make sure you spelled the name correctly or go to\n'
-            'https://github.com/roedoejet/g2p/ for a list of mappings'
+            'https://github.com/roedoejet/gi2pi/ for a list of mappings'
         ))
 
 class InvalidNormalization(CommandLineError):

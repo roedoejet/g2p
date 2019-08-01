@@ -14,21 +14,21 @@ before_install:
 # virtualenv
 install:
   # Install Python dependencies
-  - pip3 install -r /home/travis/build/roedoejet/g2p/requirements.txt
+  - pip3 install -r /home/travis/build/roedoejet/gi2pi/requirements.txt
   # Install testing requirements
   - pip3 install coverage
   - pip3 install coveralls
   - pip3 install gunicorn
-  # Install g2p
-  - cd /home/travis/build/roedoejet/g2p && pip3 install -e .
+  # Install gi2pi
+  - cd /home/travis/build/roedoejet/gi2pi && pip3 install -e .
 
 before_script:
-  - gunicorn g2p:app --bind 0.0.0.0:5000 --daemon
+  - gunicorn gi2pi:app --bind 0.0.0.0:5000 --daemon
 
 # commands to run the testing suite. if any of these fail, travic lets us know
 script: 
-  - cd /home/travis/build/roedoejet/g2p && python3 run_tests.py dev
-  - cd /home/travis/build/roedoejet/g2p && coverage run --source g2p run_tests.py dev
+  - cd /home/travis/build/roedoejet/gi2pi && python3 run_tests.py dev
+  - cd /home/travis/build/roedoejet/gi2pi && coverage run --source gi2pi run_tests.py dev
 
 # commands to run after the tests successfully complete
 after_success:

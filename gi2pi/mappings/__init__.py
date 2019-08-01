@@ -15,11 +15,11 @@ from operator import methodcaller
 
 from openpyxl import load_workbook
 
-from g2p import exceptions
-from g2p.mappings.langs import LANGS
-from g2p.mappings.langs import __file__ as LANGS_FILE
-from g2p.mappings.utils import flatten_abbreviations, unicode_escape
-from g2p.log import LOGGER
+from gi2pi import exceptions
+from gi2pi.mappings.langs import LANGS
+from gi2pi.mappings.langs import __file__ as LANGS_FILE
+from gi2pi.mappings.utils import flatten_abbreviations, unicode_escape
+from gi2pi.log import LOGGER
 
 
 class Mapping():

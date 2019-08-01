@@ -2,10 +2,10 @@
 
 import os
 import json
-from g2p.tests.private.git_data_wrangler import returnLinesFromDocuments
-from g2p.tests.private import __file__ as private_dir_f
-from g2p.mappings import Mapping
-from g2p.transducer import Transducer
+from gi2pi.tests.private.git_data_wrangler import returnLinesFromDocuments
+from gi2pi.tests.private import __file__ as private_dir_f
+from gi2pi.mappings import Mapping
+from gi2pi.transducer import Transducer
 from typing import List, Union
 
 
