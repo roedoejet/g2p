@@ -2,18 +2,12 @@ import os
 from unittest import TestLoader, TextTestRunner, TestSuite
 # Unit tests
 from g2p.tests.test_mappings import MappingTest
-from g2p.tests.test_git import GitTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_transducer import TransducerTest
 
 
 loader = TestLoader()
-
-dev_tests = [
-    loader.loadTestsFromTestCase(test)
-    for test in [MappingTest, IndicesTest, TransducerTest]
-]
 
 transducer_tests = [
     loader.loadTestsFromTestCase(test)
@@ -27,10 +21,11 @@ mappings_tests = [
 
 langs_tests = [
     loader.loadTestsFromTestCase(test) for test in [
-        # LangTest,
-        GitTest
+        LangTest,
     ]
 ]
+
+dev_tests = transducer_tests + mappings_tests + langs_tests
 
 
 def run_tests(suite):
