@@ -1,11 +1,8 @@
-<<<<<<< HEAD
-# gi2pi
-=======
 # Gⁱ-2-Pⁱ
->>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
 
 [![Coverage Status](https://coveralls.io/repos/github/roedoejet/gi2pi/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/gi2pi?branch=master)
 [![Build Status](https://travis-ci.org/roedoejet/gi2pi.svg?branch=master)](https://travis-ci.org/roedoejet/gi2pi)
+[![PyPI package](https://img.shields.io/pypi/v/gi2pi.svg)](https://pypi.org/project/gi2pi/)
 [![license](https://img.shields.io/github/license/roedoejet/gi2pi.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/gi2pi)
 
@@ -14,12 +11,7 @@
 This library is for handling arbitrary transductions between input and output segments while preserving indices.
 
 ## Table of Contents
-
-<<<<<<< HEAD
-- [gi2pi](#gi2pi)
-=======
-- [G2P](#gi2pi)
->>>>>>> 701f9db0b340ab1ff5835ed3a126d1d398e78354
+- [Gⁱ-2-Pⁱ](#g%e2%81%b1-2-p%e2%81%b1)
   - [Table of Contents](#table-of-contents)
   - [Background](#background)
   - [Install](#install)
