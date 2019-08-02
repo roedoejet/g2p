@@ -4,8 +4,8 @@
 """
 
 from unittest import main, TestCase
-from gi2pi.mappings import Mapping
-from gi2pi.transducer import Transducer
+from g2p.mappings import Mapping
+from g2p.transducer import Transducer
 
 
 class IndicesTest(TestCase):

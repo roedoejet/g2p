@@ -1,8 +1,8 @@
 from unittest import main, TestCase
 import os
 import json
-from gi2pi.mappings import Mapping
-from gi2pi.tests.public import __file__ as public_data
+from g2p.mappings import Mapping
+from g2p.tests.public import __file__ as public_data
 import unicodedata as ud
 
 class MappingTest(TestCase):

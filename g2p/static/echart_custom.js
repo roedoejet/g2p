@@ -2,7 +2,7 @@ $(document).ready(function () {
     var myChart = echarts.init(document.getElementById('echart'));
     var option = {
         title: {
-            text: 'gi2pi Indices'
+            text: 'g2p Indices'
         },
         tooltip: {},
         animationDurationUpdate: 1500,

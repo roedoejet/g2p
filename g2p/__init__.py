@@ -1,17 +1,17 @@
 """
 
-Views and config to the gi2pi Studio web app
+Views and config to the g2p Studio web app
 
 """
 import sys
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
-from gi2pi.mappings import Mapping
-from gi2pi.mappings.langs import LANGS
-from gi2pi.transducer import Transducer
-from gi2pi.mappings.utils import expand_abbreviations, flatten_abbreviations
-from gi2pi.__version__ import VERSION
+from g2p.mappings import Mapping
+from g2p.mappings.langs import LANGS
+from g2p.transducer import Transducer
+from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
+from g2p.__version__ import VERSION
 
 if sys.stdout.encoding != 'utf8':
     sys.stdout.reconfigure(encoding='utf8')
@@ -50,7 +50,7 @@ def hot_to_mappings(hot_data):
 
 @APP.route('/')
 def home():
-    """ Return homepage of gi2pi Studio
+    """ Return homepage of g2p Studio
     """
     return render_template('index.html', langs=LANGS)
 

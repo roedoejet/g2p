@@ -1,19 +1,19 @@
-''' Setup for gi2pi
+''' Setup for g2p
 '''
 from setuptools import setup, find_packages
 import datetime as dt
 
 build_no = dt.datetime.today().strftime('%Y%m%d')
 
-# Ugly hack to read the current version number without importing gi2pi:
+# Ugly hack to read the current version number without importing g2p:
 # (works by )
-with open("gi2pi/__version__.py", "r", encoding="UTF-8") as version_file:
+with open("g2p/__version__.py", "r", encoding="UTF-8") as version_file:
     namespace = {}
     exec(version_file.read(), namespace)
     VERSION = namespace['VERSION'] + "." + build_no
 
 setup(
-    name='gi2pi',
+    name='g2p',
     python_requires='>=3.7',
     version=VERSION,
     long_description='indexed grapheme to phoneme conversion',

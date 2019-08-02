@@ -1,10 +1,10 @@
 # Gⁱ-2-Pⁱ
 
-[![Coverage Status](https://coveralls.io/repos/github/roedoejet/gi2pi/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/gi2pi?branch=master)
-[![Build Status](https://travis-ci.org/roedoejet/gi2pi.svg?branch=master)](https://travis-ci.org/roedoejet/gi2pi)
-[![PyPI package](https://img.shields.io/pypi/v/gi2pi.svg)](https://pypi.org/project/gi2pi/)
-[![license](https://img.shields.io/github/license/roedoejet/gi2pi.svg)](LICENSE)
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/gi2pi)
+[![Coverage Status](https://coveralls.io/repos/github/roedoejet/g2p/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/g2p?branch=master)
+[![Build Status](https://travis-ci.org/roedoejet/g2p.svg?branch=master)](https://travis-ci.org/roedoejet/g2p)
+[![PyPI package](https://img.shields.io/pypi/v/g2p.svg)](https://pypi.org/project/g2p/)
+[![license](https://img.shields.io/github/license/roedoejet/g2p.svg)](LICENSE)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/g2p)
 
 > Grapheme-to-Phoneme transductions that preserve input and output indices!
 
@@ -26,17 +26,17 @@ This library is for handling arbitrary transductions between input and output se
 
 ## Background
 
-The initial version of this package was developed by [Patrick Littell](https://github.com/littell) and was developed in order to allow for gi2pi from community orthographies to IPA and back again in [ReadAlong-Studio](https://github.com/dhdaines/ReadAlong-Studio). We decided to then pull out the gi2pi mechanism from [Convertextract](https://github.com/roedoejet/convertextract) which allows transducer relations to be declared in CSV files, and turn it into its own library - here it is!
+The initial version of this package was developed by [Patrick Littell](https://github.com/littell) and was developed in order to allow for g2p from community orthographies to IPA and back again in [ReadAlong-Studio](https://github.com/dhdaines/ReadAlong-Studio). We decided to then pull out the g2p mechanism from [Convertextract](https://github.com/roedoejet/convertextract) which allows transducer relations to be declared in CSV files, and turn it into its own library - here it is!
 
 ## Install
 
-The best thing to do is install with pip `pip install gi2pi`. 
+The best thing to do is install with pip `pip install g2p`. 
 
 Otherwise, clone the repo and pip install it locally.
 
 ```sh
-$ git clone https://github.com/roedoejet/gi2pi.git
-$ cd gi2pi
+$ git clone https://github.com/roedoejet/g2p.git
+$ cd g2p
 $ pip install -e .
 ```
 
@@ -49,16 +49,16 @@ In order to initialize a `Transducer`, you must first create a `Mapping` object.
 You can create mappings either by initializing them directly with a list:
 
 ```python
-from gi2pi.mappings import Mapping
+from g2p.mappings import Mapping
 
 mappings = Mapping([{"in": 'a', "out": 'b'}])
 
 ```
 
-Alternatively, you can add a CSV file to gi2pi/mappings/langs/<YourLang>/<YourLookupTable>
+Alternatively, you can add a CSV file to g2p/mappings/langs/<YourLang>/<YourLookupTable>
 
 ```python
-from gi2pi.mappings import Mapping
+from g2p.mappings import Mapping
 
 mappings = Mapping(language={"lang": "<YourLang>", "table": "<YourLookupTable>"})
 
@@ -69,15 +69,15 @@ mappings = Mapping(language={"lang": "<YourLang>", "table": "<YourLookupTable>"}
 Initialize a `Transducer` with a `Mapping` object. Calling the `Transducer` then produces the output. In order to preserve the indices, pass index=True when calling the `Transducer`.
 
 ```python
-from gi2pi.mappings import Mapping
-from gi2pi.transducer import Transducer
+from g2p.mappings import Mapping
+from g2p.transducer import Transducer
 
 mappings = Mapping([{"in": 'a', "out": 'b'}])
 transducer = Transducer(mappings)
 transducer('a')
 # 'b'
 transducer('a', index=True)
-# ('b', <gi2pi.transducer.IOStates object>)
+# ('b', <g2p.transducer.IOStates object>)
 
 ```
 
@@ -85,12 +85,12 @@ To make sense of the `IOStates` object that is produced, you can either call it,
 
 ## Studio
 
-You can also run the `gi2pi Studio` which is a web interface for creating custom lookup tables to be used with gi2pi. To run the `gi2pi Studio` either visit ***** or run it locally using `python run_studio.py`. 
+You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit ***** or run it locally using `python run_studio.py`. 
 
 You can also import the app directly from the package:
 
 ```python
-from gi2pi import app
+from g2p import app
 
 app.run(host='0.0.0.0', port=5000, debug=True)
 ```
@@ -103,7 +103,7 @@ app.run(host='0.0.0.0', port=5000, debug=True)
 
 ## Contributing
 
-Feel free to dive in! [Open an issue](https://github.com/roedoejet/gi2pi/issues/new) or submit PRs.
+Feel free to dive in! [Open an issue](https://github.com/roedoejet/g2p/issues/new) or submit PRs.
 
 This repo follows the [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
 

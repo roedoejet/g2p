@@ -8,10 +8,10 @@ from collections import Counter, OrderedDict
 from collections.abc import Iterable
 from copy import deepcopy
 import re
-from gi2pi.mappings import Mapping
-from gi2pi.mappings.utils import create_fixed_width_lookbehind
-from gi2pi.exceptions import MalformedMapping
-from gi2pi.log import LOGGER
+from g2p.mappings import Mapping
+from g2p.mappings.utils import create_fixed_width_lookbehind
+from g2p.exceptions import MalformedMapping
+from g2p.log import LOGGER
 
 
 class IOStates():
@@ -179,10 +179,10 @@ class Transducer():
     ----------
 
     mapping: Mapping
-        Formatted input/output pairs using the gi2pi.mappings.Mapping class
+        Formatted input/output pairs using the g2p.mappings.Mapping class
 
     as_is: bool
-        Determines whether to evaluate gi2pi rules in mapping in the order they are, or
+        Determines whether to evaluate g2p rules in mapping in the order they are, or
         to reverse sort them by length
 
     _index_match_pattern: Pattern
