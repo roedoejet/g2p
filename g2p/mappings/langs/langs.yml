@@ -1,3 +1,8 @@
+- name: Stella Nadleh
+  code: crx
+  tables:
+    - name: Syllabics
+      table: stella_syllabics.csv
 - name: Gitksan
   code: git
   tables:
