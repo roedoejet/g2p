@@ -1,3 +1,8 @@
+- name: Tsilhqot'in
+  code: clc
+  tables:
+    - name: Doulos
+      table: doulos.csv
 - name: Stella Nadleh
   code: crx
   tables:
@@ -25,10 +30,17 @@
   tables:
     - name: Doulos
       table: doulos.csv
+    - name: Times
+      table: times.csv
 - name: Mohawk
   code: moh
   tables:
     - name: Orthography
       table: orth.csv
+- name: Navajo
+  code: nav
+  tables:
+    - name: Times
+      table: times.csv
 
   

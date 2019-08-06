@@ -59,7 +59,7 @@ class Mapping():
                     self.mapping = language
                 else:
                     raise exceptions.MalformedMapping()
-            elif isinstance(language, object):
+            elif isinstance(language, dict):
                 if not "lang" in language or not "table" in language:
                     raise exceptions.MalformedLookup()
                 else:
@@ -85,7 +85,8 @@ class Mapping():
         if self.norm_form in self.allowable_norm_forms:
             for io in self.mapping:
                 for k, v in io.items():
-                    io[k] = self.normalize(v)
+                    if isinstance(v, str):
+                        io[k] = self.normalize(v)
             if self.abbreviations:
                 self.abbreviations = {self.normalize(abb): [self.normalize(
                     x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
