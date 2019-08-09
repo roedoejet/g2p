@@ -48,16 +48,13 @@ class IOStates():
         return iter(self.indices)
 
     def convert_index_to_tuples(self, index):
-        try:
-            container = []
-            for input_index, val in index.items():
-                input_string = val['input_string']
-                for output_index, output_string in val['output'].items():
-                    container.append(((input_index, input_string),
-                                      (output_index, output_string)))
-            return container
-        except:
-            breakpoint()
+        container = []
+        for input_index, val in index.items():
+            input_string = val['input_string']
+            for output_index, output_string in val['output'].items():
+                container.append(((input_index, input_string),
+                                    (output_index, output_string)))
+        return container
 
     def convert_tuples_to_index(self, tuples, reverse=False):
         indices = {}
@@ -117,7 +114,6 @@ class IOStateSequence():
                 self.states.append(arg)
             if isinstance(arg, IOStateSequence):
                 self.states += self.unpack_states(arg)
-        # breakpoint()
 
     def __iter__(self):
         return iter(self.states)
@@ -205,6 +201,7 @@ class Transducer():
 
     def __init__(self, mapping: Mapping, as_is: bool = False):
         self.mapping = mapping
+        self.map_kwargs = mapping.kwargs
         self.case_sensitive = mapping.case_sensitive
         self.as_is = as_is
         if not self.as_is:
@@ -221,23 +218,32 @@ class Transducer():
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
         return self.apply_rules(to_convert, index, debugger, output_delimiter)
 
+    def escape_special_characters(self, to_escape) -> str:
+        escape = self.map_kwargs.get('escape_special_characters', False)
+        if escape:
+            escaped = re.escape(to_escape)
+            if escaped != to_escape:
+                LOGGER.info(f"Escaped special characters in '{to_escape}' with '{escaped}'. Set 'escape_special_characters' to False in your Mapping to disable this.")
+            return escaped
+        return to_escape
+
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"""
         if "context_before" in rule and rule['context_before']:
-            before = rule["context_before"]
+            before = self.escape_special_characters(rule["context_before"])
         else:
             before = ''
         if 'context_after' in rule and rule['context_after']:
-            after = rule["context_after"]
+            after = self.escape_special_characters(rule["context_after"])
         else:
             after = ''
-        input_match = re.sub(re.compile(r'{\d+}'), "", rule["in"])
+        input_match = re.sub(re.compile(r'{\d+}'), "", self.escape_special_characters(rule["in"]))
         try:
             inp = create_fixed_width_lookbehind(before) + input_match
             if after:
                 inp += f"(?={after})"
-
+            
             if not self.case_sensitive:
                 rule_regex = re.compile(inp, re.I)
             else:
@@ -339,8 +345,6 @@ class Transducer():
 
         TODO: potentially refactor this to lean more on the return_default_mapping method
          """
-        # if input_index == 5 and input_string == 's':
-        #     breakpoint()
         intermediate_index = deepcopy(intermediate_index)
         # if input_string == 'ʁ':
         if not self.case_sensitive:
@@ -351,11 +355,8 @@ class Transducer():
             new_output = {}
             new_output[output_index] = output_string
             # attach it to intermediate_index and merge output
-            try:
-                intermediate_output = intermediate_index[input_index].get('output', {
-                })
-            except IndexError:
-                breakpoint()
+            intermediate_output = intermediate_index[input_index].get('output', {
+            })
             intermediate_index[input_index]['output'] = {**intermediate_output,
                                                          **new_output}
             return intermediate_index
