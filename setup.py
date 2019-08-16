@@ -21,7 +21,7 @@ setup(
     name='g2p',
     python_requires='>=3.7',
     version=VERSION,
-    short_description='A module for creating context-aware, rule-based Grapheme 2 Phoneme mappings that preserve indices',
+    description='Module for creating context-aware, rule-based G2P mappings that preserve indices',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(),
