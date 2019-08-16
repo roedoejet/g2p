@@ -512,7 +512,7 @@ class Transducer():
                         if match_index == input_index:
                             if output_delimiter:
                                 # Don't add the delimiter to the last segment
-                                if not char >= len(to_convert) - 1:
+                                if not char + (len(io_copy['in']) - 1) >= len(to_convert) - 1:
                                     io_copy['out'] += output_delimiter
                             # convert the final output
                             output_sub = re.sub(

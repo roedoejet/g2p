@@ -239,6 +239,7 @@ class IndicesTest(TestCase):
                                            ((2, 's'),
                                             (2, 's')),
                                            ((3, 't'), (3, 't'))])
+        # self.assertEqual(transducer[1].reduced(), [(1,1),(2,2),(3,3),(4,4)]) #TODO: this is failing
 
     def test_case_two(self):
         transducer = self.trans_two('test', True)
@@ -249,6 +250,7 @@ class IndicesTest(TestCase):
                                            ((2, 's'),
                                             (2, 's')),
                                            ((3, 't'), (3, 't'))])
+        # self.assertEqual(transducer[1].reduced(), [(1,1),(2,2),(3,3),(4,4)]) #TODO: this is failing
 
     def test_case_three(self):
         transducer = self.trans_three('test', True)

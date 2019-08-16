@@ -1,7 +1,8 @@
 ''' Setup for g2p
 '''
-from setuptools import setup, find_packages
+from os import path
 import datetime as dt
+from setuptools import setup, find_packages
 
 build_no = dt.datetime.today().strftime('%Y%m%d')
 
@@ -12,11 +13,17 @@ with open("g2p/__version__.py", "r", encoding="UTF-8") as version_file:
     exec(version_file.read(), namespace)
     VERSION = namespace['VERSION'] + "." + build_no
 
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name='g2p',
     python_requires='>=3.7',
     version=VERSION,
-    long_description='indexed grapheme to phoneme conversion',
+    short_description='A module for creating context-aware, rule-based Grapheme 2 Phoneme mappings that preserve indices',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
     install_requires=['openpyxl',
