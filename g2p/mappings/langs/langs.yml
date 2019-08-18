@@ -6,8 +6,10 @@
 - name: Stella Nadleh
   code: crx
   tables:
-    - name: Syllabics
-      table: stella_syllabics.csv
+    - name: Roman to Syllabics
+      table: stella_orth_to_syllabics.csv
+    - name: Syllabics to Roman
+      table: stella_syllabics_to_orth.csv
 - name: Gitksan
   code: git
   tables:
