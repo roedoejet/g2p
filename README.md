@@ -55,7 +55,7 @@ mappings = Mapping([{"in": 'a', "out": 'b'}])
 
 ```
 
-Alternatively, you can add a CSV file to g2p/mappings/langs/<YourLang>/<YourLookupTable>
+Alternatively, you can add a CSV file to g2p/mappings/langs/`<YourLang>`/`<YourLookupTable>`
 
 ```python
 from g2p.mappings import Mapping
