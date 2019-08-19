@@ -31,6 +31,10 @@ class IOStates():
             list(v) for v in dict(self._input_states).items()]
         self.condensed_output_states = [
             list(v) for v in dict(self._output_states).items()]
+        self.filtered_condensed_input_states = [
+            list(v) for v in dict(self._input_states).items() if v[1]]
+        self.filtered_condensed_output_states = [
+            list(v) for v in dict(self._output_states).items() if v[1]]
 
     def __repr__(self):
         return f"{self.__class__} object with input '{self.input()}' and output '{self.output()}'"
@@ -74,23 +78,42 @@ class IOStates():
         return indices
 
     def reduced(self):
+        ''' Find how many indices it takes before input and output both move forward by one phone
+        '''
+        filtered = self.filter_empty_values()
         reduced = []
         intermediate_index = {
-            'in': self.indices[0][0][0], 'out': self.indices[0][1][0]}
-        for io in self.indices:
-            inp = io[0][0] + 1
-            outp = io[1][0]
+            'in': filtered[0][0], 'out': filtered[0][1]}
+        for io in filtered:
+            inp = io[0]
+            outp = io[1]
             if inp == intermediate_index['in'] and outp > intermediate_index['out']:
                 intermediate_index['out'] = outp
-            if inp > intermediate_index['in'] and outp <= intermediate_index['out']:
+            if inp > intermediate_index['in'] and outp == intermediate_index['out']:
                 intermediate_index['in'] = inp
             if inp > intermediate_index['in'] and outp > intermediate_index['out']:
-                reduced.append(intermediate_index)
                 intermediate_index = {'in': inp, 'out': outp}
-        reduced.append({"in": len(self.condensed_input_states),
-                        "out": len(self.condensed_output_states)})
+                reduced.append(deepcopy(intermediate_index))
+        reduced.append({"in": len(self.filtered_condensed_input_states),
+                        "out": len(self.filtered_condensed_output_states)})
         reduced = [(x['in'], x['out']) for x in reduced]
         return reduced
+
+    def filter_empty_values(self):
+        filtered = []
+        input_offset = 0
+        output_offset = 0
+        indices = self.indices
+        for io in indices:
+            if not io[0][1]:
+                # epenthesis offsets the input by -1
+                input_offset -= 1
+            elif not io[1][1]:
+                 # deletion offsets the output by -1
+                output_offset -= 1
+            else:
+                filtered.append((io[0][0] + input_offset, io[1][0] + output_offset))
+        return filtered
 
     def input(self):
         """ Return the input of a given transduction
@@ -130,21 +153,23 @@ class IOStateSequence():
                 states += self.unpack_states(state)
         return states
 
-    def composed(self, s1, s2):
-        # the two states being composed must match
-        if len(s1.condensed_output_states) != len(s2.condensed_input_states):
-            LOGGER.warning(
-                "Sorry, something went wrong. Try checking the two IOStates objects you're trying to compose")
-        composed = []
-        for io_1 in s1:
-            s1_in = io_1[0]
-            s1_out = io_1[1]
-            for io_2 in s2:
-                s2_in = io_2[0]
-                s2_out = io_2[1]
-                if s2_in[0] == s1_out[0]:
-                    composed.append((s1_in, s2_out))
-        return IOStates(composed)
+    def compose_filtered_and_reduced_indices(self, i1, i2):
+        if not i1:
+            return i2
+        i2_dict = dict(i2)
+        i2_idx = 0
+        results = []
+        for i1_in, i1_out in i1:
+            highest_i2_found = 0 if not results else results[-1][1]
+            while i2_idx <= i1_out:
+                if i2_idx in i2_dict and i2_dict[i2_idx] > highest_i2_found:
+                    highest_i2_found = i2_dict[i2_idx]
+                i2_idx += 1
+            if results:
+                assert(i1_in >= results[-1][0])
+                assert(highest_i2_found >= results[-1][1])
+            results.append((i1_in, highest_i2_found))
+        return results
 
     def input(self):
         return self.states[0].input()
@@ -152,19 +177,19 @@ class IOStateSequence():
     def output(self):
         return self.states[-1].output()
 
-    def reduced(self):
+    def composed_and_reduced(self):
         ''' This is a reduced tuple-based format for indices. It requires that IOStates in the
         IOStateSequence be composed, and then they can be reduced to a list of tuples where each
         tuple contains an input and output index corresponding with that character. The list is equal
         to the length of unique characters
         '''
-        composed_states = self.composed(self.states[0], self.states[1])
+        composed_states = self.compose_filtered_and_reduced_indices(self.states[0].reduced(), self.states[1].reduced())
         counter = 2
         while counter < len(self.states):
-            composed_states = self.composed(
-                composed_states, self.states[counter])
+            composed_states = self.compose_filtered_and_reduced_indices(
+                composed_states, self.states[counter].reduced())
             counter += 1
-        return composed_states.reduced()
+        return composed_states
 
 
 class Transducer():
