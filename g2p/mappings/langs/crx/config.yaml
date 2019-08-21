@@ -1,0 +1,17 @@
+<<: &shared
+  language_name: Stella Nadleh
+mappings:
+  - display_name: Roman to Syllabics
+    mapping: stella_orth_to_syllabics.csv
+    in_lang: crx-sro
+    out_lang: crx-syl
+    authors:
+      - Aidan Pine
+    <<: *shared
+  - display_name: Syllabics to Roman
+    mapping: stella_syllabics_to_orth.csv
+    in_lang: crx-syl
+    out_lang: crx-sro
+    authors:
+      - Aidan Pine
+    <<: *shared

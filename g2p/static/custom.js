@@ -127,14 +127,14 @@ $('#varhot-add-row').click(function (event) {
 
 $('#langselect').change(function () {
     var selected = $("#langselect option:selected").val();
+    var in_lang = selected;
+    var out_lang = selected;
     if (selected !== 'custom') {
-        var arr = selected.split('-');
-        var lang = arr[0]
-        var table = arr[1]
-        socket.emit('table event', { lang: lang, table: table })
-    } else {
-        socket.emit('table event', { lang: 'custom', table: 'custom' })
+        var arr = selected.split('-to-');
+        in_lang = arr[0]
+        out_lang = arr[1]
     }
+    socket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
 })
 
 $('#animate').change(function () {

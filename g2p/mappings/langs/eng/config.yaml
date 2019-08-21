@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: English
+mappings:
+  - display_name: English IPA to Arpabet
+    in_lang: eng-ipa
+    out_lang: eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    authors:
+      - Patrick Littell
+    mapping: eng_ipa_to_arpabet.json
+    as_is: false
+    <<: *shared
+    # TODO: Need lexicon mapping

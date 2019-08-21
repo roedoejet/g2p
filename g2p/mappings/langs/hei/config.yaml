@@ -1,0 +1,17 @@
+<<: &shared
+  language_name: Heiltsuk
+mappings:
+  - display_name: Doulos
+    in_lang: hei-doulos
+    out_lang: hei
+    authors:
+      - Aidan Pine
+    mapping: doulos.csv
+    <<: *shared
+  - display_name: Times
+    in_lang: hei-times
+    out_lang: hei
+    authors:
+      - Aidan Pine
+    mapping: times.csv
+    <<: *shared

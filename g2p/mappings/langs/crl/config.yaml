@@ -1,0 +1,18 @@
+<<: &shared
+  language_name: Northern East Cree
+mappings:
+  - display_name: Northern East Cree to IPA
+    in_lang: crl
+    out_lang: crl-ipa
+    type: mapping
+    authors:
+      - David Huggins Daines
+      - Patrick Littell
+    mapping: crl_to_ipa.json
+    <<: *shared
+  - display_name: Northern East Cree IPA to English IPA
+    in_lang: crl-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: crl_ipa_to_eng_ipa.json
+    <<: *shared

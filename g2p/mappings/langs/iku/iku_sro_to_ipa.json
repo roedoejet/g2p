@@ -1,0 +1,562 @@
+[
+   {
+      "in": "ai",
+      "out": "aj"
+   },
+   {
+      "in": "pai",
+      "out": "paj"
+   },
+   {
+      "in": "tai",
+      "out": "taj"
+   },
+   {
+      "in": "kai",
+      "out": "kaj"
+   },
+   {
+      "in": "ɣai",
+      "out": "ɡaj"
+   },
+   {
+      "in": "mai",
+      "out": "maj"
+   },
+   {
+      "in": "nai",
+      "out": "naj"
+   },
+   {
+      "in": "sai",
+      "out": "saj"
+   },
+   {
+      "in": "lai",
+      "out": "laj"
+   },
+   {
+      "in": "jai",
+      "out": "jaj"
+   },
+   {
+      "in": "vai",
+      "out": "vaj"
+   },
+   {
+      "in": "rai",
+      "out": "qaj"
+   },
+   {
+      "in": "qai",
+      "out": "qaj"
+   },
+   {
+      "in": "ngai",
+      "out": "ŋaj"
+   },
+   {
+      "in": "ai",
+      "out": "aj"
+   },
+   {
+      "in": "pai",
+      "out": "paj"
+   },
+   {
+      "in": "tai",
+      "out": "taj"
+   },
+   {
+      "in": "kai",
+      "out": "kaj"
+   },
+   {
+      "in": "gai",
+      "out": "ɡaj"
+   },
+   {
+      "in": "mai",
+      "out": "maj"
+   },
+   {
+      "in": "nai",
+      "out": "naj"
+   },
+   {
+      "in": "sai",
+      "out": "saj"
+   },
+   {
+      "in": "lai",
+      "out": "laj"
+   },
+   {
+      "in": "jai",
+      "out": "jaj"
+   },
+   {
+      "in": "vai",
+      "out": "vaj"
+   },
+   {
+      "in": "rai",
+      "out": "qaj"
+   },
+   {
+      "in": "qai",
+      "out": "qaj"
+   },
+   {
+      "in": "ngai",
+      "out": "ŋaj"
+   },
+   {
+      "in": "i",
+      "out": "i"
+   },
+   {
+      "in": "pi",
+      "out": "pi"
+   },
+   {
+      "in": "ti",
+      "out": "ti"
+   },
+   {
+      "in": "ki",
+      "out": "ki"
+   },
+   {
+      "in": "gi",
+      "out": "ɡi"
+   },
+   {
+      "in": "mi",
+      "out": "mi"
+   },
+   {
+      "in": "ni",
+      "out": "ni"
+   },
+   {
+      "in": "si",
+      "out": "si"
+   },
+   {
+      "in": "li",
+      "out": "li"
+   },
+   {
+      "in": "ji",
+      "out": "ji"
+   },
+   {
+      "in": "vi",
+      "out": "vi"
+   },
+   {
+      "in": "ri",
+      "out": "qi"
+   },
+   {
+      "in": "qi",
+      "out": "qi"
+   },
+   {
+      "in": "ngi",
+      "out": "ŋi"
+   },
+   {
+      "in": "nngi",
+      "out": "ŋːi"
+   },
+   {
+      "in": "łi",
+      "out": "ɬi"
+   },
+   {
+      "in": "ii",
+      "out": "iː"
+   },
+   {
+      "in": "pii",
+      "out": "piː"
+   },
+   {
+      "in": "tii",
+      "out": "tiː"
+   },
+   {
+      "in": "kii",
+      "out": "kiː"
+   },
+   {
+      "in": "gii",
+      "out": "ɡiː"
+   },
+   {
+      "in": "mii",
+      "out": "miː"
+   },
+   {
+      "in": "nii",
+      "out": "niː"
+   },
+   {
+      "in": "sii",
+      "out": "siː"
+   },
+   {
+      "in": "lii",
+      "out": "liː"
+   },
+   {
+      "in": "jii",
+      "out": "jiː"
+   },
+   {
+      "in": "vii",
+      "out": "viː"
+   },
+   {
+      "in": "rii",
+      "out": "qiː"
+   },
+   {
+      "in": "qii",
+      "out": "qiː"
+   },
+   {
+      "in": "ngii",
+      "out": "ŋiː"
+   },
+   {
+      "in": "nngii",
+      "out": "ŋːiː"
+   },
+   {
+      "in": "łii",
+      "out": "ɬiː"
+   },
+   {
+      "in": "u",
+      "out": "u"
+   },
+   {
+      "in": "pu",
+      "out": "pu"
+   },
+   {
+      "in": "tu",
+      "out": "tu"
+   },
+   {
+      "in": "ku",
+      "out": "ku"
+   },
+   {
+      "in": "gu",
+      "out": "ɡu"
+   },
+   {
+      "in": "mu",
+      "out": "mu"
+   },
+   {
+      "in": "nu",
+      "out": "nu"
+   },
+   {
+      "in": "su",
+      "out": "su"
+   },
+   {
+      "in": "lu",
+      "out": "lu"
+   },
+   {
+      "in": "ju",
+      "out": "ju"
+   },
+   {
+      "in": "vu",
+      "out": "vu"
+   },
+   {
+      "in": "ru",
+      "out": "qu"
+   },
+   {
+      "in": "qu",
+      "out": "qu"
+   },
+   {
+      "in": "ngu",
+      "out": "ŋu"
+   },
+   {
+      "in": "nngu",
+      "out": "ŋŋu"
+   },
+   {
+      "in": "łu",
+      "out": "ɬu"
+   },
+   {
+      "in": "uu",
+      "out": "uː"
+   },
+   {
+      "in": "puu",
+      "out": "puː"
+   },
+   {
+      "in": "tuu",
+      "out": "tuː"
+   },
+   {
+      "in": "kuu",
+      "out": "kuː"
+   },
+   {
+      "in": "guu",
+      "out": "ɡuː"
+   },
+   {
+      "in": "muu",
+      "out": "muː"
+   },
+   {
+      "in": "nuu",
+      "out": "nuː"
+   },
+   {
+      "in": "suu",
+      "out": "suː"
+   },
+   {
+      "in": "luu",
+      "out": "luː"
+   },
+   {
+      "in": "juu",
+      "out": "juː"
+   },
+   {
+      "in": "vuu",
+      "out": "vuː"
+   },
+   {
+      "in": "ruu",
+      "out": "quː"
+   },
+   {
+      "in": "quu",
+      "out": "quː"
+   },
+   {
+      "in": "nguu",
+      "out": "ŋuː"
+   },
+   {
+      "in": "nnguu",
+      "out": "ŋŋuː"
+   },
+   {
+      "in": "łuu",
+      "out": "ɬuː"
+   },
+   {
+      "in": "a",
+      "out": "a"
+   },
+   {
+      "in": "pa",
+      "out": "pa"
+   },
+   {
+      "in": "ta",
+      "out": "ta"
+   },
+   {
+      "in": "ka",
+      "out": "ka"
+   },
+   {
+      "in": "ga",
+      "out": "ɡa"
+   },
+   {
+      "in": "ma",
+      "out": "ma"
+   },
+   {
+      "in": "na",
+      "out": "na"
+   },
+   {
+      "in": "sa",
+      "out": "sa"
+   },
+   {
+      "in": "la",
+      "out": "la"
+   },
+   {
+      "in": "ja",
+      "out": "ja"
+   },
+   {
+      "in": "va",
+      "out": "va"
+   },
+   {
+      "in": "ra",
+      "out": "qa"
+   },
+   {
+      "in": "qa",
+      "out": "qa"
+   },
+   {
+      "in": "nga",
+      "out": "ŋa"
+   },
+   {
+      "in": "nnga",
+      "out": "ŋːa"
+   },
+   {
+      "in": "ła",
+      "out": "ɬa"
+   },
+   {
+      "in": "aa",
+      "out": "aː"
+   },
+   {
+      "in": "paa",
+      "out": "paː"
+   },
+   {
+      "in": "taa",
+      "out": "taː"
+   },
+   {
+      "in": "kaa",
+      "out": "kaː"
+   },
+   {
+      "in": "gaa",
+      "out": "ɡaː"
+   },
+   {
+      "in": "maa",
+      "out": "maː"
+   },
+   {
+      "in": "naa",
+      "out": "naː"
+   },
+   {
+      "in": "saa",
+      "out": "saː"
+   },
+   {
+      "in": "laa",
+      "out": "laː"
+   },
+   {
+      "in": "jaa",
+      "out": "jaː"
+   },
+   {
+      "in": "vaa",
+      "out": "vaː"
+   },
+   {
+      "in": "raa",
+      "out": "qaː"
+   },
+   {
+      "in": "qaa",
+      "out": "qaː"
+   },
+   {
+      "in": "ngaa",
+      "out": "ŋaː"
+   },
+   {
+      "in": "nngaa",
+      "out": "ŋːaː"
+   },
+   {
+      "in": "łaa",
+      "out": "ɬaː"
+   },
+   {
+      "in": "h",
+      "out": "h"
+   },
+   {
+      "in": "p",
+      "out": "p"
+   },
+   {
+      "in": "t",
+      "out": "t"
+   },
+   {
+      "in": "k",
+      "out": "k"
+   },
+   {
+      "in": "g",
+      "out": "ɡ"
+   },
+   {
+      "in": "m",
+      "out": "m"
+   },
+   {
+      "in": "n",
+      "out": "n"
+   },
+   {
+      "in": "s",
+      "out": "s"
+   },
+   {
+      "in": "l",
+      "out": "l"
+   },
+   {
+      "in": "j",
+      "out": "j"
+   },
+   {
+      "in": "v",
+      "out": "v"
+   },
+   {
+      "in": "r",
+      "out": "q"
+   },
+   {
+      "in": "q",
+      "out": "q"
+   },
+   {
+      "in": "ng",
+      "out": "ŋ"
+   },
+   {
+      "in": "nng",
+      "out": "ŋː"
+   },
+   {
+      "in": "ł",
+      "out": "ɬ"
+   }
+]

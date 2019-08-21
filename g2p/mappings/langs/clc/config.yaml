@@ -1,0 +1,8 @@
+<<: &shared
+  language_name: Tsilhqot'in
+mappings:
+  - display_name: Doulos
+    mapping: doulos.csv
+    in_lang: clc-doulos
+    out_lang: clc
+    <<: *shared

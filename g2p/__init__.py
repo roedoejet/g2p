@@ -11,7 +11,7 @@ from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS
 from g2p.transducer import Transducer
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
-from g2p.__version__ import VERSION
+from g2p._version import VERSION
 
 if sys.stdout.encoding != 'utf8':
     sys.stdout.reconfigure(encoding='utf8')
@@ -52,6 +52,7 @@ def hot_to_mappings(hot_data):
 def home():
     """ Return homepage of g2p Studio
     """
+    print(LANGS)
     return render_template('index.html', langs=LANGS)
 
 
@@ -70,11 +71,11 @@ def convert(message):
 def change_table(message):
     """ Change the lookup table
     """
-    if message['lang'] == 'custom':
+    print(message)
+    if message['in_lang'] == 'custom' or message['out_lang'] == 'custom':
         mappings = Mapping(return_empty_mappings())
     else:
-        mappings = Mapping(
-            language={'lang': message['lang'], 'table': message['table']})
+        mappings = Mapping(in_lang=message['in_lang'], out_lang=message['out_lang'])
     emit('table response', {'mappings': mappings(),
                             'abbs': expand_abbreviations(mappings.abbreviations)})
 

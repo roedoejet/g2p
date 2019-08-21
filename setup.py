@@ -8,7 +8,7 @@ build_no = dt.datetime.today().strftime('%Y%m%d')
 
 # Ugly hack to read the current version number without importing g2p:
 # (works by )
-with open("g2p/__version__.py", "r", encoding="UTF-8") as version_file:
+with open("g2p/_version.py", "r", encoding="UTF-8") as version_file:
     namespace = {}
     exec(version_file.read(), namespace)
     VERSION = namespace['VERSION'] + "." + build_no
@@ -37,5 +37,9 @@ setup(
                       'flask-talisman',
                       'pyyaml',
                       'regex'],
+    entry_points={
+        'console_scripts': [
+            'g2p = g2p.cli:cli'
+    ]},
     zip_safe=False
 )

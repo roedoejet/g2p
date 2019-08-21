@@ -53,9 +53,9 @@
                 <h4>Languages</h4>
                 <select id="langselect">
                     <option value="custom">Custom</option>
-                    {% for lang in langs %}
-                    {% for table in lang['tables'] %}
-                    <option value="{{ lang['name'] }}-{{ table['name'] }}">{{ lang['name'] }} - {{ table['name'] }}
+                    {% for k, v in langs.items() %}
+                    {% for mapping in v['mappings'] %}
+                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ mapping['language_name'] }} - {{ mapping['display_name'] }}
                     </option>
                     {% endfor %}
                     {% endfor %}

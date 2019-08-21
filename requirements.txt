@@ -1,4 +1,5 @@
 openpyxl
+click
 coloredlogs
 Flask
 flask_socketio

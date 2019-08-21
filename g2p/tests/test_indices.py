@@ -156,6 +156,9 @@ class IndicesTest(TestCase):
         self.test_mapping_seven = Mapping(
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
         )
+        self.test_mapping_seven_as_is = Mapping(
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=True
+        )
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
         self.test_mapping_combining = Mapping(
@@ -174,8 +177,7 @@ class IndicesTest(TestCase):
         self.trans_five = Transducer(self.test_mapping_five)
         self.trans_six = Transducer(self.test_mapping_six)
         self.trans_seven = Transducer(self.test_mapping_seven)
-        self.trans_seven_as_is = Transducer(
-            self.test_mapping_seven, as_is=True)
+        self.trans_seven_as_is = Transducer(self.test_mapping_seven_as_is)
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
@@ -239,7 +241,8 @@ class IndicesTest(TestCase):
                                            ((2, 's'),
                                             (2, 's')),
                                            ((3, 't'), (3, 't'))])
-        self.assertEqual(transducer[1].reduced(), [(1, 1), (2, 2), (3, 3), (4, 4)])
+        self.assertEqual(transducer[1].reduced(), [
+                         (1, 1), (2, 2), (3, 3), (4, 4)])
 
     def test_case_two(self):
         transducer = self.trans_two('test', True)

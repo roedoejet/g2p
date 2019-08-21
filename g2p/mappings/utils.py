@@ -3,10 +3,16 @@
 Utilities used by other classes
 
 """
-
+import csv
 from collections import defaultdict
 import regex as re
+import json
 
+from openpyxl import load_workbook
+from typing import Dict
+
+from g2p import exceptions
+from g2p.log import LOGGER
 
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
@@ -70,3 +76,124 @@ def pattern_to_fixed_width_lookbehinds(match):
             all_lookbehinds.append(current_list)
     all_lookbehinds = [f"(?<={'|'.join(items)})" for items in all_lookbehinds]
     return '(' + '|'.join(all_lookbehinds) + ')'
+
+def load_from_workbook(language):
+    ''' Parse mapping from Excel workbook
+    '''
+    work_book = load_workbook(language)
+    work_sheet = work_book.active
+    # Create wordlist
+    mapping = []
+    # Loop through rows in worksheet, create if statements for different columns
+    # and append mappings to self.mapping.
+    for entry in work_sheet:
+        new_io = {"in": "", "out": "",
+                    "context_before": "", "context_after": ""}
+        for col in entry:
+            if col.column == 'A':
+                value = col.value
+                if isinstance(value, (float, int)):
+                    value = str(value)
+                new_io["in"] = value
+            if col.column == 'B':
+                value = col.value
+                if isinstance(value, (float, int)):
+                    value = str(value)
+                new_io["out"] = value
+            if col.column == 'C':
+                if col.value is not None:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["context_before"] = value
+            if col.column == 'D':
+                if col.value is not None:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["context_after"] = value
+        mapping.append(new_io)
+
+    return mapping
+
+def load_from_csv(language):
+    ''' Parse mapping from csv
+    '''
+    work_sheet = []
+    with open(language, encoding='utf8') as f:
+        reader = csv.reader(f)
+        for line in reader:
+            work_sheet.append(line)
+    # Create wordlist
+    mapping = []
+    # Loop through rows in worksheet, create if statements for different columns
+    # and append mappings to self.mapping.
+    for entry in work_sheet:
+        new_io = {"in": "", "out": "",
+                    "context_before": "", "context_after": ""}
+        new_io['in'] = entry[0]
+        new_io['out'] = entry[1]
+        try:
+            new_io['context_before'] = entry[2]
+        except IndexError:
+            new_io['context_before'] = ''
+        try:
+            new_io['context_after'] = entry[3]
+        except IndexError:
+            new_io['context_after'] = ''
+        for k in new_io:
+            if isinstance(new_io[k], float) or isinstance(new_io[k], int):
+                new_io[k] = str(new_io[k])
+        mapping.append(new_io)
+
+    return mapping
+
+def load_from_file(path: str) -> list:
+    ''' Helper method to load mapping from file.
+    '''
+    if path.endswith('csv'):
+        mapping = load_from_csv(path)
+    elif path.endswith('xlsx'):
+        mapping = load_from_workbook(path)
+    elif path.endswith('json'):
+        with open(path) as f:
+            mapping = json.load(f)
+    # if self.reverse:
+    #     mapping = self.reverse_mappings(mapping)
+    return validate(mapping)
+
+def validate(mapping):
+    try:
+        for io in mapping:
+            if not 'context_before' in io:
+                io['context_before'] = ''
+            if not 'context_after' in io:
+                io['context_after'] = ''
+        valid = all('in' in d for d in mapping) and all('out' in d for d in mapping)
+        if not valid:
+            raise exceptions.MalformedMapping()     
+        return mapping
+    except TypeError:
+        raise exceptions.MalformedMapping() # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
+
+def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
+    for k, v in to_escape.items():
+        escaped = re.escape(v)
+        if escaped != v:
+            LOGGER.info(f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
+        to_escape[k] = escaped
+    return to_escape
+
+def load_abbreviations_from_file(path):
+    ''' Helper method to load abbreviations from file.
+    '''
+    if path.endswith('csv'):
+        abbs = []
+        with open(path, encoding='utf8') as f:
+            reader = csv.reader(f)
+            abbs = flatten_abbreviations(reader)
+    else:
+        raise exceptions.IncorrectFileType(
+            '''Sorry, abbreviations must be stored as CSV files.
+            You provided the following: %s''' % path)
+    return abbs

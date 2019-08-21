@@ -1,0 +1,18 @@
+<<: &shared
+  language_name: Chukchi
+mappings:
+  - display_name: Chukchi to IPA
+    in_lang: ckt
+    out_lang: ckt-ipa
+    type: mapping
+    authors:
+      - Vasilisa Andrianets
+      - Patrick Littell
+    mapping: ckt_to_ipa.json
+    <<: *shared
+  - display_name: Chukchi IPA to English IPA
+    in_lang: ckt-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: ckt_ipa_to_eng_ipa.json
+    <<: *shared

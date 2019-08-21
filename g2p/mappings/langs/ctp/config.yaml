@@ -1,0 +1,18 @@
+<<: &shared
+  language_name: Western Highland Chatino
+mappings:
+  - display_name: Western Highland Chatino to IPA
+    in_lang: ctp
+    out_lang: ctp-ipa
+    type: mapping
+    authors:
+      - Patrick Littell
+    mapping: ctp_to_ipa.json
+    case_sensitive: false
+    <<: *shared
+  - display_name: Western Highland Chatino IPA to English IPA
+    in_lang: ctp-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: ctp_ipa_to_eng_ipa.json
+    <<: *shared

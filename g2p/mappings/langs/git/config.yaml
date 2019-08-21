@@ -1,0 +1,25 @@
+<<: &shared
+  language_name: Gitksan
+mappings:
+  # - display_name: Orthography
+  #   in_lang: git
+  #   out_lang: git-ipa
+  #   authors:
+  #     - Fineen Davis
+  #   mapping: Orthography_Deterministic.csv
+  #   abbreviations: Ortho_variables.csv
+  #   <<: *shared
+  # - display_name: Rigsby APA
+  #   in_lang: git
+  #   out_lang: git-apa
+  #   authors:
+  #     - Fineen Davis
+  #   mapping: RAPA_Deterministic.csv
+  #   <<: *shared
+  - display_name: Unicode Normalization
+    in_lang: git
+    out_lang: git-norm
+    authors:
+      - Aidan Pine
+    mapping: norm.csv
+    <<: *shared

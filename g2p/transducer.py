@@ -202,82 +202,22 @@ class Transducer():
     mapping: Mapping
         Formatted input/output pairs using the g2p.mappings.Mapping class
 
-    as_is: bool
-        Determines whether to evaluate g2p rules in mapping in the order they are, or
-        to reverse sort them by length
-
     _index_match_pattern: Pattern
         Pattern to match the digit inside curly brackets { } as is this package's convention
 
     _char_match_pattern: Pattern
         Pattern to match the character(s) preceding the _index_match_pattern
 
-
-    Methods
-    -------
-
-    rule_to_regex(rule: str) -> Pattern:
-        Turns an input string (and the context) from an input/output pair
-        into a regular expression pattern
-
-
-
     '''
 
-    def __init__(self, mapping: Mapping, as_is: bool = False):
+    def __init__(self, mapping: Mapping):
         self.mapping = mapping
-        self.map_kwargs = mapping.kwargs
-        self.case_sensitive = mapping.case_sensitive
-        self.as_is = as_is
-        if not self.as_is:
-            # sort by reverse len
-            self.mapping = sorted(self.mapping(), key=lambda x: len(
-                x["in"]), reverse=True)
-        # turn "in" in to Regex
-        for io in self.mapping:
-            io['match_pattern'] = self.rule_to_regex(io)
-
+        self.case_sensitive = mapping.kwargs['case_sensitive']
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
         return self.apply_rules(to_convert, index, debugger, output_delimiter)
-
-    def escape_special_characters(self, to_escape) -> str:
-        escape = self.map_kwargs.get('escape_special_characters', False)
-        if escape:
-            escaped = re.escape(to_escape)
-            if escaped != to_escape:
-                LOGGER.info(f"Escaped special characters in '{to_escape}' with '{escaped}'. Set 'escape_special_characters' to False in your Mapping to disable this.")
-            return escaped
-        return to_escape
-
-    def rule_to_regex(self, rule: str) -> Pattern:
-        """Turns an input string (and the context) from an input/output pair
-        into a regular expression pattern"""
-        if "context_before" in rule and rule['context_before']:
-            before = self.escape_special_characters(rule["context_before"])
-        else:
-            before = ''
-        if 'context_after' in rule and rule['context_after']:
-            after = self.escape_special_characters(rule["context_after"])
-        else:
-            after = ''
-        input_match = re.sub(re.compile(r'{\d+}'), "", self.escape_special_characters(rule["in"]))
-        try:
-            inp = create_fixed_width_lookbehind(before) + input_match
-            if after:
-                inp += f"(?={after})"
-            
-            if not self.case_sensitive:
-                rule_regex = re.compile(inp, re.I)
-            else:
-                rule_regex = re.compile(inp)
-
-        except:
-            raise Exception(
-                'Your regex is malformed.')
-        return rule_regex
 
     def return_match_starting_indices(self, match_object_list, match_indices):
         indices = []
@@ -371,9 +311,6 @@ class Transducer():
         TODO: potentially refactor this to lean more on the return_default_mapping method
          """
         intermediate_index = deepcopy(intermediate_index)
-        # if input_string == 'ʁ':
-        if not self.case_sensitive:
-            original_str = original_str.lower()
         # (n)one-to-(n)one
         if len(input_string) <= 1 and len(output_string) <= 1:
             # create output dictionary
@@ -505,6 +442,9 @@ class Transducer():
         """
         indices = {}
         rules_applied = []
+
+        if not self.case_sensitive:
+            to_convert = to_convert.lower()
 
         # initialized converted
         converted = to_convert

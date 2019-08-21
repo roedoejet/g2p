@@ -1,0 +1,8 @@
+<<: &shared
+  language_name: Navajo
+mappings:
+  - display_name: Times
+    mapping: times.csv
+    in_lang: nav-times
+    out_lang: nav
+    <<: *shared

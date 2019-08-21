@@ -1,0 +1,217 @@
+{
+    "type": "mapping",
+    "authors": [
+        "Aidan Pine"
+    ],
+    "created": "2019-06-23",
+    "last_modified": "2019-06-23",
+    "in_metadata": {
+        "display_name": "SENĆOŦEN",
+        "display": true,
+        "lang": "str-sen",
+        "format": "custom",
+        "delimiter": "",
+        "case_insensitive": false,
+        "as_is": true
+    },
+    "out_metadata": {
+        "lang": "str-sen-ipa",
+        "format": "ipa",
+        "delimiter": ""
+    },
+    "map": [
+        {
+            "in": "Á",
+            "out": "e"
+        },
+        {
+            "in": "A\u0301",
+            "out": "e"
+        },
+        {
+            "in": "A",
+            "out": "e"
+        },
+        {
+            "in": "Ⱥ",
+            "out": "ej"
+        },
+        {
+            "in": "B",
+            "out": "pʼ"
+        },
+        {
+            "in": "Ć",
+            "out": "t͡ʃ"
+        },
+        {
+            "in": "C\u0301",
+            "out": "t͡ʃ"
+        },
+        {
+            "in": "Ȼ",
+            "out": "k̟ʷ"
+        },
+        {
+            "in": "C",
+            "out": "k̟"
+        },
+        {
+            "in": "D",
+            "out": "tʼ"
+        },
+        {
+            "in": "E",
+            "out": "ʌ"
+        },
+        {
+            "in": "H",
+            "out": "h"
+        },
+        {
+            "in": "I",
+            "out": "i"
+        },
+        {
+            "in": "Í",
+            "out": "əj"
+        },
+        {
+            "in": "J",
+            "out": "t͡ʃʼ"
+        },
+        {
+            "in": "Ꝁ",
+            "out": "qʷʼ"
+        },
+        {
+            "in": "₭",
+            "out": "qʷʼ"
+        },
+        {
+            "in": "K\u0331",
+            "out": "q"
+        },
+        {
+            "in": "K\u0332",
+            "out": "q"
+        },
+        {
+            "in": "K",
+            "out": "qʼ"
+        },
+        {
+            "in": "L",
+            "out": "l"
+        },
+        {
+            "in": "Ƚ",
+            "out": "ɬ"
+        },
+        {
+            "in": "M",
+            "out": "m"
+        },
+        {
+            "in": "N\u0331",
+            "out": "ŋ"
+        },
+        {
+            "in": "N\u0332",
+            "out": "ŋ"
+        },
+        {
+            "in": "N",
+            "out": "n"
+        },
+        {
+            "in": "O",
+            "out": "ɑ"
+        },
+        {
+            "in": "P",
+            "out": "p"
+        },
+        {
+            "in": "Q",
+            "out": "kʷʼ"
+        },
+        {
+            "in": "S",
+            "out": "s"
+        },
+        {
+            "in": "Ś",
+            "out": "ʃ"
+        },
+        {
+            "in": "Ⱦ",
+            "out": "t͡s̪ʼ"
+        },
+        {
+            "in": "Ṯ",
+            "out": "tɬʼ"
+        },
+        {
+            "in": "T\u0331",
+            "out": "tɬʼ"
+        },
+        {
+            "in": "T\u0332",
+            "out": "tɬʼ"
+        },
+        {
+            "in": "Ŧ|Ŧ",
+            "out": "s̪"
+        },
+        {
+            "in": "T",
+            "out": "t"
+        },
+        {
+            "in": "U",
+            "out": "u"
+        },
+        {
+            "in": "W\u0331",
+            "out": "xʷ"
+        },
+        {
+            "in": "W\u0332",
+            "out": "xʷ"
+        },
+        {
+            "in": "W",
+            "out": "w"
+        },
+        {
+            "in": "X\u0331",
+            "out": "χʷ"
+        },
+        {
+            "in": "X\u0332",
+            "out": "χʷ"
+        },
+        {
+            "in": "X",
+            "out": "χ"
+        },
+        {
+            "in": "Y",
+            "out": "j"
+        },
+        {
+            "in": "Z",
+            "out": "d͡z"
+        },
+        {
+            "in": "¸",
+            "out": "ʔ"
+        },
+        {
+            "in": "s",
+            "out": "s"
+        }
+    ],
+    "comments": ["TODO: Should allow for inputs like 'K\u0331|K\u0332'. This currently crashes the g2p library"]
+}

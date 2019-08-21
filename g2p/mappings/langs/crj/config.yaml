@@ -1,0 +1,18 @@
+<<: &shared
+  language_name: Southern East Cree
+mappings:
+  - display_name: Southern East Cree to IPA
+    in_lang: crj
+    out_lang: crj-ipa
+    type: mapping
+    authors:
+      - David Huggins Daines
+      - Patrick Littell
+    mapping: crj_to_ipa.json
+    <<: *shared
+  - display_name: Southern East Cree IPA to English IPA
+    in_lang: crj-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: crj_ipa_to_eng_ipa.json
+    <<: *shared

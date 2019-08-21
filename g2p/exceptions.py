@@ -13,13 +13,13 @@ class CommandLineError(Exception):
 
 class MappingMissing(CommandLineError):
     def __init__(self, language):
-        self.language = language['lang']
-        self.table = language['table']
+        self.in_lang = language['in_lang']
+        self.out_lang = language['out_lang']
     
     def __str__(self):
         return self.render((
             '\n'
-            'There is no mapping with the name "%(table)s" for the language "%(language)s", please\n'
+            'There is no mapping between the languages "%(in_lang)s" and "%(out_lang)s", please\n'
             'make sure you spelled the name correctly or go to\n'
             'https://github.com/roedoejet/g2p/ for a list of mappings'
         ))

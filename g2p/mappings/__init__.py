@@ -8,88 +8,64 @@ import csv
 import os
 import unicodedata as ud
 import re
-from typing import DefaultDict, List, Union
-from collections import defaultdict
+import json
+from typing import DefaultDict, List, Pattern, Union
+from collections import defaultdict, OrderedDict
 from itertools import chain
+from pathlib import Path
 from operator import methodcaller
 
-from openpyxl import load_workbook
+import yaml
 
 from g2p import exceptions
-from g2p.mappings.langs import LANGS
-from g2p.mappings.langs import __file__ as LANGS_FILE
-from g2p.mappings.utils import flatten_abbreviations, unicode_escape
+from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
+from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters
+from g2p.mappings.utils import flatten_abbreviations, load_abbreviations_from_file
+from g2p.mappings.utils import load_from_file, unicode_escape, validate
 from g2p.log import LOGGER
 
 
 class Mapping():
     """ Class for lookup tables
-    """
 
-    def __init__(self, language, reverse: bool = False, norm_form: str = "NFC",
-                 abbreviations: Union[str, DefaultDict[str, List[str]]] = False,
-                 case_sensitive: bool = True, **kwargs):
-        self.kwargs = kwargs
+        @param as_is: bool = False
+            Evaluate g2p rules in mapping in the order they are.
+            Default is to reverse sort them by length.
+
+        @param case_sensitive: bool = True
+            Lower all rules and conversion input
+
+        @param escape_special: bool = False
+            Escape special characters in rules
+
+        @param norm_form: str = "NFC"
+            Normalization standard to follow. NFC | NKFC | NFD | NKFD
+
+        @param reverse: bool = False
+            Reverse all mappings
+
+    """
+    def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
+        self.possible_kwargs = ['as_is', 'authors', 'case_sensitive', 'escape_special', 'in_lang', 'norm_form', 'out_lang', 'reverse']
+        self.kwargs = OrderedDict(kwargs)
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
-        self.norm_form = norm_form
-        self.case_sensitive = case_sensitive
-        self.path = language
-        self.reverse = reverse
+        self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
             self.abbreviations = abbreviations
         elif abbreviations:
-            self.abbreviations = self.load_abbreviations_from_file(
+            self.abbreviations = load_abbreviations_from_file(
                 abbreviations)
-
-        # Load workbook, either from mapping spreadsheets, or user loaded
-        if not isinstance(language, type(None)):
-            if isinstance(language, list):
-                self.path = 'user supplied data'
-                if all('in' in d for d in language) and all('out' in d for d in language):
-                    if self.reverse:
-                        language = self.reverse_mappings(language)
-                    if not all('context_before' in io for io in language):
-                        for io in language:
-                            if not 'context_before' in io:
-                                io['context_before'] = ''
-                    if not all('context_after' in io for io in language):
-                        for io in language:
-                            if not 'context_after' in io:
-                                io['context_after'] = ''
-                    self.mapping = language
-                else:
-                    raise exceptions.MalformedMapping()
-            elif isinstance(language, dict):
-                if not "lang" in language or not "table" in language:
-                    raise exceptions.MalformedLookup()
-                else:
-                    try:
-                        lang = [lang for lang in LANGS if lang['name'].strip() ==
-                                language['lang'].strip() or lang['code'].strip() == language['lang'].strip()][0]
-                        table = [table for table in lang['tables']
-                                 if table['name'].strip() == language['table'].strip()][0]
-                        self.mapping = self.load_from_file(os.path.join(
-                            os.path.dirname(LANGS_FILE), lang['code'], table['table']))
-                        if "abbreviations" in table and table['abbreviations']:
-                            self.abbreviations = self.load_abbreviations_from_file(os.path.join(
-                                os.path.dirname(LANGS_FILE), lang['code'], table['abbreviations']))
-                    except KeyError:
-                        raise exceptions.MappingMissing(language)
-                    except IndexError:
-                        raise exceptions.MappingMissing(language)
-            else:
-                self.mapping = self.load_from_file(language)
+        # Handle user-supplied list
+        if isinstance(mapping, list):
+            self.mapping = validate(mapping)
+        elif isinstance(mapping, str):
+            self.mapping, self.kwargs = self.load_mapping_from_path(mapping)
         else:
-            raise exceptions.MappingMissing(language)
-
-        if self.norm_form in self.allowable_norm_forms:
-            for io in self.mapping:
-                for k, v in io.items():
-                    if isinstance(v, str):
-                        io[k] = self.normalize(v)
-            if self.abbreviations:
-                self.abbreviations = {self.normalize(abb): [self.normalize(
-                    x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
+            if "in_lang" in kwargs and "out_lang" in kwargs:
+                self.mapping, self.kwargs = self.find_mapping(
+                    kwargs['in_lang'], kwargs['out_lang'])
+            else:
+                raise exceptions.MalformedLookup()
         if self.abbreviations:
             for abb, stands_for in self.abbreviations.items():
                 abb_match = re.compile(abb)
@@ -98,8 +74,8 @@ class Mapping():
                     for key in io.keys():
                         if re.search(abb_match, io[key]):
                             io[key] = re.sub(abb_match, abb_repl, io[key])
-        if not self.case_sensitive:
-            self.lower_mappings(self.mapping)
+        if not self.processed:
+            self.mapping = self.process_kwargs(self.mapping)
 
     def __len__(self):
         return len(self.mapping)
@@ -110,29 +86,96 @@ class Mapping():
     def __iter__(self):
         return iter(self.mapping)
 
+    def process_kwargs(self, mapping):
+        ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
+        '''
+        # Add defaults
+        if 'as_is' not in self.kwargs:
+            self.kwargs['as_is'] = False
+        if 'case_sensitive' not in self.kwargs:
+            self.kwargs['case_sensitive'] = True
+        if 'escape_special' not in self.kwargs:
+            self.kwargs['escape_special'] = False
+        if 'norm_form' not in self.kwargs:
+            self.kwargs['norm_form'] = 'NFC'
+        if 'reverse' not in self.kwargs:
+            self.kwargs['reverse'] = False
+        # Process kwargs in order received
+        for kwarg, val in self.kwargs.items():
+            if kwarg == 'as_is' and not val:
+                # sort by reverse len
+                mapping = sorted(mapping, key=lambda x: len(
+                    x["in"]), reverse=True)
+            if kwarg == 'escape_special' and val:
+                mapping = [escape_special_characters(x) for x in mapping]
+            if kwarg == 'case_sensitive' and not val:
+                mapping = self.lower_mappings(mapping)
+            if kwarg == 'norm_form' and val:
+                for io in mapping:
+                    for k, v in io.items():
+                        if isinstance(v, str):
+                            io[k] = self.normalize(v)
+                #TODO: Should all of these also apply to abbreviations?
+                if self.abbreviations:
+                    self.abbreviations = {self.normalize(abb): [self.normalize(
+                        x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
+            if kwarg == 'reverse' and val:
+                mapping = self.reverse_mappings(mapping)
+        # After all processing is done, turn into regex
+        for io in mapping:
+            io['match_pattern'] = self.rule_to_regex(io)
+        self.processed = True
+        return mapping
+
     def normalize(self, inp: str):
         ''' Normalize to NFC(omposed) or NFD(ecomposed).
             Also, find any Unicode Escapes & decode 'em!
         '''
-        if self.norm_form not in self.allowable_norm_forms:
+        if self.kwargs['norm_form'] not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
         else:
-            normalized = ud.normalize(self.norm_form, unicode_escape(inp))
+            normalized = ud.normalize(self.kwargs['norm_form'], unicode_escape(inp))
             if normalized != inp:
                 LOGGER.info(
                     'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
-                    inp, normalized, self.norm_form)
+                    inp, normalized, self.kwargs['norm_form'])
             return normalized
 
+    def rule_to_regex(self, rule: str) -> Pattern:
+        """Turns an input string (and the context) from an input/output pair
+        into a regular expression pattern"""
+        if "context_before" in rule and rule['context_before']:
+            before = rule["context_before"]
+        else:
+            before = ''
+        if 'context_after' in rule and rule['context_after']:
+            after = rule["context_after"]
+        else:
+            after = ''
+        input_match = re.sub(re.compile(
+            r'{\d+}'), "", rule['in'])
+        try:
+            inp = create_fixed_width_lookbehind(before) + input_match
+            if after:
+                inp += f"(?={after})"
+            if not self.kwargs['case_sensitive']:
+                rule_regex = re.compile(inp, re.I)
+            else:
+                rule_regex = re.compile(inp)
+        except:
+            raise Exception(
+                'Your regex is malformed.')
+        return rule_regex
+
     def reverse_mappings(self, mapping):
-        ''' Reverse the table
+        ''' Reverse the mapping
         '''
         for io in mapping:
             io['in'], io['out'] = io['out'], io['in']
         return mapping
 
     def lower_mappings(self, mapping):
-        ''' Lower the table
+        ''' Lower the mapping
         '''
         for io in mapping:
             for k, v in io.items():
@@ -154,102 +197,26 @@ class Mapping():
                         io[key] = abb['stands_for']
         return mappings
 
-    def load_abbreviations_from_file(self, path):
-        ''' Helper method to load abbreviations from file.
+    def find_mapping(self, in_lang: str, out_lang: str) -> list:
+        ''' Given an input and output, find a mapping to get between them.
         '''
-        if path.endswith('csv'):
-            abbs = []
-            with open(path, encoding='utf8') as f:
-                reader = csv.reader(f)
-                abbs = flatten_abbreviations(reader)
+        for mapping in MAPPINGS_AVAILABLE:
+            map_in_lang = mapping.get('in_lang', '')
+            map_out_lang = mapping.get('out_lang', '')
+            if map_in_lang == in_lang and map_out_lang == out_lang:
+                return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
+        return [], OrderedDict()
+    
+    def load_mapping_from_path(self, path: str) -> list:
+        path = Path(path)
+        if path.exists() and (path.suffix.endswith('yml') or path.suffix.endswith('yaml')):
+            with open(path) as f:
+                mapping = yaml.safe_load(f)
+            mapping['mapping_data'] = load_from_file(os.path.join(path.parent, mapping['mapping']))
+            return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
         else:
-            raise exceptions.IncorrectFileType(
-                '''Sorry, abbreviations must be stored as CSV files.
-                You provided the following: %s''' % path)
-        return abbs
+            raise exceptions.MalformedMapping
 
-    def load_from_file(self, path):
-        ''' Helper method to load table from file.
-        '''
-        if path.endswith('csv'):
-            return self.load_from_csv(path)
-        elif path.endswith('xlsx'):
-            return self.load_from_workbook(path)
 
-    def load_from_csv(self, language):
-        ''' Parse table from csv
-        '''
-        work_sheet = []
-        with open(language, encoding='utf8') as f:
-            reader = csv.reader(f)
-            for line in reader:
-                work_sheet.append(line)
-        # Create wordlist
-        mapping = []
-        # Loop through rows in worksheet, create if statements for different columns
-        # and append mappings to self.mapping.
-        for entry in work_sheet:
-            new_io = {"in": "", "out": "",
-                      "context_before": "", "context_after": ""}
-            new_io['in'] = entry[0]
-            new_io['out'] = entry[1]
-            try:
-                new_io['context_before'] = entry[2]
-            except IndexError:
-                new_io['context_before'] = ''
-            try:
-                new_io['context_after'] = entry[3]
-            except IndexError:
-                new_io['context_after'] = ''
-            for k in new_io:
-                if isinstance(new_io[k], float) or isinstance(new_io[k], int):
-                    new_io[k] = str(new_io[k])
-
-            mapping.append(new_io)
-
-        if self.reverse:
-            mapping = self.reverse_mappings(mapping)
-
-        return mapping
-
-    def load_from_workbook(self, language):
-        ''' Parse table from Excel workbook
-        '''
-        work_book = load_workbook(language)
-        work_sheet = work_book.active
-        # Create wordlist
-        mapping = []
-        # Loop through rows in worksheet, create if statements for different columns
-        # and append mappings to self.mapping.
-        for entry in work_sheet:
-            new_io = {"in": "", "out": "",
-                      "context_before": "", "context_after": ""}
-            for col in entry:
-                if col.column == 'A':
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["in"] = value
-                if col.column == 'B':
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["out"] = value
-                if col.column == 'C':
-                    if col.value is not None:
-                        value = col.value
-                        if isinstance(value, (float, int)):
-                            value = str(value)
-                        new_io["context_before"] = value
-                if col.column == 'D':
-                    if col.value is not None:
-                        value = col.value
-                        if isinstance(value, (float, int)):
-                            value = str(value)
-                        new_io["context_after"] = value
-            mapping.append(new_io)
-
-        if self.reverse:
-            mapping = self.reverse_mappings(mapping)
-
-        return mapping
+if __name__ == '__main__':
+    pass
