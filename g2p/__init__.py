@@ -4,6 +4,7 @@ Views and config to the g2p Studio web app
 
 """
 import sys
+import io
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
@@ -14,10 +15,10 @@ from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p._version import VERSION
 
 if sys.stdout.encoding != 'utf8':
-    sys.stdout.reconfigure(encoding='utf8')
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
 
 if sys.stderr.encoding != 'utf8':
-    sys.stderr.reconfigure(encoding='utf8')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 
 APP = Flask(__name__)

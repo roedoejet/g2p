@@ -19,7 +19,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='g2p',
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     version=VERSION,
     author="Aidan Pine",
     author_email="hello@aidanpine.ca",

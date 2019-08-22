@@ -3,15 +3,20 @@ Class for performing transductions based on mappings
 
 '''
 
+import re
+import copy
 from typing import List, Pattern, Tuple, Union
-from collections import Counter, OrderedDict
+from collections import OrderedDict
 from collections.abc import Iterable
 from copy import deepcopy
-import re
 from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
+
+# Avoid TypeError in Python < 3.7 (see
+# https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
+copy._deepcopy_dispatch[type(re.compile(''))] = lambda r, _: r
 
 
 class IOStates():
