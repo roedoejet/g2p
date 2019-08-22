@@ -1,0 +1,20 @@
+<<: &shared
+  language_name: Undetermined
+mappings:
+  - display_name: Undetermined to IPA
+    mapping: und_to_ipa.json
+    in_lang: und
+    out_lang: und-ipa
+    case_sensitive: false
+    escape_special: true
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Undetermined IPA to English IPA
+    mapping: und_ipa_to_eng_ipa.json
+    in_lang: und-ipa
+    out_lang: eng-ipa
+    as_is: false
+    authors:
+      - Patrick Littell
+    <<: *shared

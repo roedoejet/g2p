@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Kwak'wala
+mappings:
+  - display_name: Kwak'wala IPA to English IPA
+    mapping: kwk_ipa_to_eng_ipa.json
+    in_lang: kwk-ipa
+    out_lang: eng-ipa
+    case_sensitive: false
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Kwak'wala (NAPA) to IPA
+    mapping: kwk_napa_to_ipa.json
+    in_lang: kwk-napa
+    out_lang: kwk-ipa
+    as_is: false
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Kwak'wala (U'mista) to IPA
+    mapping: kwk_umista_to_ipa.json
+    in_lang: kwk-umista
+    out_lang: kwk-ipa
+    as_is: false
+    authors:
+      - Patrick Littell
+    <<: *shared
