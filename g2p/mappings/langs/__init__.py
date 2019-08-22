@@ -5,7 +5,7 @@ from pathlib import Path
 import timeit
 import yaml
 
-from g2p.mappings.utils import load_from_file
+from g2p.mappings.utils import load_mapping_files
 from g2p import exceptions
 LANGS_DIR = os.path.dirname(__file__)
 
@@ -14,26 +14,20 @@ def cache_langs():
     '''
     langs = {}
     dir_path = Path(LANGS_DIR)
-    paths = dir_path.glob('./*/config.y*ml')
+    # Sort by language code
+    paths = sorted(dir_path.glob('./*/config.y*ml'), key=lambda x: x.parent.stem)
     for path in paths:
         code = path.parent.stem
         with open(path) as f:
             data = yaml.safe_load(f)
         # Allow for a single map in a configuration
         if not 'mappings' in data:
-            try:
-                mapping['mapping_data'] = load_from_file(os.path.join(LANGS_DIR, code, data['mapping']))
-            except KeyError:
-                # Is "mapping" key missing?
-                raise exceptions.MalformedMapping()
+            data = load_mapping_files(os.path.join(LANGS_DIR, code), data)
         # Else, there is more than one mapping, under 'mappings' key
         else:
             for mapping in data['mappings']:
-                try:
-                    mapping['mapping_data'] = load_from_file(os.path.join(LANGS_DIR, code, mapping['mapping']))
-                except KeyError:
-                    # Is "mapping" key missing?
-                    raise exceptions.MalformedMapping()
+                index = data['mappings'].index(mapping)
+                data['mappings'][index] = load_mapping_files(os.path.join(LANGS_DIR, code), mapping)
         langs = {**langs, **{code: data}}
     with open(LANGS_PKL, 'wb') as f:
         pickle.dump(langs, f)

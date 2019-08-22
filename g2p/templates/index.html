@@ -55,7 +55,8 @@
                     <option value="custom">Custom</option>
                     {% for k, v in langs.items() %}
                     {% for mapping in v['mappings'] %}
-                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ mapping['language_name'] }} - {{ mapping['display_name'] }}
+                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ k }} - {{ mapping['language_name'] }}
+                        - {{ mapping['display_name'] }}
                     </option>
                     {% endfor %}
                     {% endfor %}
@@ -69,6 +70,20 @@
                         <div>
                             <input checked id='as_is' type='checkbox' name='as_is' value='as_is'>
                             <label for='as_is'>Leave order as is</label>
+                        </div>
+                        <div>
+                            <input checked id='case_sensitive' type='checkbox' name='case_sensitive'
+                                value='case_sensitive'>
+                            <label for='case_sensitive'>Rules are case sensitive</label>
+                        </div>
+                        <div>
+                            <input checked id='escape_special' type='checkbox' name='escape_special'
+                                value='escape_special'>
+                            <label for='escape_special'>Escape special characters</label>
+                        </div>
+                        <div>
+                            <input checked id='reverse' type='checkbox' name='reverse' value='reverse'>
+                            <label for='reverse'>Reverse the rules</label>
                         </div>
                     </fieldset>
                 </form>

@@ -1,49 +1,118 @@
-{
-   "type": "mapping",
-   "authors": ["Patrick Littell"],
-   "created": "2019-04-19",
-   "last_modified": "2019-04-19",
-   "in_metadata": {
-      "lang": "und",
-      "format": "custom",
-      "delimiter": "",
-      "case_insensitive": true,
-      "escape_special_characters": true
+[
+   {
+      "in": "a",
+      "out": "a"
    },
-   "out_metadata": {
-      "lang": "und-ipa",
-      "format": "ipa",
-      "delimiter": ""
+   {
+      "in": "b",
+      "out": "b"
    },
-   "map": [
-      { "in": "a",	"out": "a" },
-      { "in": "b",	"out": "b" },
-      { "in": "c",	"out": "t͡ʃ" },
-      { "in": "d",	"out": "d" },
-      { "in": "e",	"out": "e" },
-      { "in": "f",	"out": "f" },
-      { "in": "g",	"out": "ɡ" },
-      { "in": "h",	"out": "h" },
-      { "in": "i",	"out": "i" },
-      { "in": "j",	"out": "ʒ" },
-      { "in": "k",	"out": "k" },
-      { "in": "l",	"out": "l" },
-      { "in": "m",	"out": "m" },
-      { "in": "n",	"out": "n" },
-      { "in": "o",	"out": "o" },
-      { "in": "p",	"out": "p" },
-      { "in": "q",	"out": "q" },
-      { "in": "r",	"out": "r" },
-      { "in": "s",	"out": "s" },
-      { "in": "t",	"out": "t" },
-      { "in": "u",	"out": "u" },
-      { "in": "v",	"out": "v" },
-      { "in": "w",	"out": "w" },
-      { "in": "x",	"out": "x" },
-      { "in": "y",	"out": "j" },
-      { "in": "z",	"out": "z" },
-      { "in": "@",	"out": "ə" },
-      { "in": "?",	"out": "ʔ" },
-      { "in": "'",	"out": "ʔ" }
-   ]
-}
+   {
+      "in": "c",
+      "out": "t͡ʃ"
+   },
+   {
+      "in": "d",
+      "out": "d"
+   },
+   {
+      "in": "e",
+      "out": "e"
+   },
+   {
+      "in": "f",
+      "out": "f"
+   },
+   {
+      "in": "g",
+      "out": "ɡ"
+   },
+   {
+      "in": "h",
+      "out": "h"
+   },
+   {
+      "in": "i",
+      "out": "i"
+   },
+   {
+      "in": "j",
+      "out": "ʒ"
+   },
+   {
+      "in": "k",
+      "out": "k"
+   },
+   {
+      "in": "l",
+      "out": "l"
+   },
+   {
+      "in": "m",
+      "out": "m"
+   },
+   {
+      "in": "n",
+      "out": "n"
+   },
+   {
+      "in": "o",
+      "out": "o"
+   },
+   {
+      "in": "p",
+      "out": "p"
+   },
+   {
+      "in": "q",
+      "out": "q"
+   },
+   {
+      "in": "r",
+      "out": "r"
+   },
+   {
+      "in": "s",
+      "out": "s"
+   },
+   {
+      "in": "t",
+      "out": "t"
+   },
+   {
+      "in": "u",
+      "out": "u"
+   },
+   {
+      "in": "v",
+      "out": "v"
+   },
+   {
+      "in": "w",
+      "out": "w"
+   },
+   {
+      "in": "x",
+      "out": "x"
+   },
+   {
+      "in": "y",
+      "out": "j"
+   },
+   {
+      "in": "z",
+      "out": "z"
+   },
+   {
+      "in": "@",
+      "out": "ə"
+   },
+   {
+      "in": "?",
+      "out": "ʔ"
+   },
+   {
+      "in": "'",
+      "out": "ʔ"
+   }
+]

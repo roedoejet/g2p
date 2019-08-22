@@ -6,6 +6,7 @@ mappings:
     in_lang: moh
     out_lang: moh-ipa
     case_sensitive: false
+    abbreviations: abbreviations.csv
     authors:
       - Aidan Pine
     <<: *shared

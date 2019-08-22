@@ -40,19 +40,16 @@ def return_empty_mappings(n=DEFAULT_N):
         y += 1
     return mappings
 
-
 def hot_to_mappings(hot_data):
     ''' Parse data from HandsOnTable to Mapping format
     '''
     return [{"context_before": x[2], "in": x[0], "context_after": x[3],
              "out": x[1]} for x in hot_data if x[0] and x[1]]
 
-
 @APP.route('/')
 def home():
     """ Return homepage of g2p Studio
     """
-    print(LANGS)
     return render_template('index.html', langs=LANGS)
 
 
@@ -61,7 +58,7 @@ def convert(message):
     """ Convert input text and return output
     """
     mappings = Mapping(hot_to_mappings(message['data']['mappings']), abbreviations=flatten_abbreviations(
-        message['data']['abbreviations']))
+        message['data']['abbreviations']), **message['data']['kwargs'])
     transducer = Transducer(mappings)
     output_string = transducer(message['data']['input_string'])
     emit('conversion response', {'output_string': output_string})
@@ -71,13 +68,14 @@ def convert(message):
 def change_table(message):
     """ Change the lookup table
     """
-    print(message)
     if message['in_lang'] == 'custom' or message['out_lang'] == 'custom':
         mappings = Mapping(return_empty_mappings())
     else:
-        mappings = Mapping(in_lang=message['in_lang'], out_lang=message['out_lang'])
-    emit('table response', {'mappings': mappings(),
-                            'abbs': expand_abbreviations(mappings.abbreviations)})
+        mappings = Mapping(
+            in_lang=message['in_lang'], out_lang=message['out_lang'])
+    emit('table response', {'mappings': mappings.plain_mapping(),
+                            'abbs': expand_abbreviations(mappings.abbreviations),
+                            'kwargs': mappings.kwargs})
 
 
 @SOCKETIO.on('connect', namespace='/test')

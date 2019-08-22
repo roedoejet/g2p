@@ -3,10 +3,12 @@
 Utilities used by other classes
 
 """
+import os
 import csv
 from collections import defaultdict
 import regex as re
 import json
+from copy import deepcopy
 
 from openpyxl import load_workbook
 from typing import Dict
@@ -34,8 +36,10 @@ def expand_abbreviations(data):
             for col in data[key]:
                 line.append(col)
             lines.append(line)
+    if not lines:
+        while len(lines) < 10:
+            lines.append(['', '', '', '', '', ''])
     return lines
-
 
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints
@@ -158,9 +162,18 @@ def load_from_file(path: str) -> list:
     elif path.endswith('json'):
         with open(path) as f:
             mapping = json.load(f)
-    # if self.reverse:
-    #     mapping = self.reverse_mappings(mapping)
     return validate(mapping)
+
+def load_mapping_files(root_path, mapping):
+    mapping = deepcopy(mapping)
+    try:
+        mapping['mapping_data'] = load_from_file(os.path.join(root_path, mapping['mapping']))
+    except KeyError:
+        # Is "mapping" key missing?
+        raise exceptions.MalformedMapping()
+    if 'abbreviations' in mapping and not 'abbreviations_data' in mapping:
+        mapping['abbreviations_data'] = load_abbreviations_from_file(os.path.join(root_path, mapping['abbreviations']))
+    return mapping
 
 def validate(mapping):
     try:

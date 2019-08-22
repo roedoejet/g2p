@@ -21,7 +21,7 @@ from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters
 from g2p.mappings.utils import flatten_abbreviations, load_abbreviations_from_file
-from g2p.mappings.utils import load_from_file, unicode_escape, validate
+from g2p.mappings.utils import load_from_file, load_mapping_files, unicode_escape, validate
 from g2p.log import LOGGER
 
 
@@ -45,8 +45,10 @@ class Mapping():
             Reverse all mappings
 
     """
+
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
-        self.possible_kwargs = ['as_is', 'authors', 'case_sensitive', 'escape_special', 'in_lang', 'norm_form', 'out_lang', 'reverse']
+        self.possible_kwargs = ['as_is', 'authors', 'case_sensitive',
+                                'escape_special', 'in_lang', 'norm_form', 'out_lang', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.processed = False
@@ -59,21 +61,28 @@ class Mapping():
         if isinstance(mapping, list):
             self.mapping = validate(mapping)
         elif isinstance(mapping, str):
-            self.mapping, self.kwargs = self.load_mapping_from_path(mapping)
+            self.mapping, map_kwargs, self.abbreviations = self.load_mapping_from_path(
+                mapping)
+            # Merge kwargs, but prioritize kwargs that initialized the Mapping
+            self.kwargs = {**map_kwargs, **self.kwargs}
         else:
-            if "in_lang" in kwargs and "out_lang" in kwargs:
-                self.mapping, self.kwargs = self.find_mapping(
-                    kwargs['in_lang'], kwargs['out_lang'])
+            if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
+                self.mapping, map_kwargs, self.abbreviations = self.find_mapping(
+                    self.kwargs['in_lang'], self.kwargs['out_lang'])
+                # Merge kwargs, but prioritize kwargs that initialized the Mapping
+                self.kwargs = {**map_kwargs, **self.kwargs}
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
             for abb, stands_for in self.abbreviations.items():
                 abb_match = re.compile(abb)
                 abb_repl = '|'.join(stands_for)
-                for io in self.mapping:
-                    for key in io.keys():
-                        if re.search(abb_match, io[key]):
-                            io[key] = re.sub(abb_match, abb_repl, io[key])
+                if 'match_pattern' not in self.mapping[0]:
+                    for io in self.mapping:
+                        for key in io.keys():
+                            if key in ['in', 'out', 'context_before', 'context_after'] and re.search(abb_match, io[key]):
+                                io[key] = re.sub(
+                                    abb_match, unicode_escape(abb_repl), io[key])
         if not self.processed:
             self.mapping = self.process_kwargs(self.mapping)
 
@@ -85,6 +94,11 @@ class Mapping():
 
     def __iter__(self):
         return iter(self.mapping)
+
+    def plain_mapping(self):
+        ''' Return mapping
+        '''
+        return [{k: v for k, v in io.items() if k in ['in', 'out', 'context_before', 'context_after']} for io in self.mapping]
 
     def process_kwargs(self, mapping):
         ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
@@ -115,10 +129,6 @@ class Mapping():
                     for k, v in io.items():
                         if isinstance(v, str):
                             io[k] = self.normalize(v)
-                #TODO: Should all of these also apply to abbreviations?
-                if self.abbreviations:
-                    self.abbreviations = {self.normalize(abb): [self.normalize(
-                        x) for x in stands_for] for abb, stands_for in self.abbreviations.items()}
             if kwarg == 'reverse' and val:
                 mapping = self.reverse_mappings(mapping)
         # After all processing is done, turn into regex
@@ -134,7 +144,8 @@ class Mapping():
         if self.kwargs['norm_form'] not in self.allowable_norm_forms:
             raise exceptions.InvalidNormalization(self.normalize)
         else:
-            normalized = ud.normalize(self.kwargs['norm_form'], unicode_escape(inp))
+            normalized = ud.normalize(
+                self.kwargs['norm_form'], unicode_escape(inp))
             if normalized != inp:
                 LOGGER.info(
                     'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
@@ -164,7 +175,8 @@ class Mapping():
                 rule_regex = re.compile(inp)
         except:
             raise Exception(
-                'Your regex is malformed.')
+                f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+                    Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
         return rule_regex
 
     def reverse_mappings(self, mapping):
@@ -179,7 +191,8 @@ class Mapping():
         '''
         for io in mapping:
             for k, v in io.items():
-                io[k] = v.lower()
+                if k in ['in', 'out', 'context_before', 'context_after']:
+                    io[k] = v.lower()
         return mapping
 
     def add_abbreviations(self, abbs, mappings):
@@ -204,16 +217,27 @@ class Mapping():
             map_in_lang = mapping.get('in_lang', '')
             map_out_lang = mapping.get('out_lang', '')
             if map_in_lang == in_lang and map_out_lang == out_lang:
-                return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
+                if 'abbreviations_data' in mapping:
+                    abbreviations_data = mapping['abbreviations_data']
+                else:
+                    abbreviations_data = None
+                try:
+                    return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs}), abbreviations_data
+                except:
+                    breakpoint()
         return [], OrderedDict()
-    
+
     def load_mapping_from_path(self, path: str) -> list:
         path = Path(path)
         if path.exists() and (path.suffix.endswith('yml') or path.suffix.endswith('yaml')):
             with open(path) as f:
                 mapping = yaml.safe_load(f)
-            mapping['mapping_data'] = load_from_file(os.path.join(path.parent, mapping['mapping']))
-            return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
+            mapping = load_mapping_files(path.parent, mapping)
+            if 'abbreviations_data' in mapping:
+                abbreviations_data = mapping['abbreviations_data']
+            else:
+                abbreviations_data = None
+            return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs}), abbreviations_data
         else:
             raise exceptions.MalformedMapping
 
