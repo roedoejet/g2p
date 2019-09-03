@@ -21,7 +21,7 @@ from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters
 from g2p.mappings.utils import flatten_abbreviations, load_abbreviations_from_file
-from g2p.mappings.utils import load_from_file, load_mapping_files, unicode_escape, validate
+from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
 from g2p.log import LOGGER
 
 
@@ -61,16 +61,18 @@ class Mapping():
         if isinstance(mapping, list):
             self.mapping = validate(mapping)
         elif isinstance(mapping, str):
-            self.mapping, map_kwargs, self.abbreviations = self.load_mapping_from_path(
-                mapping)
+            loaded_config = load_mapping_from_path(mapping)
+            self.mapping = loaded_config['mapping_data']
+            mapping_kwargs = OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
+            self.abbreviations = loaded_config.get('abbreviations_data', None)
             # Merge kwargs, but prioritize kwargs that initialized the Mapping
-            self.kwargs = {**map_kwargs, **self.kwargs}
+            self.kwargs = {**mapping_kwargs, **self.kwargs}
         else:
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
-                self.mapping, map_kwargs, self.abbreviations = self.find_mapping(
+                self.mapping, mapping_kwargs, self.abbreviations = self.find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
                 # Merge kwargs, but prioritize kwargs that initialized the Mapping
-                self.kwargs = {**map_kwargs, **self.kwargs}
+                self.kwargs = {**mapping_kwargs, **self.kwargs}
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
@@ -226,20 +228,6 @@ class Mapping():
                 except:
                     breakpoint()
         return [], OrderedDict()
-
-    def load_mapping_from_path(self, path: str) -> list:
-        path = Path(path)
-        if path.exists() and (path.suffix.endswith('yml') or path.suffix.endswith('yaml')):
-            with open(path) as f:
-                mapping = yaml.safe_load(f)
-            mapping = load_mapping_files(path.parent, mapping)
-            if 'abbreviations_data' in mapping:
-                abbreviations_data = mapping['abbreviations_data']
-            else:
-                abbreviations_data = None
-            return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs}), abbreviations_data
-        else:
-            raise exceptions.MalformedMapping
 
 
 if __name__ == '__main__':

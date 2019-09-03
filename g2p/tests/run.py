@@ -1,47 +1,59 @@
+""" Organize tests into Test Suites
+"""
+
 import os
 from unittest import TestLoader, TextTestRunner, TestSuite
+
 # Unit tests
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_transducer import TransducerTest
+from g2p.tests.test_cli import CliTester
+from g2p.tests.test_utils import UtilsTester
 
 
-loader = TestLoader()
+LOADER = TestLoader()
 
-transducer_tests = [
-    loader.loadTestsFromTestCase(test)
+TRANSDUCER_TESTS = [
+    LOADER.loadTestsFromTestCase(test)
     for test in [IndicesTest, TransducerTest]
 ]
 
-mappings_tests = [
-    loader.loadTestsFromTestCase(test)
-    for test in [MappingTest]
+MAPPINGS_TESTS = [
+    LOADER.loadTestsFromTestCase(test)
+    for test in [MappingTest, UtilsTester]
 ]
 
-langs_tests = [
-    loader.loadTestsFromTestCase(test) for test in [
+LANGS_TESTS = [
+    LOADER.loadTestsFromTestCase(test) for test in [
         LangTest,
     ]
 ]
 
-dev_tests = transducer_tests + mappings_tests + langs_tests
+INTEGRATION_TESTS = [
+    LOADER.loadTestsFromTestCase(test) for test in [
+        CliTester,
+    ]
+]
 
+DEV_TESTS = TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS
 
 def run_tests(suite):
+    ''' Decide which Test Suite to run
+    '''
     if suite == 'all':
-        suite = loader.discover(os.path.dirname(__file__))
+        suite = LOADER.discover(os.path.dirname(__file__))
     if suite == 'trans':
-        suite = TestSuite(transducer_tests)
+        suite = TestSuite(TRANSDUCER_TESTS)
     if suite == 'langs':
-        suite = TestSuite(langs_tests)
+        suite = TestSuite(LANGS_TESTS)
     if suite == 'mappings':
-        suite = TestSuite(mappings_tests)
+        suite = TestSuite(MAPPINGS_TESTS)
     elif suite == 'dev':
-        suite = TestSuite(dev_tests)
+        suite = TestSuite(DEV_TESTS)
     runner = TextTestRunner(verbosity=3)
     runner.run(suite)
-
 
 if __name__ == "__main__":
     run_tests('all')

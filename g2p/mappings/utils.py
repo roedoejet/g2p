@@ -5,10 +5,12 @@ Utilities used by other classes
 """
 import os
 import csv
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import regex as re
 import json
 from copy import deepcopy
+from pathlib import Path
+import yaml
 
 from openpyxl import load_workbook
 from typing import Dict
@@ -164,16 +166,33 @@ def load_from_file(path: str) -> list:
             mapping = json.load(f)
     return validate(mapping)
 
-def load_mapping_files(root_path, mapping):
-    mapping = deepcopy(mapping)
-    try:
-        mapping['mapping_data'] = load_from_file(os.path.join(root_path, mapping['mapping']))
-    except KeyError:
-        # Is "mapping" key missing?
-        raise exceptions.MalformedMapping()
-    if 'abbreviations' in mapping and not 'abbreviations_data' in mapping:
-        mapping['abbreviations_data'] = load_abbreviations_from_file(os.path.join(root_path, mapping['abbreviations']))
-    return mapping
+
+def load_mapping_from_path(path_to_mapping_config, index=0):
+    ''' Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
+        provided to the 'index' argument. Default is 0.
+    '''
+    path = Path(path_to_mapping_config)
+    # If path leads to actual mapping config
+    if path.exists() and (path.suffix.endswith('yml') or path.suffix.endswith('yaml')):
+        # safe load it
+        with open(path) as f:
+            mapping = yaml.safe_load(f)
+        # If more than one mapping in the mapping config
+        if 'mappings' in mapping:
+            LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config, mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
+            mapping = mapping['mappings'][index]
+        # try to load the data from the mapping data file
+        if 'mapping' in mapping:
+            mapping['mapping_data'] = load_from_file(os.path.join(path.parent, mapping['mapping']))
+        else:
+            # Is "mapping" key missing?
+            raise exceptions.MalformedMapping
+        # load any abbreviations
+        if 'abbreviations' in mapping:
+            mapping['abbreviations_data'] = load_abbreviations_from_file(os.path.join(path.parent, mapping['abbreviations']))
+        return mapping
+    else:
+        raise exceptions.MappingMissing
 
 def validate(mapping):
     try:

@@ -5,7 +5,7 @@ from pathlib import Path
 import timeit
 import yaml
 
-from g2p.mappings.utils import load_mapping_files
+from g2p.mappings.utils import load_mapping_from_path
 from g2p import exceptions
 LANGS_DIR = os.path.dirname(__file__)
 
@@ -20,14 +20,12 @@ def cache_langs():
         code = path.parent.stem
         with open(path) as f:
             data = yaml.safe_load(f)
-        # Allow for a single map in a configuration
-        if not 'mappings' in data:
-            data = load_mapping_files(os.path.join(LANGS_DIR, code), data)
-        # Else, there is more than one mapping, under 'mappings' key
+        # If there is a mappings key, there is more than one mapping
+        if 'mappings' in data:
+            for index, mapping in enumerate(data['mappings']):
+                data['mappings'][index] = load_mapping_from_path(path, index)
         else:
-            for mapping in data['mappings']:
-                index = data['mappings'].index(mapping)
-                data['mappings'][index] = load_mapping_files(os.path.join(LANGS_DIR, code), mapping)
+            data = load_mapping_from_path(path)
         langs = {**langs, **{code: data}}
     with open(LANGS_PKL, 'wb') as f:
         pickle.dump(langs, f)

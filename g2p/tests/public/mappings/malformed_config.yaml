@@ -1,0 +1,11 @@
+language_name: Minimal
+display_name: Minimal to Minimal
+in_lang: min
+out_lang: min
+as_is: true
+case_sensitive: false
+escape_special: true
+norm_form: 'NFD'
+reverse: true
+authors:
+  - Aidan Pine

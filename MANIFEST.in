@@ -1,4 +1,5 @@
 recursive-include g2p/mappings/langs *
+recursive-include g2p/tests/public *
 include g2p/static/*.css
 include g2p/static/*.js
 include MANIFEST.in
