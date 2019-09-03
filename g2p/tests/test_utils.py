@@ -3,6 +3,7 @@
 
 import os
 from unittest import main, TestCase
+from collections import defaultdict
 
 from g2p.mappings import utils
 from g2p.tests.public import PUBLIC_DIR
@@ -13,11 +14,20 @@ class UtilsTester(TestCase):
     def setUp(self):
         pass
 
-    def test_abb_flatten(self):
-        pass
-
-    def test_abb_expand(self):
-        pass
+    def test_abb_flatten_and_expand(self):
+        test_rows = [
+            ["VOWEL", 'a', 'e', 'i', 'o', 'u'],
+            ["OTHER", 't', 'e', 's', 't']
+        ]
+        default_dict = defaultdict(list)
+        default_dict['VOWEL'].extend(['a', 'e', 'i', 'o', 'u'])
+        default_dict['OTHER'].extend(['t', 'e', 's', 't'])
+        empty_rows = []
+        while len(empty_rows) < 10:
+            empty_rows.append(['', '', '', '', '', ''])
+        self.assertEqual(utils.flatten_abbreviations(test_rows), default_dict)
+        self.assertEqual(utils.expand_abbreviations(default_dict), test_rows)
+        self.assertEqual(utils.expand_abbreviations({}), empty_rows)
 
     def test_unicode_escape(self):
         ''' Should turn \u0331 declared in CSVs
@@ -47,9 +57,9 @@ class UtilsTester(TestCase):
         xlsx = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 2)
         # breakpoint()
-        self.assertEqual(minimal, csv)
-        self.assertEqual(minimal, json)
-        self.assertEqual(minimal, xlsx)
+        self.assertEqual(minimal['mapping_data'], csv['mapping_data'])
+        self.assertEqual(minimal['mapping_data'], json['mapping_data'])
+        self.assertEqual(minimal['mapping_data'], xlsx['mapping_data'])
 
     def test_validate(self):
         pass
@@ -65,6 +75,7 @@ class UtilsTester(TestCase):
             os.path.join(PUBLIC_DIR, 'mappings', 'abbreviations.csv'))
         self.assertTrue("VOWEL" in abbs)
         self.assertEqual(abbs['VOWEL'], ['a', 'e', 'i', 'o', 'u'])
+
 
 if __name__ == '__main__':
     main()
