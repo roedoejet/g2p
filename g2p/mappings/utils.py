@@ -179,8 +179,14 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
             mapping = yaml.safe_load(f)
         # If more than one mapping in the mapping config
         if 'mappings' in mapping:
-            LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config, mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
-            mapping = mapping['mappings'][index]
+            try:
+                LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config, mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
+                mapping = mapping['mappings'][index]
+            except KeyError:
+                LOGGER.warning('An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
+        # Log the warning if an Index other than 0 was provided for a mapping config with a single mapping.
+        elif index != 0:
+            LOGGER.warning('An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
         # try to load the data from the mapping data file
         if 'mapping' in mapping:
             mapping['mapping_data'] = load_from_file(os.path.join(path.parent, mapping['mapping']))

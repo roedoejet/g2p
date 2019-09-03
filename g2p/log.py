@@ -24,18 +24,6 @@ def setup_logger(name):
                         logger=logger, field_styles=FIELD_STYLES)
     return logger
 
-class LogCounter:
-    ''' A wrapper for the logger to determine how many times
-        an error is logged
-    '''
-    def __init__(self, fn):
-        self.fn = fn
-        self.count = 0
-    
-    def __call__(self, *args, **kwargs):
-        self.count += 1
-        return self.fn(*args, **kwargs)
-
 LOGGER = setup_logger('root')
 
 TEST_LOGGER = setup_logger('test')

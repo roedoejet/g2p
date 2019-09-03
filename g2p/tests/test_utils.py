@@ -41,11 +41,12 @@ class UtilsTester(TestCase):
         minimal = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_config.yaml'))
         csv = utils.load_mapping_from_path(os.path.join(
-            PUBLIC_DIR, 'mappings', 'minimal_config.yaml'), 0)
+            PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 0)
         json = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_config.yaml'), 1)
         xlsx = utils.load_mapping_from_path(os.path.join(
-            PUBLIC_DIR, 'mappings', 'minimal_config.yaml'), 2)
+            PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 2)
+        # breakpoint()
         self.assertEqual(minimal, csv)
         self.assertEqual(minimal, json)
         self.assertEqual(minimal, xlsx)
