@@ -19,3 +19,4 @@ g2p/tests/private
 log.txt
 
 .coverage
+htmlcov

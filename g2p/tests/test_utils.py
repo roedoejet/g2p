@@ -53,10 +53,9 @@ class UtilsTester(TestCase):
         csv = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 0)
         json = utils.load_mapping_from_path(os.path.join(
-            PUBLIC_DIR, 'mappings', 'minimal_config.yaml'), 1)
+            PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 1)
         xlsx = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 2)
-        # breakpoint()
         self.assertEqual(minimal['mapping_data'], csv['mapping_data'])
         self.assertEqual(minimal['mapping_data'], json['mapping_data'])
         self.assertEqual(minimal['mapping_data'], xlsx['mapping_data'])
@@ -65,7 +64,7 @@ class UtilsTester(TestCase):
         pass
 
     def test_escape_special(self):
-        pass
+        self.assertEqual(utils.escape_special_characters({'in': '?'}), {'in': '\?'})
 
     def test_load_abbs(self):
         with self.assertRaises(IncorrectFileType):
