@@ -63,7 +63,7 @@ class Mapping():
         elif isinstance(mapping, str):
             loaded_config = load_mapping_from_path(mapping)
             self.mapping = loaded_config['mapping_data']
-            mapping_kwargs = OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs})
+            mapping_kwargs = OrderedDict({k: v for k, v in loaded_config.items() if k in self.possible_kwargs})
             self.abbreviations = loaded_config.get('abbreviations_data', None)
             # Merge kwargs, but prioritize kwargs that initialized the Mapping
             self.kwargs = {**mapping_kwargs, **self.kwargs}

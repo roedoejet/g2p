@@ -73,8 +73,8 @@ class MappingTest(TestCase):
     def test_minimal(self):
         mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'minimal_config.yaml'))
         transducer = Transducer(mapping)
+        self.assertEqual(transducer('abb'), 'aab')
         self.assertEqual(transducer('a'), 'a')
-        self.assertEqual(transducer('b'), 'a')
         self.assertTrue(mapping.kwargs['as_is'])
         self.assertFalse(mapping.kwargs['case_sensitive'])
         self.assertTrue(mapping.kwargs['escape_special'])
