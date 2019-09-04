@@ -10,7 +10,7 @@ from g2p.tests.public import PUBLIC_DIR
 from g2p.exceptions import IncorrectFileType, MalformedMapping
 
 
-class UtilsTester(TestCase):
+class UtilsTest(TestCase):
     def setUp(self):
         pass
 

@@ -12,9 +12,9 @@ class CommandLineError(Exception):
         return msg % vars(self)
 
 class MappingMissing(CommandLineError):
-    def __init__(self, language):
-        self.in_lang = language['in_lang']
-        self.out_lang = language['out_lang']
+    def __init__(self, in_lang, out_lang):
+        self.in_lang = in_lang
+        self.out_lang = out_lang
     
     def __str__(self):
         return self.render((

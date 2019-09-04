@@ -6,6 +6,7 @@
 from unittest import main, TestCase
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
+from g2p.transducer.indices import Indices
 
 
 class IndicesTest(TestCase):
@@ -288,18 +289,18 @@ class IndicesTest(TestCase):
     def test_case_seven(self):
         transducer_as_is = self.trans_seven_as_is('test', True)
         self.assertEqual(transducer_as_is[0], 'test')
-        # self.assertEqual(transducer_as_is[1](), [((0, 't'), (0, 't')),
-        #                                          ((1, 'e'), (1, 'e')),
-        #                                          ((2, 's'), (2, 's')),
-        #                                          ((3, 't'), (3, 't'))])
-        # transducer = self.trans_seven('test', True)
-        # self.assertEqual(transducer[0], 'tesht')
+        self.assertEqual(transducer_as_is[1](), [((0, 't'), (0, 't')),
+                                                 ((1, 'e'), (1, 'e')),
+                                                 ((2, 's'), (2, 's')),
+                                                 ((3, 't'), (3, 't'))])
+        transducer = self.trans_seven('test', True)
+        self.assertEqual(transducer[0], 'tesht')
 
-        # self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
-        #                                    ((1, 'e'), (1, 'e')),
-        #                                    ((2, 's'), (2, 's')),
-        #                                    ((2, 's'), (3, 'h')),
-        #                                    ((3, 't'), (4, 't'))])
+        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
+                                           ((1, 'e'), (1, 'e')),
+                                           ((2, 's'), (2, 's')),
+                                           ((2, 's'), (3, 'h')),
+                                           ((3, 't'), (4, 't'))])
 
     def test_case_eight(self):
         transducer = self.trans_eight('test', True)
@@ -310,6 +311,16 @@ class IndicesTest(TestCase):
                                            ((2, 's'), (3, 's')),
                                            ((3, 't'), (4, 's'))])
 
+    def test_conversion(self):
+        tuple_format = [
+            ((0, 'a'), (0, 'b'))
+        ]
+        dict_format = {0: {'input_string': 'a', 'output': {0: 'b'}}}
+        indices_from_tups = Indices(tuple_format)
+        indices_from_dict = Indices(dict_format)
+        self.assertEqual(indices_from_dict(), indices_from_tups())
+        self.assertEqual(indices_from_tups.convert_index_to_tuples(dict_format), tuple_format)
+        self.assertEqual(indices_from_tups.convert_tuples_to_index(tuple_format), dict_format)
 
 if __name__ == "__main__":
     main()

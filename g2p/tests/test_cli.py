@@ -6,7 +6,7 @@ from g2p import APP
 from g2p.log import LOGGER
 from g2p.cli import update
 
-class CliTester(TestCase):
+class CliTest(TestCase):
     def setUp(self):
         self.runner = APP.test_cli_runner()
 

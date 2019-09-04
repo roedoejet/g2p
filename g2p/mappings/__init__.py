@@ -227,7 +227,7 @@ class Mapping():
                     return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs}), abbreviations_data
                 except:
                     breakpoint()
-        return [], OrderedDict()
+        raise exceptions.MappingMissing(in_lang, out_lang)
 
 
 if __name__ == '__main__':

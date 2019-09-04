@@ -198,7 +198,7 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
             mapping['abbreviations_data'] = load_abbreviations_from_file(os.path.join(path.parent, mapping['abbreviations']))
         return mapping
     else:
-        raise exceptions.MappingMissing
+        raise FileNotFoundError
 
 def validate(mapping):
     try:

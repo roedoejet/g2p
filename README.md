@@ -77,11 +77,11 @@ transducer = Transducer(mappings)
 transducer('a')
 # 'b'
 transducer('a', index=True)
-# ('b', <g2p.transducer.IOStates object>)
+# ('b', <g2p.transducer.indices.Indices object>)
 
 ```
 
-To make sense of the `IOStates` object that is produced, you can either call it, and produce a list of each character. Doing that for the above produces `[((0, 'a'), (0, 'b'))]` - a list of relation tuples where each relation tuple is comprised of an input and output. Each input tuple and output tuple is in turn comprised of an index and a corresponding character. You can also call `output()` and `input()` to see the plain text output and input respectively.
+To make sense of the `Indices` object that is produced, you can either call it, and produce a list of each character. Doing that for the above produces `[((0, 'a'), (0, 'b'))]` - a list of relation tuples where each relation tuple is comprised of an input and output. Each input tuple and output tuple is in turn comprised of an index and a corresponding character. You can also call `output()` and `input()` to see the plain text output and input respectively.
 
 ## Studio
 

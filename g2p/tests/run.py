@@ -2,27 +2,37 @@
 """
 
 import os
+import sys
 from unittest import TestLoader, TextTestRunner, TestSuite
 
 # Unit tests
+from g2p.log import LOGGER
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_transducer import TransducerTest
-from g2p.tests.test_cli import CliTester
-from g2p.tests.test_utils import UtilsTester
+from g2p.tests.test_cli import CliTest
+from g2p.tests.test_utils import UtilsTest
+from g2p.tests.test_transitive import TransitiveTest
 
 
 LOADER = TestLoader()
 
 TRANSDUCER_TESTS = [
     LOADER.loadTestsFromTestCase(test)
-    for test in [IndicesTest, TransducerTest]
+    for test in [
+        IndicesTest,
+        TransducerTest,
+        # TransitiveTest #TODO: Need to implement transitive closure
+    ]
 ]
 
 MAPPINGS_TESTS = [
     LOADER.loadTestsFromTestCase(test)
-    for test in [MappingTest, UtilsTester]
+    for test in [
+        MappingTest,
+        UtilsTest
+    ]
 ]
 
 LANGS_TESTS = [
@@ -33,11 +43,12 @@ LANGS_TESTS = [
 
 INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test) for test in [
-        CliTester,
+        CliTest,
     ]
 ]
 
 DEV_TESTS = TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS
+
 
 def run_tests(suite):
     ''' Decide which Test Suite to run
@@ -53,7 +64,14 @@ def run_tests(suite):
     elif suite == 'dev':
         suite = TestSuite(DEV_TESTS)
     runner = TextTestRunner(verbosity=3)
-    runner.run(suite)
+    if isinstance(suite, str):
+        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+    else:
+        runner.run(suite)
+
 
 if __name__ == "__main__":
-    run_tests('all')
+    try:
+        run_tests(sys.argv[1])
+    except IndexError:
+        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
