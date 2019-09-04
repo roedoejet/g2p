@@ -8,6 +8,7 @@ from collections import defaultdict
 from g2p.mappings import utils
 from g2p.tests.public import PUBLIC_DIR
 from g2p.exceptions import IncorrectFileType, MalformedMapping
+from g2p.transducer.utils import convert_index_to_tuples, convert_tuples_to_index
 
 
 class UtilsTest(TestCase):
@@ -74,6 +75,14 @@ class UtilsTest(TestCase):
             os.path.join(PUBLIC_DIR, 'mappings', 'abbreviations.csv'))
         self.assertTrue("VOWEL" in abbs)
         self.assertEqual(abbs['VOWEL'], ['a', 'e', 'i', 'o', 'u'])
+
+    def test_tuple_dict_conversion(self):
+        tuple_format = [
+            ((0, 'a'), (0, 'b'))
+        ]
+        dict_format = {0: {'input_string': 'a', 'output': {0: 'b'}}}
+        self.assertEqual(convert_index_to_tuples(dict_format), tuple_format)
+        self.assertEqual(convert_tuples_to_index(tuple_format), dict_format)
 
 
 if __name__ == '__main__':

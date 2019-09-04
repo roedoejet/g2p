@@ -7,6 +7,8 @@ import copy
 from typing import List, Tuple, Union
 from collections.abc import Iterable
 
+from g2p.transducer.utils import convert_index_to_tuples, convert_tuples_to_index
+
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
 copy._deepcopy_dispatch[type(re.compile(''))] = lambda r, _: r
@@ -17,7 +19,7 @@ class Indices():
 
     def __init__(self, index: Union[dict, List[Tuple[Tuple[int, str], Tuple[int, str]]]]):
         if isinstance(index, dict):
-            self.indices = self.convert_index_to_tuples(index)
+            self.indices = convert_index_to_tuples(index)
         else:
             self.indices = index
         self._input_states = sorted(
@@ -47,32 +49,6 @@ class Indices():
 
     def __iter__(self):
         return iter(self.indices)
-
-    def convert_index_to_tuples(self, index):
-        container = []
-        for input_index, val in index.items():
-            input_string = val['input_string']
-            for output_index, output_string in val['output'].items():
-                container.append(((input_index, input_string),
-                                    (output_index, output_string)))
-        return container
-
-    def convert_tuples_to_index(self, tuples, reverse=False):
-        indices = {}
-        for tup in tuples:
-            if reverse:
-                inp = tup[1]
-                outp = tup[0]
-            else:
-                inp = tup[0]
-                outp = tup[1]
-            if inp[0] in indices:
-                intermediate_output = indices[inp[0]].get('output', {})
-            else:
-                intermediate_output = {}
-            indices[inp[0]] = {'input_string': inp[1],
-                               'output': {**intermediate_output, **{outp[0]: outp[1]}}}
-        return indices
 
     def reduced(self):
         ''' Find how many indices it takes before input and output both move forward by one phone

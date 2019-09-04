@@ -13,6 +13,7 @@ from g2p.mappings.utils import create_fixed_width_lookbehind
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.transducer.indices import Indices
+from g2p.transducer.utils import return_default_mapping, return_match_starting_indices
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
@@ -46,14 +47,6 @@ class Transducer():
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
         return self.apply_rules(to_convert, index, debugger, output_delimiter)
 
-    def return_match_starting_indices(self, match_object_list, match_indices):
-        indices = []
-        all_matches = [x['match_index'] for x in match_object_list]
-        for match_index in match_indices:
-            indices.append(len(''.join([match_object_list[i]['string'] for i, v in enumerate(
-                all_matches[:match_index])])))
-        return indices
-
     def strings_to_lists(self, input_string: str, output_string: str,
                          input_index: int, output_index: int):
         ''' Create default lists
@@ -66,45 +59,9 @@ class Transducer():
             i + input_index for i, v in enumerate(default_inputs)]
         default_output_offsets = [
             i + output_index for i, v in enumerate(default_outputs)]
-        default_index = self.return_default_mapping(
+        default_index = return_default_mapping(
             default_inputs, default_outputs, default_input_offsets, default_output_offsets)
         return default_index
-
-    def return_default_mapping(self, input_strings: List[str], output_strings: List[str],
-                               input_index_offsets: List[int], output_index_offsets: List[int]):
-        ''' This function takes an arbitrary number of input & output strings and their corresponding index offsets.
-            It then zips them up 1 by 1. If the input is longer than the output or vice versa, it continues zipping
-            using the last item of either input or output respectively.
-        '''
-        new_input = {}
-        # go through each input or output whichever is longer
-        for i in range(0, max(len(input_strings), len(output_strings))):
-            try:
-                input_i = input_index_offsets[i]
-            except IndexError:
-                input_i = input_index_offsets[-1]
-            try:
-                output_i = output_index_offsets[i]
-            except IndexError:
-                output_i = output_index_offsets[-1]
-            try:
-                # if inputs and outputs are the same length, just zip them up
-                new_input[input_i] = {'input_string': input_strings[i],
-                                      'output': {output_i: output_strings[i]}}
-            except IndexError:
-                # but if the input is longer than output, use the last output character
-                if len(input_strings) > len(output_strings):
-                    new_input[input_i] = {'input_string': input_strings[i],
-                                          'output': {output_i: output_strings[-1]}}
-                # conversely if the output is longer than input, use the last input character
-                elif len(input_strings) < len(output_strings):
-                    if input_i in new_input:
-                        intermediate_output = new_input[input_i]['output']
-                    else:
-                        intermediate_output = {}
-                    new_input[input_i] = {'input_string': input_strings[-1],
-                                          'output': {**intermediate_output, **{output_i: output_strings[i]}}}
-        return new_input
 
     def return_index(self, input_index: int, output_index: int,
                      input_string: str, output_string: str, original_str: str,
@@ -199,11 +156,11 @@ class Transducer():
                                       for x in inputs if x['match_index'] == match_index]
                     default_outputs = [x['string']
                                        for x in outputs if x['match_index'] == match_index]
-                    default_input_offsets = self.return_match_starting_indices(
+                    default_input_offsets = return_match_starting_indices(
                         inputs, [i + input_index for i, v in enumerate(inputs) if v['match_index'] == match_index])
-                    default_output_offsets = self.return_match_starting_indices(
+                    default_output_offsets = return_match_starting_indices(
                         outputs, [i + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index])
-                    default_index = self.return_default_mapping(
+                    default_index = return_default_mapping(
                         default_inputs, default_outputs, default_input_offsets, default_output_offsets)
 
                     new_input = {**new_input, **default_index}
@@ -215,16 +172,6 @@ class Transducer():
                 default_index = self.strings_to_lists(input_string, output_string, input_index, output_index)
                 new_input = {**new_input, **default_index}
             return {**intermediate_index, **new_input}
-
-    def get_index_length(self, new_index: List[Tuple[Tuple[int, str]]]) -> Tuple[int, int]:
-        """ Return how many unique input characters and output characters
-            there are in a given index tuple.
-        """
-        # Use set to remove duplicate inputs/outputs (ie for many-to-one)
-        input_indices = set([x[0] for x in new_index])
-        output_indices = set([x[1] for x in new_index])
-        # Sum the length of the inputs/outputs
-        return (sum([len(x[1]) for x in input_indices]), sum([len(x[1]) for x in output_indices]))
 
     def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = '') -> Union[str, Tuple[str, Indices]]:
         """ Apply all the rules in self.mapping sequentially.
@@ -316,7 +263,7 @@ class Transducer():
                     input_index += 1
                     # do the same with outputs
                     outputs = {}
-                    for k, v in new_index.items():
+                    for v in new_index.values():
                         outputs = {**outputs, **v['output']}
                     output_index = max(outputs.keys())
                     output_index += 1

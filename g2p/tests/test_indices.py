@@ -319,8 +319,6 @@ class IndicesTest(TestCase):
         indices_from_tups = Indices(tuple_format)
         indices_from_dict = Indices(dict_format)
         self.assertEqual(indices_from_dict(), indices_from_tups())
-        self.assertEqual(indices_from_tups.convert_index_to_tuples(dict_format), tuple_format)
-        self.assertEqual(indices_from_tups.convert_tuples_to_index(tuple_format), dict_format)
 
 if __name__ == "__main__":
     main()
