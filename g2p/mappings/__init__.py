@@ -20,7 +20,7 @@ import yaml
 from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters
-from g2p.mappings.utils import flatten_abbreviations, load_abbreviations_from_file
+from g2p.mappings.utils import flatten_abbreviations, IndentDumper, load_abbreviations_from_file
 from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
 from g2p.log import LOGGER
 
@@ -47,8 +47,6 @@ class Mapping():
     """
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
-        self.possible_kwargs = ['as_is', 'authors', 'case_sensitive',
-                                'escape_special', 'in_lang', 'norm_form', 'out_lang', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.processed = False
@@ -62,17 +60,15 @@ class Mapping():
             self.mapping = validate(mapping)
         elif isinstance(mapping, str):
             loaded_config = load_mapping_from_path(mapping)
-            self.mapping = loaded_config['mapping_data']
-            mapping_kwargs = OrderedDict({k: v for k, v in loaded_config.items() if k in self.possible_kwargs})
-            self.abbreviations = loaded_config.get('abbreviations_data', None)
-            # Merge kwargs, but prioritize kwargs that initialized the Mapping
-            self.kwargs = {**mapping_kwargs, **self.kwargs}
+            self.process_loaded_config(loaded_config)
         else:
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
-                self.mapping, mapping_kwargs, self.abbreviations = self.find_mapping(
+                loaded_config = self.find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
-                # Merge kwargs, but prioritize kwargs that initialized the Mapping
-                self.kwargs = {**mapping_kwargs, **self.kwargs}
+                self.process_loaded_config(loaded_config)
+            elif 'id' in self.kwargs:
+                loaded_config = self.find_mapping_by_id(self.kwargs['id'])
+                self.process_loaded_config(loaded_config)
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
@@ -96,6 +92,22 @@ class Mapping():
 
     def __iter__(self):
         return iter(self.mapping)
+
+    def inventory(self, in_or_out: str = 'in'):
+        ''' Return just inputs or outputs as inventory of mapping
+        '''
+        return [x[in_or_out] for x in self.mapping]
+
+    def process_loaded_config(self, config):
+        ''' For a mapping loaded from a file, take the keyword arguments and supply them to the 
+            Mapping, and get any abbreviations data.
+        '''
+        self.mapping = config['mapping_data']
+        mapping_kwargs = OrderedDict(
+            {k: v for k, v in config.items()})
+        self.abbreviations = config.get('abbreviations_data', None)
+        # Merge kwargs, but prioritize kwargs that initialized the Mapping
+        self.kwargs = {**mapping_kwargs, **self.kwargs}
 
     def plain_mapping(self):
         ''' Return mapping
@@ -219,15 +231,64 @@ class Mapping():
             map_in_lang = mapping.get('in_lang', '')
             map_out_lang = mapping.get('out_lang', '')
             if map_in_lang == in_lang and map_out_lang == out_lang:
-                if 'abbreviations_data' in mapping:
-                    abbreviations_data = mapping['abbreviations_data']
-                else:
-                    abbreviations_data = None
-                try:
-                    return mapping['mapping_data'], OrderedDict({k: v for k, v in mapping.items() if k in self.possible_kwargs}), abbreviations_data
-                except:
-                    breakpoint()
+                return mapping
         raise exceptions.MappingMissing(in_lang, out_lang)
+
+    def find_mapping_by_id(self, map_id: str):
+        ''' Find the mapping with a given ID
+        '''
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.get('id', '') == map_id:
+                return mapping
+
+    def mapping_to_file(self, output_path: str, file_type: str):
+        ''' Write mapping to file
+        '''
+        if not os.path.isdir(output_path):
+            raise Exception("Path %s is not a directory", output_path)
+        fn = os.path.join(output_path, self.kwargs.get('in_lang', 'und') + "_to_" + \
+            self.kwargs.get('out_lang', 'und') + "." + file_type)
+        fieldnames = ['in', 'out', 'context_before', 'context_after']
+        filtered = [{k: v for k, v in io.items() if k in fieldnames} for io in self.mapping]
+        if file_type == 'json':
+            with open(fn, 'w') as f:
+                json.dump(filtered, f, indent=4)
+        elif file_type == 'csv':
+            with open(fn, 'w') as f:
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                for io in filtered:
+                    writer.writerow(io)
+        else:
+            raise exceptions.IncorrectFileType
+
+    def config_to_file(self, output_path: str, mapping_type: str):
+        ''' Write config to file
+        '''
+        if not os.path.isdir(output_path):
+            raise Exception("Path %s is not a directory", output_path)
+        fn = os.path.join(output_path, 'config.yaml')
+        template = {"mappings": [
+            {
+                "language_name": self.kwargs.get('language_name', self.kwargs.get('in_lang', 'und')),
+                "display_name": self.kwargs.get('display_name', self.kwargs.get('in_lang', 'und') + " to " + self.kwargs.get('out_lang', 'und')),
+                "in_lang": self.kwargs.get('in_lang', 'und'),
+                "out_lang": self.kwargs.get('out_lang', 'und'),
+                "authors": self.kwargs.get('authors', ['generated']),
+                "as_is": self.kwargs.get('as_is', False),
+                "case_sensitive": self.kwargs.get('case_sensitive', True),
+                "escape_special": self.kwargs.get('escape_special', False),
+                "norm_form": self.kwargs.get('norm_form', "NFC"),
+                "reverse": self.kwargs.get('reverse', False),
+                "mapping": self.kwargs.get('in_lang', 'und') + "_to_" + \
+            self.kwargs.get('out_lang', 'und') + "." + mapping_type
+            }
+        ]}
+        with open(fn, 'w') as f:
+            yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
+
+    def to_file(self, output_path: str, mapping_type: str = 'csv'):
+        self.mapping_to_file(output_path, mapping_type)
+        self.config_to_file(output_path, mapping_type)
 
 
 if __name__ == '__main__':

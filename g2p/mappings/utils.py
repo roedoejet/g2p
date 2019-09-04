@@ -18,6 +18,7 @@ from typing import Dict
 from g2p import exceptions
 from g2p.log import LOGGER
 
+
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
     '''
@@ -42,6 +43,7 @@ def expand_abbreviations(data):
         while len(lines) < 10:
             lines.append(['', '', '', '', '', ''])
     return lines
+
 
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints
@@ -83,6 +85,7 @@ def pattern_to_fixed_width_lookbehinds(match):
     all_lookbehinds = [f"(?<={'|'.join(items)})" for items in all_lookbehinds]
     return '(' + '|'.join(all_lookbehinds) + ')'
 
+
 def load_from_workbook(language):
     ''' Parse mapping from Excel workbook
     '''
@@ -94,7 +97,7 @@ def load_from_workbook(language):
     # and append mappings to self.mapping.
     for entry in work_sheet:
         new_io = {"in": "", "out": "",
-                    "context_before": "", "context_after": ""}
+                  "context_before": "", "context_after": ""}
         for col in entry:
             if col.column == 'A':
                 value = col.value
@@ -122,6 +125,7 @@ def load_from_workbook(language):
 
     return mapping
 
+
 def load_from_csv(language):
     ''' Parse mapping from csv
     '''
@@ -136,7 +140,7 @@ def load_from_csv(language):
     # and append mappings to self.mapping.
     for entry in work_sheet:
         new_io = {"in": "", "out": "",
-                    "context_before": "", "context_after": ""}
+                  "context_before": "", "context_after": ""}
         new_io['in'] = entry[0]
         new_io['out'] = entry[1]
         try:
@@ -153,6 +157,7 @@ def load_from_csv(language):
         mapping.append(new_io)
 
     return mapping
+
 
 def load_from_file(path: str) -> list:
     ''' Helper method to load mapping from file.
@@ -180,25 +185,31 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         # If more than one mapping in the mapping config
         if 'mappings' in mapping:
             try:
-                LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config, mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
+                LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config,
+                            mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
                 mapping = mapping['mappings'][index]
             except KeyError:
-                LOGGER.warning('An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
+                LOGGER.warning(
+                    'An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
         # Log the warning if an Index other than 0 was provided for a mapping config with a single mapping.
         elif index != 0:
-            LOGGER.warning('An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
+            LOGGER.warning(
+                'An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
         # try to load the data from the mapping data file
         if 'mapping' in mapping:
-            mapping['mapping_data'] = load_from_file(os.path.join(path.parent, mapping['mapping']))
+            mapping['mapping_data'] = load_from_file(
+                os.path.join(path.parent, mapping['mapping']))
         else:
             # Is "mapping" key missing?
             raise exceptions.MalformedMapping
         # load any abbreviations
         if 'abbreviations' in mapping:
-            mapping['abbreviations_data'] = load_abbreviations_from_file(os.path.join(path.parent, mapping['abbreviations']))
+            mapping['abbreviations_data'] = load_abbreviations_from_file(
+                os.path.join(path.parent, mapping['abbreviations']))
         return mapping
     else:
         raise FileNotFoundError
+
 
 def validate(mapping):
     try:
@@ -207,20 +218,25 @@ def validate(mapping):
                 io['context_before'] = ''
             if not 'context_after' in io:
                 io['context_after'] = ''
-        valid = all('in' in d for d in mapping) and all('out' in d for d in mapping)
+        valid = all('in' in d for d in mapping) and all(
+            'out' in d for d in mapping)
         if not valid:
-            raise exceptions.MalformedMapping()     
+            raise exceptions.MalformedMapping()
         return mapping
     except TypeError:
-        raise exceptions.MalformedMapping() # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
+        # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
+        raise exceptions.MalformedMapping()
+
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
     for k, v in to_escape.items():
         escaped = re.escape(v)
         if escaped != v:
-            LOGGER.info(f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
+            LOGGER.info(
+                f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
         to_escape[k] = escaped
     return to_escape
+
 
 def load_abbreviations_from_file(path):
     ''' Helper method to load abbreviations from file.
@@ -235,3 +251,20 @@ def load_abbreviations_from_file(path):
             '''Sorry, abbreviations must be stored as CSV files.
             You provided the following: %s''' % path)
     return abbs
+
+
+def is_ipa(lang: str) -> bool:
+    pattern = re.compile('[-_]?ipa$')
+    return bool(re.search(pattern, lang))
+
+
+def is_xsampa(lang: str) -> bool:
+    pattern = re.compile('[-_]?x(-?)sampa$')
+    return bool(re.search(pattern, lang))
+
+class IndentDumper(yaml.Dumper):
+    def increase_indent(self, flow=False, indentless=False):
+        return super(IndentDumper, self).increase_indent(flow, False)
+
+
+
