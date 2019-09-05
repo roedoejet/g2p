@@ -91,22 +91,33 @@ document.getElementById("export-abbs").addEventListener("click", function (event
 
 document.getElementById('as_is').addEventListener('click', function (event) {
     const as_is = event.target.checked
-    setKwargs({as_is})
+    setKwargs({ as_is })
 })
 
 document.getElementById('case_sensitive').addEventListener('click', function (event) {
     const case_sensitive = event.target.checked
-    setKwargs({case_sensitive})
+    setKwargs({ case_sensitive })
 })
 
 document.getElementById('escape_special').addEventListener('click', function (event) {
     const escape_special = event.target.checked
-    setKwargs({escape_special})
+    setKwargs({ escape_special })
 })
 
 document.getElementById('reverse').addEventListener('click', function (event) {
     const reverse = event.target.checked
-    setKwargs({reverse})
+    setKwargs({ reverse })
+})
+
+document.getElementById('standard-radio').addEventListener('click', function (event) {
+    $('#animated').hide()
+    $('#standard').show()
+})
+
+document.getElementById('animated-radio').addEventListener('click', function (event) {
+    $('#standard').hide()
+    $('#animated').show()
+    $(window).trigger('resize');
 })
 
 var getKwargs = function () {
@@ -114,35 +125,52 @@ var getKwargs = function () {
     const case_sensitive = document.getElementById('case_sensitive').checked
     const escape_special = document.getElementById('escape_special').checked
     const reverse = document.getElementById('reverse').checked
-    return {as_is, case_sensitive, escape_special, reverse}
+    return { as_is, case_sensitive, escape_special, reverse }
 }
 
-var setKwargs = function(kwargs) {
-    if ('as_is' in kwargs){
+var setKwargs = function (kwargs) {
+    if ('as_is' in kwargs) {
         document.getElementById('as_is').checked = kwargs['as_is']
     }
-    if ('case_sensitive' in kwargs){
+    if ('case_sensitive' in kwargs) {
         document.getElementById('case_sensitive').checked = kwargs['case_sensitive']
     }
-    if ('escape_special' in kwargs){
+    if ('escape_special' in kwargs) {
         document.getElementById('escape_special').checked = kwargs['escape_special']
     }
-    if ('reverse' in kwargs){
+    if ('reverse' in kwargs) {
         document.getElementById('reverse').checked = kwargs['reverse']
     }
     convert()
 }
 
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-var convert = function () {
-    socket.emit('conversion event', {
-        data: {
-            input_string: $('#input').val(),
-            mappings: hot.getData(),
-            abbreviations: varhot.getData(),
-            kwargs: getKwargs()
+var convert = function (index = false) {
+    if (index) {
+        var input_string = $('#indexInput').val();
+        if (input_string) {
+            socket.emit('index conversion event', {
+                data: {
+                    input_string: input_string,
+                    mappings: hot.getData(),
+                    abbreviations: varhot.getData(),
+                    kwargs: getKwargs()
+                }
+            });
         }
-    });
+    } else {
+        var input_string = $('#input').val();
+        if (input_string) {
+            socket.emit('conversion event', {
+                data: {
+                    input_string: $('#input').val(),
+                    mappings: hot.getData(),
+                    abbreviations: varhot.getData(),
+                    kwargs: getKwargs()
+                }
+            });
+        }
+    }
 }
 
 socket.on('conversion response', function (msg) {
@@ -154,6 +182,7 @@ socket.on('connection response', function (msg) {
 })
 
 socket.on('table response', function (msg) {
+    console.log(msg)
     hot.loadData(msg['mappings'])
     varhot.loadData(msg['abbs'])
     setKwargs(msg['kwargs'])
@@ -166,6 +195,7 @@ $('#input').on('keyup', function (event) {
 })
 $('#hot').on('change', function (event) {
     convert()
+    // convert(index = true)
     return false;
 })
 $('#hot-add').click(function (event) {

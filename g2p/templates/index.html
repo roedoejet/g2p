@@ -38,6 +38,15 @@
         </div>
 
         <div class='row'>
+            <div class='columns twelve center-text'>
+                <form id='textForm' name="textForm">
+                    <input id='standard-radio' type="radio" name="texttype" value="plain" checked> Standard
+                    <input id='animated-radio' type="radio" name="texttype" value="animated"> Animate
+                </form>
+            </div>
+        </div>
+        <br>
+        <div id='standard' class='row'>
             <div class='columns six center-text'>
                 <textarea id='input' spellcheck="false"></textarea>
             </div>
@@ -45,9 +54,19 @@
                 <textarea id='output' spellcheck="false"></textarea>
             </div>
         </div>
-        <!-- <div class='row'>
-            <div id="echart" style="width:100%; height:400px;"></div>
-        </div> -->
+        <div id='animated' style='display: none'>
+            <div class='row'>
+                <div class='columns twelve center-text'>
+                    <input id='indexInput' type="text" name="usrname" maxlength="10">
+                </div>
+            </div>
+            <div class='row'>
+                <div class='columns twelve center-text'>
+                    <div id="echart" style="width:100%; min-width: 400px; height:400px;"></div>
+                </div>
+            </div>
+        </div>
+        <br>
         <div class='row'>
             <div class='columns six'>
                 <h4>Languages</h4>
@@ -55,7 +74,8 @@
                     <option value="custom">Custom</option>
                     {% for k, v in langs.items() %}
                     {% for mapping in v['mappings'] %}
-                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ k }} - {{ mapping['language_name'] }}
+                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ k }} -
+                        {{ mapping['language_name'] }}
                         - {{ mapping['display_name'] }}
                     </option>
                     {% endfor %}
@@ -175,6 +195,7 @@
 
 <script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
 
+<script src="{{ url_for('static', filename='echart_custom.js') }}"></script>
 <script src="{{ url_for('static', filename='custom.js') }}"></script>
 <script src="{{ url_for('static', filename='blocks.js') }}"></script>
 

@@ -11,6 +11,7 @@ from flask_talisman import Talisman
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS
 from g2p.transducer import Transducer
+from g2p.transducer.indices import Indices
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p._version import VERSION
 
@@ -25,6 +26,23 @@ APP = Flask(__name__)
 SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
 
+def return_echart_data(indices: Indices):
+    input_string = indices.input()
+    input_x = 300
+    input_y = 300
+
+    output_string = indices.output()
+    output_x = 500
+    output_y = 300
+
+    inputs = [{'name': f"{x} (in-{i})", "x": input_x, "y": input_y + (i*50)} for i,x in enumerate(input_string)]
+    outputs = [{'name': f"{x} (out-{i})", "x": output_x, "y": output_y + (i*50)} for i,x in enumerate(output_string)]
+
+    data = inputs + outputs
+
+    links = [{"source": x[0][0], "target": x[1][0] + len(input_string)} for x in indices()]
+
+    return data, links
 
 def return_empty_mappings(n=DEFAULT_N):
     ''' Return 'n' * empty mappings
@@ -53,6 +71,16 @@ def home():
     """
     return render_template('index.html', langs=LANGS)
 
+@SOCKETIO.on('index conversion event', namespace='/test')
+def index_convert(message):
+    """ Convert input text and return output with indices for echart
+    """
+    mappings = Mapping(hot_to_mappings(message['data']['mappings']), abbreviations=flatten_abbreviations(
+        message['data']['abbreviations']), **message['data']['kwargs'])
+    transducer = Transducer(mappings)
+    output_string, indices = transducer(message['data']['input_string'], index=True)
+    data, links = return_echart_data(indices)
+    emit('index conversion response', {'output_string': output_string, 'index_data': data, 'index_links': links})
 
 @SOCKETIO.on('conversion event', namespace='/test')
 def convert(message):

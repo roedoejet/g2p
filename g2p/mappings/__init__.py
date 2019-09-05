@@ -47,6 +47,9 @@ class Mapping():
     """
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
+        # should these just be explicit instead of kwargs...
+        self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
+                                 'out_lang', 'as_is', 'case_sensitive', 'escape_special', 'norm_form', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.processed = False
@@ -75,7 +78,7 @@ class Mapping():
             for abb, stands_for in self.abbreviations.items():
                 abb_match = re.compile(abb)
                 abb_repl = '|'.join(stands_for)
-                if 'match_pattern' not in self.mapping[0]:
+                if self.mapping and 'match_pattern' not in self.mapping[0]:
                     for io in self.mapping:
                         for key in io.keys():
                             if key in ['in', 'out', 'context_before', 'context_after'] and re.search(abb_match, io[key]):
@@ -104,7 +107,7 @@ class Mapping():
         '''
         self.mapping = config['mapping_data']
         mapping_kwargs = OrderedDict(
-            {k: v for k, v in config.items()})
+            {k: v for k, v in config.items() if k in self.allowable_kwargs})
         self.abbreviations = config.get('abbreviations_data', None)
         # Merge kwargs, but prioritize kwargs that initialized the Mapping
         self.kwargs = {**mapping_kwargs, **self.kwargs}
@@ -246,10 +249,11 @@ class Mapping():
         '''
         if not os.path.isdir(output_path):
             raise Exception("Path %s is not a directory", output_path)
-        fn = os.path.join(output_path, self.kwargs.get('in_lang', 'und') + "_to_" + \
-            self.kwargs.get('out_lang', 'und') + "." + file_type)
+        fn = os.path.join(output_path, self.kwargs.get('in_lang', 'und') + "_to_" +
+                          self.kwargs.get('out_lang', 'und') + "." + file_type)
         fieldnames = ['in', 'out', 'context_before', 'context_after']
-        filtered = [{k: v for k, v in io.items() if k in fieldnames} for io in self.mapping]
+        filtered = [{k: v for k, v in io.items() if k in fieldnames}
+                    for io in self.mapping]
         if file_type == 'json':
             with open(fn, 'w') as f:
                 json.dump(filtered, f, indent=4)
@@ -279,12 +283,13 @@ class Mapping():
                 "escape_special": self.kwargs.get('escape_special', False),
                 "norm_form": self.kwargs.get('norm_form', "NFC"),
                 "reverse": self.kwargs.get('reverse', False),
-                "mapping": self.kwargs.get('in_lang', 'und') + "_to_" + \
-            self.kwargs.get('out_lang', 'und') + "." + mapping_type
+                "mapping": self.kwargs.get('in_lang', 'und') + "_to_" +
+                self.kwargs.get('out_lang', 'und') + "." + mapping_type
             }
         ]}
         with open(fn, 'w') as f:
-            yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
+            yaml.dump(template, f, Dumper=IndentDumper,
+                      default_flow_style=False)
 
     def to_file(self, output_path: str, mapping_type: str = 'csv'):
         self.mapping_to_file(output_path, mapping_type)
