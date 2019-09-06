@@ -36,7 +36,8 @@ setup(
                       'flask_socketio',
                       'flask-talisman',
                       'pyyaml',
-                      'regex'],
+                      'regex',
+                      'requests'],
     entry_points={
         'console_scripts': [
             'g2p = g2p.cli:cli'
