@@ -7,3 +7,4 @@ flask-talisman
 panphon
 pyyaml
 regex
+requests
