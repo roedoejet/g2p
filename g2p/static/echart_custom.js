@@ -52,33 +52,22 @@ $(document).ready(function () {
 
     $(window).trigger('resize');
     var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-    var convert = function (index = false) {
-        if (index) {
-            var input_string = $('#indexInput').val();
-            if (input_string) {
-                socket.emit('index conversion event', {
-                    data: {
-                        input_string: input_string,
-                        mappings: hot.getData(),
-                        abbreviations: varhot.getData(),
-                        kwargs: getKwargs()
-                    }
-                });
-            }
-        } else {
-            var input_string = $('#input').val();
-            if (input_string) {
-                socket.emit('conversion event', {
-                    data: {
-                        input_string: $('#input').val(),
-                        mappings: hot.getData(),
-                        abbreviations: varhot.getData(),
-                        kwargs: getKwargs()
-                    }
-                });
-            }
+    var convert = function () {
+        var input_string = $('#indexInput').val();
+        if (input_string) {
+            socket.emit('index conversion event', {
+                data: {
+                    input_string: input_string,
+                    mappings: hot.getData(),
+                    abbreviations: varhot.getData(),
+                    kwargs: getKwargs()
+                }
+            });
         }
     }
+    // Convert after any changes to tables
+    Handsontable.hooks.add('afterChange', convert)
+    
     socket.on('index conversion response', function (msg) {
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
@@ -86,7 +75,11 @@ $(document).ready(function () {
     });
 
     $('#indexInput').on('keyup', function (event) {
-        convert(index = true)
+        convert()
+        return false;
+    })
+    $('#hot').on('change', function (event) {
+        convert()
         return false;
     })
 })

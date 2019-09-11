@@ -1,0 +1,118 @@
+[
+  {
+    "in": "a:",
+    "out": "aa"
+  },
+  {
+    "in": "á",
+    "out": "ah"
+  },
+  {
+    "in": "á:",
+    "out": "aah"
+  },
+  {
+    "in": "à",
+    "out": "al"
+  },
+  {
+    "in": "à:",
+    "out": "aal"
+  },
+  {
+    "in": "en",
+    "out": "em",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "en:",
+    "out": "eem",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "è:",
+    "out": "eel"
+  },
+  {
+    "in": "é",
+    "out": "eh"
+  },
+  {
+    "in": "é:",
+    "out": "eeh"
+  },
+  {
+    "in": "én:",
+    "out": "eemh",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "èn:",
+    "out": "eeml",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "i:",
+    "out": "ii"
+  },
+  {
+    "in": "í",
+    "out": "ih"
+  },
+  {
+    "in": "í:",
+    "out": "iih"
+  },
+  {
+    "in": "ì:",
+    "out": "iil"
+  },
+  {
+    "in": "o:",
+    "out": "oo"
+  },
+  {
+    "in": "on",
+    "out": "om",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "on:",
+    "out": "oom",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "ó",
+    "out": "oh"
+  },
+  {
+    "in": "ón",
+    "out": "omh"
+  },
+  {
+    "in": "ó:",
+    "out": "ooh"
+  },
+  {
+    "in": "ón:",
+    "out": "oomh",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "òn:",
+    "out": "ooml",
+    "context_after": "CONSONANT"
+  },
+  {
+    "in": "ò:",
+    "out": "ool"
+  },
+  {
+    "in": "'",
+    "out": "k"
+  },
+  {
+    "in": "’",
+    "out": "k"
+  }
+]

@@ -118,4 +118,4 @@ def test_connect():
 def test_disconnect():
     """ Let client know disconnected
     """
-    print('Client disconnected')
+    emit('connection response', {'data': 'Disonnected'})

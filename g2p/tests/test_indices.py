@@ -168,6 +168,10 @@ class IndicesTest(TestCase):
             [{"in": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
               "out": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}"}]
         )
+        self.test_mapping_wacky_lite = Mapping(
+            [{"in": "a{1}bc{2}c{3}",
+              "out": "ccc{2}c{3}c{1}"}]
+        )
         self.test_mapping_circum = Mapping(
             [{'in': 'a{1}c{2}', 'out': 'c{2}a{1}c{2}'}]
         )
@@ -182,6 +186,7 @@ class IndicesTest(TestCase):
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
+        self.trans_wacky_lite = Transducer(self.test_mapping_wacky_lite)
         self.trans_circum = Transducer(self.test_mapping_circum)
 
     def test_no_indices(self):
@@ -205,18 +210,18 @@ class IndicesTest(TestCase):
     def test_wacky(self):
         """ Test weird Unicode emoji transformation...
         """
+        transducer_no_i = self.trans_wacky(
+            '\U0001f600\U0001f603\U0001f604\U0001f604')
+        self.assertEqual(
+            transducer_no_i, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
+        transducer_lite = self.trans_wacky_lite(
+            'abcc', index=True)
+        self.assertEqual(
+            transducer_lite[0], 'ccccc')
         transducer = self.trans_wacky(
-            '\U0001f600\U0001f603\U0001f604\U0001f604', index=True, debugger=True)
+            '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
-        # TODO: Should this be indexing based on characters
-        # self.assertEqual(transducer[1](), [
-        #     ((0, '😀'), (4, '😄')),
-        #     ((1, '😃'), (0, '😄')),
-        #     ((2, '😄'), (1, '😄')),
-        #     ((2, '😄'), (2, '😄')),
-        #     ((3, '😄'), (3, '😄'))])
-        # Or based on match groups? Maybe this is more readable?
         self.assertEqual(transducer[1](), [
             ((0, '😀'), (4, '😄')),
             ((1, '😃😄'), (0, '😄😄😄')),
@@ -286,6 +291,12 @@ class IndicesTest(TestCase):
                                            ((2, 's'), (1, 's')),
                                            ((3, 't'), (3, 't'))])
 
+    def test_case_long_six(self):
+        # transducer_no_i = self.trans_six('esesse')
+        # self.assertEqual(transducer_no_i, 'sesese')
+        transducer = self.trans_six('esesse', True)
+        self.assertEqual(transducer[0], 'sesese')
+
     def test_case_seven(self):
         transducer_as_is = self.trans_seven_as_is('test', True)
         self.assertEqual(transducer_as_is[0], 'test')
@@ -319,6 +330,7 @@ class IndicesTest(TestCase):
         indices_from_tups = Indices(tuple_format)
         indices_from_dict = Indices(dict_format)
         self.assertEqual(indices_from_dict(), indices_from_tups())
+
 
 if __name__ == "__main__":
     main()

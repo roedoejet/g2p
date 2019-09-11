@@ -80,6 +80,7 @@ var hotVarSettings = {
 };
 var hot = new Handsontable(hotElement, hotSettings);
 var varhot = new Handsontable(hotVarElement, hotVarSettings);
+
 document.getElementById("export-rules").addEventListener("click", function (event) {
     hot.getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
@@ -145,33 +146,21 @@ var setKwargs = function (kwargs) {
 }
 
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
-var convert = function (index = false) {
-    if (index) {
-        var input_string = $('#indexInput').val();
-        if (input_string) {
-            socket.emit('index conversion event', {
-                data: {
-                    input_string: input_string,
-                    mappings: hot.getData(),
-                    abbreviations: varhot.getData(),
-                    kwargs: getKwargs()
-                }
-            });
-        }
-    } else {
-        var input_string = $('#input').val();
-        if (input_string) {
-            socket.emit('conversion event', {
-                data: {
-                    input_string: $('#input').val(),
-                    mappings: hot.getData(),
-                    abbreviations: varhot.getData(),
-                    kwargs: getKwargs()
-                }
-            });
-        }
+var convert = function () {
+    var input_string = $('#input').val();
+    if (input_string) {
+        socket.emit('conversion event', {
+            data: {
+                input_string: $('#input').val(),
+                mappings: hot.getData(),
+                abbreviations: varhot.getData(),
+                kwargs: getKwargs()
+            }
+        });
     }
 }
+// Convert after any changes to tables
+Handsontable.hooks.add('afterChange', convert)
 
 socket.on('conversion response', function (msg) {
     $('#output').text(msg['output_string']);
@@ -195,7 +184,6 @@ $('#input').on('keyup', function (event) {
 })
 $('#hot').on('change', function (event) {
     convert()
-    // convert(index = true)
     return false;
 })
 $('#hot-add').click(function (event) {
@@ -221,13 +209,4 @@ $('#langselect').change(function () {
         out_lang = arr[1]
     }
     socket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
-})
-
-$('#animate').change(function () {
-    var selected = $("#animate")[0].checked
-    if (selected) {
-        $('#echart').css({ 'display': 'inherit' })
-    } else {
-        $('#echart').css({ 'display': 'none' })
-    }
 })

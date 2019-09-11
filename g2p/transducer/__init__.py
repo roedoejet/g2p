@@ -13,7 +13,7 @@ from g2p.mappings.utils import create_fixed_width_lookbehind
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.transducer.indices import Indices
-from g2p.transducer.utils import return_default_mapping, return_match_starting_indices
+from g2p.transducer.utils import return_default_mapping
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
@@ -136,6 +136,7 @@ class Transducer():
         # many-to-many
         if len(input_string) > 1 and len(output_string) > 1:
             new_input = {}
+            # If indices are explicitly listed with {} notation
             if any(self._char_match_pattern.finditer(input_string)) and any(self._char_match_pattern.finditer(output_string)):
                 input_char_matches = [x.group()
                                       for x in self._char_match_pattern.finditer(input_string)]
@@ -150,26 +151,32 @@ class Transducer():
                     x.group() for x in self._index_match_pattern.finditer(output_string)]
                 outputs = [{'match_index': m, 'string': output_char_matches[i]}
                            for i, m in enumerate(output_match_indices)]
-
                 for match_index in input_match_indices:
-                    default_inputs = [x['string']
-                                      for x in inputs if x['match_index'] == match_index]
-                    default_outputs = [x['string']
-                                       for x in outputs if x['match_index'] == match_index]
-                    default_input_offsets = return_match_starting_indices(
-                        inputs, [i + input_index for i, v in enumerate(inputs) if v['match_index'] == match_index])
-                    default_output_offsets = return_match_starting_indices(
-                        outputs, [i + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index])
-                    default_index = return_default_mapping(
-                        default_inputs, default_outputs, default_input_offsets, default_output_offsets)
-
-                    new_input = {**new_input, **default_index}
+                    # Get strings from inputs if they match the match_index
+                    explicit_inputs = [x['string']
+                                       for x in inputs if x['match_index'] == match_index]
+                    # Get strings from outputs if they match the match_index
+                    explicit_outputs = [x['string']
+                                        for x in outputs if x['match_index'] == match_index]
+                    # Get offset for inputs by adding the length of the input string up to the match
+                    # plus the overall input index/offset
+                    explicit_input_offsets = [
+                        len(''.join([x['string'] for x in inputs[:i]])) + input_index for i, v in enumerate(inputs) if v['match_index'] == match_index]
+                    # Get offset for outputs by adding the length of the output string up to the match
+                    # plus the overall output index/offset
+                    explicit_output_offsets = [
+                        len(''.join([x['string'] for x in outputs[:i]])) + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index]
+                    # Use default mapping to zip them up
+                    explicit_index = return_default_mapping(
+                        explicit_inputs, explicit_outputs, explicit_input_offsets, explicit_output_offsets)
+                    new_input = {**new_input, **explicit_index}
+            # Make sure mapping is valid
             elif any(self._char_match_pattern.finditer(input_string)) or any(self._char_match_pattern.finditer(output_string)):
                 raise MalformedMapping()
-            # if there are no explicit inputs or outputs
-            # then just use default many-to-many indexing
+            # else just use default many-to-many indexing
             else:
-                default_index = self.strings_to_lists(input_string, output_string, input_index, output_index)
+                default_index = self.strings_to_lists(
+                    input_string, output_string, input_index, output_index)
                 new_input = {**new_input, **default_index}
             return {**intermediate_index, **new_input}
 

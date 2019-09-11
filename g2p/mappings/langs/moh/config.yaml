@@ -15,3 +15,12 @@ mappings:
     in_lang: moh-ipa
     out_lang: eng-ipa
     <<: *shared
+  - display_name: Mohawk to Mohawk ASCII
+    mapping: moh_to_ascii.json
+    in_lang: moh
+    out_lang: moh-ascii
+    abbreviations: abbreviations.csv
+    authors:
+      - Aidan Pine
+    notes: This is for TTS. Scrubs all special and non-ascii characters.
+    <<: *shared

@@ -1,13 +1,5 @@
 from typing import Dict, List, Pattern, Tuple, Union
 
-def return_match_starting_indices(match_object_list, match_indices):
-    indices = []
-    all_matches = [x['match_index'] for x in match_object_list]
-    for match_index in match_indices:
-        indices.append(len(''.join([match_object_list[i]['string'] for i, v in enumerate(
-            all_matches[:match_index])])))
-    return indices
-
 def return_default_mapping(input_strings: List[str], output_strings: List[str],
                             input_index_offsets: List[int], output_index_offsets: List[int]):
     ''' This function takes an arbitrary number of input & output strings and their corresponding index offsets.
