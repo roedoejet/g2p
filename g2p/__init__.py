@@ -14,6 +14,7 @@ from g2p.transducer import Transducer
 from g2p.transducer.indices import Indices
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p._version import VERSION
+from g2p.log import LOGGER
 
 if sys.stdout.encoding != 'utf8':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
@@ -71,7 +72,7 @@ def home():
     """
     return render_template('index.html', langs=LANGS)
 
-@SOCKETIO.on('index conversion event', namespace='/test')
+@SOCKETIO.on('index conversion event', namespace='/convert')
 def index_convert(message):
     """ Convert input text and return output with indices for echart
     """
@@ -82,7 +83,7 @@ def index_convert(message):
     data, links = return_echart_data(indices)
     emit('index conversion response', {'output_string': output_string, 'index_data': data, 'index_links': links})
 
-@SOCKETIO.on('conversion event', namespace='/test')
+@SOCKETIO.on('conversion event', namespace='/convert')
 def convert(message):
     """ Convert input text and return output
     """
@@ -93,7 +94,7 @@ def convert(message):
     emit('conversion response', {'output_string': output_string})
 
 
-@SOCKETIO.on('table event', namespace='/test')
+@SOCKETIO.on('table event', namespace='/table')
 def change_table(message):
     """ Change the lookup table
     """
@@ -107,15 +108,15 @@ def change_table(message):
                             'kwargs': mappings.kwargs})
 
 
-@SOCKETIO.on('connect', namespace='/test')
+@SOCKETIO.on('connect', namespace='/connect')
 def test_connect():
     """ Let client know disconnected
     """
     emit('connection response', {'data': 'Connected'})
 
 
-@SOCKETIO.on('disconnect', namespace='/test')
+@SOCKETIO.on('disconnect', namespace='/connect')
 def test_disconnect():
     """ Let client know disconnected
     """
-    emit('connection response', {'data': 'Disonnected'})
+    print('client disconnected')

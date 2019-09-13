@@ -1,3 +1,3 @@
-from g2p import APP
+from g2p import APP, SOCKETIO
 
-APP.run(host='0.0.0.0', port=5000, debug=True)
+SOCKETIO.run(APP, host='0.0.0.0', port=5000, debug=True)

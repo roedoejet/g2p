@@ -4,7 +4,7 @@ from flask.cli import FlaskGroup
 from collections import OrderedDict
 from g2p.mappings.langs import cache_langs
 from g2p._version import VERSION
-from g2p import APP
+from g2p import APP, SOCKETIO
 
 def create_app():
     return APP

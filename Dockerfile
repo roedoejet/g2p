@@ -16,4 +16,4 @@ RUN pip3 install -r /g2p/requirements.txt
 RUN pip3 install gunicorn
 RUN pip3 install -e /g2p
 
-CMD gunicorn g2p:APP --bind 0.0.0.0:5000
+CMD gunicorn -k gevent -w 1 g2p:APP --bind 0.0.0.0:5000

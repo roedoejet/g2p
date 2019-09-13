@@ -51,11 +51,11 @@ $(document).ready(function () {
     });
 
     $(window).trigger('resize');
-    var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+    var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
     var convert = function () {
         var input_string = $('#indexInput').val();
         if (input_string) {
-            socket.emit('index conversion event', {
+            conversionSocket.emit('index conversion event', {
                 data: {
                     input_string: input_string,
                     mappings: hot.getData(),
@@ -68,7 +68,7 @@ $(document).ready(function () {
     // Convert after any changes to tables
     Handsontable.hooks.add('afterChange', convert)
     
-    socket.on('index conversion response', function (msg) {
+    conversionSocket.on('index conversion response', function (msg) {
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
         myChart.setOption(option, true)

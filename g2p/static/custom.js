@@ -145,11 +145,14 @@ var setKwargs = function (kwargs) {
     convert()
 }
 
-var socket = io.connect('http://' + document.domain + ':' + location.port + '/test');
+var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
+var connectionSocket = io.connect('http://' + document.domain + ':' + location.port + '/connect');
+var tableSocket = io.connect('http://' + document.domain + ':' + location.port + '/table');
+
 var convert = function () {
     var input_string = $('#input').val();
     if (input_string) {
-        socket.emit('conversion event', {
+        conversionSocket.emit('conversion event', {
             data: {
                 input_string: $('#input').val(),
                 mappings: hot.getData(),
@@ -162,15 +165,15 @@ var convert = function () {
 // Convert after any changes to tables
 Handsontable.hooks.add('afterChange', convert)
 
-socket.on('conversion response', function (msg) {
+conversionSocket.on('conversion response', function (msg) {
     $('#output').text(msg['output_string']);
 });
 
-socket.on('connection response', function (msg) {
+connectionSocket.on('connection response', function (msg) {
     $('#log').text('(' + msg.data + ')')
 })
 
-socket.on('table response', function (msg) {
+tableSocket.on('table response', function (msg) {
     console.log(msg)
     hot.loadData(msg['mappings'])
     varhot.loadData(msg['abbs'])
@@ -208,5 +211,5 @@ $('#langselect').change(function () {
         in_lang = arr[0]
         out_lang = arr[1]
     }
-    socket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
+    tableSocket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
 })
