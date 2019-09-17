@@ -7,6 +7,7 @@ from unittest import TestLoader, TextTestRunner, TestSuite
 
 # Unit tests
 from g2p.log import LOGGER
+from g2p.tests.test_create_mapping import MappingCreationTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkTest
 from g2p.tests.test_indices import IndicesTest
@@ -31,6 +32,7 @@ TRANSDUCER_TESTS = [
 MAPPINGS_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
+        MappingCreationTest,
         MappingTest,
         NetworkTest,
         UtilsTest

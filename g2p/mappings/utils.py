@@ -257,7 +257,6 @@ def is_ipa(lang: str) -> bool:
     pattern = re.compile('[-_]?ipa$')
     return bool(re.search(pattern, lang))
 
-
 def is_xsampa(lang: str) -> bool:
     pattern = re.compile('[-_]?x(-?)sampa$')
     return bool(re.search(pattern, lang))
@@ -265,6 +264,9 @@ def is_xsampa(lang: str) -> bool:
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):
         return super(IndentDumper, self).increase_indent(flow, False)
+    
+    def ignore_aliases(self, *args):
+        return True
 
 
 

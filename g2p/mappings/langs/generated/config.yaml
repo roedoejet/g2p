@@ -1,0 +1,6 @@
+mappings:
+  - display_name: Atikamekw IPA to English IPA
+    in_lang: atj-ipa
+    language_name: Atikamekw
+    mapping: atj-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
