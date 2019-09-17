@@ -1,7 +1,10 @@
+import os
 import click
 import yaml
 from flask.cli import FlaskGroup
 from collections import OrderedDict
+from networkx import draw
+
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK
 from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.utils import is_ipa, is_xsampa
@@ -29,6 +32,15 @@ def generate_ipa_mapping(in_lang):
     new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
     click.echo(f"Writing English IPA mapping for {in_lang} to file")
     create_mapping(new_mapping, eng_ipa, write_to_file=True)
+
+@click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@cli.command()
+def generate_mapping_network(path):
+    ''' Generate a png of the network of mapping languages. Requires matplotlib.
+    '''
+    import matplotlib.pyplot as plt
+    draw(LANGS_NETWORK, with_labels=True)
+    plt.show()
 
 
 @click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
