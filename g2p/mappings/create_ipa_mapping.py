@@ -20,20 +20,17 @@ from __future__ import print_function, unicode_literals
 from __future__ import division, absolute_import
 
 from copy import deepcopy
-from typing import List
 import datetime as dt
-import argparse
 import json
-import io
 import os
 
-import yaml
-import panphon.distance
 from panphon.xsampa import XSampa
+import panphon.distance
 from tqdm import tqdm
+import yaml
 
-from g2p.mappings.langs import GEN_CONFIG, GEN_DIR
 from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
+from g2p.mappings.langs import GEN_CONFIG, GEN_DIR
 from g2p.mappings import Mapping
 from g2p.log import LOGGER
 
@@ -112,14 +109,24 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
         with open(map_output_path, 'w') as f:
             json.dump(mapping, f, indent=4)
         data = deepcopy(data)
-        # add new mapping if it's not already there
+        cfg_exists = bool([x for x in data['mappings'] if x['in_lang'] == map_1_name and x['out_lang'] == map_2_name])
+        # add new mapping if no mappings are generated yet
         if not data['mappings']:
             data['mappings'] = [config]
-        elif config not in data['mappings']:
+        # add new mapping if it doesn't exist yet
+        elif not cfg_exists:
             data['mappings'].append(config)
             # rewrite config
             with open(GEN_CONFIG, 'w') as f:
                 yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
+        elif cfg_exists:
+            for i, cfg in enumerate(data['mappings']):
+                if cfg['in_lang'] == map_1_name and cfg['out_lang'] == map_2_name:
+                    data['mappings'][i] = config
+                    # rewrite config
+                    with open(GEN_CONFIG, 'w') as f:
+                        yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
+                    break
         else:
             LOGGER.warn(f"Not writing generated files because a non-generated mapping from {map_1_name} to {map_2_name} already exists.")
     return Mapping(mapping, **{k:v for k,v in config.items() if k != 'mapping'})
