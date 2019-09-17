@@ -191,6 +191,7 @@ class Mapping():
             else:
                 rule_regex = re.compile(inp)
         except:
+            breakpoint()
             raise Exception(
                 f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')

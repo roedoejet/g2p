@@ -4,6 +4,7 @@ coloredlogs
 Flask
 flask_socketio
 flask-talisman
+networkx
 panphon
 pyyaml
 regex
