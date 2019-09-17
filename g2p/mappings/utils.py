@@ -247,9 +247,7 @@ def load_abbreviations_from_file(path):
             reader = csv.reader(f)
             abbs = flatten_abbreviations(reader)
     else:
-        raise exceptions.IncorrectFileType(
-            '''Sorry, abbreviations must be stored as CSV files.
-            You provided the following: %s''' % path)
+        raise exceptions.IncorrectFileType(f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
     return abbs
 
 
@@ -257,16 +255,15 @@ def is_ipa(lang: str) -> bool:
     pattern = re.compile('[-_]?ipa$')
     return bool(re.search(pattern, lang))
 
+
 def is_xsampa(lang: str) -> bool:
     pattern = re.compile('[-_]?x(-?)sampa$')
     return bool(re.search(pattern, lang))
 
+
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):
         return super(IndentDumper, self).increase_indent(flow, False)
-    
+
     def ignore_aliases(self, *args):
         return True
-
-
-

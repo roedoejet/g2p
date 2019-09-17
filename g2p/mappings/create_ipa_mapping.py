@@ -30,6 +30,7 @@ import os
 import yaml
 import panphon.distance
 from panphon.xsampa import XSampa
+from tqdm import tqdm
 
 from g2p.mappings.langs import GEN_CONFIG, GEN_DIR
 from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
@@ -172,12 +173,16 @@ def align_inventories(inventory_l1, inventory_l2,
     mapping = []
     inventory_l1 = sorted(set(inventory_l1))
     inventory_l2 = list(set(inventory_l2))
+    pbar = tqdm(total=100)
+    step = 1/len(inventory_l1)*100
     for i1, p1 in enumerate(process_characters(inventory_l1,
                                                l1_is_xsampa)):
         # we enumerate the strings because we want to save the original string
         # (e.g., 'kʷ') to the mapping, not the processed one (e.g. 'kw')
         good_match = find_good_match(p1, inventory_l2, l2_is_xsampa)
         mapping.append({"in": inventory_l1[i1], "out": good_match})
+        pbar.update(step)
+    pbar.close()
     return mapping
 
 if __name__ == '__main__':
