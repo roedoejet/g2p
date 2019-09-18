@@ -9,7 +9,7 @@ from typing import Dict, List, Pattern, Tuple, Union
 from collections import OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
-from g2p.mappings.utils import create_fixed_width_lookbehind
+from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.transducer.indices import Indices
@@ -41,11 +41,16 @@ class Transducer():
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
         self.case_sensitive = mapping.kwargs['case_sensitive']
+        self.norm_form = mapping.kwargs.get('norm_form', 'none')
+        self.out_delimiter = mapping.kwargs.get('out_delimiter', '')
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
-    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = ''):
-        return self.apply_rules(to_convert, index, debugger, output_delimiter)
+    def __repr__(self):
+        return f"{__class__} between {self.mapping.kwargs['in_lang']} and {self.mapping.kwargs['out_lang']}"
+
+    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
+        return self.apply_rules(to_convert, index, debugger)
 
     def strings_to_lists(self, input_string: str, output_string: str,
                          input_index: int, output_index: int):
@@ -180,7 +185,7 @@ class Transducer():
                 new_input = {**new_input, **default_index}
             return {**intermediate_index, **new_input}
 
-    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False, output_delimiter: str = '') -> Union[str, Tuple[str, Indices]]:
+    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False) -> Union[str, Tuple[str, Indices]]:
         """ Apply all the rules in self.mapping sequentially.
 
         @param to_convert: str
@@ -192,15 +197,15 @@ class Transducer():
         @param debugger: bool
             This is whether to show intermediary steps, default is False
 
-         @param output_delimiter: str
-            This is whether to insert a delimiter between each conversion, default is an empty string
-
         """
         indices = {}
         rules_applied = []
 
         if not self.case_sensitive:
             to_convert = to_convert.lower()
+
+        if self.norm_form:
+            to_convert = normalize(to_convert, self.norm_form)
 
         # initialized converted
         converted = to_convert
@@ -231,10 +236,10 @@ class Transducer():
                         # then apply the rule and append the index-formatted tuple
                         # to the main indices list
                         if match_index == input_index:
-                            if output_delimiter:
+                            if self.out_delimiter:
                                 # Don't add the delimiter to the last segment
                                 if not char + (len(io_copy['in']) - 1) >= len(to_convert) - 1:
-                                    io_copy['out'] += output_delimiter
+                                    io_copy['out'] += self.out_delimiter
                             # convert the final output
                             output_sub = re.sub(
                                 re.compile(r'{\d+}'), '', io_copy['out'])
@@ -288,10 +293,8 @@ class Transducer():
             # if not worrying about indices, just do the conversion rule-by-rule
             for io in self.mapping:
                 io_copy = copy.deepcopy(io)
-                if output_delimiter:
-                    # Don't add the delimiter to the last segment
-                    if not char >= len(to_convert) - 1:
-                        io_copy['out'] += output_delimiter
+                if self.out_delimiter:
+                    io_copy['out'] += self.out_delimiter
                 output_sub = re.sub(re.compile(r'{\d+}'), '', io_copy['out'])
                 if re.search(io_copy["match_pattern"], converted):
                     inp = converted
@@ -302,6 +305,8 @@ class Transducer():
                                         "rule": io_copy, "output": outp}
                         rules_applied.append(applied_rule)
                     converted = outp
+            # Don't add the delimiter to the last segment
+            converted = converted.rstrip()
         if index and debugger:
             io_states = Indices(indices)
             return (io_states.output(), io_states, rules_applied)
@@ -326,6 +331,9 @@ class CompositeTransducer():
 
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
+
+    def __repr__(self):
+        return f"{__class__} between {self._transducers[0].mapping.kwargs['in_lang']} and {self._transducers[-1].mapping.kwargs['out_lang']}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         return self.apply_rules(to_convert, index, debugger)

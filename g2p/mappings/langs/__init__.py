@@ -26,6 +26,7 @@ def cache_langs():
         with open(path) as f:
             data = yaml.safe_load(f)
         # If there is a mappings key, there is more than one mapping
+        # TODO: should put in some measure to prioritize non-generated mappings and warn when they override
         if 'mappings' in data:
             for index, mapping in enumerate(data['mappings']):
                 mappings_legal_pairs.append((data['mappings'][index]['in_lang'], data['mappings'][index]['out_lang']))

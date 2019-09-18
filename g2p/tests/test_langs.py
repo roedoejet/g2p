@@ -2,6 +2,7 @@
 
 from unittest import main, TestCase
 import os
+from g2p import make_g2p
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
@@ -11,14 +12,32 @@ class LangTest(TestCase):
     '''
 
     def setUp(self):
-        git = [{"in_lang": "git",
-               "out_lang": "git-ipa",
-               "samples": [
-                       ('gwila', '\u025fʷilæ'),
-                       ("li'lp'en", "lilˀpˀin"),
-                       ("hlik\u0332'sxw", "ɬɛq\u0294sx\u02b7")
-                   ],
-               }]
+        git = [
+            {"in_lang": "git",
+                "out_lang": "git-ipa",
+                "samples": [
+                    ('gwila', '\u025fʷilæ'),
+                    ("li'lp'en", "lilˀpˀin"),
+                    ("hlik\u0332'sxw", "ɬɛq\u0294sx\u02b7")
+                ],
+             },
+            {'in_lang': 'git',
+                'out_lang': 'eng-arpabet',
+                "samples": [
+                    ("K̲'ay", 'K HH AE Y'),
+                    ("guts'uusgi'y", 'G UW T S HH UW S G IY HH Y')
+                ]},
+            {'in_lang': 'str-sen',
+                'out_lang': 'eng-arpabet',
+                "samples": [
+                    ('X̱I¸ÁM¸', 'SH W IY HH EY M HH')
+                ]},
+            {'in_lang': 'ctp',
+                'out_lang': 'eng-arpabet',
+                "samples": [
+                    ('Qneᴬ', 'HH N EY')
+                ]}
+        ]
 
         self.langs_to_test = git
 
@@ -27,10 +46,11 @@ class LangTest(TestCase):
         for lang in self.langs_to_test:
             in_lang = lang['in_lang']
             out_lang = lang['out_lang']
-            mappings = Mapping(in_lang=in_lang, out_lang=out_lang)
-            transducer=Transducer(mappings)
+            transducer = make_g2p(in_lang, out_lang)
             # go through each table in the current lang
             for sample in lang['samples']:
+                # if in_lang == 'str-sen':
+                #     breakpoint()
                 # assert that the transduced first item in the tuple is equal to the second item in the tuple
                 self.assertEqual(transducer(sample[0]), sample[1])
 

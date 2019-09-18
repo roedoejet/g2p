@@ -5,12 +5,6 @@ mappings:
     language_name: Atikamekw
     mapping: atj-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - author: Generated 2019-09-17 16:27:11.132510
-    display_name: Gitksan IPA to English IPA
-    in_lang: git-ipa
-    language_name: Gitksan
-    mapping: git-ipa_to_eng-ipa.json
-    out_lang: eng-ipa
   - author: Generated 2019-09-17 21:24:11.257523
     display_name: Atikamekw IPA to Atikamekw dummy
     in_lang: atj-ipa

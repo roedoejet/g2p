@@ -5,6 +5,7 @@ mappings:
     in_lang: git
     out_lang: git-ipa
     as_is: true
+    case_sensitive: false
     authors:
       - Fineen Davis
     mapping: Orthography_Deterministic.csv
@@ -23,4 +24,12 @@ mappings:
     authors:
       - Aidan Pine
     mapping: norm.csv
+    <<: *shared
+  - display_name: Gitksan IPA to English IPA
+    in_lang: git-ipa
+    out_lang: eng-ipa
+    as_is: false
+    authors:
+      - Aidan Pine
+    mapping: git_ipa_to_eng_ipa.json
     <<: *shared

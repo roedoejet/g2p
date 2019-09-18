@@ -14,6 +14,8 @@ from pathlib import Path
 import datetime as dt
 import yaml
 
+import unicodedata as ud
+
 from openpyxl import load_workbook
 from typing import Dict
 
@@ -49,6 +51,19 @@ def expand_abbreviations(data):
             lines.append(['', '', '', '', '', ''])
     return lines
 
+def normalize(inp: str, norm_form: str):
+    ''' Normalize to NFC(omposed) or NFD(ecomposed).
+        Also, find any Unicode Escapes & decode 'em!
+    '''
+    if norm_form not in ['NFC', 'NFD', 'NKFC', 'NKFD']:
+        raise exceptions.InvalidNormalization(normalize)
+    else:
+        normalized = ud.normalize(norm_form, unicode_escape(inp))
+        if normalized != inp:
+            LOGGER.info(
+                'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
+                inp, normalized, norm_form)
+        return normalized
 
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints

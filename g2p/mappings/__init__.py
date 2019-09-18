@@ -6,7 +6,6 @@ Module for all things related to lookup tables
 
 import csv
 import os
-import unicodedata as ud
 import re
 import json
 from typing import DefaultDict, List, Pattern, Union
@@ -19,7 +18,7 @@ import yaml
 
 from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
-from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters
+from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters, normalize
 from g2p.mappings.utils import flatten_abbreviations, IndentDumper, load_abbreviations_from_file
 from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
 from g2p.log import LOGGER
@@ -49,9 +48,8 @@ class Mapping():
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
         # should these just be explicit instead of kwargs...
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
-                                 'out_lang', 'as_is', 'case_sensitive', 'escape_special', 'norm_form', 'reverse']
+                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'escape_special', 'norm_form', 'reverse']
         self.kwargs = OrderedDict(kwargs)
-        self.allowable_norm_forms = ['NFC', 'NKFC', 'NFD', 'NFKD']
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
             self.abbreviations = abbreviations
@@ -145,7 +143,7 @@ class Mapping():
                 for io in mapping:
                     for k, v in io.items():
                         if isinstance(v, str):
-                            io[k] = self.normalize(v)
+                            io[k] = normalize(v, self.kwargs['norm_form'])
             if kwarg == 'reverse' and val:
                 mapping = self.reverse_mappings(mapping)
         # After all processing is done, turn into regex
@@ -153,21 +151,6 @@ class Mapping():
             io['match_pattern'] = self.rule_to_regex(io)
         self.processed = True
         return mapping
-
-    def normalize(self, inp: str):
-        ''' Normalize to NFC(omposed) or NFD(ecomposed).
-            Also, find any Unicode Escapes & decode 'em!
-        '''
-        if self.kwargs['norm_form'] not in self.allowable_norm_forms:
-            raise exceptions.InvalidNormalization(self.normalize)
-        else:
-            normalized = ud.normalize(
-                self.kwargs['norm_form'], unicode_escape(inp))
-            if normalized != inp:
-                LOGGER.info(
-                    'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
-                    inp, normalized, self.kwargs['norm_form'])
-            return normalized
 
     def rule_to_regex(self, rule: str) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
