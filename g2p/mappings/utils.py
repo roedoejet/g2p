@@ -5,7 +5,8 @@ Utilities used by other classes
 """
 import os
 import csv
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
+from typing import List
 import regex as re
 import json
 from copy import deepcopy
@@ -284,7 +285,7 @@ def generate_config(in_lang, out_lang, in_display_name, out_display_name):
     }
     return config
 
-def write_generated_mapping_to_file(config, mapping):
+def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
     # read config
     with open(GEN_CONFIG, 'r') as f:
         data = yaml.safe_load(f)
