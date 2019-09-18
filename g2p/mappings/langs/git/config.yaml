@@ -8,8 +8,7 @@ mappings:
     case_sensitive: false
     authors:
       - Fineen Davis
-    mapping: Orthography_Deterministic.csv
-    abbreviations: Ortho_variables.csv
+    mapping: git_to_ipa.json
     <<: *shared
   - display_name: Rigsby APA
     in_lang: git

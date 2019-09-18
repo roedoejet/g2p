@@ -16,9 +16,8 @@ class LangTest(TestCase):
             {"in_lang": "git",
                 "out_lang": "git-ipa",
                 "samples": [
-                    ('gwila', '\u025fʷilæ'),
-                    ("li'lp'en", "lilˀpˀin"),
-                    ("hlik\u0332'sxw", "ɬɛq\u0294sx\u02b7")
+                    ('gwila', '\u0261ʷilæ'),
+                    ("hlik\u0332'sxw", "ɬiq\u0294sx\u02b7")
                 ],
              },
             {'in_lang': 'git',
@@ -49,8 +48,6 @@ class LangTest(TestCase):
             transducer = make_g2p(in_lang, out_lang)
             # go through each table in the current lang
             for sample in lang['samples']:
-                # if in_lang == 'str-sen':
-                #     breakpoint()
                 # assert that the transduced first item in the tuple is equal to the second item in the tuple
                 self.assertEqual(transducer(sample[0]), sample[1])
 

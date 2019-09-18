@@ -53,12 +53,20 @@ class MappingTest(TestCase):
         self.assertEqual(transducer_escaped('\d'), 'b')
 
     def test_norm_form(self):
-        mapping = Mapping([{'in': 'a\u0301', "out": 'a'}], norm_form='NFD')
-        mapping_nfc = Mapping([{'in': 'a\u0301', "out": 'a'}])
-        transducer = Transducer(mapping)
+        mapping_nfc = Mapping([{'in': 'a\u0301', "out": 'a'}]) # Defaults to NFC
+        mapping_nfd = Mapping([{'in': 'a\u0301', "out": 'a'}], norm_form='NFD')
+        mapping_none = Mapping([{'in': 'a\u0301', "out": 'a'}], norm_form=False)
+
         transducer_nfc = Transducer(mapping_nfc)
-        self.assertEqual(transducer('\u00E1'), '\u00E1')
+        transducer_nfd = Transducer(mapping_nfd)
+        transducer_none = Transducer(mapping_none)
+
+        self.assertEqual(transducer_nfc('a\u0301'), 'a')
         self.assertEqual(transducer_nfc('\u00E1'), 'a')
+        self.assertEqual(transducer_nfd('a\u0301'), 'a')
+        self.assertEqual(transducer_nfd('\u00E1'), 'a')
+        self.assertEqual(transducer_none('a\u0301'), 'a')
+        self.assertEqual(transducer_none('\u00E1'), '\u00E1')
 
     def test_reverse(self):
         mapping = Mapping([{'in': 'a', "out": 'b'}])
