@@ -10,6 +10,7 @@ import regex as re
 import json
 from copy import deepcopy
 from pathlib import Path
+import datetime as dt
 import yaml
 
 from openpyxl import load_workbook
@@ -17,7 +18,10 @@ from typing import Dict
 
 from g2p import exceptions
 from g2p.log import LOGGER
+from g2p.mappings import langs
 
+GEN_DIR = os.path.join(os.path.dirname(langs.__file__), 'generated')
+GEN_CONFIG = os.path.join(GEN_DIR, 'config.yaml')
 
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
@@ -250,16 +254,81 @@ def load_abbreviations_from_file(path):
         raise exceptions.IncorrectFileType(f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
     return abbs
 
+def generate_config(in_lang, out_lang, in_display_name, out_display_name):
+    if is_ipa(in_lang):
+        in_type = 'IPA'
+    elif is_xsampa(in_lang):
+        in_type = 'XSAMPA'
+    elif is_dummy(in_lang):
+        in_type = 'dummy'
+    else:
+        in_type = 'custom'
+
+    if is_ipa(out_lang):
+        out_type = 'IPA'
+    elif is_xsampa(out_lang):
+        out_type = 'XSAMPA'
+    elif is_dummy(out_lang):
+        out_type = 'dummy'
+    else:
+        out_type = 'custom'
+        
+    mapping_fn = f'{in_lang}_to_{out_lang}.json'
+    config = {
+        'display_name': f"{in_display_name} {in_type} to {out_display_name} {out_type}",
+        'mapping': mapping_fn,
+        'in_lang': in_lang,
+        'out_lang': out_lang,
+        'language_name': in_display_name,
+        'author': f"Generated {dt.datetime.now()}"
+    }
+    return config
+
+def write_generated_mapping_to_file(config, mapping):
+    # read config
+    with open(GEN_CONFIG, 'r') as f:
+        data = yaml.safe_load(f)
+    map_output_path = os.path.join(GEN_DIR, config['mapping'])
+    # write mapping
+    if os.path.exists(map_output_path):
+        LOGGER.info(f"Overwriting file at {map_output_path}")
+    with open(map_output_path, 'w') as f:
+        json.dump(mapping, f, indent=4)
+    data = deepcopy(data)
+    cfg_exists = bool([x for x in data['mappings'] if x['in_lang']
+                       == config['in_lang'] and x['out_lang'] == config['out_lang']])
+    # add new mapping if no mappings are generated yet
+    if not data['mappings']:
+        data['mappings'] = [config]
+    # add new mapping if it doesn't exist yet
+    elif not cfg_exists:
+        data['mappings'].append(config)
+        # rewrite config
+        with open(GEN_CONFIG, 'w') as f:
+            yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
+    elif cfg_exists:
+        for i, cfg in enumerate(data['mappings']):
+            if cfg['in_lang'] == config['in_lang'] and cfg['out_lang'] == config['out_lang']:
+                data['mappings'][i] = config
+                # rewrite config
+                with open(GEN_CONFIG, 'w') as f:
+                    yaml.dump(data, f, Dumper=IndentDumper,
+                              default_flow_style=False)
+                break
+    else:
+        LOGGER.warn(
+            f"Not writing generated files because a non-generated mapping from {config['in_lang']} to {config['out_lang']} already exists.")
 
 def is_ipa(lang: str) -> bool:
     pattern = re.compile('[-_]?ipa$')
     return bool(re.search(pattern, lang))
 
-
 def is_xsampa(lang: str) -> bool:
     pattern = re.compile('[-_]?x(-?)sampa$')
     return bool(re.search(pattern, lang))
 
+def is_dummy(lang: str) -> bool:
+    return lang == 'dummy'
 
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):

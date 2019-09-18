@@ -20,7 +20,6 @@ from __future__ import print_function, unicode_literals
 from __future__ import division, absolute_import
 
 from copy import deepcopy
-import datetime as dt
 import json
 import os
 
@@ -29,8 +28,7 @@ import panphon.distance
 from tqdm import tqdm
 import yaml
 
-from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
-from g2p.mappings.langs import GEN_CONFIG, GEN_DIR
+from g2p.mappings.utils import generate_config, is_ipa, is_xsampa, IndentDumper, write_generated_mapping_to_file
 from g2p.mappings import Mapping
 from g2p.log import LOGGER
 
@@ -83,54 +81,18 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     l1_is_xsampa, l2_is_xsampa = is_xsampa(map_1_name), is_xsampa(map_2_name)
     mapping = align_inventories(mapping_1.inventory(mapping_1_io), mapping_2.inventory(mapping_2_io),
                                 l1_is_xsampa, l2_is_xsampa)
-    
 
-    l1_display_name = mapping_1.kwargs.get('language_name', 'No Language display name in Config')
-    l2_display_name = mapping_2.kwargs.get('language_name', 'No Language display name in Config')
-    l1_type = "IPA" if is_ipa(map_1_name) else "XSAMPA"
-    l2_type = "IPA" if is_ipa(map_2_name) else "XSAMPA"
-    mapping_fn = f'{map_1_name}_to_{map_2_name}.json'
-    config = {
-        'display_name': f"{l1_display_name} {l1_type} to {l2_display_name} {l2_type}",
-        'mapping': mapping_fn,
-        'in_lang': map_1_name,
-        'out_lang': map_2_name,
-        'language_name': l1_display_name,
-        'author': f"Generated {dt.datetime.now()}"
-    }
+    l1_display_name = mapping_1.kwargs.get(
+        'language_name', 'No Language display name in Config')
+    l2_display_name = mapping_2.kwargs.get(
+        'language_name', 'No Language display name in Config')
+
+    config = generate_config(map_1_name, map_2_name, l1_display_name, l2_display_name)
+
     if write_to_file:
-        # read config
-        with open(GEN_CONFIG, 'r') as f:
-            data = yaml.safe_load(f)
-        map_output_path = os.path.join(GEN_DIR, mapping_fn)
-        # write mapping
-        if os.path.exists(map_output_path):
-            LOGGER.info(f"Overwriting file at {map_output_path}")
-        with open(map_output_path, 'w') as f:
-            json.dump(mapping, f, indent=4)
-        data = deepcopy(data)
-        cfg_exists = bool([x for x in data['mappings'] if x['in_lang'] == map_1_name and x['out_lang'] == map_2_name])
-        # add new mapping if no mappings are generated yet
-        if not data['mappings']:
-            data['mappings'] = [config]
-        # add new mapping if it doesn't exist yet
-        elif not cfg_exists:
-            data['mappings'].append(config)
-            # rewrite config
-            with open(GEN_CONFIG, 'w') as f:
-                yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
-        elif cfg_exists:
-            for i, cfg in enumerate(data['mappings']):
-                if cfg['in_lang'] == map_1_name and cfg['out_lang'] == map_2_name:
-                    data['mappings'][i] = config
-                    # rewrite config
-                    with open(GEN_CONFIG, 'w') as f:
-                        yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
-                    break
-        else:
-            LOGGER.warn(f"Not writing generated files because a non-generated mapping from {map_1_name} to {map_2_name} already exists.")
-    return Mapping(mapping, **{k:v for k,v in config.items() if k != 'mapping'})
+        write_generated_mapping_to_file(config, mapping)
 
+    return Mapping(mapping, **{k: v for k, v in config.items() if k != 'mapping'})
 
 def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
     """Find a good sequence in inventory_l2 matching p1."""

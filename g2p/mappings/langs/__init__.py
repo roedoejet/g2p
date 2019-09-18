@@ -10,8 +10,6 @@ from networkx import Graph, read_gpickle, write_gpickle
 from g2p.mappings.utils import load_mapping_from_path
 
 LANGS_DIR = os.path.dirname(__file__)
-GEN_DIR = os.path.join(LANGS_DIR, 'generated')
-GEN_CONFIG = os.path.join(GEN_DIR, 'config.yaml')
 LANGS_PKL = os.path.join(LANGS_DIR, 'langs.pkl')
 LANGS_NWORK_PATH = os.path.join(LANGS_DIR, 'network.pkl')
 
