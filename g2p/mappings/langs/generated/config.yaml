@@ -17,3 +17,15 @@ mappings:
     language_name: Atikamekw
     mapping: atj-ipa_to_dummy.json
     out_lang: dummy
+  - author: Generated 2019-09-17 21:39:41.382977
+    display_name: Atikamekw custom to Atikamekw dummy
+    in_lang: atj
+    language_name: Atikamekw
+    mapping: atj_to_dummy.json
+    out_lang: dummy
+  - author: Generated 2019-09-17 21:40:58.444927
+    display_name: Gitksan custom to Gitksan dummy
+    in_lang: git
+    language_name: Gitksan
+    mapping: git_to_dummy.json
+    out_lang: dummy

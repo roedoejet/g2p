@@ -10,3 +10,4 @@ pyyaml
 regex
 requests
 tqdm
+unidecode
