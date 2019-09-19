@@ -12,7 +12,7 @@ from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
-from g2p.transducer.indices import Indices
+from g2p.transducer.indices import Indices, IndexSequence
 from g2p.transducer.utils import return_default_mapping
 
 # Avoid TypeError in Python < 3.7 (see
@@ -339,14 +339,13 @@ class CompositeTransducer():
         return self.apply_rules(to_convert, index, debugger)
 
     def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False):
-        # TODO: should turn indexed into IndexSequence
         converted = to_convert
         indexed = []
         debugged = []
         for transducer in self._transducers:
             response = transducer(converted, index, debugger)
             if index:
-                indexed += response[1]
+                indexed.append(response[1])
                 if debugger:
                     debugged += response[2]
             if debugger:
@@ -356,9 +355,9 @@ class CompositeTransducer():
             else:
                 converted = response
         if index and debugger:
-            return (converted, indexed, debugged)
+            return (converted, IndexSequence(*indexed), debugged)
         if index:
-            return (converted, indexed)
+            return (converted, IndexSequence(*indexed))
         if debugger:
             return (converted, debugged)
         return converted

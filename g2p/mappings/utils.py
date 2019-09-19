@@ -250,7 +250,10 @@ def validate(mapping):
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
     for k, v in to_escape.items():
-        escaped = re.escape(v)
+        if isinstance(v, str):
+            escaped = re.escape(v)
+        else:
+            escaped = v
         if escaped != v:
             LOGGER.info(
                 f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")

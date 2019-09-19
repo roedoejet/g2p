@@ -100,7 +100,7 @@ class Mapping():
         return [x[in_or_out] for x in self.mapping]
 
     def process_loaded_config(self, config):
-        ''' For a mapping loaded from a file, take the keyword arguments and supply them to the 
+        ''' For a mapping loaded from a file, take the keyword arguments and supply them to the
             Mapping, and get any abbreviations data.
         '''
         self.mapping = config['mapping_data']
@@ -174,7 +174,8 @@ class Mapping():
             else:
                 rule_regex = re.compile(inp)
         except:
-            breakpoint()
+            LOGGER.error(f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+                    Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
             raise Exception(
                 f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')

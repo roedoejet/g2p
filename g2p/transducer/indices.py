@@ -150,7 +150,7 @@ class IndexSequence():
     def output(self):
         return self.states[-1].output()
 
-    def composed_and_reduced(self):
+    def reduced(self):
         ''' This is a reduced tuple-based format for indices. It requires that Indices in the
         IndexSequence be composed, and then they can be reduced to a list of tuples where each
         tuple contains an input and output index corresponding with that character. The list is equal
