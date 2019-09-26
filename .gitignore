@@ -20,3 +20,5 @@ log.txt
 
 .coverage
 htmlcov
+
+flask_session

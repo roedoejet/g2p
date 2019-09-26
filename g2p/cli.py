@@ -59,6 +59,9 @@ def generate_mapping_network(path):
 def convert(in_lang, out_lang, input_text):
     ''' Convert any text
     '''
+    if os.path.exists(input_text) and input_text.endswith('txt'):
+        with open(input_text) as f:
+            input_text = f.read()
     transducer = make_g2p(in_lang, out_lang)
     click.echo(transducer(input_text))
 
