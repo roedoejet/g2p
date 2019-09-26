@@ -23,7 +23,7 @@ mappings:
     language_name: "SEN\u0106O\u0166EN"
     mapping: str-sen_to_dummy.json
     out_lang: dummy
-  - author: Generated 2019-09-26 12:26:34.031492
+  - author: Generated 2019-09-26 13:48:19.852180
     display_name: Danish IPA to English IPA
     in_lang: dan-ipa
     language_name: Danish
