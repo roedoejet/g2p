@@ -10,6 +10,8 @@
 
 This library is for handling arbitrary transductions between input and output segments while preserving indices.
 
+:warning: :construction: This repo is currently **under construction** it is certainly useable, but you should proceed with caution when integrationg into other projects as it is currently pre-alpha and breaking changes should be expected :construction: :warning:
+
 ## Table of Contents
 - [Gⁱ-2-Pⁱ](#g%e2%81%b1-2-p%e2%81%b1)
   - [Table of Contents](#table-of-contents)
