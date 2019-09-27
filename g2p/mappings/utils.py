@@ -26,6 +26,7 @@ from g2p.mappings import langs
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), 'generated')
 GEN_CONFIG = os.path.join(GEN_DIR, 'config.yaml')
 
+
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
     '''
@@ -51,6 +52,7 @@ def expand_abbreviations(data):
             lines.append(['', '', '', '', '', ''])
     return lines
 
+
 def normalize(inp: str, norm_form: str):
     ''' Normalize to NFC(omposed) or NFD(ecomposed).
         Also, find any Unicode Escapes & decode 'em!
@@ -66,6 +68,7 @@ def normalize(inp: str, norm_form: str):
                 'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
                 inp, normalized, norm_form)
         return normalized
+
 
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints
@@ -83,7 +86,11 @@ def escape_to_codepoint(match):
 def create_fixed_width_lookbehind(pattern):
     '''Turn all characters into fixed width lookbehinds
     '''
-    return re.sub(re.compile(r"""(?<=\(?)[\p{L}\p{M}|]+(?=\)?)""", re.U),
+    return re.sub(re.compile(r"""
+    (?<=\(?)            # lookbehind
+    [\[\]\p{L}\p{M}|]+  # match any number of Unicode characters and diacritics, plus square brackets
+    (?=\)?)             # lookahead
+    """, re.U | re.VERBOSE),
                   pattern_to_fixed_width_lookbehinds, pattern)
 
 
@@ -272,8 +279,10 @@ def load_abbreviations_from_file(path):
             reader = csv.reader(f)
             abbs = flatten_abbreviations(reader)
     else:
-        raise exceptions.IncorrectFileType(f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
+        raise exceptions.IncorrectFileType(
+            f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
     return abbs
+
 
 def generate_config(in_lang, out_lang, in_display_name, out_display_name):
     if is_ipa(in_lang):
@@ -293,7 +302,7 @@ def generate_config(in_lang, out_lang, in_display_name, out_display_name):
         out_type = 'dummy'
     else:
         out_type = 'custom'
-        
+
     mapping_fn = f'{in_lang}_to_{out_lang}.json'
     config = {
         'display_name': f"{in_display_name} {in_type} to {out_display_name} {out_type}",
@@ -304,6 +313,7 @@ def generate_config(in_lang, out_lang, in_display_name, out_display_name):
         'author': f"Generated {dt.datetime.now()}"
     }
     return config
+
 
 def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
     # read config
@@ -340,16 +350,20 @@ def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
         LOGGER.warn(
             f"Not writing generated files because a non-generated mapping from {config['in_lang']} to {config['out_lang']} already exists.")
 
+
 def is_ipa(lang: str) -> bool:
     pattern = re.compile('[-_]?ipa$')
     return bool(re.search(pattern, lang))
+
 
 def is_xsampa(lang: str) -> bool:
     pattern = re.compile('[-_]?x(-?)sampa$')
     return bool(re.search(pattern, lang))
 
+
 def is_dummy(lang: str) -> bool:
     return lang == 'dummy'
+
 
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):

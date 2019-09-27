@@ -41,6 +41,10 @@ class TransducerTest(TestCase):
             [cls.test_trans, cls.test_trans_rev])
         cls.test_trans_composite_2 = CompositeTransducer(
             [cls.test_trans_rev, cls.test_trans])
+        cls.test_regex_set_transducer_sanity = Transducer(
+            Mapping([{"in": "a", "out": "b", "context_before": "c"}]))
+        cls.test_regex_set_transducer = Transducer(
+            Mapping([{"in": "a", "out": "b", "context_before": "[cd]|[fgh]"}]))
 
     def test_ordered(self):
         transducer_i_feed = self.test_trans_ordered_feed('a', True)
@@ -80,6 +84,12 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_case_sensitive_transducer("'n"), "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'N"), "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'n"), "n̓")
+
+    def test_regex_set(self):
+        # https://github.com/roedoejet/g2p/issues/15
+        self.assertEqual(self.test_regex_set_transducer_sanity('ca'), 'cb')
+        self.assertEqual(self.test_regex_set_transducer('ca'), 'cb')
+        self.assertEqual(self.test_regex_set_transducer('fa'), 'fb')
 
 
 if __name__ == "__main__":
