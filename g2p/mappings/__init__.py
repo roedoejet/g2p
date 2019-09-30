@@ -13,6 +13,7 @@ from collections import defaultdict, OrderedDict
 from itertools import chain
 from pathlib import Path
 from operator import methodcaller
+from copy import deepcopy
 
 import yaml
 
@@ -135,16 +136,16 @@ class Mapping():
                 # sort by reverse len
                 mapping = sorted(mapping, key=lambda x: len(
                     x["in"]), reverse=True)
-            if kwarg == 'escape_special' and val:
+            elif kwarg == 'escape_special' and val:
                 mapping = [escape_special_characters(x) for x in mapping]
-            if kwarg == 'case_sensitive' and not val:
+            elif kwarg == 'case_sensitive' and not val:
                 mapping = self.lower_mappings(mapping)
-            if kwarg == 'norm_form' and val:
+            elif kwarg == 'norm_form' and val:
                 for io in mapping:
                     for k, v in io.items():
                         if isinstance(v, str):
                             io[k] = normalize(v, self.kwargs['norm_form'])
-            if kwarg == 'reverse' and val:
+            elif kwarg == 'reverse' and val:
                 mapping = self.reverse_mappings(mapping)
         # After all processing is done, turn into regex
         for io in mapping:
@@ -219,7 +220,7 @@ class Mapping():
             map_in_lang = mapping.get('in_lang', '')
             map_out_lang = mapping.get('out_lang', '')
             if map_in_lang == in_lang and map_out_lang == out_lang:
-                return mapping
+                return deepcopy(mapping)
         raise exceptions.MappingMissing(in_lang, out_lang)
 
     def find_mapping_by_id(self, map_id: str):
@@ -227,7 +228,7 @@ class Mapping():
         '''
         for mapping in MAPPINGS_AVAILABLE:
             if mapping.get('id', '') == map_id:
-                return mapping
+                return deepcopy(mapping)
 
     def mapping_to_file(self, output_path: str, file_type: str):
         ''' Write mapping to file
