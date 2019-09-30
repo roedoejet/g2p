@@ -4,7 +4,7 @@ from g2p import make_g2p
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.create_ipa_mapping import align_inventories
-from g2p.mappings.utils import generate_config, is_ipa, write_generated_mapping_to_file
+from g2p.mappings.utils import generate_config, is_ipa, write_generated_mapping_to_file, unicode_escape
 
 def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False):
     dummy_inventory = ["ɑ", "i", "u", "t", "s", "n"]
@@ -15,7 +15,7 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
         mapping = align_inventories(mapping.inventory(io), dummy_inventory)
     else:
         und_g2p = make_g2p('und', 'und-ipa')
-        mapping = [{"in": x, "out": und_g2p(unidecode(x).lower())} for x in mapping.inventory(io)]
+        mapping = [{"in": unicode_escape(x), "out": und_g2p(unidecode(x).lower())} for x in mapping.inventory(io)]
         dummy_list = align_inventories([x['out'] for x in mapping], dummy_inventory)
         dummy_dict = {}
         for x in dummy_list:
