@@ -66,8 +66,8 @@ def return_empty_mappings(n=DEFAULT_N):
 def hot_to_mappings(hot_data):
     ''' Parse data from HandsOnTable to Mapping format
     '''
-    return [{"context_before": x[2], "in": x[0], "context_after": x[3],
-             "out": x[1]} for x in hot_data if x[0] and x[1]]
+    return [{"context_before": str(x[2] or ''), "in": str(x[0] or ''), "context_after": str(x[3] or ''),
+             "out": str(x[1] or '')} for x in hot_data if x[0] and x[1]]
 
 @APP.route('/')
 def home():
