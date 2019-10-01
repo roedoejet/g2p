@@ -128,23 +128,23 @@ def load_from_workbook(language):
         new_io = {"in": "", "out": "",
                   "context_before": "", "context_after": ""}
         for col in entry:
-            if col.column == 'A':
+            if col.column == 'A' or col.column == 1:
                 value = col.value
                 if isinstance(value, (float, int)):
                     value = str(value)
                 new_io["in"] = value
-            if col.column == 'B':
+            if col.column == 'B' or col.column == 2:
                 value = col.value
                 if isinstance(value, (float, int)):
                     value = str(value)
                 new_io["out"] = value
-            if col.column == 'C':
+            if col.column == 'C' or col.column == 3:
                 if col.value is not None:
                     value = col.value
                     if isinstance(value, (float, int)):
                         value = str(value)
                     new_io["context_before"] = value
-            if col.column == 'D':
+            if col.column == 'D' or col.column == 4:
                 if col.value is not None:
                     value = col.value
                     if isinstance(value, (float, int)):

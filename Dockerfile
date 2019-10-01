@@ -8,6 +8,7 @@ RUN mkdir /g2p/g2p
 COPY g2p /g2p/g2p
 COPY requirements.txt /g2p
 COPY setup.py /g2p
+COPY README.md /g2p
 
 # Get Dependencies
 RUN apt-get update -y && apt-get install -y apt-transport-https
@@ -16,4 +17,4 @@ RUN pip3 install -r /g2p/requirements.txt
 RUN pip3 install gunicorn
 RUN pip3 install -e /g2p
 
-CMD gunicorn -k gevent -w 1 g2p:APP --bind 0.0.0.0:5000
+# CMD gunicorn -k gevent -w 1 g2p:APP --bind 0.0.0.0:5000
