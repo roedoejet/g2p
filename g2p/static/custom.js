@@ -166,11 +166,15 @@ var convert = function () {
 Handsontable.hooks.add('afterChange', convert)
 
 conversionSocket.on('conversion response', function (msg) {
-    $('#output').text(msg['output_string']);
+    $('#output').val(msg['output_string']);
 });
 
 connectionSocket.on('connection response', function (msg) {
     $('#log').text('(' + msg.data + ')')
+})
+
+connectionSocket.on('disconnect', function () {
+    $('#log').text('(Disconnected)')
 })
 
 tableSocket.on('table response', function (msg) {

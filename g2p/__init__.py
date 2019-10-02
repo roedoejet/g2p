@@ -122,7 +122,7 @@ def test_connect():
 def test_disconnect():
     """ Let client know disconnected
     """
-    print('client disconnected')
+    emit('connection response', {'data': 'Disconnected'})
 
 
 def make_g2p(in_lang: str, out_lang: str):
