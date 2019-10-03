@@ -67,7 +67,7 @@ def hot_to_mappings(hot_data):
     ''' Parse data from HandsOnTable to Mapping format
     '''
     return [{"context_before": str(x[2] or ''), "in": str(x[0] or ''), "context_after": str(x[3] or ''),
-             "out": str(x[1] or '')} for x in hot_data if x[0] and x[1]]
+             "out": str(x[1] or '')} for x in hot_data if x[0] or x[1]]
 
 @APP.route('/')
 def home():
