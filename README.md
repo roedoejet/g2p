@@ -117,6 +117,7 @@ This project exists thanks to all the people who contribute.
 
 [@littell](https://github.com/littell).
 [@finguist](https://github.com/finguist).
+[@joanise](https://github.com/joanise).
 [@eddieantonio](https://github.com/eddieantonio).
 [@dhdaines](https://github.com/dhdaines).
 
