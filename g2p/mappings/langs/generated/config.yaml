@@ -29,3 +29,9 @@ mappings:
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
+  - author: Generated 2019-10-03 17:05:30.225423
+    display_name: French IPA to English IPA
+    in_lang: fra-ipa
+    language_name: French
+    mapping: fra-ipa_to_eng-ipa.json
+    out_lang: eng-ipa

@@ -1,104 +1,104 @@
-ais	ɛ		\b
-est	ɛ		\b
-s			\b
-x			\b
-ent	e		\b
-nt	n		\b
-wagon	vagon		
-ez	é		\b
-er	é		\b
-b	b		
-ch	ʃ		
-sh	ʃ		
-s	z	Vowels	Vowels
-ss	s		
-s	s		
-c	s		[eiy]
-c	k		
-ç	s		
-d	d		
-f	f		
-ph	f		
-ge	ʒ		[aouɛ]
-g	ʒ		[eiy]
-gn	ɲ		
-gu	g		
-ng	ŋ		\b
-g	g		
-j	ʒ		
-k	k		
-ill	j	Vowels	
-ill	ij		
-ail	aj		\b
-eil	ɛj		\b
-ll	l		
-l	l		
-mm	m		
-m	m		
-nn	n		
-n	n		
-p	p		
-qu	k		
-q	k		
-rh	ʁ		
-rr	ʁ		
-r	ʁ		
-th	t		
-t	t		
-ti	si		[aeou][nm]
-v	v		
-w	w		
-x	ks		
-z	z		
-e			\b
-en	ɛn		Vowels
-en	ɑ̃		
-ein	ɛn		Vowels
-ein	ɛ̃		
-em	ɑ̃		[pb]
-an	ɑɑn		Vowels
-ant	ɑ̃		\b
-an	ɑ̃		
-am	ɑ̃		[pb]
-ɑɑ	ɑ		
-ain	ɛn		Vowels
-in	ɪn		Vowels
-ain	ɛ̃		
-in	ɛ̃		
-aim	ɛ̃		[pb]
-im	ɛ̃		[pb]
-ɪ	i		
-on	ɔn		Vowels
-om	ɔm		Vowels
-on	ɔ̃		
-om	ɔ̃		[pb]
-un	yyyn		Vowels
-un	œ̃		
-um	œ̃		[pb]
-um	œ̃		\b
-yyy	u		
-œu	œ		
-eu	ø		
-o	ɔ		[rnml]
-eau	o		
-au	o		
-ae	e		
-æ	e		
-e	ə		
-ai	e		
-é	e		
-aî	ɛː		
-à	a		
-â	ɑ		
-a	a		
-oin	wɛ		
-oi	wa		
-è	ɛ		
-ê	ɛː		
-ay	ɛj		Vowels
-ay	e		
-oy	waj		Vowels
-oy	wa		
-y	i		
-u	y		
-oy	u		
+ais,ɛ,,\b
+est,ɛ,,\b
+s,,,\b
+x,,,\b
+ent,e,,\b
+nt,n,,\b
+wagon,vagon,,
+ez,é,,\b
+er,é,,\b
+b,b,,
+ch,ʃ,,
+sh,ʃ,,
+s,z,Vowels,Vowels
+ss,s,,
+s,s,,
+c,s,,[eiy]
+c,k,,
+ç,s,,
+d,d,,
+f,f,,
+ph,f,,
+ge,ʒ,,[aouɛ]
+g,ʒ,,[eiy]
+gn,ɲ,,
+gu,g,,
+ng,ŋ,,\b
+g,g,,
+j,ʒ,,
+k,k,,
+ill,j,Vowels,
+ill,ij,,
+ail,aj,,\b
+eil,ɛj,,\b
+ll,l,,
+l,l,,
+mm,m,,
+m,m,,
+nn,n,,
+n,n,,
+p,p,,
+qu,k,,
+q,k,,
+rh,ʁ,,
+rr,ʁ,,
+r,ʁ,,
+th,t,,
+t,t,,
+ti,si,,[aeou][nm]
+v,v,,
+w,w,,
+x,ks,,
+z,z,,
+e,,,\b
+en,ɛn,,Vowels
+en,ɑ̃,,
+ein,ɛn,,Vowels
+ein,ɛ̃,,
+em,ɑ̃,,[pb]
+an,ɑɑn,,Vowels
+ant,ɑ̃,,\b
+an,ɑ̃,,
+am,ɑ̃,,[pb]
+ɑɑ,ɑ,,
+ain,ɛn,,Vowels
+in,ɪn,,Vowels
+ain,ɛ̃,,
+in,ɛ̃,,
+aim,ɛ̃,,[pb]
+im,ɛ̃,,[pb]
+ɪ,i,,
+on,ɔn,,Vowels
+om,ɔm,,Vowels
+on,ɔ̃,,
+om,ɔ̃,,[pb]
+un,yyyn,,Vowels
+un,œ̃,,
+um,œ̃,,[pb]
+um,œ̃,,\b
+yyy,u,,
+œu,œ,,
+eu,ø,,
+o,ɔ,,[rnml]
+eau,o,,
+au,o,,
+ae,e,,
+æ,e,,
+e,ə,,
+ai,e,,
+é,e,,
+aî,ɛː,,
+à,a,,
+â,ɑ,,
+a,a,,
+oin,wɛ,,
+oi,wa,,
+è,ɛ,,
+ê,ɛː,,
+ay,ɛj,,Vowels
+ay,e,,
+oy,waj,,Vowels
+oy,wa,,
+y,i,,
+u,y,,
+oy,u,,
