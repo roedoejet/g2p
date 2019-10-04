@@ -14,8 +14,12 @@ with open("g2p/_version.py", "r", encoding="UTF-8") as version_file:
     VERSION = namespace['VERSION'] + "." + build_no
 
 this_directory = path.abspath(path.dirname(__file__))
+
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+with open(path.join(this_directory, 'requirements.txt')) as f:
+    REQS = f.read().splitlines()
 
 setup(
     name='g2p',
@@ -30,14 +34,7 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     include_package_data=True,
-    install_requires=['openpyxl',
-                      'coloredlogs',
-                      'Flask',
-                      'flask_socketio',
-                      'flask-talisman',
-                      'pyyaml',
-                      'regex',
-                      'requests'],
+    install_requires=REQS,
     entry_points={
         'console_scripts': [
             'g2p = g2p.cli:cli'
