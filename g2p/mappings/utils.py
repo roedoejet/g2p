@@ -87,9 +87,9 @@ def create_fixed_width_lookbehind(pattern):
     '''Turn all characters into fixed width lookbehinds
     '''
     return re.sub(re.compile(r"""
-    (?<=\(?)            # lookbehind
-    [\[\]\p{L}\p{M}|]+  # match any number of Unicode characters and diacritics, plus square brackets
-    (?=\)?)             # lookahead
+    (?<=\(?)              # lookbehind
+    [\\\[\]\p{L}\p{M}|]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
+    (?=\)?)               # lookahead
     """, re.U | re.VERBOSE),
                   pattern_to_fixed_width_lookbehinds, pattern)
 
