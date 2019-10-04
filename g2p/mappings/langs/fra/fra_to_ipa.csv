@@ -1,4 +1,5 @@
 ais,ɛ,,\b
+aî,ɛː,,
 est,ɛ,,\b
 s,,,\b
 x,,,\b
@@ -7,6 +8,7 @@ nt,n,,\b
 wagon,vagon,,
 ez,é,,\b
 er,é,,\b
+è,ɛ,,
 b,b,,
 ch,ʃ,,
 sh,ʃ,,
@@ -50,7 +52,6 @@ v,v,,
 w,w,,
 x,ks,,
 z,z,,
-e,,,\b
 en,ɛn,,Vowels
 en,ɑ̃,,
 ein,ɛn,,Vowels
@@ -84,16 +85,15 @@ eau,o,,
 au,o,,
 ae,e,,
 æ,e,,
-e,ə,,
 ai,e,,
-é,e,,
-aî,ɛː,,
+é,e,,
+e,,,\b[^\0301]
+e,ʌ,,[^\0301]
 à,a,,
 â,ɑ,,
 a,a,,
 oin,wɛ,,
 oi,wa,,
-è,ɛ,,
 ê,ɛː,,
 ay,ɛj,,Vowels
 ay,e,,

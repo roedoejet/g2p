@@ -11,5 +11,5 @@ mappings:
     abbreviations: fra_abbs.csv
     as_is: true
     case_sensitive: false
-    norm_form: 'none'
+    norm_form: 'NFD'
     <<: *shared
