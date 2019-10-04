@@ -35,7 +35,12 @@ class LangTest(TestCase):
                 'out_lang': 'eng-arpabet',
                 "samples": [
                     ('Qneᴬ', 'HH N EY')
-                ]}
+                ]},
+            {'in_lang': 'fra-ipa',
+             'out_lang': 'eng-ipa',
+             "samples": [
+                         ('ʒ', 'ʒ')
+             ]},
         ]
 
         self.langs_to_test = git
@@ -51,6 +56,16 @@ class LangTest(TestCase):
                 # assert that the transduced first item in the tuple is equal to the second item in the tuple
                 self.assertEqual(transducer(sample[0]), sample[1])
 
+    def test_index(self):
+        # go through each language declared in the test case set up
+        for lang in self.langs_to_test:
+            in_lang = lang['in_lang']
+            out_lang = lang['out_lang']
+            transducer = make_g2p(in_lang, out_lang)
+            # go through each table in the current lang
+            for sample in lang['samples']:
+                # assert that the transduced first item in the tuple is equal to the second item in the tuple
+                self.assertEqual(transducer(sample[0], index=True)[0], sample[1])
 
 if __name__ == "__main__":
     main()

@@ -228,6 +228,8 @@ class Transducer():
                 rule_applied = False
                 # go through rules
                 for io in self.mapping:
+                    if not io['in'] and not io['out']:
+                        continue
                     io_copy = copy.deepcopy(io)
                     # find all matches.
                     for match in io_copy['match_pattern'].finditer(intermediate_conversion):
