@@ -52,18 +52,34 @@ def generate_mapping_network(path):
     plt.show()
 
 
+@click.option('--debugger/--no-debugger', default=False)
+@click.option('--index/--no-index', default=False)
 @click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('in_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('input_text', type=click.STRING)
 @cli.command()
-def convert(in_lang, out_lang, input_text):
+def convert(in_lang, out_lang, input_text, index, debugger):
     ''' Convert any text
     '''
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text) as f:
             input_text = f.read()
     transducer = make_g2p(in_lang, out_lang)
-    click.echo(transducer(input_text))
+    if not index and not debugger:
+        click.echo(transducer(input_text))
+    elif not index and debugger:
+        text, rules_applied = transducer(input_text, debugger=debugger)
+        click.echo(f"Transducer produced: {text}")
+        click.echo(f"The following rules were applied: {rules_applied}")
+    elif index and not debugger:
+        text, indices = transducer(input_text, index=index)
+        click.echo(f"Transducer produced: {text}")
+        click.echo(f"The transduction has the following indices: {indices.reduced()}")
+    elif index and debugger:
+        text, indices, rules_applied = transducer(input_text, index=index, debugger=debugger)
+        click.echo(f"Transducer produced: {text}")
+        click.echo(f"The transduction has the following indices: {indices.reduced()}")
+        click.echo(f"The following rules were applied: {rules_applied}")
 
 
 @cli.command()
