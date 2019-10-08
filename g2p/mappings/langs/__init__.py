@@ -38,16 +38,16 @@ def cache_langs():
     lang_network = Graph()
     lang_network.add_edges_from(mappings_legal_pairs)
 
-    with open(LANGS_NWORK_PATH, 'wb', encoding='utf8') as f:
+    with open(LANGS_NWORK_PATH, 'wb') as f:
         write_gpickle(lang_network, f)
 
-    with open(LANGS_PKL, 'wb', encoding='utf8') as f:
+    with open(LANGS_PKL, 'wb') as f:
         pickle.dump(langs, f)
 
     return langs
 
 # Cache mappings as pickle file for quick loading
-with open(LANGS_PKL, 'rb', encoding='utf8') as f:
+with open(LANGS_PKL, 'rb') as f:
     LANGS = pickle.load(f)
 
 LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)

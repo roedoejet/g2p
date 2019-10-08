@@ -59,10 +59,10 @@ Then, call it with an argument for `in_lang` and `out_lang`. Both must be string
 ```python
 >>> transducer = make_g2p('dan', 'eng-arpabet')
 >>> transducer('hej')
-HH EH Y
+'HH EH Y'
 ```
 
-There must be a valid path between the `in_lang` and `out_lang` in order for this to work. If you've added a custom mapping, you must update g2p to include it: `g2p update`
+There must be a valid path between the `in_lang` and `out_lang` in order for this to work. If you've edited a mapping or added a custom mapping, you must update g2p to include it: `g2p update`
 
 ## CLI
 
