@@ -12,7 +12,7 @@ class MappingTest(TestCase):
 
     def setUp(self):
         self.test_mapping_norm = Mapping([{'in': '\u0061\u0301', 'out': '\u0061\u0301'}])
-        with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json')) as f:
+        with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json'), encoding='utf8') as f:
             self.json_map = json.load(f)
     
     def test_normalization(self):

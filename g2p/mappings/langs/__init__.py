@@ -23,7 +23,7 @@ def cache_langs():
     mappings_legal_pairs = []
     for path in paths:
         code = path.parent.stem
-        with open(path) as f:
+        with open(path, encoding='utf8') as f:
             data = yaml.safe_load(f)
         # If there is a mappings key, there is more than one mapping
         # TODO: should put in some measure to prioritize non-generated mappings and warn when they override
@@ -38,16 +38,16 @@ def cache_langs():
     lang_network = Graph()
     lang_network.add_edges_from(mappings_legal_pairs)
 
-    with open(LANGS_NWORK_PATH, 'wb') as f:
+    with open(LANGS_NWORK_PATH, 'wb', encoding='utf8') as f:
         write_gpickle(lang_network, f)
 
-    with open(LANGS_PKL, 'wb') as f:
+    with open(LANGS_PKL, 'wb', encoding='utf8') as f:
         pickle.dump(langs, f)
 
     return langs
 
 # Cache mappings as pickle file for quick loading
-with open(LANGS_PKL, 'rb') as f:
+with open(LANGS_PKL, 'rb', encoding='utf8') as f:
     LANGS = pickle.load(f)
 
 LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)

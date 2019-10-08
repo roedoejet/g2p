@@ -8,17 +8,17 @@ build_no = dt.datetime.today().strftime('%Y%m%d')
 
 # Ugly hack to read the current version number without importing g2p:
 # (works by )
-with open("g2p/_version.py", "r", encoding="UTF-8") as version_file:
+with open("g2p/_version.py", "r", encoding="utf8") as version_file:
     namespace = {}
     exec(version_file.read(), namespace)
     VERSION = namespace['VERSION'] + "." + build_no
 
 this_directory = path.abspath(path.dirname(__file__))
 
-with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+with open(path.join(this_directory, 'README.md'), encoding='utf8') as f:
     long_description = f.read()
 
-with open(path.join(this_directory, 'requirements.txt')) as f:
+with open(path.join(this_directory, 'requirements.txt'), encoding='utf8') as f:
     REQS = f.read().splitlines()
 
 setup(

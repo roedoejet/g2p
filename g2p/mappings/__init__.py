@@ -241,10 +241,10 @@ class Mapping():
         filtered = [{k: v for k, v in io.items() if k in fieldnames}
                     for io in self.mapping]
         if file_type == 'json':
-            with open(fn, 'w') as f:
+            with open(fn, 'w', encoding='utf8') as f:
                 json.dump(filtered, f, indent=4)
         elif file_type == 'csv':
-            with open(fn, 'w') as f:
+            with open(fn, 'w', encoding='utf8') as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
                 for io in filtered:
                     writer.writerow(io)
@@ -273,7 +273,7 @@ class Mapping():
                 self.kwargs.get('out_lang', 'und') + "." + mapping_type
             }
         ]}
-        with open(fn, 'w') as f:
+        with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,
                       default_flow_style=False)
 

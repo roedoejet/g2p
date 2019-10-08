@@ -196,7 +196,7 @@ def load_from_file(path: str) -> list:
     elif path.endswith('xlsx'):
         mapping = load_from_workbook(path)
     elif path.endswith('json'):
-        with open(path) as f:
+        with open(path, encoding='utf8') as f:
             mapping = json.load(f)
     return validate(mapping)
 
@@ -209,7 +209,7 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
     # If path leads to actual mapping config
     if path.exists() and (path.suffix.endswith('yml') or path.suffix.endswith('yaml')):
         # safe load it
-        with open(path) as f:
+        with open(path, encoding='utf8') as f:
             mapping = yaml.safe_load(f)
         # If more than one mapping in the mapping config
         if 'mappings' in mapping:
@@ -323,7 +323,7 @@ def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
     # write mapping
     if os.path.exists(map_output_path):
         LOGGER.info(f"Overwriting file at {map_output_path}")
-    with open(map_output_path, 'w') as f:
+    with open(map_output_path, 'w', encoding='utf8') as f:
         json.dump(mapping, f, indent=4)
     data = deepcopy(data)
     cfg_exists = bool([x for x in data['mappings'] if x['in_lang']
@@ -335,14 +335,14 @@ def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
     elif not cfg_exists:
         data['mappings'].append(config)
         # rewrite config
-        with open(GEN_CONFIG, 'w') as f:
+        with open(GEN_CONFIG, 'w', encoding='utf8') as f:
             yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
     elif cfg_exists:
         for i, cfg in enumerate(data['mappings']):
             if cfg['in_lang'] == config['in_lang'] and cfg['out_lang'] == config['out_lang']:
                 data['mappings'][i] = config
                 # rewrite config
-                with open(GEN_CONFIG, 'w') as f:
+                with open(GEN_CONFIG, 'w', encoding='utf8') as f:
                     yaml.dump(data, f, Dumper=IndentDumper,
                               default_flow_style=False)
                 break
