@@ -22,3 +22,6 @@ log.txt
 htmlcov
 
 flask_session
+
+# Sphinx documentation
+docs/_build/
