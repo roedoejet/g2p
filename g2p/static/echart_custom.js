@@ -51,7 +51,7 @@ $(document).ready(function () {
     });
 
     $(window).trigger('resize');
-    var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
+    var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
     var convert = function () {
         var input_string = $('#indexInput').val();
         if (input_string) {

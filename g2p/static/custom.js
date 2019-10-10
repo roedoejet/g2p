@@ -145,9 +145,9 @@ var setKwargs = function (kwargs) {
     convert()
 }
 
-var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
-var connectionSocket = io.connect('http://' + document.domain + ':' + location.port + '/connect');
-var tableSocket = io.connect('http://' + document.domain + ':' + location.port + '/table');
+var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
+var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
+var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
 var convert = function () {
     var input_string = $('#input').val();

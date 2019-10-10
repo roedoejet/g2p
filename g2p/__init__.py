@@ -5,6 +5,8 @@ Views and config to the g2p Studio web app
 """
 import sys
 import io
+import os
+import yaml
 
 from networkx import shortest_path
 from networkx.exception import NetworkXNoPath
@@ -28,6 +30,11 @@ if sys.stderr.encoding != 'utf8':
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 APP = Flask(__name__)
+
+# with open(os.path.join(os.path.dirname(__file__), 'csp.yaml')) as f:
+#     CSP = yaml.load(f)['csp']
+  
+# Talisman(APP, content_security_policy=CSP)
 CORS(APP)
 SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
