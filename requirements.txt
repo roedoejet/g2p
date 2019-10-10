@@ -1,10 +1,12 @@
 openpyxl
 click
 coloredlogs
+eventlet
 flask-cors
 Flask>=1.0.2
 flask_socketio
 flask-talisman
+gunicorn
 networkx
 panphon
 pyyaml
