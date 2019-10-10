@@ -1,7 +1,7 @@
 openpyxl
 click
 coloredlogs
-Flask
+Flask>=1.0.2
 flask_socketio
 flask-talisman
 networkx
