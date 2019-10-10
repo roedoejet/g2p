@@ -83,7 +83,7 @@ Ex. `g2p generate-mapping dan --ipa` will produce a mapping from `dan-ipa` to `e
 
 ## Studio
 
-You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit ***** or run it locally using `python run_studio.py`. 
+You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally using `python run_studio.py`. 
 
 Alternatively, you can run the app from the command line: `g2p run`.
 

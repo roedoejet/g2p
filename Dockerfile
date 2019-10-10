@@ -17,4 +17,6 @@ RUN pip3 install -r /g2p/requirements.txt
 RUN pip3 install gunicorn
 RUN pip3 install -e /g2p
 
-# CMD gunicorn -k gevent -w 1 g2p:APP --bind 0.0.0.0:5000
+# Runs the app on $PORT. 
+# Comment this out if you just want to install g2p in the container without running the studio.
+CMD gunicorn -k gevent -w 1 g2p:APP --bind 0.0.0.0:$PORT
