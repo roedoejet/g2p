@@ -9,6 +9,7 @@ import io
 from networkx import shortest_path
 from networkx.exception import NetworkXNoPath
 from flask import Flask, render_template
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
 
@@ -27,6 +28,7 @@ if sys.stderr.encoding != 'utf8':
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 APP = Flask(__name__)
+CORS(APP)
 SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
 
