@@ -4,6 +4,7 @@ coloredlogs
 Flask>=1.0.2
 flask_socketio
 flask-talisman
+gevent
 networkx
 panphon
 pyyaml
