@@ -29,3 +29,9 @@ mappings:
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
+  - author: Generated 2019-10-21 15:36:28.357631
+    display_name: Ojibway IPA to English IPA
+    in_lang: oji-ipa
+    language_name: Ojibway
+    mapping: oji-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
