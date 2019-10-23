@@ -1,13 +1,13 @@
 <<: &shared
-  language_name: Ojibway
+  language_name: Algonquin
 mappings:
-  - display_name: Ojibway to IPA
-    in_lang: oji
-    out_lang: oji-ipa
+  - display_name: Algonquin to IPA
+    in_lang: alq
+    out_lang: alq-ipa
     authors:
       - Eric Joanis
     type: mapping
-    mapping: oji_to_ipa.csv
+    mapping: alq_to_ipa.csv
     as_is: true
     case_sensitive: false
     norm_form: 'NFD'
