@@ -29,9 +29,9 @@ mappings:
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - author: Generated 2019-10-21 16:09:45.286955
-    display_name: Ojibway IPA to English IPA
-    in_lang: oji-ipa
-    language_name: Ojibway
-    mapping: oji-ipa_to_eng-ipa.json
+  - author: Generated 2019-10-23 11:18:26.278696
+    display_name: Algonquin IPA to English IPA
+    in_lang: alq-ipa
+    language_name: Algonquin
+    mapping: alq-ipa_to_eng-ipa.json
     out_lang: eng-ipa
