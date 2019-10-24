@@ -3,17 +3,11 @@
 mappings:
   - display_name: SENĆOŦEN to IPA
     mapping: str_to_ipa.json
-    in_lang: str-sen
-    out_lang: str-sen-ipa
+    in_lang: str
+    out_lang: str-ipa
     as_is: true
-    authors:
-      - Aidan Pine
-    <<: *shared
-  - display_name: SENĆOŦEN IPA to English IPA
-    mapping: str-sen-ipa_to_eng-ipa.json
-    in_lang: str-sen-ipa
-    out_lang: eng-ipa
-    as_is: false
+    norm_form: NFD
+    case_sensitive: false
     authors:
       - Aidan Pine
     <<: *shared

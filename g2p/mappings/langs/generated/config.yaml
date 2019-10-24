@@ -29,3 +29,9 @@ mappings:
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
+  - author: Generated 2019-10-24 16:21:41.605592
+    display_name: "SEN\u0106O\u0166EN IPA to English IPA"
+    in_lang: str-ipa
+    language_name: "SEN\u0106O\u0166EN"
+    mapping: str-ipa_to_eng-ipa.json
+    out_lang: eng-ipa

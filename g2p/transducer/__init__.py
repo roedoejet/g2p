@@ -132,9 +132,12 @@ class Transducer():
             # TODO: do we need intermediate output?
             for index, input_char in enumerate(input_string):
                 # prevent feeding rules from leaving traces
-                if original_str[index + input_index] == input_char:
-                    new_input[input_index + index] = {'input_string': input_char,
-                                                      'output': new_output}
+                try:
+                    if original_str[index + input_index] == input_char:
+                        new_input[input_index + index] = {'input_string': input_char,
+                                                        'output': new_output}
+                except IndexError:
+                    breakpoint()
 
             return {**intermediate_index, **new_input}
 
