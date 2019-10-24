@@ -132,7 +132,7 @@ class Transducer():
             # TODO: do we need intermediate output?
             for index, input_char in enumerate(input_string):
                 # prevent feeding rules from leaving traces
-                # TODO: This will give an index error if one of the rules contains a regex
+                # FIXME: This will give an index error if one of the rules contains a regex
                 #       like a|b -> c because the index for the input will be the length (3) 
                 #       instead of just 1 (either side of the | operator). This should be fixed.
                 #       https://github.com/roedoejet/g2p/issues/9
