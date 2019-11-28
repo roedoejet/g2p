@@ -34,6 +34,7 @@ mappings:
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
     mapping: str-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
   - author: Generated 2019-10-23 11:18:26.278696
     display_name: Algonquin IPA to English IPA
     in_lang: alq-ipa
