@@ -50,14 +50,12 @@
     "out": "eː"
   },
   {
-    "in": "én:",
-    "out": "ẽː",
-    "context_after": "CONSONANT"
+    "in": "én:",
+    "out": "ẽː"
   },
   {
-    "in": "èn:",
-    "out": "ẽː",
-    "context_after": "CONSONANT"
+    "in": "èn",
+    "out": "ẽː"
   },
   {
     "in": "i",
@@ -78,10 +76,6 @@
   {
     "in": "ì:",
     "out": "iː"
-  },
-  {
-    "in": "i",
-    "out": "i"
   },
   {
     "in": "k",
@@ -123,13 +117,11 @@
   },
   {
     "in": "ón:",
-    "out": "õː",
-    "context_after": "CONSONANT"
+    "out": "õː"
   },
   {
     "in": "òn:",
-    "out": "õː",
-    "context_after": "CONSONANT"
+    "out": "õː"
   },
   {
     "in": "ò:",
