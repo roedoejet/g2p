@@ -57,9 +57,9 @@ def normalize(inp: str, norm_form: str):
     ''' Normalize to NFC(omposed) or NFD(ecomposed).
         Also, find any Unicode Escapes & decode 'em!
     '''
-    if norm_form not in ['none', 'NFC', 'NFD', 'NKFC', 'NKFD']:
+    if norm_form not in ['none', 'NFC', 'NFD', 'NFKC', 'NFKD']:
         raise exceptions.InvalidNormalization(normalize)
-    elif norm_form == 'none':
+    elif norm_form is None or norm_form == 'none':
         return inp
     else:
         normalized = ud.normalize(norm_form, unicode_escape(inp))
