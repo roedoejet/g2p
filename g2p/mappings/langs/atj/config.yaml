@@ -5,6 +5,7 @@ mappings:
     in_lang: atj
     out_lang: atj-ipa
     type: mapping
+    case_sensitive: false
     authors:
       - David Huggines Daines
       - Patrick Littell
