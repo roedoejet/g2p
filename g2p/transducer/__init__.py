@@ -264,9 +264,6 @@ class Transducer():
                             if non_null_index:
                                 rule_applied = True
                                 new_index = {**new_index, **non_null_index}
-                        # if you've gone past the input_index, you can safely break from the loop
-                        elif match_index > input_index:
-                            break
                 # increase the index counters
                 # new_index = self.convert_index_to_tuples(new_index)
                 # if the rule applied
