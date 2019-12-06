@@ -52,18 +52,20 @@ def generate_mapping_network(path):
     plt.show()
 
 
+@click.option('--index/--no-index', default=False)
+@click.option('--debugger/--no-debugger', default=False)
 @click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('in_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('input_text', type=click.STRING)
 @cli.command()
-def convert(in_lang, out_lang, input_text):
+def convert(in_lang, out_lang, input_text, debugger, index):
     ''' Convert any text
     '''
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
     transducer = make_g2p(in_lang, out_lang)
-    click.echo(transducer(input_text))
+    click.echo(transducer(input_text, index=index, debugger=debugger))
 
 
 @cli.command()
