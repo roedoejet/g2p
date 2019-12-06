@@ -26,10 +26,10 @@ class LangTest(TestCase):
                     ("K̲'ay", 'K HH AE Y'),
                     ("guts'uusgi'y", 'G UW T S HH UW S G IY HH Y')
                 ]},
-            {'in_lang': 'str-sen',
+            {'in_lang': 'str',
                 'out_lang': 'eng-arpabet',
                 "samples": [
-                    ('X̱I¸ÁM¸', 'SH W IY HH EY M HH')
+                    ('X̱I¸ÁM¸', 'SH W IY HH AH M HH')
                 ]},
             {'in_lang': 'ctp',
                 'out_lang': 'eng-arpabet',
