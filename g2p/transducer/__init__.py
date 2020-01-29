@@ -1,36 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Example Google style docstrings.
-
-This module demonstrates documentation as specified by the `Google Python
-Style Guide`_. Docstrings may extend over multiple lines. Sections are created
-with a section header and a colon followed by a block of indented text.
-
-Example:
-    Examples can be given using either the ``Example`` or ``Examples``
-    sections. Sections support any reStructuredText formatting, including
-    literal blocks::
-
-        $ python example_google.py
-
-Section breaks are created by resuming unindented text. Section breaks
-are also implicitly created anytime a new section starts.
-
-Attributes:
-    module_level_variable1 (int): Module level variables may be documented in
-        either the ``Attributes`` section of the module docstring, or in an
-        inline docstring immediately following the variable.
-
-        Either form is acceptable, but the two should not be mixed. Choose
-        one convention to document module level variables and be consistent
-        with it.
-
-Todo:
-    * For module TODOs
-    * You have to also use ``sphinx.ext.todo`` extension
-
-.. _Google Python Style Guide:
-   http://google.github.io/styleguide/pyguide.html
-
+"""
+This module contains the Transducer and CompositeTransducer classes 
+which are responsible for performing transductions in the g2p library.
 """
 
 import re
@@ -228,10 +199,11 @@ class Transducer():
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
-            For example, a rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
-            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
-            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
-            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+            Example:
+                A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
+                It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
+                For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
+                Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
         
         Args:
             input_string (str): an input string.
