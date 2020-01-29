@@ -1,6 +1,7 @@
 import os
 import click
 import yaml
+from pprint import PrettyPrinter as pp
 from flask.cli import FlaskGroup
 from collections import OrderedDict
 from networkx import draw
@@ -65,7 +66,11 @@ def convert(in_lang, out_lang, input_text, debugger, index):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
     transducer = make_g2p(in_lang, out_lang)
-    click.echo(transducer(input_text, index=index, debugger=debugger))
+    if debugger:
+        printer = pp(indent=4)
+        printer.pprint(transducer(input_text, index=index, debugger=debugger))
+    else:
+        click.echo(transducer(input_text, index=index, debugger=debugger))
 
 
 @cli.command()

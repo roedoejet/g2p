@@ -93,8 +93,23 @@ class Mapping():
     def __call__(self):
         return self.mapping
 
+
     def __iter__(self):
         return iter(self.mapping)
+
+    def __getitem__(self, item):
+        if isinstance(item, int):  # item is an integer
+            return self.mapping[item]
+        if isinstance(item, slice):  # item is a slice
+            return self.mapping[item.start or 0:item.stop or len(self.mapping)]
+        else:  # invalid index type
+            raise TypeError('{cls} indices must be integers or slices, not {idx}'.format(
+                cls=type(self).__name__,
+                idx=type(item).__name__,
+            ))
+
+    def index(self, item):
+        return self.mapping.index(item)
 
     def inventory(self, in_or_out: str = 'in'):
         ''' Return just inputs or outputs as inventory of mapping
