@@ -34,7 +34,8 @@ class LangTest(TestCase):
             {'in_lang': 'ctp',
                 'out_lang': 'eng-arpabet',
                 "samples": [
-                    ('Qneᴬ', 'HH N EY')
+                    ('Qneᴬ', 'HH N EY'),
+                    ('ntkwaᴶ', 'N T K W AA')
                 ]}
         ]
 
