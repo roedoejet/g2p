@@ -84,9 +84,24 @@ class Transducer():
         Returns:
             The return value. True for success, False otherwise.
         """
-        for c in index_change_log:
-            if c[0] <= i:
-                i -= c[1]
+        index_change_log = copy.deepcopy(index_change_log)
+        diff = 0
+        reversed_changes = [x for x in reversed(index_change_log)]
+        for c_i, change in enumerate(reversed_changes):
+            if change[0] <= i:
+                if abs(change[1]) == 1: 
+                    i -= change[1]
+                elif abs(change[1]) == 0:
+                    continue
+                elif change[1] > 1 and i >= change[0] + change[1] - 1:
+                    i -= change[1]
+                elif change[1] < -1 and i >= change[0] + change[1] + 1:
+                    i -= change[1]
+                else:
+                    i -= min(change[1], i - change[0] + 1)
+                for next_change in reversed_changes[c_i:]:
+                    if next_change[0] >= change[0]:
+                        next_change[0] -= change[1]
         return i
 
     @staticmethod
@@ -103,12 +118,18 @@ class Transducer():
         Returns:
             Index: Changed Index
         """
-        
         indices = copy.deepcopy(indices)
         if diff != 0:
+            # For outputs with more than one value
+            # if the increment is positive, we reverse order the output keys
+            # if the increment is negative, we forward order the output keys
+            if diff > 0:
+                reverse = True
+            else:
+                reverse = False
             for k, v in indices.items():
                 if k not in range(threshold[0], threshold[1]):
-                    for k_o in sorted([x for x in v['output'].keys()], reverse=True):
+                    for k_o in sorted([x for x in v['output'].keys()], reverse=reverse):
                         if k_o >= start:
                             indices[k]['output'][k_o +
                                                  diff] = indices[k]['output'].pop(k_o)
@@ -268,6 +289,7 @@ class Transducer():
                                a tuple with the converted string and corresponding rules (index=False, debugger=True),
                                a tuple with the converted string, indices and rules (index=True, debugger=True)
         """
+        original = to_convert
         
         # Convert input as necessary
         if not self.case_sensitive:
@@ -294,12 +316,12 @@ class Transducer():
                 intermediate_to_convert = converted
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
-                start_origin = start
-                end_origin = end
-                for item in index_change_log:
-                    if item[0] < start:
-                        start_origin -= item[1]
-                        end_origin -= item[1]
+                start_origin = self.get_offset_index(start, index_change_log)
+                end_origin = self.get_offset_index(end, index_change_log)
+                # for item in index_change_log:
+                #     if item[0] < start:
+                #         start_origin -= item[1]
+                #         end_origin -= item[1]
                 # Add delimiter
                 if self.out_delimiter:
                     # if not delimited and not end segment, add delimiter
@@ -325,6 +347,7 @@ class Transducer():
                     rules_applied.append(applied_rule)
                 # update intermediate converted form
                 converted = intermediate_form
+                
                 # get the new index tuple
                 if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(io['out'])):
                     new_index = self.explicit_indices(
@@ -374,8 +397,7 @@ class Transducer():
                     for k, v in dupes.items():
                         if v > 1:
                             diff = -(v - 1)
-                            indices = self.return_incremented_indices(
-                                indices, (min(inputs), max(inputs)+1), k, diff)
+                            indices = self.return_incremented_indices(indices, (min(inputs), max(inputs)+1), k, diff)
                             for item in index_change_log:
                                 if item[0] >= k:
                                     item[0] += diff
