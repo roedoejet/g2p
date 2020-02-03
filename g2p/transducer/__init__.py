@@ -121,8 +121,8 @@ class Transducer():
         indices = copy.deepcopy(indices)
         if diff != 0:
             # For outputs with more than one value
-            # if the increment is positive, we reverse order the output keys
-            # if the increment is negative, we forward order the output keys
+            # if increment, we reverse order the output keys
+            # if decrement, we forward order the output keys
             if diff > 0:
                 reverse = True
             else:
@@ -235,7 +235,6 @@ class Transducer():
         Returns:
             Index: 
         """
-
         new_input = {}
         input_char_matches = [x.group()
                               for x in self._char_match_pattern.finditer(input_string)]
@@ -251,20 +250,30 @@ class Transducer():
         outputs = [{'match_index': m, 'string': output_char_matches[i]}
                    for i, m in enumerate(output_match_indices)]
         for match_index in input_match_indices:
-            # Get strings from inputs if they match the match_index
-            explicit_inputs = [x['string']
-                               for x in inputs if x['match_index'] == match_index]
-            # Get strings from outputs if they match the match_index
-            explicit_outputs = [x['string']
-                                for x in outputs if x['match_index'] == match_index]
+            prev_input = ''
+            # Get single character strings from inputs if they match the match_index
+            explicit_inputs = []
             # Get offset for inputs by adding the length of the input string up to the match
             # plus the overall input index/offset
-            explicit_input_offsets = [
-                len(''.join([x['string'] for x in inputs[:i]])) + input_index for i, v in enumerate(inputs) if v['match_index'] == match_index]
+            explicit_input_offsets = []
+            for v in inputs:
+                if v['match_index'] == match_index:
+                    for y_i, y_v in enumerate(v['string']):
+                        explicit_inputs.append(y_v)
+                        explicit_input_offsets.append(len(prev_input) + input_index + y_i)
+                prev_input += v['string']
+            prev_output = ''
+            # Get single character strings from outputs if they match the match_index
+            explicit_outputs = []
             # Get offset for outputs by adding the length of the output string up to the match
             # plus the overall output index/offset
-            explicit_output_offsets = [
-                len(''.join([x['string'] for x in outputs[:i]])) + output_index for i, v in enumerate(outputs) if v['match_index'] == match_index]
+            explicit_output_offsets = []
+            for v in outputs:
+                if v['match_index'] == match_index:
+                    for y_i, y_v in enumerate(v['string']):
+                        explicit_outputs.append(y_v)
+                        explicit_output_offsets.append(len(prev_output) + output_index + y_i)
+                prev_output += v['string']
             # Use default mapping to zip them up
             explicit_index = self.return_default_mapping(
                 explicit_inputs, explicit_outputs, explicit_input_offsets, explicit_output_offsets)
@@ -317,11 +326,6 @@ class Transducer():
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
                 start_origin = self.get_offset_index(start, index_change_log)
-                end_origin = self.get_offset_index(end, index_change_log)
-                # for item in index_change_log:
-                #     if item[0] < start:
-                #         start_origin -= item[1]
-                #         end_origin -= item[1]
                 # Add delimiter
                 if self.out_delimiter:
                     # if not delimited and not end segment, add delimiter
