@@ -71,7 +71,6 @@
         <div class='row'>
             <div class='columns six'>
                 <h4>Languages</h4>
-                <!-- <h6>Input</h6> -->
                 <select id="langselect">
                     <option value="custom">Custom</option>
                     {% for k, v in langs.items() %}
@@ -83,19 +82,6 @@
                     {% endfor %}
                     {% endfor %}
                 </select>
-                <!-- <h6>Output</h6>
-                <select id="langselect">
-                    <option value="custom">Custom</option>
-                    {% for k, v in langs.items() %}
-                    {% for mapping in v['mappings'] %}
-                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ k }} -
-                        {{ mapping['language_name'] }}
-                        - {{ mapping['display_name'] }}
-                    </option>
-                    {% endfor %}
-                    {% endfor %}
-                </select> -->
-
             </div>
             <div class='columns six mg-top'>
                 <form id='settings-form'>
