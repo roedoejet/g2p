@@ -220,12 +220,14 @@ class IndicesTest(TestCase):
             transducer_lite[0], 'ccccc')
         transducer = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
+
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
-        self.assertEqual(transducer[1](), [
-            ((0, '😀'), (4, '😄')),
-            ((1, '😃😄'), (0, '😄😄😄')),
-            ((3, '😄'), (3, '😄'))])
+        self.assertEqual(transducer[1](), [((0, '😀'), (4, '😄')),
+                                           ((1, '😃'), (0, '😄')),
+                                           ((2, '😄'), (1, '😄')),
+                                           ((2, '😄'), (2, '😄')),
+                                           ((3, '😄'), (3, '😄'))])
 
     def test_circum(self):
         """ Test circumfixing
@@ -292,8 +294,8 @@ class IndicesTest(TestCase):
                                            ((3, 't'), (3, 't'))])
 
     def test_case_long_six(self):
-        # transducer_no_i = self.trans_six('esesse')
-        # self.assertEqual(transducer_no_i, 'sesese')
+        transducer_no_i = self.trans_six('esesse')
+        self.assertEqual(transducer_no_i, 'sesese')
         transducer = self.trans_six('esesse', True)
         self.assertEqual(transducer[0], 'sesese')
 
