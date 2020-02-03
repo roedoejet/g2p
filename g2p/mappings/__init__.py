@@ -28,9 +28,9 @@ from g2p.log import LOGGER
 class Mapping():
     """ Class for lookup tables
 
-        @param as_is: bool = False
+        @param as_is: bool = True
             Evaluate g2p rules in mapping in the order they are.
-            Default is to reverse sort them by length.
+            If False, rules will be reverse sorted by length.
 
         @param case_sensitive: bool = True
             Lower all rules and conversion input
@@ -137,7 +137,7 @@ class Mapping():
         '''
         # Add defaults
         if 'as_is' not in self.kwargs:
-            self.kwargs['as_is'] = False
+            self.kwargs['as_is'] = True
         if 'case_sensitive' not in self.kwargs:
             self.kwargs['case_sensitive'] = True
         if 'escape_special' not in self.kwargs:
@@ -280,7 +280,7 @@ class Mapping():
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', ['generated']),
-                "as_is": self.kwargs.get('as_is', False),
+                "as_is": self.kwargs.get('as_is', True),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
                 "norm_form": self.kwargs.get('norm_form', "NFD"),

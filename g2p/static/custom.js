@@ -111,14 +111,12 @@ document.getElementById('reverse').addEventListener('click', function (event) {
 })
 
 document.getElementById('standard-radio').addEventListener('click', function (event) {
-    $('#animated').hide()
-    $('#standard').show()
-})
-
-document.getElementById('animated-radio').addEventListener('click', function (event) {
-    $('#standard').hide()
-    $('#animated').show()
-    $(window).trigger('resize');
+    if ($('#standard').is(":hidden")) {
+        $('#input').val($('#indexInput').val())
+        convert()
+        $('#animated').hide()
+        $('#standard').show()
+    }
 })
 
 var getKwargs = function () {

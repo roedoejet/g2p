@@ -65,6 +65,15 @@ $(document).ready(function () {
             });
         }
     }
+    document.getElementById('animated-radio').addEventListener('click', function (event) {
+        if ($('#animated').is(":hidden")) {
+            $('#indexInput').val($('#input').val())
+            convert()
+            $('#standard').hide()
+            $('#animated').show()
+            $(window).trigger('resize');
+        }
+    })
     // Convert after any changes to tables
     Handsontable.hooks.add('afterChange', convert)
     
