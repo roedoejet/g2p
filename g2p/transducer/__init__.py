@@ -121,8 +121,8 @@ class Transducer():
         indices = copy.deepcopy(indices)
         if diff != 0:
             # For outputs with more than one value
-            # if the increment is positive, we reverse order the output keys
-            # if the increment is negative, we forward order the output keys
+            # if increment, we reverse order the output keys
+            # if decrement, we forward order the output keys
             if diff > 0:
                 reverse = True
             else:
@@ -326,11 +326,6 @@ class Transducer():
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
                 start_origin = self.get_offset_index(start, index_change_log)
-                end_origin = self.get_offset_index(end, index_change_log)
-                # for item in index_change_log:
-                #     if item[0] < start:
-                #         start_origin -= item[1]
-                #         end_origin -= item[1]
                 # Add delimiter
                 if self.out_delimiter:
                     # if not delimited and not end segment, add delimiter
