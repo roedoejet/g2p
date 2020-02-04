@@ -85,7 +85,6 @@ class Transducer():
             The return value. True for success, False otherwise.
         """
         index_change_log = copy.deepcopy(index_change_log)
-        diff = 0
         reversed_changes = [x for x in reversed(index_change_log)]
         for c_i, change in enumerate(reversed_changes):
             if change[0] <= i:
@@ -280,11 +279,17 @@ class Transducer():
             new_input = {**new_input, **explicit_index}
         return new_input
 
-    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False) -> Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
+    def apply_rules(self, to_convert: str,
+                          index: bool = False,
+                          debugger: bool = False):
         """ Apply all the rules in self.mapping sequentially.
-            Each rule in self.mapping is executed fully across the string (`to_convert`) before going to the next rules.
-            Therefore, rules should be thought of as Phonological Rewrite Rules (https://en.wikipedia.org/wiki/Phonological_rule).
-            Rules are also therefore susceptible to Bleeding/Feeding/CounterBleeding/CounterFeeding relationships (https://linguistics.stackexchange.com/questions/6084/whats-the-difference-between-counterbleeding-bleeding-and-feeding)
+            Each rule in self.mapping is executed fully across the string (`to_convert`)
+            before going to the next rules.
+            Therefore, rules should be thought of as Phonological Rewrite Rules
+            (https://en.wikipedia.org/wiki/Phonological_rule).
+            Rules are also therefore susceptible to
+            Bleeding/Feeding/CounterBleeding/CounterFeeding relationships
+            (https://linguistics.stackexchange.com/questions/6084/whats-the-difference-between-counterbleeding-bleeding-and-feeding)
         
         Args:
             to_convert (str): The string to convert.
@@ -293,12 +298,12 @@ class Transducer():
         
         Returns:
             Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
-                Either returns a plain string (index=False, debugger=False),
-                               a tuple with the converted string and indices (index=True, debugger=False),
-                               a tuple with the converted string and corresponding rules (index=False, debugger=True),
-                               a tuple with the converted string, indices and rules (index=True, debugger=True)
+            Either returns:
+                - a plain string (index=False, debugger=False),
+                - a tuple with the converted string and indices (index=True, debugger=False),
+                - a tuple with the converted string and corresponding rules (index=False, debugger=True),
+                - a tuple with the converted string, indices and rules (index=True, debugger=True)
         """
-        original = to_convert
         
         # Convert input as necessary
         if not self.case_sensitive:

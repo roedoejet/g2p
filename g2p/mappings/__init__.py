@@ -169,9 +169,23 @@ class Mapping():
         self.processed = True
         return mapping
 
-    def rule_to_regex(self, rule: str) -> Pattern:
+    def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
-        into a regular expression pattern"""
+        into a regular expression pattern"
+        
+        The 'in' key is the match. 
+        The 'context_after' key creates a lookahead.
+        The 'context_before' key creates a lookbehind.
+
+        Args:
+            rule: A dictionary containing 'in', 'out', 'context_before', and 'context_after' keys
+
+        Raises:
+            Exception: This is raised when un-supported regex characters or symbols exist in the rule
+        
+        Returns:
+            Pattern: returns a regex pattern (re.Pattern)
+        """
         if "context_before" in rule and rule['context_before']:
             before = rule["context_before"]
         else:
