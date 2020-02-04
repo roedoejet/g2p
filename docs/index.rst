@@ -17,6 +17,10 @@ G2P is a tool for visualizing and interacting with computational linguistic mode
    start
    installation
    cli
+   package
+   studio
+   contributing
+
 
 
 Indices and tables
