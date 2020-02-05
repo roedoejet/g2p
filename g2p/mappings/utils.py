@@ -284,7 +284,7 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
-def generate_config(in_lang, out_lang, in_display_name, out_display_name):
+def generate_config(in_lang, out_lang, in_display_name, out_display_name, as_is=False):
     if is_ipa(in_lang):
         in_type = 'IPA'
     elif is_xsampa(in_lang):
@@ -310,6 +310,7 @@ def generate_config(in_lang, out_lang, in_display_name, out_display_name):
         'in_lang': in_lang,
         'out_lang': out_lang,
         'language_name': in_display_name,
+        'as_is': as_is,
         'author': f"Generated {dt.datetime.now()}"
     }
     return config
