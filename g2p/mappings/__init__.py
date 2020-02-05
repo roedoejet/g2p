@@ -44,7 +44,8 @@ class Mapping():
         @param reverse: bool = False
             Reverse all mappings
 
-        @param 
+        @param prevent_feeding: bool = False
+            Converts each rule into an intermediary form
 
     """
 
@@ -52,7 +53,7 @@ class Mapping():
         # should these just be explicit instead of kwargs...
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
                                  'out_lang', 'out_delimiter', 'as_is', 'case_sensitive',
-                                 'escape_special', 'norm_form', 'reverse']
+                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
@@ -110,6 +111,22 @@ class Mapping():
                 idx=type(item).__name__,
             ))
 
+    @staticmethod
+    def _string_to_pua(string: str, offset: int) -> str:
+        """Given an string of length n, and an offset m,
+           produce a string of n * chr(983040 + m).
+           This makes use of the Supplementary Private Use Area A Unicode block.
+        
+        Args:
+            string (str): The string to convert
+            offset (int): The offset from the start of the Supplementary Private Use Area 
+        
+        Returns:
+            str: The resulting string
+        """
+        intermediate_char = chr(983040 + offset)
+        return intermediate_char * len(string)
+
     def index(self, item):
         return self.mapping.index(item)
 
@@ -148,6 +165,8 @@ class Mapping():
             self.kwargs['norm_form'] = 'NFD'
         if 'reverse' not in self.kwargs:
             self.kwargs['reverse'] = False
+        if 'prevent_feeding' not in self.kwargs:
+            self.kwargs['prevent_feeding'] = False
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
             if kwarg == 'as_is' and not val:
@@ -165,6 +184,9 @@ class Mapping():
                             io[k] = normalize(v, self.kwargs['norm_form'])
             elif kwarg == 'reverse' and val:
                 mapping = self.reverse_mappings(mapping)
+            elif kwarg == 'prevent_feeding' and val:
+                for io in mapping:
+                    io['intermediate_form'] = self._string_to_pua(io['out'], mapping.index(io))
         # After all processing is done, turn into regex
         for io in mapping:
             io['match_pattern'] = self.rule_to_regex(io)

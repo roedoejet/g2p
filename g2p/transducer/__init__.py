@@ -7,7 +7,7 @@ which are responsible for performing transductions in the g2p library.
 import re
 import copy
 from typing import Dict, List, Pattern, Tuple, Union
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
@@ -70,6 +70,20 @@ class Transducer():
         """
         
         return self.apply_rules(to_convert, index, debugger)
+
+    @staticmethod
+    def _pua_to_index(string: str) -> int:
+        """Given a string using with characters in the Supllementary Private Use Area A Unicode block
+           Produce the number corresponding to the offset from the beginning of the block.
+        
+        Args:
+            string (str): The string to convert
+        
+        Returns:
+            int: The offset from the beginning of the block.
+        """
+        intermediate_ord = ord(string[0])
+        return intermediate_ord - 983040
 
     @staticmethod
     def get_offset_index(i: int, index_change_log: ChangeLog):
@@ -317,6 +331,7 @@ class Transducer():
         rules_applied = []
         converted = to_convert
         index_change_log = []
+        intermediate = False
         for i, char in enumerate(converted):
             indices[i] = {'input_string': char, 'output': {i: char}}
 
@@ -324,31 +339,31 @@ class Transducer():
         for io in self.mapping:
             # Make a copy of the input/output pair and reset the delimiter and intermediate diff
             io = copy.deepcopy(io)
-            delimited = False
             intermediate_diff = 0
             for match in io['match_pattern'].finditer(converted):
                 intermediate_to_convert = converted
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
                 start_origin = self.get_offset_index(start, index_change_log)
+                if 'intermediate_form' in io:
+                    out_string = io['intermediate_form']
+                    intermediate = True
+                else:
+                    out_string = io['out']
                 # Add delimiter
                 if self.out_delimiter:
-                    # if not delimited and not end segment, add delimiter
-                    if not delimited and not end >= len(converted):
-                        io['out'] += self.out_delimiter
-                        delimited = True
-                    # if already delimited and at end segment, remove delimiter
-                    if delimited and end >= len(converted):
-                        io['out'] = io['out'][:-(len(self.out_delimiter))]
+                    # if not end segment, add delimiter
+                    if not end >= len(converted):
+                        out_string += self.out_delimiter
 
                 # convert the final output
                 output_sub = re.sub(
-                    re.compile(r'{\d+}'), '', io['out'])
+                    re.compile(r'{\d+}'), '', out_string)
                 # We need to sub out the whole form because the match pattern could
                 # include lookaheads and lookbehinds outside the match indices
                 subbed = re.sub(io["match_pattern"], output_sub, converted)
                 intermediate_form = converted[:start] + \
-                    subbed[start:(start + len(io['out']))] + converted[end:]
+                    subbed[start:(start + len(out_string))] + converted[end:]
                 if debugger and intermediate_form != converted:
                     applied_rule = {"input": converted,
                                     "rule": io, "output": intermediate_form,
@@ -358,12 +373,12 @@ class Transducer():
                 converted = intermediate_form
                 
                 # get the new index tuple
-                if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(io['out'])):
+                if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
                     new_index = self.explicit_indices(
-                        io['in'], io['out'], start_origin, start)
+                        io['in'], out_string, start_origin, start)
                 else:
                     expanded = self.return_expanded_format(
-                        match.group(), io['out'], start_origin, start)
+                        match.group(), out_string, start_origin, start)
                     new_index = self.return_default_mapping(*expanded)
                 to_delete = []
                 to_merge = {}
@@ -383,7 +398,7 @@ class Transducer():
                     del new_index[k]
                 if to_merge:
                     new_index = {**to_merge, **new_index}
-                index_difference = len(io['out']) - len(io['in'])
+                index_difference = len(out_string) - len(io['in'])
                 # # if it's not empty, then a rule has applied and it can be merged with the other indices
                 # update
                 for k, v in new_index.items():
@@ -448,6 +463,22 @@ class Transducer():
                     for k_o in v['output'].keys():
                         if k_o in all_keys:
                             indices[k]['output'][k_o] = values[k_o]
+        if intermediate:
+            indices_seen = defaultdict(int)
+            for k, v in indices.items():
+                for k_o, v_o in v['output'].items():
+                    intermediate_index = self._pua_to_index(v_o)
+                    if intermediate_index < 0:
+                        continue
+                    else:
+                        output_char_index = indices_seen[intermediate_index]
+                        try:
+                            indices[k]['output'][k_o] = self.mapping[intermediate_index]['out'][output_char_index]
+                        except IndexError:
+                            indices_seen[intermediate_index] = 0
+                            output_char_index = indices_seen[intermediate_index]
+                            indices[k]['output'][k_o] = self.mapping[intermediate_index]['out'][output_char_index]
+                        indices_seen[intermediate_index] += 1
         io_states = Indices(indices)
         if index and debugger:
             return (io_states.output(), io_states, rules_applied)
