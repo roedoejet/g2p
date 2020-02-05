@@ -44,6 +44,8 @@ class Mapping():
         @param reverse: bool = False
             Reverse all mappings
 
+        @param 
+
     """
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
@@ -166,6 +168,8 @@ class Mapping():
         # After all processing is done, turn into regex
         for io in mapping:
             io['match_pattern'] = self.rule_to_regex(io)
+            if not io['match_pattern']:
+                mapping.remove(io)
         self.processed = True
         return mapping
 
@@ -185,7 +189,12 @@ class Mapping():
         
         Returns:
             Pattern: returns a regex pattern (re.Pattern)
+            bool: returns False if input is null
         """
+        # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
+        if not rule['in']:
+            LOGGER.warning(f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.')
+            return False
         if "context_before" in rule and rule['context_before']:
             before = rule["context_before"]
         else:
