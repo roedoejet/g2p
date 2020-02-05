@@ -26,8 +26,8 @@ class MappingTest(TestCase):
         self.assertTrue(json_map.kwargs['in_metadata']['case_insensitive'])
 
     def test_as_is(self):
-        mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}])
-        mapping_as_is = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=True)
+        mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        mapping_as_is = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}])
         transducer = Transducer(mapping)
         transducer_as_is = Transducer(mapping_as_is)
         self.assertEqual(transducer('aa'), 'c')

@@ -155,11 +155,10 @@ class IndicesTest(TestCase):
             [{"in": "e{1}s{2}", "out": "s{2}e{1}"}]
         )
         self.test_mapping_seven = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=False
         )
         self.test_mapping_seven_as_is = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=True
-        )
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}])
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
         self.test_mapping_combining = Mapping(
