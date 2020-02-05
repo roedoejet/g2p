@@ -71,7 +71,8 @@ def run_tests(suite):
     if isinstance(suite, str):
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
     else:
-        runner.run(suite)
+        return runner.run(suite)
+    
 
 
 if __name__ == "__main__":

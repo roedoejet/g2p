@@ -51,7 +51,7 @@ $(document).ready(function () {
     });
 
     $(window).trigger('resize');
-    var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
+    var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
     var convert = function () {
         var input_string = $('#indexInput').val();
         if (input_string) {
@@ -65,6 +65,15 @@ $(document).ready(function () {
             });
         }
     }
+    document.getElementById('animated-radio').addEventListener('click', function (event) {
+        if ($('#animated').is(":hidden")) {
+            $('#indexInput').val($('#input').val())
+            convert()
+            $('#standard').hide()
+            $('#animated').show()
+            $(window).trigger('resize');
+        }
+    })
     // Convert after any changes to tables
     Handsontable.hooks.add('afterChange', convert)
     

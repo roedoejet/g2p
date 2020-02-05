@@ -5,33 +5,39 @@ mappings:
     language_name: Atikamekw
     mapping: atj-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - author: Generated 2019-09-17 21:24:11.257523
-    display_name: Atikamekw IPA to Atikamekw dummy
-    in_lang: atj-ipa
-    language_name: Atikamekw
-    mapping: atj-ipa_to_dummy.json
-    out_lang: dummy
-  - author: Generated 2019-09-17 21:39:41.382977
-    display_name: Atikamekw custom to Atikamekw dummy
-    in_lang: atj
-    language_name: Atikamekw
-    mapping: atj_to_dummy.json
-    out_lang: dummy
-  - author: Generated 2019-09-18 12:07:53.940203
-    display_name: "SEN\u0106O\u0166EN custom to SEN\u0106O\u0166EN dummy"
-    in_lang: str-sen
-    language_name: "SEN\u0106O\u0166EN"
-    mapping: str-sen_to_dummy.json
-    out_lang: dummy
+    as_is: False
   - author: Generated 2019-09-26 13:48:19.852180
     display_name: Danish IPA to English IPA
     in_lang: dan-ipa
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
+    as_is: False
   - author: Generated 2019-10-03 17:05:30.225423
     display_name: French IPA to English IPA
     in_lang: fra-ipa
     language_name: French
     mapping: fra-ipa_to_eng-ipa.json
     out_lang: eng-ipa
+    as_is: False
+  - author: Generated 2019-10-24 16:21:41.605592
+    display_name: "SEN\u0106O\u0166EN IPA to English IPA"
+    in_lang: str-ipa
+    language_name: "SEN\u0106O\u0166EN"
+    mapping: str-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
+    as_is: False
+  - author: Generated 2019-10-23 11:18:26.278696
+    display_name: Algonquin IPA to English IPA
+    in_lang: alq-ipa
+    language_name: Algonquin
+    mapping: alq-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
+    as_is: False
+  - author: Generated 2019-12-06 15:24:08.036823
+    display_name: Mohawk IPA to English IPA
+    in_lang: moh-ipa
+    language_name: Mohawk
+    mapping: moh-ipa_to_eng-ipa.json
+    out_lang: eng-ipa
+    as_is: False

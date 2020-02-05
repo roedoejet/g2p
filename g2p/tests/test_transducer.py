@@ -15,13 +15,13 @@ class TransducerTest(TestCase):
         cls.test_mapping_rev = Mapping(
             [{"in": 'a', "out": 'b'}], reverse=True)
         cls.test_mapping_ordered_feed = Mapping(
-            [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}], as_is=True)
+            [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}])
         cls.test_mapping_ordered_counter_feed = Mapping(
-            [{"in": "b", "out": "c"}, {"in": "a", "out": "b"}], as_is=True)
+            [{"in": "b", "out": "c"}, {"in": "a", "out": "b"}])
         cls.test_as_is_mapping = Mapping(
-            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}], as_is=True)
-        cls.test_not_as_is_mapping = Mapping(
             [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}])
+        cls.test_not_as_is_mapping = Mapping(
+            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}], as_is=False)
         cls.test_case_sensitive_mapping = Mapping(
             [{"in": "'n", "out": "n̓"}], case_sensitive=True)
         cls.test_case_insensitive_mapping = Mapping(
@@ -75,7 +75,7 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_rev("a"), 'a')
 
     def test_lang_import(self):
-        self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnõːnis')
+        self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnõːnis')
 
     def test_composite(self):
         self.assertEqual(self.test_trans_composite('aba'), 'aaa')

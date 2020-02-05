@@ -9,10 +9,12 @@ mappings:
       - Patrick Littell
     mapping: ctp_to_ipa.json
     case_sensitive: false
+    as_is: true
     <<: *shared
   - display_name: Western Highland Chatino IPA to English IPA
     in_lang: ctp-ipa
     out_lang: eng-ipa
     type: mapping
     mapping: ctp_ipa_to_eng_ipa.json
+    as_is: true
     <<: *shared

@@ -6,14 +6,11 @@ mappings:
     in_lang: moh
     out_lang: moh-ipa
     case_sensitive: false
+    norm_form: NFD
+    as_is: true
     abbreviations: abbreviations.csv
     authors:
       - Aidan Pine
-    <<: *shared
-  - display_name: Mohawk IPA to English IPA
-    mapping: moh_ipa_to_eng_ipa.json
-    in_lang: moh-ipa
-    out_lang: eng-ipa
     <<: *shared
   - display_name: Mohawk to Mohawk ASCII
     mapping: moh_to_ascii.json

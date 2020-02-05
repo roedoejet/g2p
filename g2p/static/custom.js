@@ -111,14 +111,12 @@ document.getElementById('reverse').addEventListener('click', function (event) {
 })
 
 document.getElementById('standard-radio').addEventListener('click', function (event) {
-    $('#animated').hide()
-    $('#standard').show()
-})
-
-document.getElementById('animated-radio').addEventListener('click', function (event) {
-    $('#standard').hide()
-    $('#animated').show()
-    $(window).trigger('resize');
+    if ($('#standard').is(":hidden")) {
+        $('#input').val($('#indexInput').val())
+        convert()
+        $('#animated').hide()
+        $('#standard').show()
+    }
 })
 
 var getKwargs = function () {
@@ -145,9 +143,9 @@ var setKwargs = function (kwargs) {
     convert()
 }
 
-var conversionSocket = io.connect('http://' + document.domain + ':' + location.port + '/convert');
-var connectionSocket = io.connect('http://' + document.domain + ':' + location.port + '/connect');
-var tableSocket = io.connect('http://' + document.domain + ':' + location.port + '/table');
+var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
+var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
+var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
 var convert = function () {
     var input_string = $('#input').val();

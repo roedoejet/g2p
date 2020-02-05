@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: Algonquin
+mappings:
+  - display_name: Algonquin to IPA
+    in_lang: alq
+    out_lang: alq-ipa
+    authors:
+      - Eric Joanis
+    type: mapping
+    mapping: alq_to_ipa.csv
+    as_is: true
+    case_sensitive: false
+    norm_form: 'NFD'
+    <<: *shared

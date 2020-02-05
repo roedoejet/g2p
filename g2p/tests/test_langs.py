@@ -2,9 +2,13 @@
 
 from unittest import main, TestCase
 import os
+import csv
+from glob import glob
+from g2p.log import LOGGER
 from g2p import make_g2p
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
+from g2p.tests.public.data import __file__ as data_dir
 
 
 class LangTest(TestCase):
@@ -12,60 +16,34 @@ class LangTest(TestCase):
     '''
 
     def setUp(self):
-        git = [
-            {"in_lang": "git",
-                "out_lang": "git-ipa",
-                "samples": [
-                    ('gwila', '\u0261ʷilæ'),
-                    ("hlik\u0332'sxw", "ɬiq\u0294sx\u02b7")
-                ],
-             },
-            {'in_lang': 'git',
-                'out_lang': 'eng-arpabet',
-                "samples": [
-                    ("K̲'ay", 'K HH AE Y'),
-                    ("guts'uusgi'y", 'G UW T S HH UW S G IY HH Y')
-                ]},
-            {'in_lang': 'str-sen',
-                'out_lang': 'eng-arpabet',
-                "samples": [
-                    ('X̱I¸ÁM¸', 'SH W IY HH EY M HH')
-                ]},
-            {'in_lang': 'ctp',
-                'out_lang': 'eng-arpabet',
-                "samples": [
-                    ('Qneᴬ', 'HH N EY')
-                ]},
-            {'in_lang': 'fra-ipa',
-             'out_lang': 'eng-ipa',
-             "samples": [
-                         ('ʒ', 'ʒ')
-             ]},
-        ]
-
-        self.langs_to_test = git
+        DATA_DIR = os.path.dirname(data_dir)
+        self.langs_to_test = []
+        for fn in glob(f'{DATA_DIR}/*.*sv'):
+            if fn.endswith('csv'):
+                delimiter = ','
+            elif fn.endswith('psv'):
+                delimiter = '|'
+            elif fn.endswith('tsv'):
+                delimiter = '\t'
+            with open(fn) as csvfile:
+                reader = csv.reader(csvfile, delimiter=delimiter)
+                for row in reader:
+                    if len(row) != 4:
+                        LOGGER.warning(f'Row in {fn} containing values {row} does not have the right values. Please check your data.')
+                    else:
+                        self.langs_to_test.append(row)
 
     def test_io(self):
         # go through each language declared in the test case set up
-        for lang in self.langs_to_test:
-            in_lang = lang['in_lang']
-            out_lang = lang['out_lang']
-            transducer = make_g2p(in_lang, out_lang)
-            # go through each table in the current lang
-            for sample in lang['samples']:
-                # assert that the transduced first item in the tuple is equal to the second item in the tuple
-                self.assertEqual(transducer(sample[0]), sample[1])
+        for test in self.langs_to_test:
+            transducer = make_g2p(test[0], test[1])
+            self.assertEqual(transducer(test[2]), test[3])
 
     def test_index(self):
         # go through each language declared in the test case set up
-        for lang in self.langs_to_test:
-            in_lang = lang['in_lang']
-            out_lang = lang['out_lang']
-            transducer = make_g2p(in_lang, out_lang)
-            # go through each table in the current lang
-            for sample in lang['samples']:
-                # assert that the transduced first item in the tuple is equal to the second item in the tuple
-                self.assertEqual(transducer(sample[0], index=True)[0], sample[1])
+        for test in self.langs_to_test:
+            transducer = make_g2p(test[0], test[1])
+            self.assertEqual(transducer(test[2], index=True)[0], test[3])
 
 if __name__ == "__main__":
     main()

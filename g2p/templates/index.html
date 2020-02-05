@@ -10,8 +10,6 @@
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
     <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.full.min.css') }}"> -->
-    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='handsontable.main.css') }}"> -->
 
     <link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
 
@@ -57,7 +55,7 @@
         <div id='animated' style='display: none'>
             <div class='row'>
                 <div class='columns twelve center-text'>
-                    <form autocomplete='off' autocorrect='off'> 
+                    <form autocomplete='off' autocorrect='off'>
                         <input autocomplete='off' autocorrect='off' id='indexInput' type="text" name="usrname"
                             maxlength="10">
                     </form>
@@ -84,7 +82,6 @@
                     {% endfor %}
                     {% endfor %}
                 </select>
-
             </div>
             <div class='columns six mg-top'>
                 <form id='settings-form'>
@@ -100,8 +97,7 @@
                             <label for='case_sensitive'>Rules are case sensitive</label>
                         </div>
                         <div>
-                            <input id='escape_special' type='checkbox' name='escape_special'
-                                value='escape_special'>
+                            <input id='escape_special' type='checkbox' name='escape_special' value='escape_special'>
                             <label for='escape_special'>Escape special characters</label>
                         </div>
                         <div>
@@ -116,6 +112,7 @@
             <div class='columns twelve'>
                 <h4>Custom Rules</h4>
                 <button id='hot-add'>Add Rule</button>
+                <button id="export-rules">Export</button>
                 <div id="hot"></div>
                 <h4>Rule Creator</h4>
                 <button id='clear'>Clear</button>
@@ -157,47 +154,28 @@
                 <p>Follow the example below to create your own abbreviations to use in your rules.</p>
                 <button id='varhot-add-row'>Add Row</button>
                 <button id='varhot-add-col'>Add Column</button>
+                <button id="export-abbs">Export</button>
                 <div id="varhot"></div>
             </div>
         </div>
-        <div class='row'>
-            <div class='columns twelve center-text'>
-                <div class="export-buttons" class="visible">
-                    <button id="export-rules">
-                        Export Rules</button>
-                </div>
-                <div class="export-buttons" class="visible">
-                    <button id="export-abbs">
-                        Export Abbreviations</button>
-                </div>
-            </div>
-        </div>
     </div>
-
-
-    <!-- <script src="{{ url_for('static', filename='echart_custom.js') }}"></script> -->
 </body>
 
-<!-- <script src="{{ url_for('static', filename='jquery.min.js') }}"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-<!-- <script src="{{ url_for('static', filename='handsontable.full.min.js') }}"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 
-<!-- <script src="{{ url_for('static', filename='socket.io.slim.js') }}"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.slim.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script>
 
-
-<script src="{{ url_for('static', filename='blockly_compressed.js') }}"></script>
-<script src="{{ url_for('static', filename='blocks_compressed.js') }}"></script>
-<script src="{{ url_for('static', filename='en.js') }}"></script>
-<script src="{{ url_for('static', filename='javascript_compressed.js') }}"></script>
-<script src="{{ url_for('static', filename='python_compressed.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blockly.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blocks.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/msg/en.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/javascript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/python.js"></script>
 
 <script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
-
 <script src="{{ url_for('static', filename='echart_custom.js') }}"></script>
 <script src="{{ url_for('static', filename='custom.js') }}"></script>
 <script src="{{ url_for('static', filename='blocks.js') }}"></script>

@@ -23,7 +23,7 @@ def cache_langs():
     mappings_legal_pairs = []
     for path in paths:
         code = path.parent.stem
-        with open(path) as f:
+        with open(path, encoding='utf8') as f:
             data = yaml.safe_load(f)
         # If there is a mappings key, there is more than one mapping
         # TODO: should put in some measure to prioritize non-generated mappings and warn when they override

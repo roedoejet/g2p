@@ -155,11 +155,10 @@ class IndicesTest(TestCase):
             [{"in": "e{1}s{2}", "out": "s{2}e{1}"}]
         )
         self.test_mapping_seven = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=False
         )
         self.test_mapping_seven_as_is = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=True
-        )
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}])
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
         self.test_mapping_combining = Mapping(
@@ -220,12 +219,14 @@ class IndicesTest(TestCase):
             transducer_lite[0], 'ccccc')
         transducer = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
+
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
-        self.assertEqual(transducer[1](), [
-            ((0, '😀'), (4, '😄')),
-            ((1, '😃😄'), (0, '😄😄😄')),
-            ((3, '😄'), (3, '😄'))])
+        self.assertEqual(transducer[1](), [((0, '😀'), (4, '😄')),
+                                           ((1, '😃'), (0, '😄')),
+                                           ((2, '😄'), (1, '😄')),
+                                           ((2, '😄'), (2, '😄')),
+                                           ((3, '😄'), (3, '😄'))])
 
     def test_circum(self):
         """ Test circumfixing
@@ -292,8 +293,8 @@ class IndicesTest(TestCase):
                                            ((3, 't'), (3, 't'))])
 
     def test_case_long_six(self):
-        # transducer_no_i = self.trans_six('esesse')
-        # self.assertEqual(transducer_no_i, 'sesese')
+        transducer_no_i = self.trans_six('esesse')
+        self.assertEqual(transducer_no_i, 'sesese')
         transducer = self.trans_six('esesse', True)
         self.assertEqual(transducer[0], 'sesese')
 

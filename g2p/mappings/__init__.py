@@ -28,9 +28,9 @@ from g2p.log import LOGGER
 class Mapping():
     """ Class for lookup tables
 
-        @param as_is: bool = False
+        @param as_is: bool = True
             Evaluate g2p rules in mapping in the order they are.
-            Default is to reverse sort them by length.
+            If False, rules will be reverse sorted by length.
 
         @param case_sensitive: bool = True
             Lower all rules and conversion input
@@ -38,18 +38,22 @@ class Mapping():
         @param escape_special: bool = False
             Escape special characters in rules
 
-        @param norm_form: str = "NFC"
+        @param norm_form: str = "NFD"
             Normalization standard to follow. NFC | NKFC | NFD | NKFD
 
         @param reverse: bool = False
             Reverse all mappings
+
+        @param prevent_feeding: bool = False
+            Converts each rule into an intermediary form
 
     """
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
         # should these just be explicit instead of kwargs...
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
-                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'escape_special', 'norm_form', 'reverse']
+                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive',
+                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
@@ -92,8 +96,39 @@ class Mapping():
     def __call__(self):
         return self.mapping
 
+
     def __iter__(self):
         return iter(self.mapping)
+
+    def __getitem__(self, item):
+        if isinstance(item, int):  # item is an integer
+            return self.mapping[item]
+        if isinstance(item, slice):  # item is a slice
+            return self.mapping[item.start or 0:item.stop or len(self.mapping)]
+        else:  # invalid index type
+            raise TypeError('{cls} indices must be integers or slices, not {idx}'.format(
+                cls=type(self).__name__,
+                idx=type(item).__name__,
+            ))
+
+    @staticmethod
+    def _string_to_pua(string: str, offset: int) -> str:
+        """Given an string of length n, and an offset m,
+           produce a string of n * chr(983040 + m).
+           This makes use of the Supplementary Private Use Area A Unicode block.
+        
+        Args:
+            string (str): The string to convert
+            offset (int): The offset from the start of the Supplementary Private Use Area 
+        
+        Returns:
+            str: The resulting string
+        """
+        intermediate_char = chr(983040 + offset)
+        return intermediate_char * len(string)
+
+    def index(self, item):
+        return self.mapping.index(item)
 
     def inventory(self, in_or_out: str = 'in'):
         ''' Return just inputs or outputs as inventory of mapping
@@ -121,15 +156,17 @@ class Mapping():
         '''
         # Add defaults
         if 'as_is' not in self.kwargs:
-            self.kwargs['as_is'] = False
+            self.kwargs['as_is'] = True
         if 'case_sensitive' not in self.kwargs:
             self.kwargs['case_sensitive'] = True
         if 'escape_special' not in self.kwargs:
             self.kwargs['escape_special'] = False
         if 'norm_form' not in self.kwargs:
-            self.kwargs['norm_form'] = 'NFC'
+            self.kwargs['norm_form'] = 'NFD'
         if 'reverse' not in self.kwargs:
             self.kwargs['reverse'] = False
+        if 'prevent_feeding' not in self.kwargs:
+            self.kwargs['prevent_feeding'] = False
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
             if kwarg == 'as_is' and not val:
@@ -147,15 +184,39 @@ class Mapping():
                             io[k] = normalize(v, self.kwargs['norm_form'])
             elif kwarg == 'reverse' and val:
                 mapping = self.reverse_mappings(mapping)
+            elif kwarg == 'prevent_feeding' and val:
+                for io in mapping:
+                    io['intermediate_form'] = self._string_to_pua(io['out'], mapping.index(io))
         # After all processing is done, turn into regex
         for io in mapping:
             io['match_pattern'] = self.rule_to_regex(io)
+            if not io['match_pattern']:
+                mapping.remove(io)
         self.processed = True
         return mapping
 
-    def rule_to_regex(self, rule: str) -> Pattern:
+    def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
-        into a regular expression pattern"""
+        into a regular expression pattern"
+        
+        The 'in' key is the match. 
+        The 'context_after' key creates a lookahead.
+        The 'context_before' key creates a lookbehind.
+
+        Args:
+            rule: A dictionary containing 'in', 'out', 'context_before', and 'context_after' keys
+
+        Raises:
+            Exception: This is raised when un-supported regex characters or symbols exist in the rule
+        
+        Returns:
+            Pattern: returns a regex pattern (re.Pattern)
+            bool: returns False if input is null
+        """
+        # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
+        if not rule['in']:
+            LOGGER.warning(f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.')
+            return False
         if "context_before" in rule and rule['context_before']:
             before = rule["context_before"]
         else:
@@ -241,10 +302,10 @@ class Mapping():
         filtered = [{k: v for k, v in io.items() if k in fieldnames}
                     for io in self.mapping]
         if file_type == 'json':
-            with open(fn, 'w') as f:
+            with open(fn, 'w', encoding='utf8') as f:
                 json.dump(filtered, f, indent=4)
         elif file_type == 'csv':
-            with open(fn, 'w') as f:
+            with open(fn, 'w', encoding='utf8') as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)
                 for io in filtered:
                     writer.writerow(io)
@@ -264,16 +325,16 @@ class Mapping():
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', ['generated']),
-                "as_is": self.kwargs.get('as_is', False),
+                "as_is": self.kwargs.get('as_is', True),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
-                "norm_form": self.kwargs.get('norm_form', "NFC"),
+                "norm_form": self.kwargs.get('norm_form', "NFD"),
                 "reverse": self.kwargs.get('reverse', False),
                 "mapping": self.kwargs.get('in_lang', 'und') + "_to_" +
                 self.kwargs.get('out_lang', 'und') + "." + mapping_type
             }
         ]}
-        with open(fn, 'w') as f:
+        with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,
                       default_flow_style=False)
 
