@@ -82,8 +82,11 @@ class Transducer():
         Returns:
             int: The offset from the beginning of the block.
         """
-        intermediate_ord = ord(string[0])
-        return intermediate_ord - 983040
+        if string:
+            intermediate_ord = ord(string[0])
+            return intermediate_ord - 983040
+        else:
+            return - 1
 
     @staticmethod
     def get_offset_index(i: int, index_change_log: ChangeLog):

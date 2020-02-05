@@ -9,15 +9,12 @@
    },
    {
       "in": "kw",
-      "out": "1ʷ"
+      "out": "kʷ",
+      "prevent_feeding": true
    },
    {
       "in": "k",
       "out": "kʲ"
-   },
-   {
-      "in": "1ʷ",
-      "out": "kʷ"
    },
    {
       "in": "q",

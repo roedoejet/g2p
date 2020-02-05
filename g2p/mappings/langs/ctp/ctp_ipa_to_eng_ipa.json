@@ -45,15 +45,12 @@
     },
     {
         "in": "õ",
-        "out": "1"
+        "out": "õː",
+        "prevent_feeding": true
     },
     {
         "in": "o",
         "out": "oː"
-    },
-    {
-        "in": "1",
-        "out": "õː"
     },
     {
         "in": "r",
