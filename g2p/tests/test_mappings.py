@@ -89,5 +89,9 @@ class MappingTest(TestCase):
         self.assertEqual(mapping.kwargs['norm_form'], 'NFD')
         self.assertTrue(mapping.kwargs['reverse'])
 
+    def test_null_input(self):
+        mapping = Mapping([{'in': '', 'out': 'a'}])
+        self.assertFalse(mapping())
+
 if __name__ == "__main__":
     main()
