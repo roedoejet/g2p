@@ -15,13 +15,13 @@ from g2p.mappings.utils import is_ipa, is_xsampa
 from g2p.mappings import Mapping
 from g2p._version import VERSION
 from g2p.log import LOGGER
-from g2p import APP, SOCKETIO, make_g2p
+from g2p import make_g2p
+from g2p.app import APP, SOCKETIO
 
 PRINTER = pp(indent=4)
 
 def create_app():
     return APP
-
 
 @click.version_option(version=VERSION, prog_name="g2p")
 @click.group(cls=FlaskGroup, create_app=create_app)
