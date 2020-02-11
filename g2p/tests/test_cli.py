@@ -2,7 +2,7 @@ from unittest import main, TestCase
 
 import requests
 
-from g2p import APP
+from g2p.app import APP
 from g2p.log import LOGGER
 from g2p.cli import update
 

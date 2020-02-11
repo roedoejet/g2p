@@ -14,7 +14,7 @@ mappings:
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
   - as_is: false
-    author: Generated 2020-02-05 15:59:06.539823
+    author: Generated 2020-02-06 11:01:41.458466
     display_name: French IPA to English IPA
     in_lang: fra-ipa
     language_name: French
