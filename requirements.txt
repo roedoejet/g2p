@@ -6,6 +6,7 @@ flask-cors
 Flask>=1.0.2
 flask_socketio
 flask-talisman
+flask-restful
 gunicorn
 networkx
 panphon

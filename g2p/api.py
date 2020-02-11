@@ -1,30 +1,14 @@
 ''' Very Basic API
 '''
 
-from flask import jsonify, Blueprint, abort
-import json
-from flask_restful import (Resource, Api, reqparse,
-                           inputs, fields, url_for, marshal_with)
+from flask import Blueprint, abort
+from flask_restful import (Resource, Api, reqparse)
 from flask_cors import CORS
-from wordweaver.resources.affix import affix_fields
-from wordweaver.data import affix_data, verb_data
-from wordweaver.resources import require_appkey
-from slugify import slugify
 
-from networkx import shortest_path
 from networkx.exception import NetworkXError, NetworkXNoPath
 from networkx.algorithms.dag import ancestors, descendants
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p import make_g2p
-
-verb_fields = {
-    'thematic_relation': fields.String,
-    'display': fields.String,
-    'gloss': fields.String,
-    'tag': fields.String,
-    'required_affixes': fields.List(fields.Nested(affix_fields)),
-    'position': fields.Integer
-}
 
 class Ancestors(Resource):
     def get(self, node):
