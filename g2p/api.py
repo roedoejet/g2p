@@ -17,20 +17,20 @@ from g2p import make_g2p
 class Ancestors(Resource):
     def get(self, node):
         try:
-            return [x for x in ancestors(LANGS_NETWORK, node)]
+            return sorted([x for x in ancestors(LANGS_NETWORK, node)])
         except NetworkXError:
             abort(404)
 
 class Descendants(Resource):
     def get(self, node):
         try:
-            return [x for x in descendants(LANGS_NETWORK, node)]
+            return sorted([x for x in descendants(LANGS_NETWORK, node)])
         except NetworkXError:
             abort(404)
 
 class Langs(Resource):
     def get(self):
-        return [x for x in LANGS_NETWORK.nodes]
+        return sorted([x for x in LANGS_NETWORK.nodes])
 
 class Text(Resource):
     def __init__(self):
