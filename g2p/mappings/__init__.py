@@ -20,7 +20,7 @@ import yaml
 from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters, normalize
-from g2p.mappings.utils import flatten_abbreviations, IndentDumper, load_abbreviations_from_file
+from g2p.mappings.utils import find_mapping, flatten_abbreviations, IndentDumper, load_abbreviations_from_file
 from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
 from g2p.log import LOGGER
 
@@ -69,7 +69,7 @@ class Mapping():
             self.process_loaded_config(loaded_config)
         else:
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
-                loaded_config = self.find_mapping(
+                loaded_config = find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
                 self.process_loaded_config(loaded_config)
             elif 'id' in self.kwargs:
@@ -272,16 +272,6 @@ class Mapping():
                     if io[key] == abb['abbreviation']:
                         io[key] = abb['stands_for']
         return mappings
-
-    def find_mapping(self, in_lang: str, out_lang: str) -> list:
-        ''' Given an input and output, find a mapping to get between them.
-        '''
-        for mapping in MAPPINGS_AVAILABLE:
-            map_in_lang = mapping.get('in_lang', '')
-            map_out_lang = mapping.get('out_lang', '')
-            if map_in_lang == in_lang and map_out_lang == out_lang:
-                return deepcopy(mapping)
-        raise exceptions.MappingMissing(in_lang, out_lang)
 
     def find_mapping_by_id(self, map_id: str):
         ''' Find the mapping with a given ID

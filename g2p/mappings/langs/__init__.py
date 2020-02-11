@@ -5,9 +5,10 @@ from pathlib import Path
 import timeit
 import yaml
 
-from networkx import Graph, read_gpickle, write_gpickle
+from networkx import DiGraph, read_gpickle, shortest_path, write_gpickle
 
-from g2p.mappings.utils import load_mapping_from_path
+from g2p.mappings.utils import find_mapping, load_mapping_from_path
+from g2p.exceptions import MappingMissing
 
 LANGS_DIR = os.path.dirname(__file__)
 LANGS_PKL = os.path.join(LANGS_DIR, 'langs.pkl')
@@ -35,7 +36,8 @@ def cache_langs():
             data = load_mapping_from_path(path)
         langs = {**langs, **{code: data}}
     
-    lang_network = Graph()
+    # Save as a Directional Graph
+    lang_network = DiGraph()
     lang_network.add_edges_from(mappings_legal_pairs)
 
     with open(LANGS_NWORK_PATH, 'wb') as f:
