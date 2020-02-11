@@ -35,6 +35,8 @@ mappings:
     mapping: alq-ipa_to_eng-ipa.json
     out_lang: eng-ipa
   - as_is: false
+    prevent_feeding: true
+    norm_form: NFD
     author: Generated 2019-12-06 15:24:08.036823
     display_name: Mohawk IPA to English IPA
     in_lang: moh-ipa
