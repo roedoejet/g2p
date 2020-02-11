@@ -1,5 +1,7 @@
 ''' Very Basic API
 '''
+import os
+import json
 
 from flask import Blueprint, abort
 from flask_restful import (Resource, Api, reqparse)
@@ -7,7 +9,9 @@ from flask_cors import CORS
 
 from networkx.exception import NetworkXError, NetworkXNoPath
 from networkx.algorithms.dag import ancestors, descendants
+from g2p.static import __file__ as static_file
 from g2p.mappings.langs import LANGS_NETWORK
+from g2p.log import LOGGER
 from g2p import make_g2p
 
 class Ancestors(Resource):
@@ -58,6 +62,17 @@ class Text(Resource):
             abort(400)
         except FileNotFoundError:
             abort(404)
+
+def update_docs():
+    ''' Update the swagger documentation with all nodes from the network
+    '''
+    swagger_path = os.path.join(os.path.dirname(static_file), 'swagger.json')
+    with open(swagger_path) as f:
+        data = json.load(f)
+    data['components']['schemas']['Langs']['enum'] = sorted([x for x in LANGS_NETWORK.nodes])
+    with open(swagger_path, 'w') as f:
+        f.write(json.dumps(data))
+    LOGGER.info('Updated API documentation')
 
 g2p_api = Blueprint('resources.g2p', __name__)
 

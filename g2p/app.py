@@ -68,9 +68,15 @@ def return_descendant_nodes(node: str):
 
 @APP.route('/')
 def home():
-    """ Return homepage of g2p Studio
+    """ Return homepage of g2p studio
     """
     return render_template('index.html', langs=LANGS)
+
+@APP.route('/docs')
+def docs():
+    """ Return swagger docs of g2p studio API
+    """
+    return render_template('docs.html')
 
 @SOCKETIO.on('index conversion event', namespace='/convert')
 def index_convert(message):
