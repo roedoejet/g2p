@@ -1,3 +1,5 @@
+import os
+
 from unidecode import unidecode
 
 from g2p import make_g2p
@@ -6,7 +8,7 @@ from g2p.mappings import Mapping
 from g2p.mappings.create_ipa_mapping import align_inventories
 from g2p.mappings.utils import generate_config, is_ipa, write_generated_mapping_to_file, unicode_escape
 
-def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False):
+def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False, out_dir: str = ''):
     dummy_inventory = ["ɑ", "i", "u", "t", "s", "n"]
     display_name = mapping.kwargs.get('language_name', 'No Language display name in Config')
     config = generate_config(mapping.kwargs[f'{io}_lang'], 'dummy', display_name, display_name)
@@ -30,6 +32,14 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
                 x['out'] = default_char       
  
     if write_to_file:
+        if out_dir:
+            if os.path.isdir(out_dir):
+                out_config = os.path.join(out_dir, display_name)
+                write_generated_mapping_to_file(config, mapping, out_dir=out_dir, out_config=out_config)
+            else:
+                LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
+        else:
+            write_generated_mapping_to_file(config, mapping)
         write_generated_mapping_to_file(config, mapping)
     return config, mapping
 

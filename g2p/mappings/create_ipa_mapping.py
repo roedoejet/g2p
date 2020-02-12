@@ -67,7 +67,7 @@ def process_characters(inv, is_xsampa=False):
 ###################################
 
 
-def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in', write_to_file: bool = False) -> Mapping:
+def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in', write_to_file: bool = False, out_dir: str = '') -> Mapping:
     map_1_name = mapping_1.kwargs[f'{mapping_1_io}_lang']
     map_2_name = mapping_2.kwargs[f'{mapping_2_io}_lang']
     if not is_ipa(map_1_name) and not is_xsampa(map_1_name):
@@ -90,7 +90,14 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     config = generate_config(map_1_name, map_2_name, l1_display_name, l2_display_name)
 
     if write_to_file:
-        write_generated_mapping_to_file(config, mapping)
+        if out_dir:
+            if os.path.isdir(out_dir):
+                out_config = os.path.join(out_dir, l1_display_name)
+                write_generated_mapping_to_file(config, mapping, out_dir=out_dir, out_config=out_config)
+            else:
+                LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
+        else:
+            write_generated_mapping_to_file(config, mapping)
 
     return Mapping(mapping, **{k: v for k, v in config.items() if k != 'mapping'})
 
