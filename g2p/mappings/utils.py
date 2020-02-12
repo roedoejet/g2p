@@ -155,11 +155,11 @@ def load_from_workbook(language):
     return mapping
 
 
-def load_from_csv(language):
+def load_from_csv(language, delimiter=','):
     ''' Parse mapping from csv
     '''
     work_sheet = []
-    with open(language, encoding='utf8') as f:
+    with open(language, encoding='utf8', delimiter=delimiter) as f:
         reader = csv.reader(f)
         for line in reader:
             work_sheet.append(line)
@@ -192,7 +192,11 @@ def load_from_file(path: str) -> list:
     ''' Helper method to load mapping from file.
     '''
     if path.endswith('csv'):
-        mapping = load_from_csv(path)
+        mapping = load_from_csv(path, ",")
+    elif path.endswith('tsv'):
+        mapping = load_from_csv(path, "\t")
+    elif path.endswith('psv'):
+        mapping = load_from_csv(path, "|")
     elif path.endswith('xlsx'):
         mapping = load_from_workbook(path)
     elif path.endswith('json'):
@@ -285,11 +289,21 @@ def load_abbreviations_from_file(path):
     if path.endswith('csv'):
         abbs = []
         with open(path, encoding='utf8') as f:
-            reader = csv.reader(f)
+            reader = csv.reader(f, delimiter=',')
+            abbs = flatten_abbreviations(reader)
+    elif path.endswith('tsv'):
+        abbs = []
+        with open(path, encoding='utf8') as f:
+            reader = csv.reader(f, delimiter='\t')
+            abbs = flatten_abbreviations(reader)
+    elif path.endswith('psv'):
+        abbs = []
+        with open(path, encoding='utf8') as f:
+            reader = csv.reader(f, delimiter='|')
             abbs = flatten_abbreviations(reader)
     else:
         raise exceptions.IncorrectFileType(
-            f'Sorry, abbreviations must be stored as CSV files. You provided the following: {path}')
+            f'Sorry, abbreviations must be stored as CSV/TSV/PSV files. You provided the following: {path}')
     return abbs
 
 
