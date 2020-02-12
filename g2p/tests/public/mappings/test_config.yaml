@@ -1,0 +1,9 @@
+language_name: generated
+mappings:
+  - as_is: false
+    author: Generated 2020-02-12 12:57:13.216912
+    display_name: Test custom to TestOut custom
+    in_lang: test
+    language_name: Test
+    mapping: test_to_test-out.json
+    out_lang: test-out

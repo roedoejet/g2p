@@ -339,11 +339,18 @@ def generate_config(in_lang, out_lang, in_display_name, out_display_name, as_is=
     return config
 
 
-def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
+def write_generated_mapping_to_file(config: dict, mapping: List[dict], out_dir=GEN_DIR, out_config=GEN_CONFIG):
+    ''' Given a configuration and a list of input/output pairs, write a config file and corresponding mapping json file.
+    '''
     # read config
-    with open(GEN_CONFIG, 'r') as f:
-        data = yaml.safe_load(f)
-    map_output_path = os.path.join(GEN_DIR, config['mapping'])
+    if os.path.exists(out_config):
+        with open(out_config, 'r') as f:
+            data = yaml.safe_load(f)
+    else:
+        data = {'language_name': 'generated', 'mappings': []}
+    if not data['mappings']:
+        data['mappings'] = []
+    map_output_path = os.path.join(out_dir, config['mapping'])
     # write mapping
     if os.path.exists(map_output_path):
         LOGGER.info(f"Overwriting file at {map_output_path}")
@@ -352,21 +359,18 @@ def write_generated_mapping_to_file(config: dict, mapping: List[dict]):
     data = deepcopy(data)
     cfg_exists = bool([x for x in data['mappings'] if x['in_lang']
                        == config['in_lang'] and x['out_lang'] == config['out_lang']])
-    # add new mapping if no mappings are generated yet
-    if not data['mappings']:
-        data['mappings'] = [config]
     # add new mapping if it doesn't exist yet
-    elif not cfg_exists:
+    if not cfg_exists:
         data['mappings'].append(config)
         # rewrite config
-        with open(GEN_CONFIG, 'w', encoding='utf8') as f:
+        with open(out_config, 'w', encoding='utf8') as f:
             yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
     elif cfg_exists:
         for i, cfg in enumerate(data['mappings']):
             if cfg['in_lang'] == config['in_lang'] and cfg['out_lang'] == config['out_lang']:
                 data['mappings'][i] = config
                 # rewrite config
-                with open(GEN_CONFIG, 'w', encoding='utf8') as f:
+                with open(out_config, 'w', encoding='utf8') as f:
                     yaml.dump(data, f, Dumper=IndentDumper,
                               default_flow_style=False)
                 break

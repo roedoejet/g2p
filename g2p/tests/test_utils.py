@@ -53,11 +53,17 @@ class UtilsTest(TestCase):
             PUBLIC_DIR, 'mappings', 'minimal_config.yaml'))
         csv = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 0)
-        json = utils.load_mapping_from_path(os.path.join(
+        tsv = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 1)
-        xlsx = utils.load_mapping_from_path(os.path.join(
+        psv = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 2)
+        json = utils.load_mapping_from_path(os.path.join(
+            PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 3)
+        xlsx = utils.load_mapping_from_path(os.path.join(
+            PUBLIC_DIR, 'mappings', 'minimal_configs.yaml'), 4)
         self.assertEqual(minimal['mapping_data'], csv['mapping_data'])
+        self.assertEqual(minimal['mapping_data'], tsv['mapping_data'])
+        self.assertEqual(minimal['mapping_data'], psv['mapping_data'])
         self.assertEqual(minimal['mapping_data'], json['mapping_data'])
         self.assertEqual(minimal['mapping_data'], xlsx['mapping_data'])
 
@@ -71,10 +77,11 @@ class UtilsTest(TestCase):
         with self.assertRaises(IncorrectFileType):
             utils.load_abbreviations_from_file(os.path.join(
                 PUBLIC_DIR, 'mappings', 'abbreviations.json'))
-        abbs = utils.load_abbreviations_from_file(
-            os.path.join(PUBLIC_DIR, 'mappings', 'abbreviations.csv'))
-        self.assertTrue("VOWEL" in abbs)
-        self.assertEqual(abbs['VOWEL'], ['a', 'e', 'i', 'o', 'u'])
+        for abb in ['abbreviations.csv', 'abbreviations.tsv', 'abbreviations.psv']:
+            abbs = utils.load_abbreviations_from_file(
+                os.path.join(PUBLIC_DIR, 'mappings', abb))
+            self.assertTrue("VOWEL" in abbs)
+            self.assertEqual(abbs['VOWEL'], ['a', 'e', 'i', 'o', 'u'])
 
     def test_tuple_dict_conversion(self):
         tuple_format = [
@@ -84,6 +91,25 @@ class UtilsTest(TestCase):
         self.assertEqual(convert_index_to_tuples(dict_format), tuple_format)
         self.assertEqual(convert_tuples_to_index(tuple_format), dict_format)
 
+    def test_generated_mapping(self):
+        config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
+        mapping = [{'in': 'a', 'out': 'b'}]
+        utils.write_generated_mapping_to_file(config, mapping, os.path.join(PUBLIC_DIR, 'mappings'), os.path.join(PUBLIC_DIR, 'mappings', 'test_config.yaml'))
+        utils.write_generated_mapping_to_file(config, mapping, os.path.join(PUBLIC_DIR, 'mappings'), os.path.join(PUBLIC_DIR, 'mappings', 'generated_add.yaml'))
+        test_config = utils.load_mapping_from_path(os.path.join(
+            PUBLIC_DIR, 'mappings', 'test_config.yaml'))
+        test_config_added = utils.load_mapping_from_path(os.path.join(
+            PUBLIC_DIR, 'mappings', 'generated_add.yaml'))
+        self.assertEqual(test_config['mapping_data'], [{'in': 'a', 'out': 'b', 'context_before': '', 'context_after': ''}])
+        self.assertEqual(test_config['in_lang'], 'test')
+        self.assertEqual(test_config['out_lang'], 'test-out')
+        self.assertEqual(test_config['language_name'], 'Test')
+        self.assertEqual(test_config['display_name'], 'Test custom to TestOut custom')
+        self.assertEqual(test_config_added['mapping_data'], [{'in': 'a', 'out': 'b', 'context_before': '', 'context_after': ''}])
+        self.assertEqual(test_config_added['in_lang'], 'test')
+        self.assertEqual(test_config_added['out_lang'], 'test-out')
+        self.assertEqual(test_config_added['language_name'], 'Test')
+        self.assertEqual(test_config_added['display_name'], 'Test custom to TestOut custom')
 
 if __name__ == '__main__':
     main()

@@ -15,6 +15,32 @@ mappings:
       - Aidan Pine
     <<: *shared
   - language_name: Minimal
+    display_name: Minimal TSV to Minimal
+    mapping: minimal.tsv
+    in_lang: min
+    out_lang: min
+    as_is: true
+    case_sensitive: false
+    escape_special: true
+    norm_form: 'NFD'
+    reverse: true
+    authors:
+      - Aidan Pine
+    <<: *shared
+  - language_name: Minimal
+    display_name: Minimal PSV to Minimal
+    mapping: minimal.psv
+    in_lang: min
+    out_lang: min
+    as_is: true
+    case_sensitive: false
+    escape_special: true
+    norm_form: 'NFD'
+    reverse: true
+    authors:
+      - Aidan Pine
+    <<: *shared
+  - language_name: Minimal
     display_name: Minimal JSON to Minimal
     mapping: minimal.json
     in_lang: min
