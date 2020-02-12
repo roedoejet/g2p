@@ -8,7 +8,6 @@ from networkx import draw
 
 from g2p.transducer import CompositeTransducer, Transducer
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
-from g2p.mappings.validator import check_feeding, check_unnecessary
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK
 from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.utils import is_ipa, is_xsampa
@@ -75,36 +74,6 @@ def convert(in_lang, out_lang, input_text, debugger, index):
         PRINTER.pprint(transducer(input_text, index=index, debugger=debugger))
     else:
         click.echo(transducer(input_text, index=index, debugger=debugger))
-
-@click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
-@click.argument('in_lang', type=click.Choice(LANGS_NETWORK.nodes))
-@cli.command()
-def validate(in_lang, out_lang):
-    ''' Validate a mapping
-    '''
-    transducer = make_g2p(in_lang, out_lang)
-    mappings_needed = []
-    if isinstance(transducer, Transducer):
-        mappings_needed.append(transducer.mapping)
-    else:
-        for trans in transducer._transducers:
-            mappings_needed.append(trans.mapping)
-    for mapping in mappings_needed:        
-        unnecessary = check_unnecessary(mapping)
-        LOGGER.warning('The following rules are unnecessary.')
-        for rule in unnecessary:
-            inp = rule['in']
-            outp = rule['out']
-            LOGGER.info(f'The rule from {inp} to {outp} makes no change to the output.')
-        feeding = check_feeding(mapping)
-        LOGGER.warning('The following rules have possibily unwanted ordering relationships.')
-        for rule in feeding:
-            feeding_i = rule['feeding']['in']
-            feeding_o = rule['feeding']['out']
-            fed_i = rule['fed']['in']
-            fed_o = rule['fed']['out']
-            LOGGER.info(f'The rule from {feeding_i} to {feeding_o} could create the environment for the rule from {fed_i} to {fed_o} to apply unintentionally.')
-
 
 @cli.command()
 def update():
