@@ -16,6 +16,7 @@ from g2p.tests.test_transducer import TransducerTest
 from g2p.tests.test_cli import CliTest
 from g2p.tests.test_utils import UtilsTest
 from g2p.tests.test_transitive import TransitiveTest
+from g2p.tests.test_fallback import FallbackTest
 
 
 LOADER = TestLoader()
@@ -32,6 +33,7 @@ TRANSDUCER_TESTS = [
 MAPPINGS_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
+        FallbackTest,
         MappingCreationTest,
         MappingTest,
         NetworkTest,

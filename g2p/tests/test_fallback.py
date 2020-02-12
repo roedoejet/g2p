@@ -1,7 +1,6 @@
 from unittest import main, TestCase
 from g2p.mappings import Mapping
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
-from g2p.transducer import Transducer
 from g2p.tests.public import __file__ as public_data
 
 
@@ -10,7 +9,7 @@ class FallbackTest(TestCase):
         This feature is experimental, but it will try to map each character
         in a Mapping to one of the following 'unmarked' phonemes:
             ["ɑ", "i", "u", "t", "s", "n"]
-        If the mapping is 'ipa', it will align the inventories directly. 
+        If the mapping is 'ipa', it will align the inventories directly.
         If not, it will take a best guess at what the Unicode character using Unidecode and then align from there.
     '''
 
