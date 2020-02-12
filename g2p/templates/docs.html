@@ -1,60 +1,59 @@
 <!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='swagger-ui/swagger-ui.css') }}" >
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='swagger-ui/swagger-ui.css') }}">
     <!-- <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" /> -->
     <style>
-      html
-      {
-        box-sizing: border-box;
-        overflow: -moz-scrollbars-vertical;
-        overflow-y: scroll;
-      }
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
 
-      *,
-      *:before,
-      *:after
-      {
-        box-sizing: inherit;
-      }
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
 
-      body
-      {
-        margin:0;
-        background: #fafafa;
-      }
+        body {
+            margin: 0;
+            background: #fafafa;
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div id="swagger-ui"></div>
+</body>
 
-    <script src="{{ url_for('static', filename='swagger-ui/swagger-ui-bundle.js') }}"> </script>
-    <script src="{{ url_for('static', filename='swagger-ui/swagger-ui-standalone-preset.js') }}"> </script>
-    <script>
-    window.onload = function() {
+<script src="{{ url_for('static', filename='swagger-ui/swagger-ui-bundle.js') }}"> </script>
+<script src="{{ url_for('static', filename='swagger-ui/swagger-ui-standalone-preset.js') }}"> </script>
+<script>
+    window.onload = function () {
 
-      // Build a system
-      const ui = SwaggerUIBundle({
-        url: "{{ url_for('static', filename='swagger.json') }}",
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
-      })
+        // Build a system
+        const ui = SwaggerUIBundle({
+            url: "{{ url_for('static', filename='swagger.json') }}",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+        })
 
-      window.ui = ui
+        window.ui = ui
     }
-  </script>
-  </body>
+</script>
+
 </html>
