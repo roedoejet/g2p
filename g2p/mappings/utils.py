@@ -159,8 +159,8 @@ def load_from_csv(language, delimiter=','):
     ''' Parse mapping from csv
     '''
     work_sheet = []
-    with open(language, encoding='utf8', delimiter=delimiter) as f:
-        reader = csv.reader(f)
+    with open(language, encoding='utf8') as f:
+        reader = csv.reader(f, delimiter=delimiter)
         for line in reader:
             work_sheet.append(line)
     # Create wordlist
