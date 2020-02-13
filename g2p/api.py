@@ -10,9 +10,11 @@ from flask_cors import CORS
 from networkx.exception import NetworkXError, NetworkXNoPath
 from networkx.algorithms.dag import ancestors, descendants
 from g2p.static import __file__ as static_file
+from g2p.transducer import Transducer
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.log import LOGGER
 from g2p import make_g2p
+
 
 class Ancestors(Resource):
     def get(self, node):
@@ -21,6 +23,7 @@ class Ancestors(Resource):
         except NetworkXError:
             abort(404)
 
+
 class Descendants(Resource):
     def get(self, node):
         try:
@@ -28,9 +31,11 @@ class Descendants(Resource):
         except NetworkXError:
             abort(404)
 
+
 class Langs(Resource):
     def get(self):
         return sorted([x for x in LANGS_NETWORK.nodes])
+
 
 class Text(Resource):
     def __init__(self):
@@ -50,14 +55,39 @@ class Text(Resource):
             type=str, location='args',
             required=True, help="The text in the input language",
         )
+        self.parser.add_argument(
+            'index', dest='index',
+            type=bool, location='args',
+            default=False, required=False,
+            help="Return indices",
+        )
+        self.parser.add_argument(
+            'debugger', dest='debugger',
+            type=bool, location='args',
+            default=False, required=False,
+            help="The text in the input language",
+        )
+
     def get(self):
         args = self.parser.parse_args()
         in_lang = args['in-lang']
         out_lang = args['out-lang']
         text = args['text']
+        index = args['index']
+        debugger = args['debugger']
         try:
             transducer = make_g2p(in_lang, out_lang)
-            return transducer(text)
+            if debugger and index:
+                text, index, debugger = transducer(text, index=index, debugger=debugger)
+                index = index.reduced()
+                debugger = Transducer.make_debugger_output_safe(debugger)
+            elif index:
+                text, index = transducer(text, index=index, debugger=debugger)
+                index = index.reduced()
+            elif debugger:
+                text, debugger = transducer(text, index=index, debugger=debugger)
+                debugger = Transducer.make_debugger_output_safe(debugger[1])
+            return {'output-text': text, 'index': index, 'debugger': debugger}
         except NetworkXNoPath:
             abort(400)
         except FileNotFoundError:
@@ -69,10 +99,12 @@ def update_docs():
     swagger_path = os.path.join(os.path.dirname(static_file), 'swagger.json')
     with open(swagger_path) as f:
         data = json.load(f)
-    data['components']['schemas']['Langs']['enum'] = sorted([x for x in LANGS_NETWORK.nodes])
+    data['components']['schemas']['Langs']['enum'] = sorted(
+        [x for x in LANGS_NETWORK.nodes])
     with open(swagger_path, 'w') as f:
         f.write(json.dumps(data))
     LOGGER.info('Updated API documentation')
+
 
 g2p_api = Blueprint('resources.g2p', __name__)
 

@@ -68,7 +68,6 @@ class Transducer():
                                a tuple with the converted string and corresponding rules (index=False, debugger=True),
                                a tuple with the converted string, indices and rules (index=True, debugger=True)
         """
-        
         return self.apply_rules(to_convert, index, debugger)
 
     @staticmethod
@@ -150,6 +149,15 @@ class Transducer():
                             indices[k]['output'][k_o +
                                                  diff] = indices[k]['output'].pop(k_o)
         return indices
+
+    @staticmethod
+    def make_debugger_output_safe(debugger_output):
+        new_output = []
+        for x in debugger_output:
+            if isinstance(x, dict):
+                x['rule'] = {k: v for k, v in x['rule'].items() if k != 'match_pattern'}
+                new_output.append(x)
+        return new_output
 
     @staticmethod
     def return_default_mapping(input_strings: List[str], output_strings: List[str],
@@ -321,7 +329,6 @@ class Transducer():
                 - a tuple with the converted string and corresponding rules (index=False, debugger=True),
                 - a tuple with the converted string, indices and rules (index=True, debugger=True)
         """
-        
         # Convert input as necessary
         if not self.case_sensitive:
             to_convert = to_convert.lower()

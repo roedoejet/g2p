@@ -57,24 +57,32 @@ def generate_mapping_network(path):
     draw(LANGS_NETWORK, with_labels=True)
     plt.show()
 
-
+@click.option('--json-safe/--json-unsafe', default=False)
 @click.option('--index/--no-index', default=False)
 @click.option('--debugger/--no-debugger', default=False)
 @click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('in_lang', type=click.Choice(LANGS_NETWORK.nodes))
 @click.argument('input_text', type=click.STRING)
 @cli.command()
-def convert(in_lang, out_lang, input_text, debugger, index):
+def convert(in_lang, out_lang, input_text, debugger, index, json_safe):
     ''' Convert any text
     '''
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
     transducer = make_g2p(in_lang, out_lang)
+    output = list(transducer(input_text, index=index, debugger=debugger))
+    if json_safe and debugger and index:
+        output[1] = output[1].reduced()
+        output[2] = Transducer.make_debugger_output_safe(output[2])
+    elif json_safe and index:
+        output[1] = output[1].reduced()
+    elif json_safe and debugger:
+        output[1] = Transducer.make_debugger_output_safe(output[1])
     if debugger:
-        PRINTER.pprint(transducer(input_text, index=index, debugger=debugger))
+        PRINTER.pprint(output)
     else:
-        click.echo(transducer(input_text, index=index, debugger=debugger))
+        click.echo(output)
 
 @cli.command()
 def update():
