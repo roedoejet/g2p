@@ -20,11 +20,11 @@ class ResourceIntegrationTest(TestCase):
     """
 
     def setUp(self):
-        # host
+        # Test external hosts
         self.hosts = [
-            "http://localhost:5000",
-            # "https://g2p-studio.herokuapp.com"
+        #     # "https://g2p-studio.herokuapp.com"
         ]
+        self.client = APP.test_client
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}
         self.prefix = "/api/v1"
@@ -64,6 +64,13 @@ class ResourceIntegrationTest(TestCase):
                                 " returned " + str(r.status_code))
                 except:
                     LOGGER.error("Couldn't connect. Is flask running?")
+            try:
+                r = self.client().get(rt)
+                self.assertEqual(r.status_code, 200)
+                LOGGER.info("Route " + rt +
+                            " returned " + str(r.status_code))
+            except:
+                LOGGER.error("Couldn't connect. Is flask running?")
 
     def test_response_code_with_args(self):
         '''
@@ -80,6 +87,14 @@ class ResourceIntegrationTest(TestCase):
                         LOGGER.error("Couldn't connect. Is flask running?")
                 LOGGER.info("Successfully tested " + str(len(LANGS_NETWORK.nodes)
                                                          ) + " node resources at route " + host + ep + " .")
+            for node in LANGS_NETWORK.nodes:
+                rt = re.sub(self.arg_match, node, ep)
+                try:
+                    r = self.client().get(rt)
+                    self.assertEqual(r.status_code, 200)
+                except:
+                    LOGGER.error("Couldn't connect. Is flask running?")
+            LOGGER.info("Successfully tested " + str(len(LANGS_NETWORK.nodes)) + " node resources at route " + ep + " .")
 
     def test_g2p_conversion(self):
         '''
@@ -134,6 +149,46 @@ class ResourceIntegrationTest(TestCase):
             missing_response = requests.get(
                 host + self.conversion_route, params=missing_params, headers=self.headers)
             self.assertEqual(missing_response.status_code, 404)
+        response = self.client().get(self.conversion_route, query_string=params)
+        res_json = response.get_json()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            res_json, {'output-text': 'HH EH Y', 'index': [[1, 5], [2, 6], [3, 7]], 'debugger': [{'end': 2,
+                                                                                                    'input': 'hej',
+                                                                                                    'output': 'hɛj',
+                                                                                                    'rule': {'context_after': '',
+                                                                                                            'context_before': '',
+                                                                                                            'in': 'e',
+                                                                                                            'out': 'ɛ'},
+                                                                                                    'start': 1},
+                                                                                                    {'end': 2,
+                                                                                                    'input': 'hɛj',
+                                                                                                    'output': 'hEH j',
+                                                                                                    'rule': {'context_after': '',
+                                                                                                            'context_before': '',
+                                                                                                            'in': 'ɛ',
+                                                                                                            'out': 'EH'},
+                                                                                                    'start': 1},
+                                                                                                    {'end': 1,
+                                                                                                    'input': 'hEH j',
+                                                                                                    'output': 'HH EH j',
+                                                                                                    'rule': {'context_after': '',
+                                                                                                            'context_before': '',
+                                                                                                            'in': 'h',
+                                                                                                            'out': 'HH'},
+                                                                                                    'start': 0},
+                                                                                                    {'end': 7,
+                                                                                                    'input': 'HH EH j',
+                                                                                                    'output': 'HH EH Y',
+                                                                                                    'rule': {'context_after': '',
+                                                                                                            'context_before': '',
+                                                                                                            'in': 'j',
+                                                                                                            'out': 'Y'},
+                                                                                                    'start': 6}]})
+        bad_response = self.client().get(self.conversion_route, query_string=bad_params)
+        self.assertEqual(bad_response.status_code, 400)
+        missing_response = self.client().get(self.conversion_route, query_string=missing_params)
+        self.assertEqual(missing_response.status_code, 404)
 
 
 if __name__ == '__main__':

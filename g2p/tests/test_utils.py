@@ -5,6 +5,8 @@ import os
 from unittest import main, TestCase
 from collections import defaultdict
 
+import yaml
+
 from g2p.mappings import utils
 from g2p.tests.public import PUBLIC_DIR
 from g2p.exceptions import IncorrectFileType, MalformedMapping
@@ -14,6 +16,14 @@ from g2p.transducer.utils import convert_index_to_tuples, convert_tuples_to_inde
 class UtilsTest(TestCase):
     def setUp(self):
         pass
+
+    def tearDown(self):
+        gen_config = os.path.join(PUBLIC_DIR, 'mappings', 'test_config.yaml')
+        if os.path.exists(gen_config):
+            os.remove(gen_config)
+        fresh_config = {'language_name': 'generated', 'mappings': []}
+        with open(os.path.join(PUBLIC_DIR, 'mappings', 'generated_add.yaml'), 'w') as f:
+            yaml.dump(fresh_config, f, Dumper=utils.IndentDumper, default_flow_style=False)
 
     def test_abb_flatten_and_expand(self):
         test_rows = [
