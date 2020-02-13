@@ -23,7 +23,7 @@ class ResourceIntegrationTest(TestCase):
         # host
         self.hosts = [
             "http://localhost:5000",
-            # "https://g2p-studio.herokuapp.com"
+            "https://g2p-studio.herokuapp.com"
         ]
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36'}

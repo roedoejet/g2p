@@ -23,7 +23,7 @@ install:
   - cd /home/travis/build/roedoejet/g2p && pip3 install -e .
 
 before_script:
-  - gunicorn g2p:app --bind 0.0.0.0:5000 --daemon
+  - gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
 
 # commands to run the testing suite. if any of these fail, travic lets us know
 script: 
