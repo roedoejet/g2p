@@ -28,7 +28,7 @@ import panphon.distance
 from tqdm import tqdm
 import yaml
 
-from g2p.mappings.utils import generate_config, is_ipa, is_xsampa, IndentDumper, write_generated_mapping_to_file
+from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
 from g2p.mappings import Mapping
 from g2p.log import LOGGER
 
@@ -82,24 +82,21 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     mapping = align_inventories(mapping_1.inventory(mapping_1_io), mapping_2.inventory(mapping_2_io),
                                 l1_is_xsampa, l2_is_xsampa)
 
-    l1_display_name = mapping_1.kwargs.get(
-        'language_name', 'No Language display name in Config')
-    l2_display_name = mapping_2.kwargs.get(
-        'language_name', 'No Language display name in Config')
-
-    config = generate_config(map_1_name, map_2_name, l1_display_name, l2_display_name)
-
+    config = {'in_lang': map_1_name, 'out_lang': map_2_name}
+    config['mapping'] = mapping
+    mapping = Mapping(**config)
     if write_to_file:
         if out_dir:
             if os.path.isdir(out_dir):
-                out_config = os.path.join(out_dir, l1_display_name)
-                write_generated_mapping_to_file(config, mapping, out_dir=out_dir, out_config=out_config)
+                mapping.config_to_file(out_dir)
+                mapping.mapping_to_file(out_dir)
             else:
                 LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
         else:
-            write_generated_mapping_to_file(config, mapping)
+            mapping.config_to_file()
+            mapping.mapping_to_file()
 
-    return Mapping(mapping, **{k: v for k, v in config.items() if k != 'mapping'})
+    return mapping
 
 def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
     """Find a good sequence in inventory_l2 matching p1."""

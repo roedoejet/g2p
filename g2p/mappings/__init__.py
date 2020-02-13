@@ -16,14 +16,17 @@ from operator import methodcaller
 from copy import deepcopy
 
 import yaml
+import datetime as dt
 
 from g2p import exceptions
 from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters, normalize
 from g2p.mappings.utils import find_mapping, flatten_abbreviations, IndentDumper, load_abbreviations_from_file
 from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
+from g2p.mappings.utils import is_dummy, is_ipa, is_xsampa
 from g2p.log import LOGGER
 
+GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), 'generated')
 
 class Mapping():
     """ Class for lookup tables
@@ -96,7 +99,6 @@ class Mapping():
     def __call__(self):
         return self.mapping
 
-
     def __iter__(self):
         return iter(self.mapping)
 
@@ -112,15 +114,33 @@ class Mapping():
             ))
 
     @staticmethod
+    def find_mapping_by_id(map_id: str):
+        ''' Find the mapping with a given ID
+        '''
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.get('id', '') == map_id:
+                return deepcopy(mapping)
+    @staticmethod
+    def mapping_type(name):
+        if is_ipa(name):
+            return 'IPA'
+        elif is_xsampa(name):
+            return 'XSAMPA'
+        elif is_dummy(name):
+            return 'dummy'
+        else:
+            return 'custom'
+
+    @staticmethod
     def _string_to_pua(string: str, offset: int) -> str:
         """Given an string of length n, and an offset m,
            produce a string of n * chr(983040 + m).
            This makes use of the Supplementary Private Use Area A Unicode block.
-        
+
         Args:
             string (str): The string to convert
-            offset (int): The offset from the start of the Supplementary Private Use Area 
-        
+            offset (int): The offset from the start of the Supplementary Private Use Area
+
         Returns:
             str: The resulting string
         """
@@ -187,7 +207,8 @@ class Mapping():
         # After all processing is done, turn into regex
         for io in mapping:
             if self.kwargs['prevent_feeding'] or ('prevent_feeding' in io and io['prevent_feeding']):
-                io['intermediate_form'] = self._string_to_pua(io['out'], mapping.index(io))
+                io['intermediate_form'] = self._string_to_pua(
+                    io['out'], mapping.index(io))
             io['match_pattern'] = self.rule_to_regex(io)
             if not io['match_pattern']:
                 mapping.remove(io)
@@ -197,8 +218,8 @@ class Mapping():
     def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"
-        
-        The 'in' key is the match. 
+
+        The 'in' key is the match.
         The 'context_after' key creates a lookahead.
         The 'context_before' key creates a lookbehind.
 
@@ -207,14 +228,15 @@ class Mapping():
 
         Raises:
             Exception: This is raised when un-supported regex characters or symbols exist in the rule
-        
+
         Returns:
             Pattern: returns a regex pattern (re.Pattern)
             bool: returns False if input is null
         """
         # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
         if not rule['in']:
-            LOGGER.warning(f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.')
+            LOGGER.warning(
+                f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.')
             return False
         if "context_before" in rule and rule['context_before']:
             before = rule["context_before"]
@@ -273,14 +295,7 @@ class Mapping():
                         io[key] = abb['stands_for']
         return mappings
 
-    def find_mapping_by_id(self, map_id: str):
-        ''' Find the mapping with a given ID
-        '''
-        for mapping in MAPPINGS_AVAILABLE:
-            if mapping.get('id', '') == map_id:
-                return deepcopy(mapping)
-
-    def mapping_to_file(self, output_path: str, file_type: str):
+    def mapping_to_file(self, output_path: str = GEN_DIR, file_type: str = 'json'):
         ''' Write mapping to file
         '''
         if not os.path.isdir(output_path):
@@ -299,37 +314,45 @@ class Mapping():
                 for io in filtered:
                     writer.writerow(io)
         else:
-            raise exceptions.IncorrectFileType
+            raise exceptions.IncorrectFileType(f'File type {file_type} is invalid.')
 
-    def config_to_file(self, output_path: str, mapping_type: str):
+    def config_to_file(self, output_path: str = os.path.join(GEN_DIR, 'config.yaml'), mapping_type: str = 'json'):
         ''' Write config to file
         '''
-        if not os.path.isdir(output_path):
-            raise Exception("Path %s is not a directory", output_path)
-        fn = os.path.join(output_path, 'config.yaml')
+        add_config = False
+        if os.path.exists(output_path) and os.path.isfile(output_path):
+            LOGGER.warning(f'Adding mapping config to file at {output_path}')
+            fn = output_path
+            add_config = True
+        elif os.path.isdir(output_path):
+            fn = os.path.join(output_path, 'config.yaml')
+        else:
+            LOGGER.warning(f'writing mapping config to file at {output_path}')
+            fn = output_path
         template = {"mappings": [
             {
                 "language_name": self.kwargs.get('language_name', self.kwargs.get('in_lang', 'und')),
-                "display_name": self.kwargs.get('display_name', self.kwargs.get('in_lang', 'und') + " to " + self.kwargs.get('out_lang', 'und')),
+                "display_name": self.kwargs.get('display_name', self.kwargs.get('in_lang', 'und') + " " + self.mapping_type(self.kwargs.get('out_lang', 'und')) + " to " + self.kwargs.get('out_lang', 'und') + " " + self.mapping_type(self.kwargs.get('out_lang', 'und'))),
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
-                "authors": self.kwargs.get('authors', ['generated']),
+                "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
                 "as_is": self.kwargs.get('as_is', True),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
                 "norm_form": self.kwargs.get('norm_form', "NFD"),
                 "reverse": self.kwargs.get('reverse', False),
-                "mapping": self.kwargs.get('in_lang', 'und') + "_to_" +
-                self.kwargs.get('out_lang', 'und') + "." + mapping_type
+                "mapping": self.kwargs.get('in_lang', 'und') + "_to_" + self.kwargs.get('out_lang', 'und') + '.' + mapping_type
             }
         ]}
+        # If config file exists already, just add the mapping.
+        if add_config:
+            with open(fn, encoding='utf8') as f:
+                existing_data=yaml.safe_load(f.read())
+            existing_data['mappings'].append(template['mappings'][0])
+            template=existing_data
         with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,
                       default_flow_style=False)
-
-    def to_file(self, output_path: str, mapping_type: str = 'csv'):
-        self.mapping_to_file(output_path, mapping_type)
-        self.config_to_file(output_path, mapping_type)
 
 
 if __name__ == '__main__':

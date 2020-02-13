@@ -1,4 +1,5 @@
 from unittest import main, TestCase
+import re
 from g2p.mappings import Mapping
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
 from g2p.tests.public import __file__ as public_data
@@ -30,15 +31,13 @@ class FallbackTest(TestCase):
                                {'in': 'b', 'out': 'β'},
                                {'in': 'g', 'out': 'ɡ'}], in_lang='test', out_lang='test-ipa')
         test_in = align_to_dummy_fallback(mapping)
-        self.assertEqual(test_in[1], [{'in': 'a', 'out': 'ɑ'}, {'in': 'e', 'out': 'i'}, {'in': 'i', 'out': 'i'}, {
-                         'in': 'b', 'out': 't'}, {'in': 'g', 'out': 't'}, {'in': 'g', 'out': 't'}, {'in': 'i', 'out': 'i'}])
+        self.assertEqual(test_in.mapping, [{'in': 'a', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('a')}, {'in': 'e', 'out': 'i', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('e')}, {'in': 'i', 'out': 'i', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('i')}, {'in': 'b', 'out': 't', 'context_before': '',
+                                                                                                                                                                                                                                                                                                                                                              'context_after': '', 'match_pattern': re.compile('b')}, {'in': 'g', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('g')}, {'in': 'g', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('g')}, {'in': 'i', 'out': 'i', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('i')}])
         test_out = align_to_dummy_fallback(mapping, 'out')
-        self.assertEqual(test_out[1], [{'in': 'æ', 'out': 'ɑi'}, {'in': 'ɐ', 'out': 'ɑ'}, {'in': 'ɑ̃', 'out': 'ɑ'}, {
-                         'in': 'β', 'out': 't'}, {'in': 'ɡ', 'out': 't'}, {'in': 'g', 'out': 't'}, {'in': 'ةُ', 'out': 'ɑu'}])
+        self.assertEqual(test_out.mapping, [{'in': 'æ', 'out': 'ɑi', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('æ')}, {'in': 'ɐ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɐ')}, {'in': 'ɑ̃', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɑ̃')}, {
+                         'in': 'β', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('β')}, {'in': 'ɡ', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɡ')}, {'in': 'g', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('g')}, {'in': 'ةُ', 'out': 'ɑu', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ةُ')}])
         test_ipa = align_to_dummy_fallback(ipa_mapping, 'out')
-        self.assertEqual(test_ipa[1], [{'in': 'æ', 'out': 'ɑ'}, {'in': 'ɐ', 'out': 'ɑ'}, {
-                         'in': 'ɑ̃', 'out': 'ɑ'}, {'in': 'ɡ', 'out': 't'}, {'in': 'β', 'out': 's'}])
-
-
+        self.assertEqual(test_ipa.mapping, [{'in': 'æ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('æ')}, {'in': 'ɐ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɐ')}, {'in': 'ɑ̃', 'out': 'ɑ', 'context_before': '',
+                                                                                                                                                                                                                                                    'context_after': '', 'match_pattern': re.compile('ɑ̃')}, {'in': 'ɡ', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɡ')}, {'in': 'β', 'out': 's', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('β')}])
 if __name__ == "__main__":
     main()

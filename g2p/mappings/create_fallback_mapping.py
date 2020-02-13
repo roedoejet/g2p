@@ -6,12 +6,12 @@ from g2p import make_g2p
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.create_ipa_mapping import align_inventories
-from g2p.mappings.utils import generate_config, is_ipa, write_generated_mapping_to_file, unicode_escape
+from g2p.mappings.utils import is_ipa, unicode_escape
 
 def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False, out_dir: str = ''):
     dummy_inventory = ["ɑ", "i", "u", "t", "s", "n"]
     display_name = mapping.kwargs.get('language_name', 'No Language display name in Config')
-    config = generate_config(mapping.kwargs[f'{io}_lang'], 'dummy', display_name, display_name)
+    config = {'in_lang': mapping.kwargs[f'{io}_lang'], 'out_lang': 'dummy'}
     default_char = 't'
     if is_ipa(mapping.kwargs[f'{io}_lang']):
         mapping = align_inventories(mapping.inventory(io), dummy_inventory)
@@ -30,18 +30,20 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
             except KeyError:
                 LOGGER.warn(f"We couldn't guess at what {x['in']} means, so it's being replaced with '{default_char}' instead.")
                 x['out'] = default_char       
- 
+
+    config['mapping'] = mapping
+    mapping = Mapping(**config)
     if write_to_file:
         if out_dir:
             if os.path.isdir(out_dir):
-                out_config = os.path.join(out_dir, display_name)
-                write_generated_mapping_to_file(config, mapping, out_dir=out_dir, out_config=out_config)
+                mapping.config_to_file(out_dir)
+                mapping.mapping_to_file(out_dir)
             else:
                 LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
         else:
-            write_generated_mapping_to_file(config, mapping)
-        write_generated_mapping_to_file(config, mapping)
-    return config, mapping
+            mapping.config_to_file()
+            mapping.mapping_to_file()
+    return mapping
 
 if __name__ == "__main__":
     test = Mapping(in_lang='git', out_lang='git-ipa')

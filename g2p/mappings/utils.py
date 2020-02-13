@@ -26,7 +26,6 @@ from g2p.mappings import langs
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), 'generated')
 GEN_CONFIG = os.path.join(GEN_DIR, 'config.yaml')
 
-
 def flatten_abbreviations(data):
     ''' Turn a CSV-sourced list of lists into a flattened DefaultDict
     '''
@@ -35,7 +34,6 @@ def flatten_abbreviations(data):
         if line[0]:
             default_dict[line[0]].extend([l for l in line[1:] if l])
     return default_dict
-
 
 def expand_abbreviations(data):
     ''' Exapand a flattened DefaultDict into a CSV-formatted list of lists
@@ -51,7 +49,6 @@ def expand_abbreviations(data):
         while len(lines) < 10:
             lines.append(['', '', '', '', '', ''])
     return lines
-
 
 def normalize(inp: str, norm_form: str):
     ''' Normalize to NFC(omposed) or NFD(ecomposed).
@@ -69,19 +66,16 @@ def normalize(inp: str, norm_form: str):
                 inp, normalized, norm_form)
         return normalized
 
-
 def unicode_escape(text):
     ''' Find any escaped characters and turn them into codepoints
     '''
     return re.sub(r"""\\(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{6})""", escape_to_codepoint, text)
-
 
 def escape_to_codepoint(match):
     ''' Turn escape into codepoint
     '''
     hex_codepoint = match.group(1)[1:]
     return chr(int(hex_codepoint, base=16))
-
 
 def create_fixed_width_lookbehind(pattern):
     '''Turn all characters into fixed width lookbehinds
@@ -92,7 +86,6 @@ def create_fixed_width_lookbehind(pattern):
     (?=\)?)               # lookahead
     """, re.U | re.VERBOSE),
                   pattern_to_fixed_width_lookbehinds, pattern)
-
 
 def pattern_to_fixed_width_lookbehinds(match):
     ''' Python must have fixed-width lookbehinds.
@@ -113,7 +106,6 @@ def pattern_to_fixed_width_lookbehinds(match):
             all_lookbehinds.append(current_list)
     all_lookbehinds = [f"(?<={'|'.join(items)})" for items in all_lookbehinds]
     return '(' + '|'.join(all_lookbehinds) + ')'
-
 
 def load_from_workbook(language):
     ''' Parse mapping from Excel workbook
@@ -154,7 +146,6 @@ def load_from_workbook(language):
 
     return mapping
 
-
 def load_from_csv(language, delimiter=','):
     ''' Parse mapping from csv
     '''
@@ -187,7 +178,6 @@ def load_from_csv(language, delimiter=','):
 
     return mapping
 
-
 def load_from_file(path: str) -> list:
     ''' Helper method to load mapping from file.
     '''
@@ -203,7 +193,6 @@ def load_from_file(path: str) -> list:
         with open(path, encoding='utf8') as f:
             mapping = json.load(f)
     return validate(mapping)
-
 
 def load_mapping_from_path(path_to_mapping_config, index=0):
     ''' Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
@@ -269,7 +258,6 @@ def validate(mapping):
         # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
         raise exceptions.MalformedMapping()
 
-
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
     for k, v in to_escape.items():
         if isinstance(v, str):
@@ -281,7 +269,6 @@ def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
                 f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
         to_escape[k] = escaped
     return to_escape
-
 
 def load_abbreviations_from_file(path):
     ''' Helper method to load abbreviations from file.
@@ -306,92 +293,16 @@ def load_abbreviations_from_file(path):
             f'Sorry, abbreviations must be stored as CSV/TSV/PSV files. You provided the following: {path}')
     return abbs
 
-
-def generate_config(in_lang, out_lang, in_display_name, out_display_name, as_is=False):
-    if is_ipa(in_lang):
-        in_type = 'IPA'
-    elif is_xsampa(in_lang):
-        in_type = 'XSAMPA'
-    elif is_dummy(in_lang):
-        in_type = 'dummy'
-    else:
-        in_type = 'custom'
-
-    if is_ipa(out_lang):
-        out_type = 'IPA'
-    elif is_xsampa(out_lang):
-        out_type = 'XSAMPA'
-    elif is_dummy(out_lang):
-        out_type = 'dummy'
-    else:
-        out_type = 'custom'
-
-    mapping_fn = f'{in_lang}_to_{out_lang}.json'
-    config = {
-        'display_name': f"{in_display_name} {in_type} to {out_display_name} {out_type}",
-        'mapping': mapping_fn,
-        'in_lang': in_lang,
-        'out_lang': out_lang,
-        'language_name': in_display_name,
-        'as_is': as_is,
-        'author': f"Generated {dt.datetime.now()}"
-    }
-    return config
-
-
-def write_generated_mapping_to_file(config: dict, mapping: List[dict], out_dir=GEN_DIR, out_config=GEN_CONFIG):
-    ''' Given a configuration and a list of input/output pairs, write a config file and corresponding mapping json file.
-    '''
-    # read config
-    if os.path.exists(out_config):
-        with open(out_config, 'r') as f:
-            data = yaml.safe_load(f)
-    else:
-        data = {'language_name': 'generated', 'mappings': []}
-    if not data['mappings']:
-        data['mappings'] = []
-    map_output_path = os.path.join(out_dir, config['mapping'])
-    # write mapping
-    if os.path.exists(map_output_path):
-        LOGGER.info(f"Overwriting file at {map_output_path}")
-    with open(map_output_path, 'w', encoding='utf8') as f:
-        json.dump(mapping, f, indent=4)
-    data = deepcopy(data)
-    cfg_exists = bool([x for x in data['mappings'] if x['in_lang']
-                       == config['in_lang'] and x['out_lang'] == config['out_lang']])
-    # add new mapping if it doesn't exist yet
-    if not cfg_exists:
-        data['mappings'].append(config)
-        # rewrite config
-        with open(out_config, 'w', encoding='utf8') as f:
-            yaml.dump(data, f, Dumper=IndentDumper, default_flow_style=False)
-    elif cfg_exists:
-        for i, cfg in enumerate(data['mappings']):
-            if cfg['in_lang'] == config['in_lang'] and cfg['out_lang'] == config['out_lang']:
-                data['mappings'][i] = config
-                # rewrite config
-                with open(out_config, 'w', encoding='utf8') as f:
-                    yaml.dump(data, f, Dumper=IndentDumper,
-                              default_flow_style=False)
-                break
-    else:
-        LOGGER.warn(
-            f"Not writing generated files because a non-generated mapping from {config['in_lang']} to {config['out_lang']} already exists.")
-
-
 def is_ipa(lang: str) -> bool:
     pattern = re.compile('[-_]?ipa$')
     return bool(re.search(pattern, lang))
-
 
 def is_xsampa(lang: str) -> bool:
     pattern = re.compile('[-_]?x(-?)sampa$')
     return bool(re.search(pattern, lang))
 
-
 def is_dummy(lang: str) -> bool:
     return lang == 'dummy'
-
 
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):

@@ -8,6 +8,7 @@ from collections import defaultdict
 import yaml
 
 from g2p.mappings import utils
+from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
 from g2p.exceptions import IncorrectFileType, MalformedMapping
 from g2p.transducer.utils import convert_index_to_tuples, convert_tuples_to_index
@@ -18,9 +19,12 @@ class UtilsTest(TestCase):
         pass
 
     def tearDown(self):
+        gen_mapping = os.path.join(PUBLIC_DIR, 'mappings', 'test_to_test-out.json')
         gen_config = os.path.join(PUBLIC_DIR, 'mappings', 'test_config.yaml')
         if os.path.exists(gen_config):
             os.remove(gen_config)
+        if os.path.exists(gen_mapping):
+            os.remove(gen_mapping)
         fresh_config = {'language_name': 'generated', 'mappings': []}
         with open(os.path.join(PUBLIC_DIR, 'mappings', 'generated_add.yaml'), 'w') as f:
             yaml.dump(fresh_config, f, Dumper=utils.IndentDumper, default_flow_style=False)
@@ -102,10 +106,13 @@ class UtilsTest(TestCase):
         self.assertEqual(convert_tuples_to_index(tuple_format), dict_format)
 
     def test_generated_mapping(self):
-        config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
-        mapping = [{'in': 'a', 'out': 'b'}]
-        utils.write_generated_mapping_to_file(config, mapping, os.path.join(PUBLIC_DIR, 'mappings'), os.path.join(PUBLIC_DIR, 'mappings', 'test_config.yaml'))
-        utils.write_generated_mapping_to_file(config, mapping, os.path.join(PUBLIC_DIR, 'mappings'), os.path.join(PUBLIC_DIR, 'mappings', 'generated_add.yaml'))
+        config = {'in_lang': 'test', 'out_lang': 'test-out', 'as_is': False}
+        # config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
+        config['mapping'] = [{'in': 'a', 'out': 'b'}]
+        mapping = Mapping(**config)
+        mapping.config_to_file(os.path.join(PUBLIC_DIR, 'mappings', 'test_config.yaml'))
+        mapping.config_to_file(os.path.join(PUBLIC_DIR, 'mappings', 'generated_add.yaml'))
+        mapping.mapping_to_file(os.path.join(PUBLIC_DIR, 'mappings'))
         test_config = utils.load_mapping_from_path(os.path.join(
             PUBLIC_DIR, 'mappings', 'test_config.yaml'))
         test_config_added = utils.load_mapping_from_path(os.path.join(
@@ -113,13 +120,13 @@ class UtilsTest(TestCase):
         self.assertEqual(test_config['mapping_data'], [{'in': 'a', 'out': 'b', 'context_before': '', 'context_after': ''}])
         self.assertEqual(test_config['in_lang'], 'test')
         self.assertEqual(test_config['out_lang'], 'test-out')
-        self.assertEqual(test_config['language_name'], 'Test')
-        self.assertEqual(test_config['display_name'], 'Test custom to TestOut custom')
+        self.assertEqual(test_config['language_name'], 'test')
+        self.assertEqual(test_config['display_name'], 'test custom to test-out custom')
         self.assertEqual(test_config_added['mapping_data'], [{'in': 'a', 'out': 'b', 'context_before': '', 'context_after': ''}])
         self.assertEqual(test_config_added['in_lang'], 'test')
         self.assertEqual(test_config_added['out_lang'], 'test-out')
-        self.assertEqual(test_config_added['language_name'], 'Test')
-        self.assertEqual(test_config_added['display_name'], 'Test custom to TestOut custom')
+        self.assertEqual(test_config_added['language_name'], 'test')
+        self.assertEqual(test_config_added['display_name'], 'test custom to test-out custom')
 
 if __name__ == '__main__':
     main()
