@@ -13,7 +13,7 @@ from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.utils import is_ipa, is_xsampa
 from g2p.mappings import Mapping
 from g2p._version import VERSION
-from g2p.app import APP, SOCKETIO
+from g2p.app import APP, SOCKETIO, network_to_echart
 from g2p.api import update_docs
 from g2p.log import LOGGER
 from g2p import make_g2p
@@ -90,3 +90,4 @@ def update():
     '''
     cache_langs()
     update_docs()
+    network_to_echart(write_to_file=True)

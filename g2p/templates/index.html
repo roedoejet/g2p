@@ -69,8 +69,19 @@
         </div>
         <br>
         <div class='row'>
+            <div class='columns twelve center-text'>
+                <h4>Languages</h4><button id='show-langs'>Show Languages Animation</button><button id='hide-langs' style='display: none;'>Hide
+                    Languages Animation</button>
+            </div>
+        </div>
+        <div class='row'>
+            <div class='columns twelve center-text'>
+                <div id="langsechart" style="width:100%; min-width: 400px; height:400px; display: none;"></div>
+            </div>
+        </div>
+        <div class='row'>
             <div class='columns six'>
-                <h4>Languages</h4>
+                <h5>Select a mapping</h5>
                 <select id="langselect">
                     <option value="custom">Custom</option>
                     {% for k, v in langs.items() %}

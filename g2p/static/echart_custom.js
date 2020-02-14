@@ -1,4 +1,31 @@
 $(document).ready(function () {
+    const langsChart = echarts.init(document.getElementById('langsechart'));
+    var langsOption = {
+        animationDurationUpdate: 1500,
+        animationEasingUpdate: 'quinticInOut',
+        series: [
+            {
+                type: 'graph',
+                layout: 'circular',
+                // progressiveThreshold: 700,
+                data: [],
+                links: [],
+                emphasis: {
+                    label: {
+                        position: 'right',
+                        show: true
+                    }
+                },
+                roam: true,
+                focusNodeAdjacency: true,
+                lineStyle: {
+                    width: 0.5,
+                    curveness: 0.3,
+                    opacity: 0.7
+                }
+            }
+        ]
+    }
     const myChart = echarts.init(document.getElementById('echart'));
     var option = {
         title: {
@@ -43,10 +70,12 @@ $(document).ready(function () {
     };
     // use configuration item and data specified to show chart
     // myChart.setOption(option);
-
     $(window).on('resize', function () {
         if (myChart != null && myChart != undefined) {
             myChart.resize();
+        }
+        if (langsChart != null && langsChart != undefined) {
+            langsChart.resize();
         }
     });
 
@@ -76,13 +105,32 @@ $(document).ready(function () {
     })
     // Convert after any changes to tables
     Handsontable.hooks.add('afterChange', convert)
-    
     conversionSocket.on('index conversion response', function (msg) {
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
         myChart.setOption(option, true)
+        $(window).trigger('resize');
     });
-
+    $.ajax({
+        url: "/static/languages-network.json",
+        dataType: "json",
+        success: function(response) {
+            langsOption.series[0].data = response['nodes']
+            langsOption.series[0].links = response['edges']
+            langsChart.setOption(langsOption, true)
+        }
+      });
+    $('#show-langs').click(function (event) {
+        $('#langsechart').show()
+        $('show-langs').hide()
+        $('#hide-langs').show()
+        $(window).trigger('resize');
+    })
+    $('#hide-langs').click(function (event) {
+        $('#langsechart').hide()
+        $('#hide-langs').hide()
+        $('show-langs').show()
+    })
     $('#indexInput').on('keyup', function (event) {
         convert()
         return false;

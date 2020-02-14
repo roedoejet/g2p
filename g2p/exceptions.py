@@ -21,7 +21,7 @@ class MappingMissing(CommandLineError):
             '\n'
             'There is no mapping between the languages "%(in_lang)s" and "%(out_lang)s", please\n'
             'make sure you spelled the name correctly or go to\n'
-            'https://github.com/roedoejet/g2p/ for a list of mappings'
+            'https://g2p-studio.herokuapp.com/api/v1/langs for a list of mappings'
         ))
 
 class InvalidNormalization(CommandLineError):
