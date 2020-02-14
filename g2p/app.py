@@ -107,7 +107,7 @@ def return_descendant_nodes(node: str):
 def home():
     """ Return homepage of g2p studio
     """
-    return render_template('index.html', langs=LANGS)
+    return render_template('index.html')
 
 
 @APP.route('/docs')

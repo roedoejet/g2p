@@ -70,7 +70,8 @@
         <br>
         <div class='row'>
             <div class='columns twelve center-text'>
-                <h4>Languages</h4><button id='show-langs'>Show Languages Animation</button><button id='hide-langs' style='display: none;'>Hide
+                <h4>Languages</h4><button id='show-langs'>Show Languages Animation</button><button id='hide-langs'
+                    style='display: none;'>Hide
                     Languages Animation</button>
             </div>
         </div>
@@ -82,16 +83,13 @@
         <div class='row'>
             <div class='columns six'>
                 <h5>Select a mapping</h5>
-                <select id="langselect">
+                <h6>Input Language</h6>
+                <select id="input-langselect">
                     <option value="custom">Custom</option>
-                    {% for k, v in langs.items() %}
-                    {% for mapping in v['mappings'] %}
-                    <option value="{{ mapping['in_lang'] }}-to-{{ mapping['out_lang'] }}">{{ k }} -
-                        {{ mapping['language_name'] }}
-                        - {{ mapping['display_name'] }}
-                    </option>
-                    {% endfor %}
-                    {% endfor %}
+                </select>
+                <h6>Output Language</h6>
+                <select id="output-langselect">
+                    <option value="custom">Custom</option>
                 </select>
             </div>
             <div class='columns six mg-top'>

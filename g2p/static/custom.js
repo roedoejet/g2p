@@ -176,7 +176,6 @@ connectionSocket.on('disconnect', function () {
 })
 
 tableSocket.on('table response', function (msg) {
-    console.log(msg)
     hot.loadData(msg['mappings'])
     varhot.loadData(msg['abbs'])
     setKwargs(msg['kwargs'])
@@ -215,3 +214,50 @@ $('#langselect').change(function () {
     }
     tableSocket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
 })
+
+$(document).ready(function () {
+    $.ajax({
+        url: "/api/v1/langs",
+        dataType: "json",
+        success: function (response) {
+            $.each(response, function (index, value) {
+                $("#input-langselect").append("<option value=" + value + ">" + value + "</option>")
+            })
+        }
+    });
+
+    $("#input-langselect").on('change', function (event) {
+        let in_lang = $("#input-langselect option:selected").val()
+        $.ajax({
+            url: "/api/v1/descendants/" + in_lang,
+            dataType: "json",
+            success: function (response) {
+                $("#output-langselect").empty()
+                $.each(response, function (index, value) {
+                    $("#output-langselect").append("<option value=" + value + ">" + value + "</option>")
+                })
+                changeTable()
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.log(xhr.status)
+                if (xhr.status == 404) {
+                    $('#input-langselect option[value=custom]').attr('selected', 'selected');
+                    $("#output-langselect").empty();
+                    $("#output-langselect").append("<option value='custom' selected>Custom</option>");
+                    changeTable()
+                }
+            }
+        });
+    })
+
+    function changeTable() {
+        let in_lang = $("#input-langselect option:selected").val()
+        let out_lang = $("#output-langselect option:selected").val()
+        tableSocket.emit('table event', { in_lang, out_lang })
+    }
+
+    $("#output-langselect").on('change', function (event) {
+        changeTable()
+    })
+
+});
