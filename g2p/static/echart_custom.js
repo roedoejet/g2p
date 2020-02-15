@@ -3,13 +3,22 @@ $(document).ready(function () {
     var langsOption = {
         animationDurationUpdate: 1500,
         animationEasingUpdate: 'quinticInOut',
+        legend: [{
+            // selectedMode: 'single',
+            // selected: {'},
+            data: ['alq', 'atj', 'ckt', 'clc', 'crj', 'crl', 'crx', 'ctp', 'dan', 'eng', 'fra', 'generated', 'git', 'hei', 'iku', 'kwk', 'moh', 'nav', 'norm', 'str', 'tgx', 'und', 'win']
+        }],
         series: [
             {
                 type: 'graph',
-                layout: 'circular',
+                layout: 'force',
                 // progressiveThreshold: 700,
                 data: [],
                 links: [],
+                categories: [{'name': 'alq'}, {'name': 'atj'}, {'name': 'ckt'}, {'name': 'clc'}, {'name': 'crj'}, {'name': 'crl'}, {'name': 'crx'}, {'name': 'ctp'}, {'name': 'dan'}, {'name': 'eng'}, {'name': 'fra'}, {'name': 'generated'}, {'name': 'git'}, {'name': 'hei'}, {'name': 'iku'}, {'name': 'kwk'}, {'name': 'moh'}, {'name': 'nav'}, {'name': 'norm'}, {'name': 'str'}, {'name': 'tgx'}, {'name': 'und'}, {'name': 'win'}],
+                circular: {
+                    rotateLabel: true
+                },
                 emphasis: {
                     label: {
                         position: 'right',
@@ -21,7 +30,8 @@ $(document).ready(function () {
                 lineStyle: {
                     width: 0.5,
                     curveness: 0.3,
-                    opacity: 0.7
+                    opacity: 0.7,
+                    color: 'source'
                 }
             }
         ]
@@ -114,22 +124,25 @@ $(document).ready(function () {
     $.ajax({
         url: "/static/languages-network.json",
         dataType: "json",
-        success: function(response) {
-            langsOption.series[0].data = response['nodes']
+        success: function (response) {
+            // 'name': node, 'symbolSize': size, 'id': node, 'category'
+            langsOption.series[0].data = response['nodes'].map(x => {
+                return { 'name': x.name, 'symbolSize': x.symbolSize, 'id': x.id, 'category': x.category }
+            })
             langsOption.series[0].links = response['edges']
             langsChart.setOption(langsOption, true)
         }
-      });
+    });
     $('#show-langs').click(function (event) {
         $('#langsechart').show()
-        $('show-langs').hide()
+        $('#show-langs').hide()
         $('#hide-langs').show()
         $(window).trigger('resize');
     })
     $('#hide-langs').click(function (event) {
         $('#langsechart').hide()
         $('#hide-langs').hide()
-        $('show-langs').show()
+        $('#show-langs').show()
     })
     $('#indexInput').on('keyup', function (event) {
         convert()

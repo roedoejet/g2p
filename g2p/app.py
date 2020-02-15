@@ -5,6 +5,7 @@ Views and config to the g2p Studio web app
 """
 import json
 import os
+import requests
 from networkx.algorithms.dag import ancestors, descendants
 from networkx.drawing.layout import spring_layout, spectral_layout, shell_layout, circular_layout
 from flask import Flask, render_template
@@ -14,12 +15,13 @@ from flask_talisman import Talisman
 
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
-from g2p.transducer import Transducer
+from g2p.transducer import CompositeTransducer, Transducer
 from g2p.transducer.indices import Indices
 from g2p.static import __file__ as static_file
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p.api import g2p_api
 from g2p.log import LOGGER
+from g2p import make_g2p
 
 APP = Flask(__name__)
 APP.register_blueprint(g2p_api, url_prefix='/api/v1')
@@ -30,19 +32,13 @@ DEFAULT_N = 10
 def network_to_echart(write_to_file: bool = False, layout: bool = False):
     nodes = []
     no_nodes = len(LANGS_NETWORK.nodes)
-    if layout:
-        for node, coords in spring_layout(LANGS_NETWORK.nodes, scale=400).items():
-            no_ancestors = len(ancestors(LANGS_NETWORK, node))
-            no_descendants = len(descendants(LANGS_NETWORK, node))
-            size = min(20, max(2, ((no_ancestors/no_nodes)*100 + (no_descendants/no_nodes)*100)))
-            nodes.append({'name': node, 'symbolSize': size, 'id': node, 'x': coords[0], 'y': coords[1]})
-    else:
-        # Layout can be handled by echarts
-        for node in LANGS_NETWORK.nodes:
-            no_ancestors = len(ancestors(LANGS_NETWORK, node))
-            no_descendants = len(descendants(LANGS_NETWORK, node))
-            size = min(20, max(2, ((no_ancestors/no_nodes)*100 + (no_descendants/no_nodes)*100)))
-            nodes.append({'name': node, 'symbolSize': size, 'id': node})
+    for node in LANGS_NETWORK.nodes:
+        lang_name = node.split('-')[0]
+        no_ancestors = len(ancestors(LANGS_NETWORK, node))
+        no_descendants = len(descendants(LANGS_NETWORK, node))
+        size = min(20, max(2, ((no_ancestors/no_nodes)*100 + (no_descendants/no_nodes)*100)))
+        node = {'name': node, 'symbolSize': size, 'id': node, 'category': lang_name}
+        nodes.append(node)
     edges = []
     for edge in LANGS_NETWORK.edges:
         edges.append({'source': edge[0], 'target': edge[1]})
@@ -149,11 +145,16 @@ def change_table(message):
     if message['in_lang'] == 'custom' or message['out_lang'] == 'custom':
         mappings = Mapping(return_empty_mappings())
     else:
-        mappings = Mapping(
-            in_lang=message['in_lang'], out_lang=message['out_lang'])
-    emit('table response', {'mappings': mappings.plain_mapping(),
-                            'abbs': expand_abbreviations(mappings.abbreviations),
-                            'kwargs': mappings.kwargs})
+        transducer = make_g2p(message['in_lang'], message['out_lang'])
+    if isinstance(transducer, Transducer):
+        mappings = [transducer.mapping]
+    elif isinstance(transducer, CompositeTransducer):
+        mappings = [x.mapping for x in transducer._transducers]
+    else:
+        pass
+    emit('table response', [{'mappings': x.plain_mapping(),
+                            'abbs': expand_abbreviations(x.abbreviations),
+                            'kwargs': x.kwargs} for x in mappings])
 
 
 @SOCKETIO.on('connect', namespace='/connect')

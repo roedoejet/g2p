@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css"
         href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
     <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='skeleton.css') }}">
@@ -63,15 +63,15 @@
             </div>
             <div class='row'>
                 <div class='columns twelve center-text'>
-                    <div id="echart" style="width:100%; min-width: 400px; height:400px;"></div>
+                    <div id="echart" style="width:100%; min-width: 500px; height:500px;"></div>
                 </div>
             </div>
         </div>
         <br>
         <div class='row'>
             <div class='columns twelve center-text'>
-                <h4>Languages</h4><button id='show-langs'>Show Languages Animation</button><button id='hide-langs'
-                    style='display: none;'>Hide
+                <h4>Languages</h4><button id='show-langs' style='margin-bottom: 20px;'>Show Languages
+                    Animation</button><button id='hide-langs' style='display: none; margin-bottom: 20px;'>Hide
                     Languages Animation</button>
             </div>
         </div>
@@ -122,7 +122,11 @@
                 <h4>Custom Rules</h4>
                 <button id='hot-add'>Add Rule</button>
                 <button id="export-rules">Export</button>
-                <div id="hot"></div>
+                <ul id='table-nav' class="nav nav-tabs">
+                    <li class="active title"><a>Custom</a></li>
+                </ul>
+                <div id='table-container'>
+                </div>
                 <h4>Rule Creator</h4>
                 <button id='clear'>Clear</button>
                 <button id='add'>Add to Rules</button>
@@ -183,10 +187,11 @@
 <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/msg/en.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/javascript.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/python.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 <script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
 <script src="{{ url_for('static', filename='echart_custom.js') }}"></script>
 <script src="{{ url_for('static', filename='custom.js') }}"></script>
-<script src="{{ url_for('static', filename='blocks.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='blocks.js') }}"></script> -->
 
 </html>

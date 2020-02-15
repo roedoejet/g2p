@@ -1,5 +1,73 @@
+var TABLES = []
+function create_table(index, data) {
+    let id = 'hot-' + index
+    let el = '<div class="hot-container" id="' + id + '-container"><div id="' + id + '"></div></div>';
+    if (index === 0) {
+        el = '<div class="hot-container active" id="' + id + '-container"><div id="' + id + '"></div></div>';
+    }
+    $("#table-container").append(el)
+    var hotElement = document.querySelector('#hot-' + index);
+    var hotSettings = {
+        data: data,
+        columns: [
+            {
+                data: 'in',
+                type: 'text'
+            },
+            {
+                data: 'out',
+                type: 'text'
+            },
+            {
+                data: 'context_before',
+                type: 'text'
+            },
+            {
+                data: 'context_after',
+                type: 'text'
+            }
+        ],
+        stretchH: 'all',
+        width: 880,
+        autoWrapRow: true,
+        height: 287,
+        maxRows: 250,
+        rowHeaders: true,
+        colHeaders: [
+            'In',
+            'Out',
+            'Context Before',
+            'Context After'
+        ],
+        afterRowMove: (rows, target) => {
+            convert()
+        },
+        manualRowMove: true,
+        manualColumnMove: false,
+        manualColumnResize: true,
+        manualRowResize: true,
+        exportFile: true,
+        licenseKey: 'non-commercial-and-evaluation'
+    };
+    var hot = new Handsontable(hotElement, hotSettings);
+    const callback = (mutationsList, observer) => {
+        for (var mutation of mutationsList) {
+            if (mutation.attributeName == 'class' && !mutation.target.hidden) {
+                hot.refreshDimensions();
+            }
+        }
+    };
 
-
+    const observer = new MutationObserver(callback);
+    const targetNode = document.getElementById('hot-' + index + '-container');
+    const config = { attributes: true };
+    observer.observe(targetNode, config);
+    document.getElementById("export-rules").addEventListener("click", function (event) {
+        hot.getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
+    })
+    TABLES.push(hot)
+    return hot
+}
 var size = 10;
 var dataObject = []
 var varsObject = []
@@ -15,50 +83,7 @@ for (var j = 0; j < size; j++) {
     }
     varsObject.push(['', '', '', '', '', ''])
 };
-var hotElement = document.querySelector('#hot');
 var hotVarElement = document.querySelector('#varhot');
-var hotSettings = {
-    data: dataObject,
-    columns: [
-        {
-            data: 'in',
-            type: 'text'
-        },
-        {
-            data: 'out',
-            type: 'text'
-        },
-        {
-            data: 'context_before',
-            type: 'text'
-        },
-        {
-            data: 'context_after',
-            type: 'text'
-        }
-    ],
-    stretchH: 'all',
-    // width: 880,
-    autoWrapRow: true,
-    height: 287,
-    maxRows: 250,
-    rowHeaders: true,
-    colHeaders: [
-        'In',
-        'Out',
-        'Context Before',
-        'Context After'
-    ],
-    afterRowMove: (rows, target) => {
-        convert()
-    },
-    manualRowMove: true,
-    manualColumnMove: false,
-    manualColumnResize: true,
-    manualRowResize: true,
-    exportFile: true,
-    licenseKey: 'non-commercial-and-evaluation'
-};
 var hotVarSettings = {
     data: varsObject,
     stretchH: 'all',
@@ -78,12 +103,11 @@ var hotVarSettings = {
     exportFile: true,
     licenseKey: 'non-commercial-and-evaluation'
 };
-var hot = new Handsontable(hotElement, hotSettings);
 var varhot = new Handsontable(hotVarElement, hotVarSettings);
 
-document.getElementById("export-rules").addEventListener("click", function (event) {
-    hot.getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
-})
+// Create Initial table
+create_table(0, dataObject)
+
 document.getElementById("export-abbs").addEventListener("click", function (event) {
     varhot.getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
 })
@@ -148,12 +172,14 @@ var connectionSocket = io.connect('//' + document.domain + ':' + location.port +
 var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
 var convert = function () {
+    var active = $('#table-nav li.title.active')
+    var index = $('#table-nav li.title').index(active)
     var input_string = $('#input').val();
     if (input_string) {
         conversionSocket.emit('conversion event', {
             data: {
                 input_string: $('#input').val(),
-                mappings: hot.getData(),
+                mappings: TABLES[index].getData(),
                 abbreviations: varhot.getData(),
                 kwargs: getKwargs()
             }
@@ -175,10 +201,31 @@ connectionSocket.on('disconnect', function () {
     $('#log').text('(Disconnected)')
 })
 
+function showTable(index) {
+    let containers = $(".hot-container")
+    for (var j = 0; j < containers.length; j++) {
+        $('.hot-container').eq(j).removeClass('active')
+        $('li.title').eq(j).removeClass('active')
+        if (index === j) {
+            $('li.title').eq(j).addClass('active')
+            $('.hot-container').eq(j).addClass('active')
+        }
+    }
+    convert()
+}
+
 tableSocket.on('table response', function (msg) {
-    hot.loadData(msg['mappings'])
-    varhot.loadData(msg['abbs'])
-    setKwargs(msg['kwargs'])
+    TABLES = []
+    $("#table-nav").empty()
+    $("#table-container").empty()
+    for (var j = 0; j < msg.length; j++) {
+        let li = '<li class="title"><a onclick="showTable(' + j + ')" id="link-' + j + '">' + msg[j]['kwargs']['display_name'] + '</a></li>'
+        if (j === 0) {
+            li = '<li class="active title"><a onclick="showTable(' + j + ')" id="link-' + j + '">' + msg[j]['kwargs']['display_name'] + '</a></li>'
+        }
+        $("#table-nav").append(li)
+        create_table(j, msg[j]['mappings'])
+    }
     convert()
 })
 
@@ -239,7 +286,6 @@ $(document).ready(function () {
                 changeTable()
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                console.log(xhr.status)
                 if (xhr.status == 404) {
                     $('#input-langselect option[value=custom]').attr('selected', 'selected');
                     $("#output-langselect").empty();

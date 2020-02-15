@@ -30,3 +30,11 @@ label {
 .mg-top {
     margin-top: 40px;
 }
+
+.hot-container {
+    display: none;
+}
+
+.hot-container.active {
+    display: inline;
+}
