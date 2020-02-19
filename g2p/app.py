@@ -131,9 +131,13 @@ def index_convert(message):
 def convert(message):
     """ Convert input text and return output
     """
-    mappings = Mapping(hot_to_mappings(message['data']['mappings']), abbreviations=flatten_abbreviations(
-        message['data']['abbreviations']), **message['data']['kwargs'])
-    transducer = Transducer(mappings)
+    transducers = []
+    for mapping in message['data']['mappings']:
+        mappings_obj = Mapping(hot_to_mappings(mapping['mapping']), abbreviations=flatten_abbreviations(
+            mapping['abbreviations']), **mapping['kwargs'])
+        transducer = Transducer(mappings_obj)
+        transducers.append(transducer)
+    transducer = CompositeTransducer(transducers)
     output_string = transducer(message['data']['input_string'])
     emit('conversion response', {'output_string': output_string})
 

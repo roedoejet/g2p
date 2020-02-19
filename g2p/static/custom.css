@@ -27,14 +27,14 @@ label {
     overflow-x: hidden;
 }
 
-.mg-top {
+.mg-top, h4 {
     margin-top: 40px;
 }
 
-.hot-container {
+.hot-container, .settings, .abbs-container {
     display: none;
 }
 
-.hot-container.active {
+.hot-container.active, .settings.active, .abbs-container.active {
     display: inline;
 }

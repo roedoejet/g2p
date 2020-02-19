@@ -93,28 +93,12 @@
                 </select>
             </div>
             <div class='columns six mg-top'>
-                <form id='settings-form'>
-                    <fieldset>
-                        <legend>Settings</legend>
-                        <div>
-                            <input checked id='as_is' type='checkbox' name='as_is' value='as_is'>
-                            <label for='as_is'>Leave order as is</label>
-                        </div>
-                        <div>
-                            <input checked id='case_sensitive' type='checkbox' name='case_sensitive'
-                                value='case_sensitive'>
-                            <label for='case_sensitive'>Rules are case sensitive</label>
-                        </div>
-                        <div>
-                            <input id='escape_special' type='checkbox' name='escape_special' value='escape_special'>
-                            <label for='escape_special'>Escape special characters</label>
-                        </div>
-                        <div>
-                            <input id='reverse' type='checkbox' name='reverse' value='reverse'>
-                            <label for='reverse'>Reverse the rules</label>
-                        </div>
-                    </fieldset>
-                </form>
+                <h5>Settings</h5>
+                <ul id='settings-nav' class="nav nav-tabs">
+                    <li class="active title settings"><a>Custom</a></li>
+                </ul>
+                <div id='settings-container'>
+                </div>
             </div>
         </div>
         <div class='row'>
@@ -123,11 +107,11 @@
                 <button id='hot-add'>Add Rule</button>
                 <button id="export-rules">Export</button>
                 <ul id='table-nav' class="nav nav-tabs">
-                    <li class="active title"><a>Custom</a></li>
+                    <li class="active title rules"><a>Custom</a></li>
                 </ul>
                 <div id='table-container'>
                 </div>
-                <h4>Rule Creator</h4>
+                <!-- <h4>Rule Creator</h4>
                 <button id='clear'>Clear</button>
                 <button id='add'>Add to Rules</button>
                 <button id='exportJS'>Export JavaScript</button>
@@ -153,12 +137,11 @@
                         </category>
                         <category name="Loops" colour="120" icon="icon_loops">
                             <block type="controls_forEach"></block>
-                        </category>
+                        </category> -->
                         <!-- <category custom="VARIABLE" name="Variables" colour="440">
                         </category> -->
-
-                    </xml>
-                </div>
+                    <!-- </xml>
+                </div> -->
             </div>
         </div>
         <div class='row mg-top'>
@@ -168,7 +151,11 @@
                 <button id='varhot-add-row'>Add Row</button>
                 <button id='varhot-add-col'>Add Column</button>
                 <button id="export-abbs">Export</button>
-                <div id="varhot"></div>
+                <ul id='abbs-nav' class="nav nav-tabs">
+                    <li class="active title abbs"><a>Custom</a></li>
+                </ul>
+                <div id='abbs-table-container'>
+                </div>
             </div>
         </div>
     </div>
@@ -182,14 +169,14 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blockly.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blocks.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/msg/en.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/javascript.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/python.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blockly.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/blocks.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/msg/en.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/javascript.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/python.js"></script> -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-<script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='blockly_main.js') }}"></script> -->
 <script src="{{ url_for('static', filename='echart_custom.js') }}"></script>
 <script src="{{ url_for('static', filename='custom.js') }}"></script>
 <!-- <script src="{{ url_for('static', filename='blocks.js') }}"></script> -->
