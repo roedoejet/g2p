@@ -1,6 +1,56 @@
 var TABLES = []
 var ABBS = []
 
+// index graph echart
+const myChart = echarts.init(document.getElementById('echart'));
+var option = {
+    title: {
+        text: ''
+    },
+    color: '#1EAEDB',
+    tooltip: {},
+    animationDurationUpdate: 1500,
+    animationEasingUpdate: 'quinticInOut',
+    series: [
+        {
+            type: 'graph',
+            layout: 'none',
+            symbolSize: 70,
+            roam: true,
+            label: {
+                normal: {
+                    show: true
+                }
+            },
+            edgeSymbol: ['none', 'arrow'],
+            edgeSymbolSize: [0, 10],
+            edgeLabel: {
+                normal: {
+                    textStyle: {
+                        fontSize: 24
+                    }
+                }
+            },
+            data: [{ "name": "a (in-0)", "x": 300, "y": 300 }, { "name": "a (out-0)", "x": 500, "y": 300 }],
+            links: [{ "source": 0, "target": 1 }],
+            lineStyle: {
+                normal: {
+                    color: '#333',
+                    opacity: 0.8,
+                    width: 2,
+                    curveness: 0
+                }
+            }
+        }
+    ]
+};
+
+$(window).on('resize', function () {
+    if (myChart != null && myChart != undefined) {
+        myChart.resize();
+    }
+});
+
 function createSettings(index, data) {
     let include = 'checked';
     let as_is = '';
@@ -288,26 +338,56 @@ var conversionSocket = io.connect('//' + document.domain + ':' + location.port +
 var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
 var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
+var trackIndex = function(){
+    return $('#animated-radio').is(":checked")
+}
+
 var convert = function () {
     // prevent conversion from happening before TABLES, ABBS, and SETTINGS are populated.
     if (TABLES.length > 0 && ABBS.length > 0) {
+        let index = trackIndex()
         var input_string = $('#input').val();
+        if (index) {
+            input_string = $('#indexInput').val();
+        }
         if (input_string) {
             let mappings = getIncludedMappings()
             conversionSocket.emit('conversion event', {
                 data: {
-                    input_string: $('#input').val(),
+                    index,
+                    input_string,
                     mappings
                 }
             });
         }
     }
 }
+
+document.getElementById('animated-radio').addEventListener('click', function (event) {
+    if ($('#animated').is(":hidden")) {
+        $('#indexInput').val($('#input').val())
+        convert()
+        $('#standard').hide()
+        $('#animated').show()
+        $(window).trigger('resize');
+    }
+})
+
 // Convert after any changes to tables
 Handsontable.hooks.add('afterChange', convert)
-
 conversionSocket.on('conversion response', function (msg) {
-    $('#output').val(msg['output_string']);
+    let index = trackIndex()
+    if (index) {
+        // Convert after any changes to tables
+        option.series[0].data = msg.index_data
+        option.series[0].links = msg.index_links
+        console.log(myChart)
+        console.log(option)
+        myChart.setOption(option, true)
+        $(window).trigger('resize');
+    } else {
+        $('#output').val(msg['output_string']);
+    }
 });
 
 connectionSocket.on('connection response', function (msg) {
@@ -399,6 +479,10 @@ tableSocket.on('table response', function (msg) {
 
 $('#input').on('keyup', function (event) {
     convert()
+    return false;
+})
+$('#indexInput').on('keyup', function (event) {
+    convert(index = true)
     return false;
 })
 $('#hot-add').click(function (event) {

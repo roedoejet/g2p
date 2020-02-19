@@ -12,11 +12,12 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
+from typing import List
 
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.transducer import CompositeTransducer, Transducer
-from g2p.transducer.indices import Indices
+from g2p.transducer.indices import Indices, IndexSequence
 from g2p.static import __file__ as static_file
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p.api import g2p_api
@@ -48,25 +49,35 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
         LOGGER.info(f'Wrote network nodes and edges to static file.')
     return nodes, edges
 
-def return_echart_data(indices: Indices):
-    input_string = indices.input()
-    input_x = 300
-    input_y = 300
-
-    output_string = indices.output()
-    output_x = 500
-    output_y = 300
-
-    inputs = [{'name': f"{x} (in-{i})", "x": input_x, "y": input_y + (i*50)}
-              for i, x in enumerate(input_string)]
-    outputs = [{'name': f"{x} (out-{i})", "x": output_x, "y": output_y + (i*50)}
-               for i, x in enumerate(output_string)]
-
-    nodes = inputs + outputs
-
-    edges = [{"source": x[0][0], "target": x[1]
-              [0] + len(input_string)} for x in indices()]
-
+def return_echart_data(index_sequence: IndexSequence):
+    x = 100
+    diff = 200
+    nodes = []
+    edges = []
+    index_offset = 0
+    for ind, indices in enumerate(index_sequence.states):
+        input_string = indices.input()
+        if ind == 0:
+            input_x = x + (ind * diff)
+            input_y = 300
+            x += diff
+            inputs = [{'name': f"{x}", 'id': f"(in{ind+index_offset}-in{i+index_offset})",  "x": input_x, "y": input_y + (i*50)}
+                for i, x in enumerate(input_string)]
+            nodes += inputs
+            edges += [{"source": x[0][0] + index_offset, "target": x[1]
+                [0] + len(input_string) + index_offset} for x in indices()]
+            index_offset += len(input_string)
+        else:
+            edges += [{"source": x[0][0] + index_offset, "target": x[1]
+                [0] + len(input_string) + index_offset} for x in indices()]
+            index_offset += len(output_string)
+        output_string = indices.output()
+        output_x = x + (ind * diff)
+        output_y = 300      
+        outputs = [{'name': f"{x}", 'id': f"({ind+index_offset}-{i+index_offset})", "x": output_x, "y": output_y + (i*50)}
+                for i, x in enumerate(output_string)]
+        nodes += outputs
+        
     return nodes, edges
 
 
@@ -112,34 +123,25 @@ def docs():
     """
     return render_template('docs.html')
 
-
-@SOCKETIO.on('index conversion event', namespace='/convert')
-def index_convert(message):
-    """ Convert input text and return output with indices for echart
-    """
-    mappings = Mapping(hot_to_mappings(message['data']['mappings']), abbreviations=flatten_abbreviations(
-        message['data']['abbreviations']), **message['data']['kwargs'])
-    transducer = Transducer(mappings)
-    output_string, indices = transducer(
-        message['data']['input_string'], index=True)
-    data, links = return_echart_data(indices)
-    emit('index conversion response', {
-         'output_string': output_string, 'index_data': data, 'index_links': links})
-
-
 @SOCKETIO.on('conversion event', namespace='/convert')
 def convert(message):
     """ Convert input text and return output
     """
     transducers = []
+    print(message)
     for mapping in message['data']['mappings']:
         mappings_obj = Mapping(hot_to_mappings(mapping['mapping']), abbreviations=flatten_abbreviations(
             mapping['abbreviations']), **mapping['kwargs'])
         transducer = Transducer(mappings_obj)
         transducers.append(transducer)
     transducer = CompositeTransducer(transducers)
-    output_string = transducer(message['data']['input_string'])
-    emit('conversion response', {'output_string': output_string})
+    if message['data']['index']:
+        output_string, iseq = transducer(message['data']['input_string'], index=True)
+        data, links = return_echart_data(iseq)
+        emit('conversion response', {'output_string': output_string, 'index_data': data, 'index_links': links})
+    else:
+        output_string = transducer(message['data']['input_string'])
+        emit('conversion response', {'output_string': output_string})
 
 
 @SOCKETIO.on('table event', namespace='/table')
