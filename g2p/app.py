@@ -128,7 +128,6 @@ def convert(message):
     """ Convert input text and return output
     """
     transducers = []
-    print(message)
     for mapping in message['data']['mappings']:
         mappings_obj = Mapping(hot_to_mappings(mapping['mapping']), abbreviations=flatten_abbreviations(
             mapping['abbreviations']), **mapping['kwargs'])

@@ -13,8 +13,18 @@ function returnValueFromBlockInput(block, key, lang = 'js') {
     }
 }
 
+function returnIndex() {
+    let elements = document.querySelectorAll('li.title.abbs');
+    let index = 0;
+    for (var j = 0; j < elements.length; j++) {
+        if ('active' in elements[j].classList) { index = j }
+    };
+    return index
+}
+
 function returnAbbreviations() {
-    var varhot = window['varhot']
+    let index = returnIndex()
+    var varhot = window['ABBS'][index]
     let data = varhot.getData()
     let abbreviations = {};
     for (var i = 0; i < data.length; i++) {
@@ -26,8 +36,8 @@ function returnAbbreviations() {
     return abbreviations
 }
 
-let ABBS = returnAbbreviations();
-let ABB_KEYS = Object.keys(ABBS);
+let BLOCKLY_ABBS = returnAbbreviations();
+let ABB_KEYS = Object.keys(BLOCKLY_ABBS);
 let ABB_ARGS = [];
 for (var i = 0; i < ABB_KEYS.length; i++) {
     ABB_ARGS.push([ABB_KEYS[i], ABB_KEYS[i]])
@@ -66,8 +76,8 @@ Blockly.defineBlocksWithJsonArray([
 
 function setAbbreviations() {
     var options = []
-    ABBS = returnAbbreviations();
-    ABB_KEYS = Object.keys(ABBS);
+    BLOCKLY_ABBS = returnAbbreviations();
+    ABB_KEYS = Object.keys(BLOCKLY_ABBS);
     for (var i = 0; i < ABB_KEYS.length; i++) {
         options.push([ABB_KEYS[i], ABB_KEYS[i]])
     }
@@ -88,12 +98,12 @@ Blockly.Blocks['abbreviations'] = {
 
 Blockly.JavaScript['abbreviations'] = function (block) {
     var value = block.getFieldValue('VALUE');
-    return [JSON.stringify(ABBS[value]), Blockly.JavaScript.ORDER_ATOMIC];
+    return [JSON.stringify(BLOCKLY_ABBS[value]), Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.Python['abbreviations'] = function (block) {
     var value = block.getFieldValue('VALUE');
-    return [JSON.stringify(ABBS[value]), Blockly.Python.ORDER_ATOMIC];
+    return [JSON.stringify(BLOCKLY_ABBS[value]), Blockly.Python.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['create_rule'] = function (block) {
@@ -105,9 +115,10 @@ Blockly.JavaScript['create_rule'] = function (block) {
     let before = returnValueFromBlockInput(block, "CONTEXT_BEFORE")
     code += "rule['context_before'] = " + before + ";\n"
     let after = returnValueFromBlockInput(block, "CONTEXTAFTER")
+    let index = returnIndex()
     code += "rule['context_after'] = " + after + ";\n"
     code += 'console.log(rule);\n'
-    code += 'let hot = window["hot"];\n'
+    code += 'let hot = window["TABLES"][' + index + '];\n'
     code += 'let rows = hot.countRows();\n'
     code += "hot.alter('insert_row', rows, 1);\n"
     code += "hot.setDataAtCell(rows, 0, rule['in']);\n"
