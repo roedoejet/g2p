@@ -7,13 +7,9 @@
 [![license](https://img.shields.io/github/license/roedoejet/g2p.svg)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/g2p)
 
-> Grapheme-to-Phoneme transductions that preserve input and output indices!
+> Grapheme-to-Phoneme transformations that preserve input and output indices!
 
-This library is for handling arbitrary transductions between input and output segments while preserving indices.
-
-:warning: :construction: This repo is currently **under construction** :construction: :warning:
-
-It is certainly useable, but you should proceed with caution when integrating into other projects as it is currently pre-alpha and breaking changes should be expected.
+This library is for handling arbitrary conversions between input and output segments while preserving indices.
 
 ## Table of Contents
 - [Gⁱ-2-Pⁱ](#g%e2%81%b1-2-p%e2%81%b1)
