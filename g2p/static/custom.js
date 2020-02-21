@@ -107,7 +107,7 @@ function createSettings(index, data) {
                         <label for='reverse'>Reverse the rules</label>
                 </div>
                 <div>
-                <input ${out_delimiter} id='out_delimiter-${index}' type='text' name='out_delimiter' value='' placeholder='delimiter' maxlength='1'>
+                <input id='out_delimiter-${index}' type='text' name='out_delimiter' value='${out_delimiter}' placeholder='delimiter' maxlength='1'>
                     <label for='reverse'>Reverse the rules</label>
             </div>
         </fieldset>
