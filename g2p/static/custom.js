@@ -58,6 +58,7 @@ function createSettings(index, data) {
     let escape_special = '';
     let reverse = '';
     let active = '';
+    let out_delimiter = '';
     if (index === 0) {
         active = 'active'
     }
@@ -75,6 +76,9 @@ function createSettings(index, data) {
     }
     if (data['reverse']) {
         reverse = 'checked'
+    }
+    if (data['out_delimiter']) {
+        out_delimiter = data['out_delimiter']
     }
     let settings_template = `
     <div class='${active} settings'>
@@ -102,6 +106,10 @@ function createSettings(index, data) {
                     <input ${reverse} id='reverse-${index}' type='checkbox' name='reverse' value='reverse'>
                         <label for='reverse'>Reverse the rules</label>
                 </div>
+                <div>
+                <input ${out_delimiter} id='out_delimiter-${index}' type='text' name='out_delimiter' value='' placeholder='delimiter' maxlength='1'>
+                    <label for='reverse'>Reverse the rules</label>
+            </div>
         </fieldset>
     </form>
 </div>`
@@ -129,6 +137,11 @@ function createSettings(index, data) {
     document.getElementById(`reverse-${index}`).addEventListener('click', function (event) {
         const reverse = event.target.checked
         setKwargs(index, { reverse })
+    })
+
+    document.getElementById(`out_delimiter-${index}`).addEventListener('change', function (event) {
+        const out_delimiter = event.target.value
+        setKwargs(index, { out_delimiter })
     })
 }
 
@@ -312,7 +325,8 @@ var getKwargs = function (index) {
     const escape_special = document.getElementById(`escape_special-${index}`).checked
     const reverse = document.getElementById(`reverse-${index}`).checked
     const include = document.getElementById(`include-${index}`).checked
-    return { as_is, case_sensitive, escape_special, reverse, include }
+    const out_delimiter = document.getElementById(`out_delimiter-${index}`).value
+    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter }
 }
 
 var setKwargs = function (index, kwargs) {
@@ -330,6 +344,9 @@ var setKwargs = function (index, kwargs) {
     }
     if ('include' in kwargs) {
         document.getElementById(`include-${index}`).checked = kwargs['include']
+    }
+    if ('out_delimiter' in kwargs) {
+        document.getElementById(`out_delimiter-${index}`).value = kwargs['out_delimiter']
     }
     convert()
 }
@@ -381,8 +398,6 @@ conversionSocket.on('conversion response', function (msg) {
         // Convert after any changes to tables
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
-        console.log(myChart)
-        console.log(option)
         myChart.setOption(option, true)
         $(window).trigger('resize');
     } else {
