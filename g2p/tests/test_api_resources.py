@@ -54,7 +54,7 @@ class ResourceIntegrationTest(TestCase):
             try:
                 r = self.client().get(rt)
                 self.assertEqual(r.status_code, 200)
-                LOGGER.info("Route " + rt +
+                LOGGER.debug("Route " + rt +
                             " returned " + str(r.status_code))
             except:
                 LOGGER.error("Couldn't connect. Is flask running?")
@@ -71,7 +71,7 @@ class ResourceIntegrationTest(TestCase):
                     self.assertEqual(r.status_code, 200)
                 except:
                     LOGGER.error("Couldn't connect. Is flask running?")
-            LOGGER.info("Successfully tested " + str(len(LANGS_NETWORK.nodes)) + " node resources at route " + ep + " .")
+            LOGGER.debug("Successfully tested " + str(len(LANGS_NETWORK.nodes)) + " node resources at route " + ep + " .")
 
     def test_g2p_conversion(self):
         '''

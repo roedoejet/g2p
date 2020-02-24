@@ -57,11 +57,11 @@ def normalize(inp: str, norm_form: str):
     if norm_form not in ['none', 'NFC', 'NFD', 'NFKC', 'NFKD']:
         raise exceptions.InvalidNormalization(normalize)
     elif norm_form is None or norm_form == 'none':
-        return inp
+        return unicode_escape(inp)
     else:
         normalized = ud.normalize(norm_form, unicode_escape(inp))
         if normalized != inp:
-            LOGGER.info(
+            LOGGER.debug(
                 'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
                 inp, normalized, norm_form)
         return normalized
@@ -207,8 +207,8 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         # If more than one mapping in the mapping config
         if 'mappings' in mapping:
             try:
-                LOGGER.info('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config,
-                            mapping['mappings'][index]['in_lang'], mapping['mappings'][index]['out_lang'], index)
+                LOGGER.debug('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config,
+                            mapping['mappings'][index].get('in_lang', 'und'), mapping['mappings'][index].get('out_lang', 'und'), index)
                 mapping = mapping['mappings'][index]
             except KeyError:
                 LOGGER.warning(
@@ -265,7 +265,7 @@ def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
         else:
             escaped = v
         if escaped != v:
-            LOGGER.info(
+            LOGGER.debug(
                 f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
         to_escape[k] = escaped
     return to_escape

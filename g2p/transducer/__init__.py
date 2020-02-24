@@ -51,7 +51,7 @@ class Transducer():
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
     def __repr__(self):
-        return f"{__class__} between {self.mapping.kwargs['in_lang']} and {self.mapping.kwargs['out_lang']}"
+        return f"{__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
@@ -512,7 +512,7 @@ class CompositeTransducer():
         self._transducers = transducers
 
     def __repr__(self):
-        return f"{__class__} between {self._transducers[0].mapping.kwargs['in_lang']} and {self._transducers[-1].mapping.kwargs['out_lang']}"
+        return f"{__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         return self.apply_rules(to_convert, index, debugger)

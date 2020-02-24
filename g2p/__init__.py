@@ -43,7 +43,7 @@ def make_g2p(in_lang: str, out_lang: str):
     for i, lang in enumerate(path):
         try:
             mapping = Mapping(in_lang=path[i], out_lang=path[i+1])
-            LOGGER.info(f"Adding mapping between {path[i]} and {path[i+1]} to composite transducer.")
+            LOGGER.debug(f"Adding mapping between {path[i]} and {path[i+1]} to composite transducer.")
             mappings_needed.append(mapping)
         except IndexError:
             continue

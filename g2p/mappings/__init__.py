@@ -42,7 +42,7 @@ class Mapping():
             Escape special characters in rules
 
         @param norm_form: str = "NFD"
-            Normalization standard to follow. NFC | NKFC | NFD | NKFD
+            Normalization standard to follow. NFC | NKFC | NFD | NKFD | none
 
         @param reverse: bool = False
             Reverse all mappings
@@ -67,9 +67,11 @@ class Mapping():
         # Handle user-supplied list
         if isinstance(mapping, list):
             self.mapping = validate(mapping)
-        elif isinstance(mapping, str):
+        elif isinstance(mapping, str) and (mapping.endswith('yaml') or mapping.endswith('yml')):
             loaded_config = load_mapping_from_path(mapping)
             self.process_loaded_config(loaded_config)
+        elif isinstance(mapping, str):
+            self.mapping = validate(load_from_file(mapping))
         else:
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
                 loaded_config = find_mapping(
