@@ -27,7 +27,7 @@ var option = {
             edgeLabel: {
                 normal: {
                     textStyle: {
-                        fontSize: 24
+                        fontSize: 36
                     }
                 }
             },
@@ -398,6 +398,7 @@ conversionSocket.on('conversion response', function (msg) {
         // Convert after any changes to tables
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
+        console.log(option)
         myChart.setOption(option, true)
         $(window).trigger('resize');
     } else {

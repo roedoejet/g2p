@@ -30,6 +30,22 @@ CORS(APP)
 SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
 
+
+def shade_colour(colour, percent, r=0, g=0, b=0):
+    R = hex(
+        min(255, int((int(colour[1:3], 16) * (100 + percent + r) / 100)))).lstrip('0x')
+    G = hex(
+        min(255, int((int(colour[3:5], 16) * (100 + percent + g) / 100)))).lstrip('0x')
+    B = hex(
+        min(255, int((int(colour[5:], 16) * (100 + percent + b) / 100)))).lstrip('0x')
+    return '#' + str(R) + str(G) + str(B)
+
+
+def contrasting_text_color(hex_str):
+    (R, G, B) = (hex_str[1:3], hex_str[3:5], hex_str[5:])
+    return '#000' if 1 - (int(R, 16) * 0.299 + int(G, 16) * 0.587 + int(B, 16) * 0.114) / 255 < 0.5 else '#fff'
+
+
 def network_to_echart(write_to_file: bool = False, layout: bool = False):
     nodes = []
     no_nodes = len(LANGS_NETWORK.nodes)
@@ -37,8 +53,10 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
         lang_name = node.split('-')[0]
         no_ancestors = len(ancestors(LANGS_NETWORK, node))
         no_descendants = len(descendants(LANGS_NETWORK, node))
-        size = min(20, max(2, ((no_ancestors/no_nodes)*100 + (no_descendants/no_nodes)*100)))
-        node = {'name': node, 'symbolSize': size, 'id': node, 'category': lang_name}
+        size = min(20, max(2, ((no_ancestors/no_nodes) *
+                               100 + (no_descendants/no_nodes)*100)))
+        node = {'name': node, 'symbolSize': size,
+                'id': node, 'category': lang_name}
         nodes.append(node)
     edges = []
     for edge in LANGS_NETWORK.edges:
@@ -49,35 +67,55 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
         LOGGER.info(f'Wrote network nodes and edges to static file.')
     return nodes, edges
 
+
 def return_echart_data(index_sequence: IndexSequence):
     x = 100
     diff = 200
     nodes = []
     edges = []
     index_offset = 0
+    colour = "#222222"
+    steps = len(index_sequence.states)
     for ind, indices in enumerate(index_sequence.states):
         input_string = indices.input()
         if ind == 0:
+            symbol_size = min(300 / len(indices()), 40)
             input_x = x + (ind * diff)
             input_y = 300
             x += diff
-            inputs = [{'name': f"{x}", 'id': f"(in{ind+index_offset}-in{i+index_offset})",  "x": input_x, "y": input_y + (i*50)}
-                for i, x in enumerate(input_string)]
+            inputs = [{'name': f"{x}",
+                       'id': f"(in{ind+index_offset}-in{i+index_offset})",
+                       'x': input_x,
+                       'y': input_y + (i*50),
+                       'symbolSize': symbol_size,
+                       'label': {'color': contrasting_text_color(colour)},
+                       'itemStyle': {'color': colour,
+                                     'borderColor': contrasting_text_color(colour)}}
+                      for i, x in enumerate(input_string)]
             nodes += inputs
             edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                [0] + len(input_string) + index_offset} for x in indices()]
+                       [0] + len(input_string) + index_offset} for x in indices()]
             index_offset += len(input_string)
         else:
             edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                [0] + len(input_string) + index_offset} for x in indices()]
+                       [0] + len(input_string) + index_offset} for x in indices()]
             index_offset += len(output_string)
+        symbol_size = min(300 / len(indices()), 40)
+        colour = shade_colour(colour, (1/steps)*350, g=50, b=20)
         output_string = indices.output()
         output_x = x + (ind * diff)
-        output_y = 300      
-        outputs = [{'name': f"{x}", 'id': f"({ind+index_offset}-{i+index_offset})", "x": output_x, "y": output_y + (i*50)}
-                for i, x in enumerate(output_string)]
+        output_y = 300
+        outputs = [{'name': f"{x}",
+                    'id': f"({ind+index_offset}-{i+index_offset})",
+                    'x': output_x,
+                    'y': output_y + (i*50),
+                    'symbolSize': symbol_size,
+                    'label': {'color': contrasting_text_color(colour)},
+                    'itemStyle': {'color': colour,
+                                  'borderColor': contrasting_text_color(colour)}}
+                   for i, x in enumerate(output_string)]
         nodes += outputs
-        
+
     return nodes, edges
 
 
@@ -123,6 +161,7 @@ def docs():
     """
     return render_template('docs.html')
 
+
 @SOCKETIO.on('conversion event', namespace='/convert')
 def convert(message):
     """ Convert input text and return output
@@ -135,9 +174,11 @@ def convert(message):
         transducers.append(transducer)
     transducer = CompositeTransducer(transducers)
     if message['data']['index']:
-        output_string, iseq = transducer(message['data']['input_string'], index=True)
+        output_string, iseq = transducer(
+            message['data']['input_string'], index=True)
         data, links = return_echart_data(iseq)
-        emit('conversion response', {'output_string': output_string, 'index_data': data, 'index_links': links})
+        emit('conversion response', {
+             'output_string': output_string, 'index_data': data, 'index_links': links})
     else:
         output_string = transducer(message['data']['input_string'])
         emit('conversion response', {'output_string': output_string})
@@ -158,8 +199,8 @@ def change_table(message):
     else:
         pass
     emit('table response', [{'mappings': x.plain_mapping(),
-                            'abbs': expand_abbreviations(x.abbreviations),
-                            'kwargs': x.kwargs} for x in mappings])
+                             'abbs': expand_abbreviations(x.abbreviations),
+                             'kwargs': x.kwargs} for x in mappings])
 
 
 @SOCKETIO.on('connect', namespace='/connect')
