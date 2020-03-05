@@ -98,5 +98,10 @@ class MappingTest(TestCase):
         mapping = Mapping([{'in': '', 'out': 'a'}])
         self.assertFalse(mapping())
 
+    def test_no_escape(self):
+        mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'no_escape.csv'))
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer('?'), 'ʔ')
+
 if __name__ == "__main__":
     main()

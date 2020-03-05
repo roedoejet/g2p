@@ -60,17 +60,21 @@ def generate_mapping_network(path):
 @click.option('--json-safe/--json-unsafe', default=False)
 @click.option('--index/--no-index', default=False)
 @click.option('--debugger/--no-debugger', default=False)
-@click.argument('out_lang', type=click.Choice(LANGS_NETWORK.nodes))
-@click.argument('in_lang', type=click.Choice(LANGS_NETWORK.nodes))
+@click.option('--path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument('out_lang', default='')
+@click.argument('in_lang', default='')
 @click.argument('input_text', type=click.STRING)
 @cli.command()
-def convert(in_lang, out_lang, input_text, debugger, index, json_safe):
-    ''' Convert any text
+def convert(in_lang, out_lang, input_text, path, debugger, index, json_safe):
+    '''Convert from in-lang to out-lang. Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of options.
     '''
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
-    transducer = make_g2p(in_lang, out_lang)
+    if in_lang and out_lang:
+        transducer = make_g2p(in_lang, out_lang)
+    elif path:
+        transducer = Transducer(Mapping(path))
     output = list(transducer(input_text, index=index, debugger=debugger))
     if json_safe and debugger and index:
         output[1] = output[1].reduced()
@@ -79,6 +83,8 @@ def convert(in_lang, out_lang, input_text, debugger, index, json_safe):
         output[1] = output[1].reduced()
     elif json_safe and debugger:
         output[1] = Transducer.make_debugger_output_safe(output[1])
+    elif not index and not debugger and not json_safe:
+        output = ''.join(output)
     if debugger:
         PRINTER.pprint(output)
     else:

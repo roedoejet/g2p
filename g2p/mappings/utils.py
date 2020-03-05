@@ -192,6 +192,8 @@ def load_from_file(path: str) -> list:
     elif path.endswith('json'):
         with open(path, encoding='utf8') as f:
             mapping = json.load(f)
+    else:
+        raise TypeError(f"Path at {path} is not a valid filetype.")
     return validate(mapping)
 
 def load_mapping_from_path(path_to_mapping_config, index=0):

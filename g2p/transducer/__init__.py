@@ -32,8 +32,141 @@ Index = Dict
 # [[0,1],[2,-1]] 
 ChangeLog = List[List[int]]
 
-
 class Transducer():
+    """This is the fundamental class for performing conversions in the g2p library.
+
+    Each Transducer must be initialized with a Mapping object. The Transducer object can then be called to apply the rules from Mapping on a given input.
+
+    Attributes:
+        mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
+
+    """
+    def __init__(self, mapping: Mapping):
+        self.mapping = mapping
+        self.case_sensitive = mapping.kwargs['case_sensitive']
+        self.norm_form = mapping.kwargs.get('norm_form', 'none')
+        self.out_delimiter = mapping.kwargs.get('out_delimiter', '')
+        self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
+        self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
+
+    def __repr__(self):
+        return f"{__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
+
+    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
+        """The basic method to transduce an input. A proxy for self.apply_rules.
+        
+        Args:
+            to_convert (str): The string to convert.
+            index (bool, optional): Return indices in output. Defaults to False.
+            debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
+        
+        Returns:
+            Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
+                Either returns a plain string (index=False, debugger=False),
+                               a tuple with the converted string and indices (index=True, debugger=False),
+                               a tuple with the converted string and corresponding rules (index=False, debugger=True),
+                               a tuple with the converted string, indices and rules (index=True, debugger=True)
+        """
+        return self.apply_rules(to_convert, index, debugger)
+
+    def update_nodes(self, output_nodes, match, out_string: str):
+        breakpoint()
+        output_nodes = copy.deepcopy(output_nodes)
+        start = match.start()
+        in_string = match.group()
+        in_length = len(in_string)
+        out_length = len(out_string)
+        change_log = []
+        if in_length == out_length:
+            for i, char in enumerate(out_string):
+                output_nodes[i + start][1] = char
+            return output_nodes, change_log
+        # TODO: refactor following two insertion/deletion blocks
+        elif in_length < out_length:
+            for i, char in enumerate(out_string):
+                if i <= in_length -1:
+                    output_nodes[i + start][1] = char
+                else:
+                    unaffected_nodes = output_nodes[:i + start]
+                    new_node = [i+start, char]
+                    changed_nodes = [[x[0] + 1, x[1]] for x in output_nodes[i+start:]]
+                    change_log.append((in_length - 1 + start, i + start, 'add'))
+                    output_nodes = unaffected_nodes + [new_node] + changed_nodes
+            return output_nodes, change_log
+        else:
+            for i, char in enumerate(in_string):
+                if i <= out_length - 1:
+                    output_nodes[i + start][1] = out_string[i]
+                else:
+                    unaffected_nodes = output_nodes[:i + start]
+                    del output_nodes[i+start]
+                    changed_nodes = [[x[0] - 1, x[1]] for x in output_nodes[i+start:]]
+                    change_log.append((start + i, out_length - 1 + start, 'remove'))
+                    output_nodes = unaffected_nodes + changed_nodes
+            return output_nodes, change_log
+            
+    def apply_rules(self, to_convert: str, index: bool, debugger: bool):
+        if not self.case_sensitive:
+            to_convert = to_convert.lower()
+
+        if self.norm_form:
+            to_convert = normalize(to_convert, self.norm_form)
+        
+        input_nodes = [[i, x] for i, x in enumerate(to_convert)]
+        output_nodes = input_nodes
+        edges = [[i, i] for i, x in enumerate(to_convert)]
+        converted = to_convert
+        for io in self.mapping:
+            if not io['in'] and not io['out']:
+                continue
+            io = copy.deepcopy(io)
+            for match in io['match_pattern'].finditer(converted):
+                start = match.start()
+                end = match.end()
+                if 'intermediate_form' in io:
+                    out_string = io['intermediate_form']
+                    intermediate = True
+                else:
+                    out_string = io['out']
+                if self.out_delimiter:
+                    # if not end segment, add delimiter
+                    if not end >= len(converted):
+                        out_string += self.out_delimiter
+                # remove g2p in-line syntax from output
+                out_string = re.sub(
+                    re.compile(r'{\d+}'), '', out_string)
+                # if debugger, add info
+                # if debugger and intermediate_form != converted:
+                #     applied_rule = {"input": converted,
+                #                     "rule": io, "output": intermediate_form,
+                #                     "start": start, "end": end}
+                # update intermediate converted form
+                # get the new indices
+                if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
+                    # explicit indices
+                    pass
+                else:
+                    # default indices
+                    output_nodes, new_edges = self.update_nodes(output_nodes, match, out_string)
+                    for edge in new_edges:
+                        if edge[2] == 'add':
+                            for i in range(0, len(edges)):
+                                if edges[i][1] >= edge[1]:
+                                    edges[i][1] += 1
+                            edges.append([edge[0], edge[1]])
+                        else:
+                            for i in range(0, len(edges)):
+                                if edges[i][0] == edge[0] and edges[i][1] == edge[1]:
+                                    del edges[i]
+                                    break
+                                if edges[i][1] > edge[1]:
+                                    edges[i][1] -= 1
+            print(''.join([x[1] for x in output_nodes]))
+            print(sorted(edges, key=lambda x: x[0]))
+            return ''.join([x[1] for x in output_nodes]), edges
+
+
+class Transducer1():
     """This is the fundamental class for performing conversions in the g2p library.
 
     Each Transducer must be initialized with a Mapping object. The Transducer object can then be called to apply the rules from Mapping on a given input.
@@ -100,10 +233,11 @@ class Transducer():
         Returns:
             The return value. True for success, False otherwise.
         """
+        # breakpoint()
         index_change_log = copy.deepcopy(index_change_log)
         reversed_changes = [x for x in reversed(index_change_log)]
         for c_i, change in enumerate(reversed_changes):
-            if change[0] <= i:
+            if change[0] < i:
                 if abs(change[1]) == 1: 
                     i -= change[1]
                 elif abs(change[1]) == 0:
@@ -114,9 +248,9 @@ class Transducer():
                     i -= change[1]
                 else:
                     i -= min(change[1], i - change[0] + 1)
-                for next_change in reversed_changes[c_i:]:
+                for n_i, next_change in enumerate(reversed_changes[c_i:]):
                     if next_change[0] >= change[0]:
-                        next_change[0] -= change[1]
+                        reversed_changes[c_i + n_i][0] -= change[1]
         return i
 
     @staticmethod
@@ -335,7 +469,6 @@ class Transducer():
 
         if self.norm_form:
             to_convert = normalize(to_convert, self.norm_form)
-
         # Initialize
         indices = {}
         rules_applied = []
@@ -344,7 +477,7 @@ class Transducer():
         intermediate = False
         for i, char in enumerate(converted):
             indices[i] = {'input_string': char, 'output': {i: char}}
-
+        counter = 0
         # Go through each input/output pair in the provided Mapping object
         for io in self.mapping:
             if not io['in'] and not io['out']:
@@ -353,6 +486,7 @@ class Transducer():
             io = copy.deepcopy(io)
             intermediate_diff = 0
             for match in io['match_pattern'].finditer(converted):
+                counter += 1
                 intermediate_to_convert = converted
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
@@ -395,17 +529,20 @@ class Transducer():
                 to_delete = []
                 to_merge = {}
                 for k, v in new_index.items():
-                    if indices[k]['input_string'] != new_index[k]['input_string'] and len(intermediate_to_convert) - 1 >= k and new_index[k]['input_string'] == intermediate_to_convert[k]:
-                        rebased_key = self.get_offset_index(
-                            k, index_change_log)
-                        if rebased_key in new_index.keys():
-                            new_index[rebased_key]['output'].update(
-                                v['output'])
-                        else:
-                            to_merge = {
-                                **{rebased_key: {'output': v['output']}}, **to_merge}
-                        if rebased_key != k:
-                            to_delete.append(k)
+                    try:
+                        if indices[k]['input_string'] != new_index[k]['input_string'] and len(intermediate_to_convert) - 1 >= k and new_index[k]['input_string'] == intermediate_to_convert[k]:
+                            rebased_key = self.get_offset_index(
+                                k, index_change_log)
+                            if rebased_key in new_index.keys():
+                                new_index[rebased_key]['output'].update(
+                                    v['output'])
+                            else:
+                                to_merge = {
+                                    **{rebased_key: {'output': v['output']}}, **to_merge}
+                            if rebased_key != k:
+                                to_delete.append(k)
+                    except:
+                        breakpoint()
                 for k in to_delete:
                     del new_index[k]
                 if to_merge:
@@ -454,6 +591,23 @@ class Transducer():
                                 if item[0] >= threshold:
                                     item[0] += diff
                             index_change_log.append([threshold, diff])
+                    for pair in zip(inputs, outputs):
+                        if len(pair[1]) > 1:
+                            if min(pair[1]) < pair[0]:
+                                val_in_index = self.get_offset_index(max(pair[1]), index_change_log)
+                            else:
+                                val_in_index = self.get_offset_index(min(pair[1]), index_change_log)
+                            for k, v in indices.items():
+                                if k > val_in_index:
+                                    if min(indices[k]['output'].keys()) == min_out:
+                                        try:
+                                            popped = {min_out: indices[min(inputs)]['output'].pop(min_out)}
+                                        except:
+                                            breakpoint()
+                                        bumped = indices[min(inputs)]['output']
+                                        indices[min(inputs)]['output'] = popped
+                                        indices[k]['output'] = bumped
+                        
 
                     # check deleted
                     if to_delete:

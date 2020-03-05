@@ -259,10 +259,12 @@ class Mapping():
             else:
                 rule_regex = re.compile(inp)
         except:
-            LOGGER.error(f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+            in_lang = self.kwargs.get('in_lang', 'und')
+            out_lang = self.kwargs.get('out_lang', 'und')
+            LOGGER.error(f'Your regex in mapping between {in_lang} and {out_lang} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
             raise Exception(
-                f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+                f'Your regex in mapping between {in_lang} and {out_lang} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
         return rule_regex
 
