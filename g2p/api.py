@@ -79,14 +79,12 @@ class Text(Resource):
             transducer = make_g2p(in_lang, out_lang)
             if debugger and index:
                 text, index, debugger = transducer(text, index=index, debugger=debugger)
-                index = index.reduced()
-                debugger = Transducer.make_debugger_output_safe(debugger)
             elif index:
                 text, index = transducer(text, index=index, debugger=debugger)
-                index = index.reduced()
             elif debugger:
                 text, debugger = transducer(text, index=index, debugger=debugger)
-                debugger = Transducer.make_debugger_output_safe(debugger[1])
+            else:
+                text = transducer(text, index=index, debugger=debugger)
             return {'output-text': text, 'index': index, 'debugger': debugger}
         except NetworkXNoPath:
             abort(400)

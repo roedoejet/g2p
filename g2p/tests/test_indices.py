@@ -199,12 +199,10 @@ class IndicesTest(TestCase):
         """
         transducer = self.trans_combining('k\u0313am', index=True)
         self.assertEqual(transducer[0], "'kam")
-        self.assertEqual(transducer[1](), [((0, "k"), (1, 'k')),
-                                           ((1, '\u0313'),
-                                            (0, "'")),
-                                           ((2, 'a'),
-                                            (2, 'a')),
-                                           ((3, 'm'), (3, 'm'))])
+        self.assertEqual(transducer[1], [(0, 1),
+                                         (1, 0),
+                                         (2, 2),
+                                         (3, 3)])
 
     def test_wacky(self):
         """ Test weird Unicode emoji transformation...
@@ -222,75 +220,49 @@ class IndicesTest(TestCase):
 
         self.assertEqual(
             transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
-        self.assertEqual(transducer[1](), [((0, '😀'), (4, '😄')),
-                                           ((1, '😃'), (0, '😄')),
-                                           ((2, '😄'), (1, '😄')),
-                                           ((2, '😄'), (2, '😄')),
-                                           ((3, '😄'), (3, '😄'))])
+        self.assertEqual(
+            transducer[1], [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)])
 
     def test_circum(self):
         """ Test circumfixing
         """
         transducer = self.trans_circum('ac', index=True)
         self.assertEqual(transducer[0], 'cac')
-        self.assertEqual(transducer[1](), [((0, 'a'), (1, 'a')),
-                                           ((1, 'c'), (0, 'c')),
-                                           ((1, 'c'), (2, 'c'))])
+        self.assertEqual(transducer[1], [(0, 1), (1, 0), (1, 2)])
 
     def test_case_one(self):
         """ Test case one
         """
         transducer = self.trans_one('test', True)
         self.assertEqual(transducer[0], 'pest')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
-                                           ((1, 'e'),
-                                            (1, 'e')),
-                                           ((2, 's'),
-                                            (2, 's')),
-                                           ((3, 't'), (3, 't'))])
-        self.assertEqual(transducer[1].reduced(), [
-                         (1, 1), (2, 2), (3, 3), (4, 4)])
+        self.assertEqual(transducer[1], [(0, 0), (1, 1), (2, 2), (3, 3)])
 
     def test_case_two(self):
         transducer = self.trans_two('test', True)
         self.assertEqual(transducer[0], 'tst')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
-                                           ((1, 'e'),
-                                            (1, '')),
-                                           ((2, 's'),
-                                            (2, 's')),
-                                           ((3, 't'), (3, 't'))])
-        self.assertEqual(transducer[1].reduced(), [(2, 1), (3, 2), (4, 3)])
+        self.assertEqual(transducer[1], [(0, 0), (1, 0), (2, 1), (3, 2)])
 
     def test_case_three(self):
         transducer = self.trans_three('test', True)
         self.assertEqual(transducer[0], 'chest')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 'c')),
-                                           ((0, 't'),
-                                            (1, 'h')),
-                                           ((1, 'e'),
-                                            (2, 'e')),
-                                           ((2, 's'),
-                                            (3, 's')),
-                                           ((3, 't'), (4, 't'))])
+        self.assertEqual(transducer[1], [(0, 0),
+                                         (0, 1),
+                                         (1, 2),
+                                         (2, 3),
+                                         (3, 4)])
 
     def test_case_four(self):
         transducer = self.trans_four('test', True)
         self.assertEqual(transducer[0], 'pst')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 'p')),
-                                           ((1, 'e'),
-                                            (0, 'p')),
-                                           ((2, 's'),
-                                            (1, 's')),
-                                           ((3, 't'), (2, 't'))])
+        self.assertEqual(transducer[1], [(0, 0),
+                                         (1, 0),
+                                         (2, 1),
+                                         (3, 2)])
 
     def test_case_six(self):
         transducer = self.trans_six('test', True)
         self.assertEqual(transducer[0], 'tset')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
-                                           ((1, 'e'), (2, 'e')),
-                                           ((2, 's'), (1, 's')),
-                                           ((3, 't'), (3, 't'))])
+        self.assertEqual(transducer[1], [(0, 0), (1, 2), (2, 1), (3, 3)])
 
     def test_case_long_six(self):
         transducer_no_i = self.trans_six('esesse')
@@ -301,27 +273,23 @@ class IndicesTest(TestCase):
     def test_case_seven(self):
         transducer_as_is = self.trans_seven_as_is('test', True)
         self.assertEqual(transducer_as_is[0], 'test')
-        self.assertEqual(transducer_as_is[1](), [((0, 't'), (0, 't')),
-                                                 ((1, 'e'), (1, 'e')),
-                                                 ((2, 's'), (2, 's')),
-                                                 ((3, 't'), (3, 't'))])
+        self.assertEqual(transducer_as_is[1], [(0, 0), (1, 1), (2, 2), (3, 3)])
         transducer = self.trans_seven('test', True)
         self.assertEqual(transducer[0], 'tesht')
-
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 't')),
-                                           ((1, 'e'), (1, 'e')),
-                                           ((2, 's'), (2, 's')),
-                                           ((2, 's'), (3, 'h')),
-                                           ((3, 't'), (4, 't'))])
+        self.assertEqual(transducer[1], [(0, 0),
+                                         (1, 1),
+                                         (2, 2),
+                                         (2, 3),
+                                         (3, 4)])
 
     def test_case_eight(self):
         transducer = self.trans_eight('test', True)
         self.assertEqual(transducer[0], 'chess')
-        self.assertEqual(transducer[1](), [((0, 't'), (0, 'c')),
-                                           ((1, 'e'), (1, 'h')),
-                                           ((1, 'e'), (2, 'e')),
-                                           ((2, 's'), (3, 's')),
-                                           ((3, 't'), (4, 's'))])
+        self.assertEqual(transducer[1], [(0, 0),
+                                         (1, 1),
+                                         (1, 2),
+                                         (2, 3),
+                                         (3, 4)])
 
     def test_conversion(self):
         tuple_format = [
@@ -331,7 +299,6 @@ class IndicesTest(TestCase):
         indices_from_tups = Indices(tuple_format)
         indices_from_dict = Indices(dict_format)
         self.assertEqual(indices_from_dict(), indices_from_tups())
-
 
 if __name__ == "__main__":
     main()

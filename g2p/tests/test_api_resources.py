@@ -86,38 +86,7 @@ class ResourceIntegrationTest(TestCase):
         res_json = response.get_json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            res_json, {'output-text': 'HH EH Y', 'index': [[1, 5], [2, 6], [3, 7]], 'debugger': [{'end': 2,
-                                                                                                    'input': 'hej',
-                                                                                                    'output': 'hɛj',
-                                                                                                    'rule': {'context_after': '',
-                                                                                                            'context_before': '',
-                                                                                                            'in': 'e',
-                                                                                                            'out': 'ɛ'},
-                                                                                                    'start': 1},
-                                                                                                    {'end': 2,
-                                                                                                    'input': 'hɛj',
-                                                                                                    'output': 'hEH j',
-                                                                                                    'rule': {'context_after': '',
-                                                                                                            'context_before': '',
-                                                                                                            'in': 'ɛ',
-                                                                                                            'out': 'EH'},
-                                                                                                    'start': 1},
-                                                                                                    {'end': 1,
-                                                                                                    'input': 'hEH j',
-                                                                                                    'output': 'HH EH j',
-                                                                                                    'rule': {'context_after': '',
-                                                                                                            'context_before': '',
-                                                                                                            'in': 'h',
-                                                                                                            'out': 'HH'},
-                                                                                                    'start': 0},
-                                                                                                    {'end': 7,
-                                                                                                    'input': 'HH EH j',
-                                                                                                    'output': 'HH EH Y',
-                                                                                                    'rule': {'context_after': '',
-                                                                                                            'context_before': '',
-                                                                                                            'in': 'j',
-                                                                                                            'out': 'Y'},
-                                                                                                    'start': 6}]})
+            res_json, {'output-text': 'HH EH Y', 'index': [[1, 5], [2, 6], [3, 7]], 'debugger': []})
         bad_response = self.client().get(self.conversion_route, query_string=bad_params)
         self.assertEqual(bad_response.status_code, 400)
         missing_response = self.client().get(self.conversion_route, query_string=missing_params)

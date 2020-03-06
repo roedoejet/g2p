@@ -47,10 +47,13 @@ class TransducerTest(TestCase):
             Mapping([{"in": "a", "out": "b", "context_before": "c"}]))
         cls.test_regex_set_transducer = Transducer(
             Mapping([{"in": "a", "out": "b", "context_before": "[cd]|[fgh]"}]))
-        cls.test_deletion_transducer = Transducer(Mapping([{'in': 'a', "out": ''}]))
-        csv_deletion_mapping = Mapping(os.path.join(PUBLIC_DIR, 'mappings', 'deletion_config_csv.yaml'))
+        cls.test_deletion_transducer = Transducer(
+            Mapping([{'in': 'a', "out": ''}]))
+        csv_deletion_mapping = Mapping(os.path.join(
+            PUBLIC_DIR, 'mappings', 'deletion_config_csv.yaml'))
         cls.test_deletion_transducer_csv = Transducer(csv_deletion_mapping)
-        cls.test_deletion_transducer_json = Transducer(Mapping(os.path.join(PUBLIC_DIR, 'mappings', 'deletion_config_json.yaml')))
+        cls.test_deletion_transducer_json = Transducer(
+            Mapping(os.path.join(PUBLIC_DIR, 'mappings', 'deletion_config_json.yaml')))
 
     def test_ordered(self):
         transducer_i_feed = self.test_trans_ordered_feed('a', True)
@@ -60,11 +63,8 @@ class TransducerTest(TestCase):
         transducer_counter_feed = self.test_trans_ordered_counter_feed('a')
         # These should feed b -> c
         self.assertEqual(transducer_feed, 'c')
-        self.assertEqual(transducer_i_feed[1](), [((0, "a"), (0, "c"))])
         # These should counter-feed b -> c
         self.assertEqual(transducer_counter_feed, 'b')
-        self.assertEqual(transducer_i_counter_feed[1](), [
-                         ((0, "a"), (0, "b"))])
 
     def test_forward(self):
         self.assertEqual(self.test_trans('a'), "b")
@@ -96,7 +96,7 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_regex_set_transducer_sanity('ca'), 'cb')
         self.assertEqual(self.test_regex_set_transducer('ca'), 'cb')
         self.assertEqual(self.test_regex_set_transducer('fa'), 'fb')
-    
+
     def test_deletion(self):
         self.assertEqual(self.test_deletion_transducer('a'), '')
         self.assertEqual(self.test_deletion_transducer_csv('a'), '')

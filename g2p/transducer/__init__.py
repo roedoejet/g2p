@@ -29,8 +29,9 @@ Index = Dict
 # The first item (int) in a change is the index of where the change occurs, and the second item (int) is the change offset
 # Example:
 # an insertion of length 1 at index 0 followed by a deletion of length one at index 2
-# [[0,1],[2,-1]] 
+# [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
+
 
 class Transducer():
     """This is the fundamental class for performing conversions in the g2p library.
@@ -41,6 +42,7 @@ class Transducer():
         mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
 
     """
+
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
         self.case_sensitive = mapping.kwargs['case_sensitive']
@@ -54,12 +56,12 @@ class Transducer():
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
-        
+
         Args:
             to_convert (str): The string to convert.
             index (bool, optional): Return indices in output. Defaults to False.
             debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
-        
+
         Returns:
             Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
                 Either returns a plain string (index=False, debugger=False),
@@ -69,8 +71,80 @@ class Transducer():
         """
         return self.apply_rules(to_convert, index, debugger)
 
-    def update_nodes(self, output_nodes, match, out_string: str):
-        breakpoint()
+    def update_explicit_indices(self, output_nodes, match, out_string: str, io) -> Index:
+        """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
+            It then zips them up according to the provided indexing notation.
+
+            Example:
+                A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
+                It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
+                For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
+                Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+
+        Args:
+
+
+        Returns:
+
+        """
+        input_char_matches = [x.group()
+                              for x in self._char_match_pattern.finditer(io['in'])]
+        input_match_indices = [
+            x.group() for x in self._index_match_pattern.finditer(io['in'])]
+        inputs = {}
+        index = 0
+        start = match.start()
+        for i, m in enumerate(input_match_indices):
+            for j, char in enumerate(input_char_matches[i]):
+                if m in inputs:
+                    inputs[m].append({'index': index + start, 'string': char})
+                else:
+                    inputs[m] = [{'index': index + start, 'string': char}]
+                index += 1
+        output_char_matches = [
+            x.group() for x in self._char_match_pattern.finditer(out_string)]
+        output_match_indices = [
+            x.group() for x in self._index_match_pattern.finditer(out_string)]
+        outputs = {}
+        index = 0
+        for i, m in enumerate(output_match_indices):
+            for j, char in enumerate(output_char_matches[i]):
+                if m in outputs:
+                    outputs[m].append({'index': index + start, 'string': char})
+                else:
+                    outputs[m] = [{'index': index + start, 'string': char}]
+                index += 1
+        out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
+        output_nodes, new_edges = self.update_default_indices(
+            output_nodes, match, out_string)
+        edges = []
+        for match_index, input_matches in inputs.items():
+            output_matches = outputs[match_index]
+            if len(input_matches) > len(output_matches):
+                longest = input_matches
+            else:
+                longest = output_matches
+            for i, item in enumerate(longest):
+                if len(output_matches) > len(input_matches) and i > len(input_matches) - 1:
+                    in_char = input_matches[-1]['index']
+                    out_char = output_matches[i]['index']
+                elif len(output_matches) < len(input_matches) and i > len(output_matches) - 1:
+                    in_char = input_matches[i]['index']
+                    out_char = output_matches[-1]['index']
+                else:
+                    in_char = input_matches[i]['index']
+                    out_char = output_matches[i]['index']
+                if out_char > len(match.group()) - 1 + start:
+                    process = 'insert'
+                elif out_char == len(out_string) - 1 + start and out_char < len(match.group()) - 1 + start:
+                    process = 'delete'
+                else:
+                    process = 'explicit'
+                edges.append((in_char, out_char, process))
+        # breakpoint()
+        return output_nodes, edges
+
+    def update_default_indices(self, output_nodes, match, out_string: str):
         output_nodes = copy.deepcopy(output_nodes)
         start = match.start()
         in_string = match.group()
@@ -81,42 +155,87 @@ class Transducer():
             for i, char in enumerate(out_string):
                 output_nodes[i + start][1] = char
             return output_nodes, change_log
-        # TODO: refactor following two insertion/deletion blocks
+        # default insertion(s)
         elif in_length < out_length:
-            for i, char in enumerate(out_string):
-                if i <= in_length -1:
-                    output_nodes[i + start][1] = char
-                else:
-                    unaffected_nodes = output_nodes[:i + start]
-                    new_node = [i+start, char]
-                    changed_nodes = [[x[0] + 1, x[1]] for x in output_nodes[i+start:]]
-                    change_log.append((in_length - 1 + start, i + start, 'add'))
-                    output_nodes = unaffected_nodes + [new_node] + changed_nodes
-            return output_nodes, change_log
+            longest = out_string
+            shortest = in_string
+            process = 'insert'
+        # default deltion(s)
         else:
-            for i, char in enumerate(in_string):
-                if i <= out_length - 1:
-                    output_nodes[i + start][1] = out_string[i]
+            longest = in_string
+            shortest = out_string
+            process = 'delete'
+        # iterate the longest string
+        for i, char in enumerate(longest):
+            # if the shorter string still has that output, keep that index
+            if i <= len(shortest) - 1:
+                output_nodes[i + start][1] = out_string[i]
+            # otherwise...
+            else:
+                unaffected_nodes = output_nodes[:i + start]
+                # add a new node and increment each following node
+                # log the change in order to update the edges.
+                if process == 'insert':
+                    new_node = [i+start, char]
+                    change_log.append(
+                        (in_length - 1 + start, i + start, process))
+                    changed_nodes = [[x[0] + 1, x[1]]
+                                     for x in output_nodes[i+start:]]
+                    output_nodes = unaffected_nodes + \
+                        [new_node] + changed_nodes
+                # delete the node and decrement each following node
+                # log the change in order to update the edges.
                 else:
-                    unaffected_nodes = output_nodes[:i + start]
                     del output_nodes[i+start]
-                    changed_nodes = [[x[0] - 1, x[1]] for x in output_nodes[i+start:]]
-                    change_log.append((start + i, out_length - 1 + start, 'remove'))
+                    change_log.append(
+                        (start + i, out_length - 1 + start, process))
+                    changed_nodes = [[x[0] - 1, x[1]]
+                                     for x in output_nodes[i+start:]]
                     output_nodes = unaffected_nodes + changed_nodes
-            return output_nodes, change_log
-            
+        return output_nodes, change_log
+
+    def update_edges(self, existing_edges, new_edges):
+        edges = copy.deepcopy(existing_edges)
+        to_append = []
+        for edge in new_edges:
+            # If an edge is added, increment every following edge by one and append the edge
+            if edge[2] == 'insert':
+                for i in range(0, len(edges)):
+                    if edges[i][1] >= edge[1]:
+                        edges[i][1] += 1
+                to_append.append([edge[0], edge[1]])
+            # Else if an edge is removed, delete it and decrement every following edge by one
+            elif edge[2] == 'delete':
+                for i in range(0, len(edges)):
+                    if edges[i][0] == edge[0] and edges[i][1] == edge[1]:
+                        del edges[i]
+                        break
+                    if edges[i][1] > edge[1]:
+                        edges[i][1] -= 1
+            elif edge[2] == 'explicit':
+                for i in range(0, len(edges)):
+                    if i >= len(edges):
+                        break
+                    if edges[i][0] == edge[0] or edges[i][1] == edge[1]:
+                        del edges[i]
+                to_append.append([edge[0], edge[1]])
+        edges += to_append
+        return edges
+
     def apply_rules(self, to_convert: str, index: bool, debugger: bool):
+        # perform any normalization
         if not self.case_sensitive:
             to_convert = to_convert.lower()
-
         if self.norm_form:
             to_convert = normalize(to_convert, self.norm_form)
-        
+        # initialize values
         input_nodes = [[i, x] for i, x in enumerate(to_convert)]
         output_nodes = input_nodes
         edges = [[i, i] for i, x in enumerate(to_convert)]
         converted = to_convert
+        # iterate rules
         for io in self.mapping:
+            # Do not allow empty rules
             if not io['in'] and not io['out']:
                 continue
             io = copy.deepcopy(io)
@@ -132,38 +251,24 @@ class Transducer():
                     # if not end segment, add delimiter
                     if not end >= len(converted):
                         out_string += self.out_delimiter
-                # remove g2p in-line syntax from output
-                out_string = re.sub(
-                    re.compile(r'{\d+}'), '', out_string)
-                # if debugger, add info
-                # if debugger and intermediate_form != converted:
-                #     applied_rule = {"input": converted,
-                #                     "rule": io, "output": intermediate_form,
-                #                     "start": start, "end": end}
-                # update intermediate converted form
-                # get the new indices
                 if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
-                    # explicit indices
-                    pass
+                    output_nodes, new_edges = self.update_explicit_indices(
+                        output_nodes, match, out_string, io)
                 else:
-                    # default indices
-                    output_nodes, new_edges = self.update_nodes(output_nodes, match, out_string)
-                    for edge in new_edges:
-                        if edge[2] == 'add':
-                            for i in range(0, len(edges)):
-                                if edges[i][1] >= edge[1]:
-                                    edges[i][1] += 1
-                            edges.append([edge[0], edge[1]])
-                        else:
-                            for i in range(0, len(edges)):
-                                if edges[i][0] == edge[0] and edges[i][1] == edge[1]:
-                                    del edges[i]
-                                    break
-                                if edges[i][1] > edge[1]:
-                                    edges[i][1] -= 1
-            print(''.join([x[1] for x in output_nodes]))
-            print(sorted(edges, key=lambda x: x[0]))
-            return ''.join([x[1] for x in output_nodes]), edges
+                    output_nodes, new_edges = self.update_default_indices(
+                        output_nodes, match, out_string)
+                edges = self.update_edges(edges, new_edges)
+                converted = ''.join([x[1] for x in output_nodes])
+        edges = list(dict.fromkeys([tuple(x)
+                          for x in sorted(edges, key=lambda x: x[0])]))
+        rules_applied = []
+        if index and debugger:
+            return (converted, edges, rules_applied)
+        if debugger:
+            return (converted, rules_applied)
+        if index:
+            return (converted, edges)
+        return converted
 
 
 class Transducer1():
@@ -175,6 +280,7 @@ class Transducer1():
         mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
 
     """
+
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
         self.case_sensitive = mapping.kwargs['case_sensitive']
@@ -188,12 +294,12 @@ class Transducer1():
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
-        
+
         Args:
             to_convert (str): The string to convert.
             index (bool, optional): Return indices in output. Defaults to False.
             debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
-        
+
         Returns:
             Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
                 Either returns a plain string (index=False, debugger=False),
@@ -207,10 +313,10 @@ class Transducer1():
     def _pua_to_index(string: str) -> int:
         """Given a string using with characters in the Supllementary Private Use Area A Unicode block
            Produce the number corresponding to the offset from the beginning of the block.
-        
+
         Args:
             string (str): The string to convert
-        
+
         Returns:
             int: The offset from the beginning of the block.
         """
@@ -238,7 +344,7 @@ class Transducer1():
         reversed_changes = [x for x in reversed(index_change_log)]
         for c_i, change in enumerate(reversed_changes):
             if change[0] < i:
-                if abs(change[1]) == 1: 
+                if abs(change[1]) == 1:
                     i -= change[1]
                 elif abs(change[1]) == 0:
                     continue
@@ -257,13 +363,13 @@ class Transducer1():
     def return_incremented_indices(indices: Index, threshold: Tuple[int, int], start: int, diff: int) -> Index:
         """Given an Index, increment each output index by `diff` beginning at `start` 
            except for indices whose input are between `threshold[0]` and `threshold[1]`.
-        
+
         Args:
             indices (Index): The index to apply changes to.
             threshold (Tuple[int, int]): Input index range to not apply changes to.
             start (int): [description]: Output index where changes begin.
             diff (int): [description]: The change to apply.
-        
+
         Returns:
             Index: Changed Index
         """
@@ -289,7 +395,8 @@ class Transducer1():
         new_output = []
         for x in debugger_output:
             if isinstance(x, dict):
-                x['rule'] = {k: v for k, v in x['rule'].items() if k != 'match_pattern'}
+                x['rule'] = {k: v for k, v in x['rule'].items()
+                             if k != 'match_pattern'}
                 new_output.append(x)
         return new_output
 
@@ -309,7 +416,7 @@ class Transducer1():
         Returns:
             Index: returns an Index with the default mapping between inputs and outputs
         """
-        
+
         new_input = {}
         # go through each input or output whichever is longer
         for i in range(0, max(len(input_strings), len(output_strings))):
@@ -358,7 +465,7 @@ class Transducer1():
                                               an incremented list of corresponding input indices,
                                               an incremented list of corresponding output indices
         """
-        
+
         # separate string into chars
         # add empty string if input/output is empty
         default_inputs = [x for x in input_string]
@@ -383,13 +490,13 @@ class Transducer1():
                 It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
                 For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
                 Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
-        
+
         Args:
             input_string (str): an input string.
             output_string (str): an output string.
             input_index (int): the starting index of the input string.
             output_index (int): the starting index of the output string.
-        
+
         Returns:
             Index: 
         """
@@ -418,7 +525,8 @@ class Transducer1():
                 if v['match_index'] == match_index:
                     for y_i, y_v in enumerate(v['string']):
                         explicit_inputs.append(y_v)
-                        explicit_input_offsets.append(len(prev_input) + input_index + y_i)
+                        explicit_input_offsets.append(
+                            len(prev_input) + input_index + y_i)
                 prev_input += v['string']
             prev_output = ''
             # Get single character strings from outputs if they match the match_index
@@ -430,7 +538,8 @@ class Transducer1():
                 if v['match_index'] == match_index:
                     for y_i, y_v in enumerate(v['string']):
                         explicit_outputs.append(y_v)
-                        explicit_output_offsets.append(len(prev_output) + output_index + y_i)
+                        explicit_output_offsets.append(
+                            len(prev_output) + output_index + y_i)
                 prev_output += v['string']
             # Use default mapping to zip them up
             explicit_index = self.return_default_mapping(
@@ -439,8 +548,8 @@ class Transducer1():
         return new_input
 
     def apply_rules(self, to_convert: str,
-                          index: bool = False,
-                          debugger: bool = False):
+                    index: bool = False,
+                    debugger: bool = False):
         """ Apply all the rules in self.mapping sequentially.
             Each rule in self.mapping is executed fully across the string (`to_convert`)
             before going to the next rules.
@@ -449,12 +558,12 @@ class Transducer1():
             Rules are also therefore susceptible to
             Bleeding/Feeding/CounterBleeding/CounterFeeding relationships
             (https://linguistics.stackexchange.com/questions/6084/whats-the-difference-between-counterbleeding-bleeding-and-feeding)
-        
+
         Args:
             to_convert (str): The string to convert.
             index (bool, optional): Return indices in output. Defaults to False.
             debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
-        
+
         Returns:
             Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
             Either returns:
@@ -517,7 +626,7 @@ class Transducer1():
                     rules_applied.append(applied_rule)
                 # update intermediate converted form
                 converted = intermediate_form
-                
+
                 # get the new index tuple
                 if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
                     new_index = self.explicit_indices(
@@ -570,7 +679,8 @@ class Transducer1():
                     for k, v in dupes.items():
                         if v > 1:
                             diff = -(v - 1)
-                            indices = self.return_incremented_indices(indices, (min(inputs), max(inputs)+1), k, diff)
+                            indices = self.return_incremented_indices(
+                                indices, (min(inputs), max(inputs)+1), k, diff)
                             for item in index_change_log:
                                 if item[0] >= k:
                                     item[0] += diff
@@ -594,20 +704,22 @@ class Transducer1():
                     for pair in zip(inputs, outputs):
                         if len(pair[1]) > 1:
                             if min(pair[1]) < pair[0]:
-                                val_in_index = self.get_offset_index(max(pair[1]), index_change_log)
+                                val_in_index = self.get_offset_index(
+                                    max(pair[1]), index_change_log)
                             else:
-                                val_in_index = self.get_offset_index(min(pair[1]), index_change_log)
+                                val_in_index = self.get_offset_index(
+                                    min(pair[1]), index_change_log)
                             for k, v in indices.items():
                                 if k > val_in_index:
                                     if min(indices[k]['output'].keys()) == min_out:
                                         try:
-                                            popped = {min_out: indices[min(inputs)]['output'].pop(min_out)}
+                                            popped = {min_out: indices[min(
+                                                inputs)]['output'].pop(min_out)}
                                         except:
                                             breakpoint()
                                         bumped = indices[min(inputs)]['output']
                                         indices[min(inputs)]['output'] = popped
                                         indices[k]['output'] = bumped
-                        
 
                     # check deleted
                     if to_delete:
@@ -661,7 +773,7 @@ class CompositeTransducer():
     Attributes:
         transducers (List[Transducer]): A list of Transducer objects to compose.
     """
-    
+
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
 
@@ -688,9 +800,9 @@ class CompositeTransducer():
             else:
                 converted = response
         if index and debugger:
-            return (converted, IndexSequence(*indexed), debugged)
+            return (converted, indexed, debugged)
         if index:
-            return (converted, IndexSequence(*indexed))
+            return (converted, indexed)
         if debugger:
             return (converted, debugged)
         return converted

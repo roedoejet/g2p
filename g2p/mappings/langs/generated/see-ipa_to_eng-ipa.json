@@ -1,0 +1,116 @@
+[
+    {
+        "in": "d",
+        "out": "d",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "d\u0361\u0292",
+        "out": "d\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "e",
+        "out": "e\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "i",
+        "out": "i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "j",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "k",
+        "out": "k",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "o",
+        "out": "o\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "s",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t",
+        "out": "t",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t\u0361\u0283",
+        "out": "t\u0361\u0283",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "u",
+        "out": "u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "w",
+        "out": "w",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "z",
+        "out": "z",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "o\u0303",
+        "out": "",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0251",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261",
+        "out": "\u0261",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0283",
+        "out": "\u0283",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0294",
+        "out": "\u0294",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "e\u0303",
+        "out": "",
+        "context_before": "",
+        "context_after": ""
+    }
+]

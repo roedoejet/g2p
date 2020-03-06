@@ -68,18 +68,17 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
     return nodes, edges
 
 
-def return_echart_data(index_sequence: IndexSequence):
+def return_echart_data(input_string, output_string, index_sequence):
     x = 100
     diff = 200
     nodes = []
     edges = []
     index_offset = 0
     colour = "#222222"
-    steps = len(index_sequence.states)
-    for ind, indices in enumerate(index_sequence.states):
-        input_string = indices.input()
+    steps = len(index_sequence)
+    for ind, indices in enumerate(index_sequence):
         if ind == 0:
-            symbol_size = min(300 / len(indices()), 40)
+            symbol_size = min(300 / len(indices), 40)
             input_x = x + (ind * diff)
             input_y = 300
             x += diff
@@ -93,16 +92,13 @@ def return_echart_data(index_sequence: IndexSequence):
                                      'borderColor': contrasting_text_color(colour)}}
                       for i, x in enumerate(input_string)]
             nodes += inputs
-            edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                       [0] + len(input_string) + index_offset} for x in indices()]
+            edges += [{"source": x[0] + index_offset, "target": x[1] + len(input_string) + index_offset} for x in indices]
             index_offset += len(input_string)
         else:
-            edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                       [0] + len(input_string) + index_offset} for x in indices()]
+            edges += [{"source": x[0] + index_offset, "target": x[1] + len(input_string) + index_offset} for x in indices]
             index_offset += len(output_string)
-        symbol_size = min(300 / len(indices()), 40)
+        symbol_size = min(300 / len(indices), 40)
         colour = shade_colour(colour, (1/steps)*350, g=50, b=20)
-        output_string = indices.output()
         output_x = x + (ind * diff)
         output_y = 300
         outputs = [{'name': f"{x}",
@@ -176,7 +172,7 @@ def convert(message):
     if message['data']['index']:
         output_string, iseq = transducer(
             message['data']['input_string'], index=True)
-        data, links = return_echart_data(iseq)
+        data, links = return_echart_data(message['data']['input_string'], output_string, iseq)
         emit('conversion response', {
              'output_string': output_string, 'index_data': data, 'index_links': links})
     else:
