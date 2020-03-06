@@ -1,74 +1,34 @@
 [
     {
         "in": "d\u0361\u0292",
-        "out": "d\u0292",
-        "context_before": "",
-        "context_after": ""
+        "out": "d\u0292"
     },
     {
         "in": "t\u0361\u0283",
-        "out": "t\u0361\u0283",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0251",
-        "out": "\u0251",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0261",
-        "out": "\u0261",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0283",
-        "out": "\u0283",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0294",
-        "out": "\u0294",
-        "context_before": "",
-        "context_after": ""
+        "out": "t\u0361\u0283"
     },
     {
         "in": "e\u0303",
-        "out": "\uf000",
-        "context_before": "",
-        "context_after": ""
+        "out": "\uf000"
     },
     {
         "in": "e",
-        "out": "e\u02d0",
-        "context_before": "",
-        "context_after": ""
+        "out": "e\u02d0"
     },
     {
         "in": "\uf000",
-        "out": "e\u0303\u02d0",
-        "context_before": "",
-        "context_after": ""
+        "out": "e\u0303\u02d0"
     },
     {
         "in": "o\u0303",
-        "out": "\uf001",
-        "context_before": "",
-        "context_after": ""
+        "out": "\uf001"
     },
     {
         "in": "o",
-        "out": "o\u02d0",
-        "context_before": "",
-        "context_after": ""
+        "out": "o\u02d0"
     },
     {
         "in": "\uf001",
-        "out": "o\u0303\u02d0",
-        "context_before": "",
-        "context_after": ""
+        "out": "o\u0303\u02d0"
     }
 ]
