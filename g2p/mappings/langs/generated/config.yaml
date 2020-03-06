@@ -43,3 +43,15 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
+  - as_is: true
+    authors:
+      - Generated 2020-03-06 00:15:29.676518
+    case_sensitive: true
+    display_name: see-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: see-ipa
+    language_name: see-ipa
+    mapping: see-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    reverse: false
