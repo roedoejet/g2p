@@ -161,6 +161,7 @@ class IndicesTest(TestCase):
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}])
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
+        self.test_mapping_nine = Mapping([{'in': 'aa', 'out': ''}])
         self.test_mapping_combining = Mapping(
             [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}])
         self.test_mapping_wacky = Mapping(
@@ -183,6 +184,7 @@ class IndicesTest(TestCase):
         self.trans_seven = Transducer(self.test_mapping_seven)
         self.trans_seven_as_is = Transducer(self.test_mapping_seven_as_is)
         self.trans_eight = Transducer(self.test_mapping_eight)
+        self.trans_nine = Transducer(self.test_mapping_nine)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
         self.trans_wacky_lite = Transducer(self.test_mapping_wacky_lite)
@@ -240,7 +242,7 @@ class IndicesTest(TestCase):
     def test_case_two(self):
         transducer = self.trans_two('test', True)
         self.assertEqual(transducer[0], 'tst')
-        self.assertEqual(transducer[1], [(0, 0), (1, 0), (2, 1), (3, 2)])
+        self.assertEqual(transducer[1], [(0, 0), (2, 1), (3, 2)])
 
     def test_case_three(self):
         transducer = self.trans_three('test', True)
@@ -255,7 +257,6 @@ class IndicesTest(TestCase):
         transducer = self.trans_four('test', True)
         self.assertEqual(transducer[0], 'pst')
         self.assertEqual(transducer[1], [(0, 0),
-                                         (1, 0),
                                          (2, 1),
                                          (3, 2)])
 
@@ -290,6 +291,10 @@ class IndicesTest(TestCase):
                                          (1, 2),
                                          (2, 3),
                                          (3, 4)])
+    def test_case_nine(self):
+        transducer = self.trans_nine('aa', True)
+        self.assertEqual(transducer[0], '')
+        self.assertEqual(transducer[1], [])
 
     def test_conversion(self):
         tuple_format = [

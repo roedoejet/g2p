@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module contains the Transducer and CompositeTransducer classes 
+This module contains the Transducer and CompositeTransducer classes
 which are responsible for performing transductions in the g2p library.
 """
 
@@ -50,6 +50,7 @@ class Transducer():
         self.out_delimiter = mapping.kwargs.get('out_delimiter', '')
         self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
+        self._output_change_log = defaultdict(int)
 
     def __repr__(self):
         return f"{__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
@@ -71,7 +72,53 @@ class Transducer():
         """
         return self.apply_rules(to_convert, index, debugger)
 
-    def update_explicit_indices(self, output_nodes, match, out_string: str, io) -> Index:
+    @staticmethod
+    def _pua_to_index(string: str) -> int:
+        """Given a string using with characters in the Supllementary Private Use Area A Unicode block
+           Produce the number corresponding to the offset from the beginning of the block.
+
+        Args:
+            string (str): The string to convert
+
+        Returns:
+            int: The offset from the beginning of the block.
+        """
+        if string:
+            intermediate_ord = ord(string[0])
+            return intermediate_ord - 983040
+        else:
+            return - 1
+
+    @staticmethod
+    def edges_to_string(edges, input_nodes, output_nodes):
+        edges = copy.deepcopy(edges)
+        for i, edge in enumerate(edges):
+            edges[i] = [input_nodes[edge[0]][1], output_nodes[edge[1]][1]]
+        return edges
+
+    def resolve_intermediate_chars(self, output_nodes):
+        ''' Go through all nodes and resolve any intermediate characters from the Private Supplementary Use Area
+            to their mapped equivalents.
+        '''
+        output_nodes = copy.deepcopy(output_nodes)
+        indices_seen = defaultdict(int)
+        for i, node in enumerate(output_nodes):
+            intermediate_index = self._pua_to_index(node[1])
+            # if not Private Supplementary Use character
+            if intermediate_index < 0:
+                continue
+            else:
+                output_char_index = indices_seen[intermediate_index]
+                try:
+                    output_nodes[i][1] = self.mapping[intermediate_index]['out'][output_char_index]
+                except IndexError:
+                    indices_seen[intermediate_index] = 0
+                    output_char_index = 0
+                    output_nodes[i][1] = self.mapping[intermediate_index]['out'][output_char_index]
+                indices_seen[intermediate_index] += 1
+        return output_nodes
+
+    def update_explicit_indices(self, output_nodes, match, out_string: str, io, intermediate_diff, existing_edges) -> Index:
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
@@ -93,7 +140,7 @@ class Transducer():
             x.group() for x in self._index_match_pattern.finditer(io['in'])]
         inputs = {}
         index = 0
-        start = match.start()
+        start = match.start() + intermediate_diff
         for i, m in enumerate(input_match_indices):
             for j, char in enumerate(input_char_matches[i]):
                 if m in inputs:
@@ -116,7 +163,7 @@ class Transducer():
                 index += 1
         out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
         output_nodes, new_edges = self.update_default_indices(
-            output_nodes, match, out_string)
+            output_nodes, match, out_string, intermediate_diff, existing_edges)
         edges = []
         for match_index, input_matches in inputs.items():
             output_matches = outputs[match_index]
@@ -141,12 +188,11 @@ class Transducer():
                 else:
                     process = 'explicit'
                 edges.append((in_char, out_char, process))
-        # breakpoint()
         return output_nodes, edges
 
-    def update_default_indices(self, output_nodes, match, out_string: str):
+    def update_default_indices(self, output_nodes, match, out_string: str, intermediate_diff, edges):
         output_nodes = copy.deepcopy(output_nodes)
-        start = match.start()
+        start = match.start() + intermediate_diff
         in_string = match.group()
         in_length = len(in_string)
         out_length = len(out_string)
@@ -160,7 +206,7 @@ class Transducer():
             longest = out_string
             shortest = in_string
             process = 'insert'
-        # default deltion(s)
+        # default deletion(s)
         else:
             longest = in_string
             shortest = out_string
@@ -172,13 +218,15 @@ class Transducer():
                 output_nodes[i + start][1] = out_string[i]
             # otherwise...
             else:
-                unaffected_nodes = output_nodes[:i + start]
                 # add a new node and increment each following node
                 # log the change in order to update the edges.
                 if process == 'insert':
+                    unaffected_nodes = output_nodes[:i + start]
                     new_node = [i+start, char]
+                    temp_inp = in_length - 1 + start
+                    input_index = max([x[0] for x in edges if x[1] == temp_inp])
                     change_log.append(
-                        (in_length - 1 + start, i + start, process))
+                        (input_index, i + start, process))
                     changed_nodes = [[x[0] + 1, x[1]]
                                      for x in output_nodes[i+start:]]
                     output_nodes = unaffected_nodes + \
@@ -186,9 +234,19 @@ class Transducer():
                 # delete the node and decrement each following node
                 # log the change in order to update the edges.
                 else:
-                    del output_nodes[i+start]
+                    # breakpoint()
+                    try:
+                        del output_nodes[i+start]
+                    except IndexError:
+                        if output_nodes:
+                            del output_nodes[-1]
+                        else:
+                            continue
+                    unaffected_nodes = output_nodes[:i + start]
+                    temp_inp = start + i
+                    input_index = max([x[0] for x in edges if x[1] == temp_inp])
                     change_log.append(
-                        (start + i, out_length - 1 + start, process))
+                        (input_index, temp_inp, process))
                     changed_nodes = [[x[0] - 1, x[1]]
                                      for x in output_nodes[i+start:]]
                     output_nodes = unaffected_nodes + changed_nodes
@@ -197,6 +255,8 @@ class Transducer():
     def update_edges(self, existing_edges, new_edges):
         edges = copy.deepcopy(existing_edges)
         to_append = []
+        # filter deletions before incrementing other edges
+        edges = [x for x in edges if x not in [[y[0], y[1]] for y in new_edges if y[2] == 'delete']]
         for edge in new_edges:
             # If an edge is added, increment every following edge by one and append the edge
             if edge[2] == 'insert':
@@ -207,9 +267,6 @@ class Transducer():
             # Else if an edge is removed, delete it and decrement every following edge by one
             elif edge[2] == 'delete':
                 for i in range(0, len(edges)):
-                    if edges[i][0] == edge[0] and edges[i][1] == edge[1]:
-                        del edges[i]
-                        break
                     if edges[i][1] > edge[1]:
                         edges[i][1] -= 1
             elif edge[2] == 'explicit':
@@ -220,7 +277,7 @@ class Transducer():
                         del edges[i]
                 to_append.append([edge[0], edge[1]])
         edges += to_append
-        return edges
+        return sorted(edges, key=lambda x: x[0])
 
     def apply_rules(self, to_convert: str, index: bool, debugger: bool):
         # perform any normalization
@@ -233,18 +290,22 @@ class Transducer():
         output_nodes = input_nodes
         edges = [[i, i] for i, x in enumerate(to_convert)]
         converted = to_convert
+        rules_applied = []
+        intermediate_forms = False
+        self._output_change_log = defaultdict(int)
         # iterate rules
         for io in self.mapping:
             # Do not allow empty rules
             if not io['in'] and not io['out']:
                 continue
             io = copy.deepcopy(io)
+            intermediate_diff = 0
             for match in io['match_pattern'].finditer(converted):
-                start = match.start()
-                end = match.end()
+                start = match.start() + intermediate_diff
+                end = match.end() + intermediate_diff
                 if 'intermediate_form' in io:
                     out_string = io['intermediate_form']
-                    intermediate = True
+                    intermediate_forms = True
                 else:
                     out_string = io['out']
                 if self.out_delimiter:
@@ -252,17 +313,27 @@ class Transducer():
                     if not end >= len(converted):
                         out_string += self.out_delimiter
                 if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
-                    output_nodes, new_edges = self.update_explicit_indices(
-                        output_nodes, match, out_string, io)
+                    new_nodes, new_edges = self.update_explicit_indices(
+                        output_nodes, match, out_string, io, intermediate_diff, edges)
                 else:
-                    output_nodes, new_edges = self.update_default_indices(
-                        output_nodes, match, out_string)
+                    new_nodes, new_edges = self.update_default_indices(
+                        output_nodes, match, out_string, intermediate_diff, edges)
+                if debugger and new_nodes != output_nodes:
+                    rules_applied.append({'input': converted,
+                                          'output': ''.join([x[1] for x in new_nodes]),
+                                          'rule': {k: v for k, v in io.items() if k != 'match_pattern'},
+                                          'start': start,
+                                          'end': end})
+                intermediate_diff += (len(new_nodes) - len(output_nodes))
+                output_nodes = new_nodes
                 edges = self.update_edges(edges, new_edges)
                 converted = ''.join([x[1] for x in output_nodes])
-        edges = list(dict.fromkeys([tuple(x)
-                          for x in sorted(edges, key=lambda x: x[0])]))
-        rules_applied = []
+        edges = list(dict.fromkeys([tuple(x) for x in edges]))
+        if intermediate_forms:
+            output_nodes = self.resolve_intermediate_chars(output_nodes)
+            converted = ''.join([x[1] for x in output_nodes])
         if index and debugger:
+            rules_applied.append(self.edges_to_string(edges, input_nodes, output_nodes))
             return (converted, edges, rules_applied)
         if debugger:
             return (converted, rules_applied)
@@ -361,7 +432,7 @@ class Transducer1():
 
     @staticmethod
     def return_incremented_indices(indices: Index, threshold: Tuple[int, int], start: int, diff: int) -> Index:
-        """Given an Index, increment each output index by `diff` beginning at `start` 
+        """Given an Index, increment each output index by `diff` beginning at `start`
            except for indices whose input are between `threshold[0]` and `threshold[1]`.
 
         Args:
@@ -498,7 +569,7 @@ class Transducer1():
             output_index (int): the starting index of the output string.
 
         Returns:
-            Index: 
+            Index:
         """
         new_input = {}
         input_char_matches = [x.group()
@@ -793,7 +864,7 @@ class CompositeTransducer():
                 indexed.append(response[1])
                 if debugger:
                     debugged += response[2]
-            if debugger:
+            elif debugger:
                 debugged += response[1]
             if index or debugger:
                 converted = response[0]

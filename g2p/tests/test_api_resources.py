@@ -5,13 +5,17 @@
 
 from unittest import main, TestCase
 import re
+import os
+import json
 
 import requests
 
 from g2p.app import APP
 from g2p.log import LOGGER
 from g2p.mappings.langs import LANGS_NETWORK
+from g2p.tests.public import __file__ as PUB_FILE
 
+PUB_DIR = os.path.dirname(PUB_FILE)
 
 class ResourceIntegrationTest(TestCase):
     """
@@ -55,7 +59,7 @@ class ResourceIntegrationTest(TestCase):
                 r = self.client().get(rt)
                 self.assertEqual(r.status_code, 200)
                 LOGGER.debug("Route " + rt +
-                            " returned " + str(r.status_code))
+                             " returned " + str(r.status_code))
             except:
                 LOGGER.error("Couldn't connect. Is flask running?")
 
@@ -71,7 +75,8 @@ class ResourceIntegrationTest(TestCase):
                     self.assertEqual(r.status_code, 200)
                 except:
                     LOGGER.error("Couldn't connect. Is flask running?")
-            LOGGER.debug("Successfully tested " + str(len(LANGS_NETWORK.nodes)) + " node resources at route " + ep + " .")
+            LOGGER.debug("Successfully tested " + str(len(LANGS_NETWORK.nodes)
+                                                      ) + " node resources at route " + ep + " .")
 
     def test_g2p_conversion(self):
         '''
@@ -82,14 +87,18 @@ class ResourceIntegrationTest(TestCase):
         bad_params = {'in-lang': 'dan', 'out-lang': 'moh', 'text': "hej"}
         missing_params = {'in-lang': 'not-here',
                           'out-lang': 'eng-arpabet', 'text': "hej"}
+        self.maxDiff = None
         response = self.client().get(self.conversion_route, query_string=params)
         res_json = response.get_json()
         self.assertEqual(response.status_code, 200)
+        with open(os.path.join(PUB_DIR, 'sample_response.json')) as f:
+            data = json.load(f)
         self.assertEqual(
-            res_json, {'output-text': 'HH EH Y', 'index': [[1, 5], [2, 6], [3, 7]], 'debugger': []})
+            res_json, data)
         bad_response = self.client().get(self.conversion_route, query_string=bad_params)
         self.assertEqual(bad_response.status_code, 400)
-        missing_response = self.client().get(self.conversion_route, query_string=missing_params)
+        missing_response = self.client().get(
+            self.conversion_route, query_string=missing_params)
         self.assertEqual(missing_response.status_code, 404)
 
 
