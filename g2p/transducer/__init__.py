@@ -88,7 +88,6 @@ class TransductionGraph():
     @property
     def edges(self):
         return self._edges
-        # return list(dict.fromkeys([tuple(x) for x in self._edges]))
 
     @edges.setter
     def edges(self, value):
@@ -385,7 +384,7 @@ class Transducer():
             [tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])]))
         return tg
 
-class CompositeTransductionGraph():
+class CompositeTransductionGraph(TransductionGraph):
     ''' This class is the resulting output of calling a Transducer. 
         It contains the input and output string, their character nodes, and the edges between those nodes.
     '''
@@ -405,62 +404,12 @@ class CompositeTransductionGraph():
         self._tiers = tg_list
 
     @property
-    def input_string(self):
-        return self._input_string
-
-    @input_string.setter
-    def input_string(self, value):
-        raise ValueError(
-            f'Sorry, you tried to change the input string to {value} but it cannot be changed')
-
-    @property
-    def output_string(self):
-        return self._output_string
-
-    @output_string.setter
-    def output_string(self, value):
-        self._output_string = value
-
-    @property
-    def input_nodes(self):
-        return self._input_nodes
-
-    @input_nodes.setter
-    def input_nodes(self, value):
-        raise ValueError(
-            f'Sorry, you tried to change the input nodes to {value} but they cannot be changed')
-
-    @property
-    def output_nodes(self):
-        return self._output_nodes
-
-    @output_nodes.setter
-    def output_nodes(self, value):
-        self._output_nodes = value
-
-    @property
-    def edges(self):
-        return self._edges
-
-    @edges.setter
-    def edges(self, value):
-        self._edges = value
-
-    @property
     def tiers(self):
         return self._tiers
 
     @tiers.setter
     def tiers(self, value):
         self._tiers = value
-
-    @property
-    def debugger(self):
-        return self._debugger
-
-    @debugger.setter
-    def debugger(self, value):
-        self._debugger = value
 
 class CompositeTransducer():
     """This class combines Transducer objects to form a CompositeTransducer object.
