@@ -17,7 +17,7 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
         mapping = align_inventories(mapping.inventory(io), dummy_inventory)
     else:
         und_g2p = make_g2p('und', 'und-ipa')
-        mapping = [{"in": unicode_escape(x), "out": und_g2p(unidecode(x).lower())} for x in mapping.inventory(io)]
+        mapping = [{"in": unicode_escape(x), "out": und_g2p(unidecode(x).lower()).output_string} for x in mapping.inventory(io)]
         dummy_list = align_inventories([x['out'] for x in mapping], dummy_inventory)
         dummy_dict = {}
         for x in dummy_list:

@@ -56,51 +56,50 @@ class TransducerTest(TestCase):
             Mapping(os.path.join(PUBLIC_DIR, 'mappings', 'deletion_config_json.yaml')))
 
     def test_ordered(self):
-        transducer_i_feed = self.test_trans_ordered_feed('a', True)
+        transducer_i_feed = self.test_trans_ordered_feed('a')
         transducer_feed = self.test_trans_ordered_feed('a')
-        transducer_i_counter_feed = self.test_trans_ordered_counter_feed(
-            'a', True)
+        transducer_i_counter_feed = self.test_trans_ordered_counter_feed('a')
         transducer_counter_feed = self.test_trans_ordered_counter_feed('a')
         # These should feed b -> c
-        self.assertEqual(transducer_feed, 'c')
+        self.assertEqual(transducer_feed.output_string, 'c')
         # These should counter-feed b -> c
-        self.assertEqual(transducer_counter_feed, 'b')
+        self.assertEqual(transducer_counter_feed.output_string, 'b')
 
     def test_forward(self):
-        self.assertEqual(self.test_trans('a'), "b")
-        self.assertEqual(self.test_trans('b'), "b")
+        self.assertEqual(self.test_trans('a').output_string, "b")
+        self.assertEqual(self.test_trans('b').output_string, "b")
 
     def test_backward(self):
-        self.assertEqual(self.test_trans_rev("b"), 'a')
-        self.assertEqual(self.test_trans_rev("a"), 'a')
+        self.assertEqual(self.test_trans_rev("b").output_string, 'a')
+        self.assertEqual(self.test_trans_rev("a").output_string, 'a')
 
     def test_lang_import(self):
-        self.assertEqual(self.test_trans_moh('kawennón:nis'), 'kawẽnõːnis')
+        self.assertEqual(self.test_trans_moh('kawennón:nis').output_string, 'kawẽnõːnis')
 
     def test_composite(self):
-        self.assertEqual(self.test_trans_composite('aba'), 'aaa')
-        self.assertEqual(self.test_trans_composite_2('aba'), 'bbb')
+        self.assertEqual(self.test_trans_composite('aba').output_string, 'aaa')
+        self.assertEqual(self.test_trans_composite_2('aba').output_string, 'bbb')
 
     def test_as_is(self):
-        self.assertEqual(self.test_trans_as_is("'y"), "jˀ")
-        self.assertEqual(self.test_trans_not_as_is("'y"), "ʣˀ")
+        self.assertEqual(self.test_trans_as_is("'y").output_string, "jˀ")
+        self.assertEqual(self.test_trans_not_as_is("'y").output_string, "ʣˀ")
 
     def test_case_sensitive(self):
-        self.assertEqual(self.test_case_sensitive_transducer("'N"), "'N")
-        self.assertEqual(self.test_case_sensitive_transducer("'n"), "n̓")
-        self.assertEqual(self.test_case_insensitive_transducer("'N"), "n̓")
-        self.assertEqual(self.test_case_insensitive_transducer("'n"), "n̓")
+        self.assertEqual(self.test_case_sensitive_transducer("'N").output_string, "'N")
+        self.assertEqual(self.test_case_sensitive_transducer("'n").output_string, "n̓")
+        self.assertEqual(self.test_case_insensitive_transducer("'N").output_string, "n̓")
+        self.assertEqual(self.test_case_insensitive_transducer("'n").output_string, "n̓")
 
     def test_regex_set(self):
         # https://github.com/roedoejet/g2p/issues/15
-        self.assertEqual(self.test_regex_set_transducer_sanity('ca'), 'cb')
-        self.assertEqual(self.test_regex_set_transducer('ca'), 'cb')
-        self.assertEqual(self.test_regex_set_transducer('fa'), 'fb')
+        self.assertEqual(self.test_regex_set_transducer_sanity('ca').output_string, 'cb')
+        self.assertEqual(self.test_regex_set_transducer('ca').output_string, 'cb')
+        self.assertEqual(self.test_regex_set_transducer('fa').output_string, 'fb')
 
     def test_deletion(self):
-        self.assertEqual(self.test_deletion_transducer('a'), '')
-        self.assertEqual(self.test_deletion_transducer_csv('a'), '')
-        self.assertEqual(self.test_deletion_transducer_json('a'), '')
+        self.assertEqual(self.test_deletion_transducer('a').output_string, '')
+        self.assertEqual(self.test_deletion_transducer_csv('a').output_string, '')
+        self.assertEqual(self.test_deletion_transducer_json('a').output_string, '')
 
 
 if __name__ == "__main__":

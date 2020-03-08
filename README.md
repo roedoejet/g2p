@@ -55,7 +55,7 @@ Then, call it with an argument for `in_lang` and `out_lang`. Both must be string
 
 ```python
 >>> transducer = make_g2p('dan', 'eng-arpabet')
->>> transducer('hej')
+>>> transducer('hej').output_string
 'HH EH Y'
 ```
 

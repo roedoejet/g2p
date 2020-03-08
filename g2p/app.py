@@ -17,7 +17,6 @@ from typing import List
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.transducer import CompositeTransducer, Transducer
-from g2p.transducer.indices import Indices, IndexSequence
 from g2p.static import __file__ as static_file
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p.api import g2p_api

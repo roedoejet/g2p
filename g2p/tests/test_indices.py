@@ -6,7 +6,6 @@
 from unittest import main, TestCase
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
-from g2p.transducer.indices import Indices
 
 
 class IndicesTest(TestCase):
@@ -194,17 +193,17 @@ class IndicesTest(TestCase):
         """ Test straightforward conversion without returning indices.
         """
         transducer = self.trans_combining('k\u0313am')
-        self.assertEqual(transducer, "'kam")
+        self.assertEqual(transducer.output_string, "'kam")
 
     def test_combining(self):
         """ Test index preserving combining characters
         """
-        transducer = self.trans_combining('k\u0313am', index=True)
-        self.assertEqual(transducer[0], "'kam")
-        self.assertEqual(transducer[1], [(0, 1),
-                                         (1, 0),
-                                         (2, 2),
-                                         (3, 3)])
+        transducer = self.trans_combining('k\u0313am')
+        self.assertEqual(transducer.output_string, "'kam")
+        self.assertEqual(transducer.edges, [(0, 1),
+                                            (1, 0),
+                                            (2, 2),
+                                            (3, 3)])
 
     def test_wacky(self):
         """ Test weird Unicode emoji transformation...
@@ -212,98 +211,89 @@ class IndicesTest(TestCase):
         transducer_no_i = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604')
         self.assertEqual(
-            transducer_no_i, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
+            transducer_no_i.output_string, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
         transducer_lite = self.trans_wacky_lite(
-            'abcc', index=True)
+            'abcc')
         self.assertEqual(
-            transducer_lite[0], 'ccccc')
+            transducer_lite.output_string, 'ccccc')
         transducer = self.trans_wacky(
-            '\U0001f600\U0001f603\U0001f604\U0001f604', index=True)
+            '\U0001f600\U0001f603\U0001f604\U0001f604')
 
         self.assertEqual(
-            transducer[0], '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
+            transducer.output_string, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
         self.assertEqual(
-            transducer[1], [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)])
+            transducer.edges, [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)])
 
     def test_circum(self):
         """ Test circumfixing
         """
-        transducer = self.trans_circum('ac', index=True)
-        self.assertEqual(transducer[0], 'cac')
-        self.assertEqual(transducer[1], [(0, 1), (1, 0), (1, 2)])
+        transducer = self.trans_circum('ac')
+        self.assertEqual(transducer.output_string, 'cac')
+        self.assertEqual(transducer.edges, [(0, 1), (1, 0), (1, 2)])
 
     def test_case_one(self):
         """ Test case one
         """
-        transducer = self.trans_one('test', True)
-        self.assertEqual(transducer[0], 'pest')
-        self.assertEqual(transducer[1], [(0, 0), (1, 1), (2, 2), (3, 3)])
+        transducer = self.trans_one('test')
+        self.assertEqual(transducer.output_string, 'pest')
+        self.assertEqual(transducer.edges, [(0, 0), (1, 1), (2, 2), (3, 3)])
 
     def test_case_two(self):
-        transducer = self.trans_two('test', True)
-        self.assertEqual(transducer[0], 'tst')
-        self.assertEqual(transducer[1], [(0, 0), (2, 1), (3, 2)])
+        transducer = self.trans_two('test')
+        self.assertEqual(transducer.output_string, 'tst')
+        self.assertEqual(transducer.edges, [(0, 0), (2, 1), (3, 2)])
 
     def test_case_three(self):
-        transducer = self.trans_three('test', True)
-        self.assertEqual(transducer[0], 'chest')
-        self.assertEqual(transducer[1], [(0, 0),
-                                         (0, 1),
-                                         (1, 2),
-                                         (2, 3),
-                                         (3, 4)])
+        transducer = self.trans_three('test')
+        self.assertEqual(transducer.output_string, 'chest')
+        self.assertEqual(transducer.edges, [(0, 0),
+                                            (0, 1),
+                                            (1, 2),
+                                            (2, 3),
+                                            (3, 4)])
 
     def test_case_four(self):
-        transducer = self.trans_four('test', True)
-        self.assertEqual(transducer[0], 'pst')
-        self.assertEqual(transducer[1], [(0, 0),
-                                         (2, 1),
-                                         (3, 2)])
+        transducer = self.trans_four('test')
+        self.assertEqual(transducer.output_string, 'pst')
+        self.assertEqual(transducer.edges, [(0, 0),
+                                            (2, 1),
+                                            (3, 2)])
 
     def test_case_six(self):
-        transducer = self.trans_six('test', True)
-        self.assertEqual(transducer[0], 'tset')
-        self.assertEqual(transducer[1], [(0, 0), (1, 2), (2, 1), (3, 3)])
+        transducer = self.trans_six('test')
+        self.assertEqual(transducer.output_string, 'tset')
+        self.assertEqual(transducer.edges, [(0, 0), (1, 2), (2, 1), (3, 3)])
 
     def test_case_long_six(self):
-        transducer_no_i = self.trans_six('esesse')
-        self.assertEqual(transducer_no_i, 'sesese')
-        transducer = self.trans_six('esesse', True)
-        self.assertEqual(transducer[0], 'sesese')
+        transducer = self.trans_six('esesse')
+        self.assertEqual(transducer.output_string, 'sesese')
 
     def test_case_seven(self):
-        transducer_as_is = self.trans_seven_as_is('test', True)
-        self.assertEqual(transducer_as_is[0], 'test')
-        self.assertEqual(transducer_as_is[1], [(0, 0), (1, 1), (2, 2), (3, 3)])
-        transducer = self.trans_seven('test', True)
-        self.assertEqual(transducer[0], 'tesht')
-        self.assertEqual(transducer[1], [(0, 0),
-                                         (1, 1),
-                                         (2, 2),
-                                         (2, 3),
-                                         (3, 4)])
+        transducer_as_is = self.trans_seven_as_is('test')
+        self.assertEqual(transducer_as_is.output_string, 'test')
+        self.assertEqual(transducer_as_is.edges, [
+                         (0, 0), (1, 1), (2, 2), (3, 3)])
+        transducer = self.trans_seven('test')
+        self.assertEqual(transducer.output_string, 'tesht')
+        self.assertEqual(transducer.edges, [(0, 0),
+                                            (1, 1),
+                                            (2, 2),
+                                            (2, 3),
+                                            (3, 4)])
 
     def test_case_eight(self):
-        transducer = self.trans_eight('test', True)
-        self.assertEqual(transducer[0], 'chess')
-        self.assertEqual(transducer[1], [(0, 0),
-                                         (1, 1),
-                                         (1, 2),
-                                         (2, 3),
-                                         (3, 4)])
-    def test_case_nine(self):
-        transducer = self.trans_nine('aa', True)
-        self.assertEqual(transducer[0], '')
-        self.assertEqual(transducer[1], [])
+        transducer = self.trans_eight('test')
+        self.assertEqual(transducer.output_string, 'chess')
+        self.assertEqual(transducer.edges, [(0, 0),
+                                            (1, 1),
+                                            (1, 2),
+                                            (2, 3),
+                                            (3, 4)])
 
-    def test_conversion(self):
-        tuple_format = [
-            ((0, 'a'), (0, 'b'))
-        ]
-        dict_format = {0: {'input_string': 'a', 'output': {0: 'b'}}}
-        indices_from_tups = Indices(tuple_format)
-        indices_from_dict = Indices(dict_format)
-        self.assertEqual(indices_from_dict(), indices_from_tups())
+    def test_case_nine(self):
+        transducer = self.trans_nine('aa')
+        self.assertEqual(transducer.output_string, '')
+        self.assertEqual(transducer.edges, [])
 
 if __name__ == "__main__":
     main()

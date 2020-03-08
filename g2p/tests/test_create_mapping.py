@@ -38,9 +38,9 @@ class MappingCreationTest(TestCase):
         src_mapping = Mapping(src_mappings, in_lang='crj', out_lang='crj-ipa')
         mapping = create_mapping(src_mapping, self.target_mapping)
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('a'), 'ɑ')
-        self.assertEqual(transducer('i'), 'i')
-        self.assertEqual(transducer('u'), 'u')
+        self.assertEqual(transducer('a').output_string, 'ɑ')
+        self.assertEqual(transducer('i').output_string, 'i')
+        self.assertEqual(transducer('u').output_string, 'u')
 
     def test_bigram_mappings(self):
         src_mappings = [
@@ -51,9 +51,9 @@ class MappingCreationTest(TestCase):
         src_mapping = Mapping(src_mappings, in_lang='crj', out_lang='crj-ipa')
         mapping = create_mapping(src_mapping, self.target_mapping)
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('pi'), 'pi')
-        self.assertEqual(transducer('ti'), 'ti')
-        self.assertEqual(transducer('ki'), 'ki')
+        self.assertEqual(transducer('pi').output_string, 'pi')
+        self.assertEqual(transducer('ti').output_string, 'ti')
+        self.assertEqual(transducer('ki').output_string, 'ki')
 
     def test_trigram_mappings(self):
         src_mappings = [
@@ -64,9 +64,9 @@ class MappingCreationTest(TestCase):
         src_mapping = Mapping(src_mappings, in_lang='crj', out_lang='crj-ipa')
         mapping = create_mapping(src_mapping, self.target_mapping)
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('t͡ʃi'), 'tʃi')
-        self.assertEqual(transducer('t͡ʃu'), 'tʃu')
-        self.assertEqual(transducer('t͡ʃa'), 'tʃɑ')
+        self.assertEqual(transducer('t͡ʃi').output_string, 'tʃi')
+        self.assertEqual(transducer('t͡ʃu').output_string, 'tʃu')
+        self.assertEqual(transducer('t͡ʃa').output_string, 'tʃɑ')
 
     def test_long_mappings(self):
         src_mappings = [
@@ -77,9 +77,9 @@ class MappingCreationTest(TestCase):
         src_mapping = Mapping(src_mappings, in_lang='crj', out_lang='crj-ipa')
         mapping = create_mapping(src_mapping, self.target_mapping)
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('pʷeː'), 'pweː')
-        self.assertEqual(transducer('tʷeː'), 'tweː')
-        self.assertEqual(transducer('kʷeː'), 'kweː')
+        self.assertEqual(transducer('pʷeː').output_string, 'pweː')
+        self.assertEqual(transducer('tʷeː').output_string, 'tweː')
+        self.assertEqual(transducer('kʷeː').output_string, 'kweː')
 
 
 if __name__ == '__main__':

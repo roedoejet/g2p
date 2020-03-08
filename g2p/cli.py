@@ -74,10 +74,12 @@ def convert(in_lang, out_lang, input_text, path, debugger, index):
         transducer = make_g2p(in_lang, out_lang)
     elif path:
         transducer = Transducer(Mapping(path))
-    output = list(transducer(input_text, index=index, debugger=debugger))
+    tg = transducer(input_text)
     if debugger:
+        output = [tg.output_string, tg.edges, tg.debugger]
         PRINTER.pprint(output)
     else:
+        output = tg.output_string
         click.echo(output)
 
 @cli.command()
