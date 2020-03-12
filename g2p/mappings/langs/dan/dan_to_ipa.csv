@@ -10,9 +10,9 @@ o,ɔ
 \u00E5,oː
 d,ð,VOWEL,\b|CONSONANT|FRONT
 t,ð,VOWEL,\b|CONSONANT
-g,ɡ,,VOWEL|\b
 g,ɪ̯,FRONT
 g,ʊ̯,BACK
+g,ɡ
 r,ɐ̯,,\b
 c,s
 e,ɛ
