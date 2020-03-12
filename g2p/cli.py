@@ -57,14 +57,13 @@ def generate_mapping_network(path):
     draw(LANGS_NETWORK, with_labels=True)
     plt.show()
 
-@click.option('--index/--no-index', default=False)
 @click.option('--debugger/--no-debugger', default=False)
 @click.option('--path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument('out_lang', default='')
 @click.argument('in_lang', default='')
 @click.argument('input_text', type=click.STRING)
 @cli.command()
-def convert(in_lang, out_lang, input_text, path, debugger, index):
+def convert(in_lang, out_lang, input_text, path, debugger):
     '''Convert from in-lang to out-lang. Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of options.
     '''
     if os.path.exists(input_text) and input_text.endswith('txt'):

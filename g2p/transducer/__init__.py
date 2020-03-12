@@ -32,9 +32,10 @@ Index = Dict
 ChangeLog = List[List[int]]
 
 class TransductionGraph():
-    ''' This class is the resulting output of calling a Transducer. 
-        It contains the input and output string, their character nodes, and the edges between those nodes.
-    '''
+    """This is the object returned after performing a transduction using a Transducer.
+
+    Each TransductionGraph must be initialized with an input string.
+    """
 
     def __init__(self, input_string: str):
         # Plain strings
@@ -53,6 +54,7 @@ class TransductionGraph():
 
     @property
     def input_string(self):
+        """str: The input string that initialized the TransductionGraph."""
         return self._input_string
 
     @input_string.setter
@@ -62,31 +64,37 @@ class TransductionGraph():
 
     @property
     def output_string(self):
+        """str: The output string."""
         return self._output_string
 
     @output_string.setter
     def output_string(self, value):
         self._output_string = value
+        self._output_nodes = [[i, x] for i, x in enumerate(value)]
 
     @property
     def input_nodes(self):
+        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the input"""
         return self._input_nodes
 
     @input_nodes.setter
     def input_nodes(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the input nodes to {value} but they cannot be changed')
+            f'Sorry, you tried to change the input nodes to {value} but they cannot be changed.')
 
     @property
     def output_nodes(self):
+        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the output"""
         return self._output_nodes
 
     @output_nodes.setter
     def output_nodes(self, value):
-        self._output_nodes = value
+        raise ValueError(
+            f'Sorry, you tried to change the output nodes to {value} but they cannot be changed directly. Change output_string instead.')
 
     @property
     def edges(self):
+        """List[List[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
         return self._edges
 
     @edges.setter
@@ -95,18 +103,47 @@ class TransductionGraph():
 
     @property
     def debugger(self):
+        """List[dict]: A list of rules applied during the transformation. Useful for debugging."""
         return self._debugger
 
     @debugger.setter
     def debugger(self, value):
         self._debugger = value
 
+    @property
+    def tiers(self):
+        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the graph"""
+        return self
+
+    @tiers.setter
+    def tiers(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+
     def pretty_edges(self):
         edges = copy.deepcopy(self._edges)
         edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(edges):
-            edges[i] = [self._input_nodes[edge[0]][1], self._output_nodes[edge[1]][1]]
+            edges[i] = [self._input_nodes[edge[0]]
+                        [1], self._output_nodes[edge[1]][1]]
         return edges
+
+    def reduced_edges(self):
+        edges = sorted(copy.deepcopy(self._edges), key=lambda x: x[0])
+        reduced = []
+        intermediate_index = [self._edges[0][0], self._edges[0][1]]
+        for edge in edges:
+            inp = edge[0]
+            outp = edge[1]
+            if inp == intermediate_index[0] and outp > intermediate_index[1]:
+                intermediate_index[1] = outp
+            if inp > intermediate_index[0] and outp == intermediate_index[1]:
+                intermediate_index[0] = inp
+            if inp > intermediate_index[0] and outp > intermediate_index[1]:
+                intermediate_index = [inp, outp]
+                reduced.append(copy.deepcopy(intermediate_index))
+        reduced.append([len(self._input_string), len(self._output_string)])
+        return reduced
 
 
 class Transducer():
@@ -116,7 +153,6 @@ class Transducer():
 
     Attributes:
         mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
-
     """
 
     def __init__(self, mapping: Mapping):
@@ -135,15 +171,9 @@ class Transducer():
 
         Args:
             to_convert (str): The string to convert.
-            index (bool, optional): Return indices in output. Defaults to False.
-            debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
 
         Returns:
-            Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
-                Either returns a plain string (index=False, debugger=False),
-                               a tuple with the converted string and indices (index=True, debugger=False),
-                               a tuple with the converted string and corresponding rules (index=False, debugger=True),
-                               a tuple with the converted string, indices and rules (index=True, debugger=True)
+            TransductionGraph: Returns an object with all the nodes representing input and output characters and their corresponding edges representing the indices of the transformation.
         """
         return self.apply_rules(to_convert)
 
@@ -164,29 +194,28 @@ class Transducer():
         else:
             return - 1
 
-    def resolve_intermediate_chars(self, output_nodes):
-        ''' Go through all nodes and resolve any intermediate characters from the Private Supplementary Use Area
+    def resolve_intermediate_chars(self, output_string):
+        ''' Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
             to their mapped equivalents.
         '''
-        output_nodes = copy.deepcopy(output_nodes)
         indices_seen = defaultdict(int)
-        for i, node in enumerate(output_nodes):
-            intermediate_index = self._pua_to_index(node[1])
+        for i, char in enumerate(output_string):
+            intermediate_index = self._pua_to_index(char)
             # if not Private Supplementary Use character
             if intermediate_index < 0:
                 continue
             else:
                 output_char_index = indices_seen[intermediate_index]
                 try:
-                    output_nodes[i][1] = self.mapping[intermediate_index]['out'][output_char_index]
+                    output_string = output_string[:i] + self.mapping[intermediate_index]['out'][output_char_index] + output_string[i+1:]
                 except IndexError:
                     indices_seen[intermediate_index] = 0
                     output_char_index = 0
-                    output_nodes[i][1] = self.mapping[intermediate_index]['out'][output_char_index]
+                    output_string = output_string[:i] + self.mapping[intermediate_index]['out'][output_char_index] + output_string[i+1:]
                 indices_seen[intermediate_index] += 1
-        return output_nodes
+        return output_string
 
-    def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string) -> Index:
+    def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string):
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
@@ -195,12 +224,6 @@ class Transducer():
                 It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
                 For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
                 Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
-
-        Args:
-
-
-        Returns:
-
         """
         input_char_matches = [x.group()
                               for x in self._char_match_pattern.finditer(io['in'])]
@@ -277,8 +300,8 @@ class Transducer():
         out_length = len(out_string)
         if in_length == out_length:
             for i, char in enumerate(out_string):
-                tg.output_nodes[i + start][1] = char
-                tg.output_string = ''.join([x[1] for x in tg.output_nodes])
+                tg.output_string = tg.output_string[:i +
+                                                    start] + char + tg.output_string[i+start+1:]
             return
         # default insertion(s)
         elif in_length < out_length:
@@ -292,11 +315,15 @@ class Transducer():
             process = 'delete'
         # iterate the longest string
         deleted = 0
+        last_input_node = start
+        last_output_node = start
         for i, char in enumerate(longest):
             # if the shorter string still has that output, keep that index
             if i <= len(shortest) - 1:
-                tg.output_nodes[i + start][1] = out_string[i]
-                tg.output_string = ''.join([x[1] for x in tg.output_nodes])
+                tg.output_string = tg.output_string[:i+start] + \
+                    out_string[i] + tg.output_string[i+start+1:]
+                last_input_node = i + start
+                last_output_node = i + start
             # otherwise...
             else:
                 # add a new node and increment each following node
@@ -304,29 +331,25 @@ class Transducer():
                 if process == 'insert':
                     # Nodes
                     index_to_add = i + start
-                    new_node = [index_to_add, char]
-                    tg.output_nodes = tg.output_nodes[:index_to_add] + [
-                        [x[0] + 1, x[1]] for x in tg.output_nodes[index_to_add:]]
-                    tg.output_nodes.insert(index_to_add, new_node)
-                    tg.output_string = ''.join([x[1] for x in tg.output_nodes])
+                    tg.output_string = tg.output_string[:index_to_add] + \
+                        char + tg.output_string[index_to_add:]
                     # Edges
                     # increment
                     for i, edge in enumerate(tg.edges):
                         if edge[1] >= index_to_add:
                             tg.edges[i][1] += 1
                     # add edge to index of last input character
-                    tg.edges.append([in_length - 1 + start, index_to_add])
+                    last_input_node = max([x[0] for x in tg.edges if x[1] == last_output_node])
+                    last_output_node = index_to_add
+                    tg.edges.append([last_input_node, index_to_add])
                 # delete the node and decrement each following node
                 # log the change in order to update the edges.
                 else:
                     # Nodes
                     index_to_delete = i + start - deleted
-                    del tg.output_nodes[index_to_delete]
+                    tg.output_string = tg.output_string[:index_to_delete] + \
+                        tg.output_string[index_to_delete + 1:]
                     deleted += 1
-                    tg.output_nodes = tg.output_nodes[:index_to_delete] + [
-                        [x[0] - 1, x[1]] for x in tg.output_nodes[index_to_delete:]]
-                    tg.output_string = ''.join([x[1] for x in tg.output_nodes])
-
                     # Edges
                     # delete
                     tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
@@ -368,7 +391,8 @@ class Transducer():
                     self.update_explicit_indices(
                         tg, match, io, intermediate_diff, out_string)
                 else:
-                    self.update_default_indices(tg, match, intermediate_diff, out_string)
+                    self.update_default_indices(
+                        tg, match, intermediate_diff, out_string)
                 if io['in'] != io['out']:
                     tg.debugger.append({'input': debug_string,
                                         'output': tg.output_string,
@@ -378,16 +402,17 @@ class Transducer():
                 out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
                 intermediate_diff += len(out_string) - len(match.group())
         if intermediate_forms:
-            tg.output_nodes = self.resolve_intermediate_chars(tg.output_nodes)
-            tg.output_string = ''.join([x[1] for x in tg.output_nodes])
+            tg.output_string = self.resolve_intermediate_chars(tg.output_string)
         tg.edges = list(dict.fromkeys(
             [tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])]))
         return tg
 
+
 class CompositeTransductionGraph(TransductionGraph):
-    ''' This class is the resulting output of calling a Transducer. 
-        It contains the input and output string, their character nodes, and the edges between those nodes.
-    '''
+    """This is the object returned after performing a transduction using a CompositeTransducer.
+
+    Each CompositeTransductionGraph must be initialized with a list of TransductionGraph objects.
+    """
 
     def __init__(self, tg_list):
         # Plain strings
@@ -405,11 +430,72 @@ class CompositeTransductionGraph(TransductionGraph):
 
     @property
     def tiers(self):
+        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the CompositeTransducer"""
         return self._tiers
 
     @tiers.setter
     def tiers(self, value):
-        self._tiers = value
+        raise ValueError(
+            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+
+    def pretty_edges(self):
+        pretty_edges = []
+        for edges in self._edges:
+            edges = copy.deepcopy(edges)
+            edges.sort(key=lambda x: x[0])
+            for i, edge in enumerate(edges):
+                edges[i] = [self._input_nodes[edge[0]]
+                            [1], self._output_nodes[edge[1]][1]]
+            pretty_edges.append(edges)
+        return pretty_edges
+
+    def reduced_tier(self, edge_tier):
+        edges = sorted(copy.deepcopy(edge_tier), key=lambda x: x[0])
+        reduced = []
+        intermediate_index = [edge_tier[0][0], edge_tier[0][1]]
+        for edge in edges:
+            inp = edge[0]
+            outp = edge[1]
+            if inp == intermediate_index[0] and outp > intermediate_index[1]:
+                intermediate_index[1] = outp
+            if inp > intermediate_index[0] and outp == intermediate_index[1]:
+                intermediate_index[0] = inp
+            if inp > intermediate_index[0] and outp > intermediate_index[1]:
+                intermediate_index = [inp, outp]
+                reduced.append(copy.deepcopy(intermediate_index))
+        reduced.append([len(self._input_string), len(self._output_string)])
+        return reduced
+
+    @staticmethod
+    def compose_tiers(i1, i2):
+        if not i1:
+            return i2
+        i2_dict = dict(i2)
+        i2_idx = 0
+        results = []
+        for i1_in, i1_out in i1:
+            highest_i2_found = 0 if not results else results[-1][1]
+            while i2_idx <= i1_out:
+                if i2_idx in i2_dict and i2_dict[i2_idx] > highest_i2_found:
+                    highest_i2_found = i2_dict[i2_idx]
+                i2_idx += 1
+            if results:
+                assert(i1_in >= results[-1][0])
+                assert(highest_i2_found >= results[-1][1])
+            results.append((i1_in, highest_i2_found))
+        return results
+
+    def reduced_edges(self):
+        tier1 = sorted(copy.deepcopy(self._edges[0]), key=lambda x: x[0])
+        tier2 = sorted(copy.deepcopy(self._edges[1]), key=lambda x: x[0])
+        reduced = self.compose_tiers(tier1, tier2)
+        tiers_seen = 2
+        while tiers_seen < len(self._edges):
+            reduced = self.compose_tiers(reduced, sorted(
+                copy.deepcopy(self._edges[tiers_seen]), key=lambda x: x[0]))
+            tiers_seen += 1
+        return reduced
+
 
 class CompositeTransducer():
     """This class combines Transducer objects to form a CompositeTransducer object.
