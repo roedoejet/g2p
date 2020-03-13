@@ -219,6 +219,8 @@ class Transducer():
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
+            TODO: this needs to be fixed!
+
             Example:
                 A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
                 It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
@@ -352,7 +354,14 @@ class Transducer():
                     deleted += 1
                     # Edges
                     # delete
+                    last_input_node = max([x[0] for x in tg.edges if x[1] == index_to_delete])
+                    # if rule is not just a simple deletion,
+                    # add an edge between the node and the last output node
+                    if out_length > 0:
+                        if [last_input_node, last_output_node] not in tg.edges:
+                            tg.edges.append([last_input_node, last_output_node])
                     tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
+                    last_output_node = index_to_delete
                     # decrement
                     for i, edge in enumerate(tg.edges):
                         if edge[1] > index_to_delete:

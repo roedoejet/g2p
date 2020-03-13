@@ -97,7 +97,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
         edges += [{"source": x[0] + index_offset, "target": x[1] +
                     len(tier.input_string) + index_offset} for x in tier.edges]
         index_offset += len(tier.input_string)
-        symbol_size = min(300 / len(tier.output_string), 40)
+        symbol_size = min(300 / max(1, len(tier.output_string)), 40)
         colour = shade_colour(colour, (1/steps)*350, g=50, b=20)
         output_x = x + (ind * diff)
         output_y = 300

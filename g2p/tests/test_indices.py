@@ -256,6 +256,7 @@ class IndicesTest(TestCase):
         transducer = self.trans_four('test')
         self.assertEqual(transducer.output_string, 'pst')
         self.assertEqual(transducer.edges, [(0, 0),
+                                            (1, 0),
                                             (2, 1),
                                             (3, 2)])
 
@@ -294,6 +295,17 @@ class IndicesTest(TestCase):
         transducer = self.trans_nine('aa')
         self.assertEqual(transducer.output_string, '')
         self.assertEqual(transducer.edges, [])
+
+    def test_case_acdc(self):
+        transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
+        tg = transducer('acdc')
+        self.assertEqual(tg.output_string, 'cacdc')
+        self.assertEqual(tg.edges, [(0, 1),
+                                    (1, 0),
+                                    (1, 2),
+                                    (2, 3),
+                                    (3, 4)])
+
 
 if __name__ == "__main__":
     main()
