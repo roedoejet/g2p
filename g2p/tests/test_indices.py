@@ -208,17 +208,24 @@ class IndicesTest(TestCase):
     def test_wacky(self):
         """ Test weird Unicode emoji transformation...
         """
+        transducer_lite = self.trans_wacky_lite(
+            'abcc')
+        transducer_lite_extra = self.trans_wacky_lite(
+            'abcca')
+        self.assertEqual(
+            transducer_lite.output_string, 'ccccc')
+        self.assertEqual(
+            transducer_lite_extra.output_string, 'ccccca')
+        self.assertEqual(
+            transducer_lite.edges, [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)])
+        self.assertEqual(
+            transducer_lite_extra.edges, [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3), (4, 5)])
         transducer_no_i = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604')
         self.assertEqual(
             transducer_no_i.output_string, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
-        transducer_lite = self.trans_wacky_lite(
-            'abcc')
-        self.assertEqual(
-            transducer_lite.output_string, 'ccccc')
         transducer = self.trans_wacky(
             '\U0001f600\U0001f603\U0001f604\U0001f604')
-
         self.assertEqual(
             transducer.output_string, '\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604')
         self.assertEqual(
@@ -297,7 +304,8 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.edges, [])
 
     def test_case_acdc(self):
-        transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
+        transducer = Transducer(
+            Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
         tg = transducer('acdc')
         self.assertEqual(tg.output_string, 'cacdc')
         self.assertEqual(tg.edges, [(0, 1),
@@ -305,6 +313,22 @@ class IndicesTest(TestCase):
                                     (1, 2),
                                     (2, 3),
                                     (3, 4)])
+
+    def test_case_acac(self):
+        transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
+        transducer_default = Transducer(Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}]))
+        tg = transducer('abcabc')
+        tg_default = transducer_default('abcabc')
+        self.assertEqual(tg.output_string, 'abab')
+        self.assertEqual(tg_default.output_string, 'abab')
+        self.assertEqual(tg.edges, [(2, 0),
+                                    (2, 1),
+                                    (5, 2),
+                                    (5, 3)])
+        self.assertEqual(tg_default.edges, [(2, 0),
+                                            (2, 1),
+                                            (5, 2),
+                                            (5, 3)])
 
 
 if __name__ == "__main__":

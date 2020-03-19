@@ -192,6 +192,10 @@ class Mapping():
             self.kwargs['reverse'] = False
         if 'prevent_feeding' not in self.kwargs:
             self.kwargs['prevent_feeding'] = False
+        if 'in_lang' not in self.kwargs:
+            self.kwargs['in_lang'] = 'und'
+        if 'out_lang' not in self.kwargs:
+            self.kwargs['out_lang'] = 'und'
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
             if kwarg == 'as_is' and not val:

@@ -219,8 +219,6 @@ class Transducer():
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
-            TODO: this needs to be fixed!
-
             Example:
                 A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
                 It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
@@ -255,45 +253,58 @@ class Transducer():
                     outputs[m] = [{'index': index + start, 'string': char}]
                 index += 1
         out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
-        self.update_default_indices(tg, match, intermediate_diff, out_string)
+        deleted = 0
         for match_index, input_matches in inputs.items():
-            output_matches = outputs[match_index]
-            if len(input_matches) > len(output_matches):
-                longest = input_matches
-            else:
+            try:
+                output_matches = outputs[match_index]
+            except KeyError:
+                output_matches = []
+            if len(input_matches) == len(output_matches):
+                shortest = input_matches
                 longest = output_matches
-            for i, item in enumerate(longest):
-                if len(output_matches) > len(input_matches) and i > len(input_matches) - 1:
-                    in_char = input_matches[-1]['index']
-                    out_char = output_matches[i]['index']
-                elif len(output_matches) < len(input_matches) and i > len(output_matches) - 1:
-                    in_char = input_matches[i]['index']
-                    out_char = output_matches[-1]['index']
+                process = 'basic'
+            elif len(input_matches) < len(output_matches):
+                shortest = input_matches
+                longest = output_matches
+                process = 'insert'
+            else:
+                shortest = output_matches
+                longest = input_matches
+                process = 'delete'
+            for i, char in enumerate(longest):
+                if process == 'basic' or i <= len(shortest) - 1:
+                    input_index = input_matches[i]['index'] - intermediate_diff
+                    output_index = output_matches[i]['index']
+                    # don't allow insertion in basic process
+                    if output_index >= len(match.group()) + start:
+                        output_index = len(match.group()) + start - 1
+                    tg.output_string = tg.output_string[:output_index] + char['string'] + tg.output_string[output_index+1:]
+                    tg.edges = [x for x in tg.edges if x[1] != output_index]
+                    tg.edges.append([input_index, output_index])
                 else:
-                    in_char = input_matches[i]['index']
-                    out_char = output_matches[i]['index']
-                if out_char > len(match.group()) - 1 + start:
-                    # increment
-                    tg.edges = [x for x in tg.edges if x[1] != out_char]
-                    for i, edge in enumerate(tg.edges):
-                        if edge[1] >= out_char:
-                            tg.edges[i][1] += 1
-                    # add edge to index of last input character
-                    tg.edges.append([in_char, out_char])
-                elif out_char == len(out_string) - 1 + start and out_char < len(match.group()) - 1 + start:
-                    tg.edges = [x for x in tg.edges if x[1] != out_char]
-                    for i, edge in enumerate(tg.edges):
-                        if edge[1] > out_char:
-                            tg.edges[i][1] -= 1
-                else:
-                    for i in range(0, len(tg.edges)):
-                        try:
-                            if tg.edges[i][1] == out_char:
-                                # this might cause problems...
-                                del tg.edges[i]
-                        except IndexError:
-                            break
-                    tg.edges.append([in_char, out_char])
+                    if process == 'insert':
+                        input_index = input_matches[-1]['index'] - intermediate_diff
+                        output_index = output_matches[i]['index']
+                        tg.output_string = tg.output_string[:output_index] + char['string'] + tg.output_string[output_index:]
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] >= output_index:
+                                tg.edges[i][1] += 1
+                        tg.edges.append([input_index, output_index])
+                    else:
+                        input_index = input_matches[i]['index'] - intermediate_diff
+                        if output_matches:
+                            output_index = output_matches[-1]['index'] - deleted
+                        else:
+                            output_index = input_index - deleted
+                        tg.output_string = tg.output_string[:output_index] + tg.output_string[output_index + 1:]
+                        deleted += 1
+                        if len(output_matches) > 0 and [input_index, output_index] not in tg.edges:
+                            tg.edges.append([input_index, output_index])
+                        tg.edges = [x for x in tg.edges if x[1] != output_index]
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] > output_index:
+                                tg.edges[i][1] -= 1
+            
 
     def update_default_indices(self, tg, match, intermediate_diff, out_string):
         start = match.start() + intermediate_diff
