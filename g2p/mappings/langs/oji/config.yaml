@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: Ojibwe
+mappings:
+  - display_name: Ojibwe to IPA
+    in_lang: oji
+    out_lang: oji-ipa
+    authors:
+      - David Huggins-Daines
+    type: mapping
+    mapping: oji_to_ipa.csv
+    as_is: true
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
