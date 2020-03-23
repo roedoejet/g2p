@@ -128,23 +128,6 @@ class TransductionGraph():
                         [1], self._output_nodes[edge[1]][1]]
         return edges
 
-    def reduced_edges(self):
-        edges = sorted(copy.deepcopy(self._edges), key=lambda x: x[0])
-        reduced = []
-        intermediate_index = [self._edges[0][0], self._edges[0][1]]
-        for edge in edges:
-            inp = edge[0]
-            outp = edge[1]
-            if inp == intermediate_index[0] and outp > intermediate_index[1]:
-                intermediate_index[1] = outp
-            if inp > intermediate_index[0] and outp == intermediate_index[1]:
-                intermediate_index[0] = inp
-            if inp > intermediate_index[0] and outp > intermediate_index[1]:
-                intermediate_index = [inp, outp]
-                reduced.append(copy.deepcopy(intermediate_index))
-        reduced.append([len(self._input_string), len(self._output_string)])
-        return reduced
-
 
 class Transducer():
     """This is the fundamental class for performing conversions in the g2p library.
@@ -164,7 +147,7 @@ class Transducer():
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
     def __repr__(self):
-        return f"{__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
@@ -460,61 +443,14 @@ class CompositeTransductionGraph(TransductionGraph):
 
     def pretty_edges(self):
         pretty_edges = []
-        for edges in self._edges:
+        for tier_i, edges in enumerate(self._edges):
             edges = copy.deepcopy(edges)
             edges.sort(key=lambda x: x[0])
             for i, edge in enumerate(edges):
-                edges[i] = [self._input_nodes[edge[0]]
-                            [1], self._output_nodes[edge[1]][1]]
+                edges[i] = [self.tiers[tier_i].input_nodes[edge[0]]
+                            [1], self.tiers[tier_i].output_nodes[edge[1]][1]]
             pretty_edges.append(edges)
         return pretty_edges
-
-    def reduced_tier(self, edge_tier):
-        edges = sorted(copy.deepcopy(edge_tier), key=lambda x: x[0])
-        reduced = []
-        intermediate_index = [edge_tier[0][0], edge_tier[0][1]]
-        for edge in edges:
-            inp = edge[0]
-            outp = edge[1]
-            if inp == intermediate_index[0] and outp > intermediate_index[1]:
-                intermediate_index[1] = outp
-            if inp > intermediate_index[0] and outp == intermediate_index[1]:
-                intermediate_index[0] = inp
-            if inp > intermediate_index[0] and outp > intermediate_index[1]:
-                intermediate_index = [inp, outp]
-                reduced.append(copy.deepcopy(intermediate_index))
-        reduced.append([len(self._input_string), len(self._output_string)])
-        return reduced
-
-    @staticmethod
-    def compose_tiers(i1, i2):
-        if not i1:
-            return i2
-        i2_dict = dict(i2)
-        i2_idx = 0
-        results = []
-        for i1_in, i1_out in i1:
-            highest_i2_found = 0 if not results else results[-1][1]
-            while i2_idx <= i1_out:
-                if i2_idx in i2_dict and i2_dict[i2_idx] > highest_i2_found:
-                    highest_i2_found = i2_dict[i2_idx]
-                i2_idx += 1
-            if results:
-                assert(i1_in >= results[-1][0])
-                assert(highest_i2_found >= results[-1][1])
-            results.append((i1_in, highest_i2_found))
-        return results
-
-    def reduced_edges(self):
-        tier1 = sorted(copy.deepcopy(self._edges[0]), key=lambda x: x[0])
-        tier2 = sorted(copy.deepcopy(self._edges[1]), key=lambda x: x[0])
-        reduced = self.compose_tiers(tier1, tier2)
-        tiers_seen = 2
-        while tiers_seen < len(self._edges):
-            reduced = self.compose_tiers(reduced, sorted(
-                copy.deepcopy(self._edges[tiers_seen]), key=lambda x: x[0]))
-            tiers_seen += 1
-        return reduced
 
 
 class CompositeTransducer():
@@ -529,7 +465,7 @@ class CompositeTransducer():
         self._tiers = []
 
     def __repr__(self):
-        return f"{__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
 
     def __call__(self, to_convert: str):
         return self.apply_rules(to_convert)
