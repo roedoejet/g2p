@@ -6,7 +6,7 @@ mappings:
     in_lang: see
     out_lang: see-ipa
     case_sensitive: false
-    norm_form: NFC
+    norm_form: NFD
     as_is: true
     authors:
       - Aidan Pine
