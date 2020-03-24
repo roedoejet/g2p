@@ -248,7 +248,7 @@ class IndicesTest(TestCase):
     def test_case_two(self):
         transducer = self.trans_two('test')
         self.assertEqual(transducer.output_string, 'tst')
-        self.assertEqual(transducer.edges, [(0, 0), (2, 1), (3, 2)])
+        self.assertEqual(transducer.edges, [(0, 0), (1, None), (2, 1), (3, 2)])
 
     def test_case_three(self):
         transducer = self.trans_three('test')
@@ -301,7 +301,7 @@ class IndicesTest(TestCase):
     def test_case_nine(self):
         transducer = self.trans_nine('aa')
         self.assertEqual(transducer.output_string, '')
-        self.assertEqual(transducer.edges, [])
+        self.assertEqual(transducer.edges, [(0, None), (1, None)])
 
     def test_case_acdc(self):
         transducer = Transducer(
@@ -316,17 +316,26 @@ class IndicesTest(TestCase):
 
     def test_case_acac(self):
         transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
-        transducer_default = Transducer(Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}]))
+        transducer_default = Transducer(
+            Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}]))
         tg = transducer('abcabc')
         tg_default = transducer_default('abcabc')
         self.assertEqual(tg.output_string, 'abab')
         self.assertEqual(tg_default.output_string, 'abab')
-        self.assertEqual(tg.edges, [(2, 0),
+        self.assertEqual(tg.edges, [(0, None),
+                                    (1, None),
+                                    (2, 0),
                                     (2, 1),
+                                    (3, None),
+                                    (4, None),
                                     (5, 2),
                                     (5, 3)])
-        self.assertEqual(tg_default.edges, [(2, 0),
+        self.assertEqual(tg_default.edges, [(0, None),
+                                            (1, None),
+                                            (2, 0),
                                             (2, 1),
+                                            (3, None),
+                                            (4, None),
                                             (5, 2),
                                             (5, 3)])
 

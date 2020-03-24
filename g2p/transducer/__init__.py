@@ -31,6 +31,7 @@ Index = Dict
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
 
+
 class TransductionGraph():
     """This is the object returned after performing a transduction using a Transducer.
 
@@ -124,8 +125,11 @@ class TransductionGraph():
         edges = copy.deepcopy(self._edges)
         edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(edges):
-            edges[i] = [self._input_nodes[edge[0]]
-                        [1], self._output_nodes[edge[1]][1]]
+            if edge[1] != None:
+                edges[i] = [self._input_nodes[edge[0]]
+                            [1], self._output_nodes[edge[1]][1]]
+            else:
+                edges[i] = [self._input_nodes[edge[0]][1], None]
         return edges
 
 
@@ -190,11 +194,15 @@ class Transducer():
             else:
                 output_char_index = indices_seen[intermediate_index]
                 try:
-                    output_string = output_string[:i] + self.mapping[intermediate_index]['out'][output_char_index] + output_string[i+1:]
+                    output_string = output_string[:i] + \
+                        self.mapping[intermediate_index]['out'][output_char_index] + \
+                        output_string[i+1:]
                 except IndexError:
                     indices_seen[intermediate_index] = 0
                     output_char_index = 0
-                    output_string = output_string[:i] + self.mapping[intermediate_index]['out'][output_char_index] + output_string[i+1:]
+                    output_string = output_string[:i] + \
+                        self.mapping[intermediate_index]['out'][output_char_index] + \
+                        output_string[i+1:]
                 indices_seen[intermediate_index] += 1
         return output_string
 
@@ -261,33 +269,43 @@ class Transducer():
                     # don't allow insertion in basic process
                     if output_index >= len(match.group()) + start:
                         output_index = len(match.group()) + start - 1
-                    tg.output_string = tg.output_string[:output_index] + char['string'] + tg.output_string[output_index+1:]
+                    tg.output_string = tg.output_string[:output_index] + \
+                        char['string'] + tg.output_string[output_index+1:]
                     tg.edges = [x for x in tg.edges if x[1] != output_index]
                     tg.edges.append([input_index, output_index])
                 else:
                     if process == 'insert':
-                        input_index = input_matches[-1]['index'] - intermediate_diff
+                        input_index = input_matches[-1]['index'] - \
+                            intermediate_diff
                         output_index = output_matches[i]['index']
-                        tg.output_string = tg.output_string[:output_index] + char['string'] + tg.output_string[output_index:]
+                        tg.output_string = tg.output_string[:output_index] + \
+                            char['string'] + tg.output_string[output_index:]
                         for i, edge in enumerate(tg.edges):
-                            if edge[1] >= output_index:
+                            if edge[1] != None and edge[1] >= output_index:
                                 tg.edges[i][1] += 1
                         tg.edges.append([input_index, output_index])
                     else:
-                        input_index = input_matches[i]['index'] - intermediate_diff
+                        input_index = input_matches[i]['index'] - \
+                            intermediate_diff
                         if output_matches:
                             output_index = output_matches[-1]['index'] - deleted
                         else:
-                            output_index = input_index - deleted
-                        tg.output_string = tg.output_string[:output_index] + tg.output_string[output_index + 1:]
+                            output_index = input_index + intermediate_diff - deleted
+                        tg.output_string = tg.output_string[:output_index] + \
+                            tg.output_string[output_index + 1:]
                         deleted += 1
-                        if len(output_matches) > 0 and [input_index, output_index] not in tg.edges:
-                            tg.edges.append([input_index, output_index])
-                        tg.edges = [x for x in tg.edges if x[1] != output_index]
+                        if len(output_matches) > 0:
+                            if [input_index, output_index] not in tg.edges:
+                                tg.edges.append([input_index, output_index])
+                            tg.edges = [
+                                x for x in tg.edges if x[1] != output_index]
+                        else:
+                            for i, edge in enumerate(tg.edges):
+                                if edge[1] != None and edge[1] == output_index:
+                                    tg.edges[i][1] = None
                         for i, edge in enumerate(tg.edges):
-                            if edge[1] > output_index:
+                            if edge[1] != None and edge[1] > output_index:
                                 tg.edges[i][1] -= 1
-            
 
     def update_default_indices(self, tg, match, intermediate_diff, out_string):
         start = match.start() + intermediate_diff
@@ -330,12 +348,13 @@ class Transducer():
                     tg.output_string = tg.output_string[:index_to_add] + \
                         char + tg.output_string[index_to_add:]
                     # Edges
-                    # increment
+                    # Remove previously deleted and increment
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] >= index_to_add:
+                        if edge[1] != None and edge[1] >= index_to_add:
                             tg.edges[i][1] += 1
                     # add edge to index of last input character
-                    last_input_node = max([x[0] for x in tg.edges if x[1] == last_output_node])
+                    last_input_node = max(
+                        [x[0] for x in tg.edges if x[1] == last_output_node])
                     last_output_node = index_to_add
                     tg.edges.append([last_input_node, index_to_add])
                 # delete the node and decrement each following node
@@ -348,17 +367,24 @@ class Transducer():
                     deleted += 1
                     # Edges
                     # delete
-                    last_input_node = max([x[0] for x in tg.edges if x[1] == index_to_delete])
+                    last_input_node = max(
+                        [x[0] for x in tg.edges if x[1] == index_to_delete])
                     # if rule is not just a simple deletion,
                     # add an edge between the node and the last output node
                     if out_length > 0:
                         if [last_input_node, last_output_node] not in tg.edges:
-                            tg.edges.append([last_input_node, last_output_node])
-                    tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
+                            tg.edges.append(
+                                [last_input_node, last_output_node])
+                        tg.edges = [x for x in tg.edges if x[1]
+                                    != index_to_delete]
+                    else:
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] != None and edge[1] == index_to_delete:
+                                tg.edges[i][1] = None
                     last_output_node = index_to_delete
                     # decrement
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] > index_to_delete:
+                        if edge[1] != None and edge[1] > index_to_delete:
                             tg.edges[i][1] -= 1
 
     def apply_rules(self, to_convert: str):
@@ -405,7 +431,8 @@ class Transducer():
                 out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
                 intermediate_diff += len(out_string) - len(match.group())
         if intermediate_forms:
-            tg.output_string = self.resolve_intermediate_chars(tg.output_string)
+            tg.output_string = self.resolve_intermediate_chars(
+                tg.output_string)
         tg.edges = list(dict.fromkeys(
             [tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])]))
         return tg
@@ -447,8 +474,11 @@ class CompositeTransductionGraph(TransductionGraph):
             edges = copy.deepcopy(edges)
             edges.sort(key=lambda x: x[0])
             for i, edge in enumerate(edges):
-                edges[i] = [self.tiers[tier_i].input_nodes[edge[0]]
-                            [1], self.tiers[tier_i].output_nodes[edge[1]][1]]
+                if edge[1] != None:
+                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]]
+                                [1], self.tiers[tier_i].output_nodes[edge[1]][1]]
+                else:
+                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
             pretty_edges.append(edges)
         return pretty_edges
 
