@@ -12,12 +12,11 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
-from typing import List
+from typing import List, Union
 
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
-from g2p.transducer import CompositeTransducer, Transducer
-from g2p.transducer.indices import Indices, IndexSequence
+from g2p.transducer import CompositeTransducer, Transducer, TransductionGraph, CompositeTransductionGraph
 from g2p.static import __file__ as static_file
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p.api import g2p_api
@@ -68,18 +67,20 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
     return nodes, edges
 
 
-def return_echart_data(index_sequence: IndexSequence):
+def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph]):
     x = 100
     diff = 200
     nodes = []
     edges = []
     index_offset = 0
     colour = "#222222"
-    steps = len(index_sequence.states)
-    for ind, indices in enumerate(index_sequence.states):
-        input_string = indices.input()
+    if isinstance(tg, CompositeTransductionGraph):
+        steps = len(tg.tiers)
+    else:
+        steps = 1
+    for ind, tier in enumerate(tg.tiers):
         if ind == 0:
-            symbol_size = min(300 / len(indices()), 40)
+            symbol_size = min(300 / len(tier.input_string), 40)
             input_x = x + (ind * diff)
             input_y = 300
             x += diff
@@ -91,18 +92,13 @@ def return_echart_data(index_sequence: IndexSequence):
                        'label': {'color': contrasting_text_color(colour)},
                        'itemStyle': {'color': colour,
                                      'borderColor': contrasting_text_color(colour)}}
-                      for i, x in enumerate(input_string)]
+                      for i, x in enumerate(tier.input_string)]
             nodes += inputs
-            edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                       [0] + len(input_string) + index_offset} for x in indices()]
-            index_offset += len(input_string)
-        else:
-            edges += [{"source": x[0][0] + index_offset, "target": x[1]
-                       [0] + len(input_string) + index_offset} for x in indices()]
-            index_offset += len(output_string)
-        symbol_size = min(300 / len(indices()), 40)
+        edges += [{"source": x[0] + index_offset, "target": x[1] +
+                    len(tier.input_string) + index_offset} for x in tier.edges if x[1] != None]
+        index_offset += len(tier.input_string)
+        symbol_size = min(300 / max(1, len(tier.output_string)), 40)
         colour = shade_colour(colour, (1/steps)*350, g=50, b=20)
-        output_string = indices.output()
         output_x = x + (ind * diff)
         output_y = 300
         outputs = [{'name': f"{x}",
@@ -113,9 +109,8 @@ def return_echart_data(index_sequence: IndexSequence):
                     'label': {'color': contrasting_text_color(colour)},
                     'itemStyle': {'color': colour,
                                   'borderColor': contrasting_text_color(colour)}}
-                   for i, x in enumerate(output_string)]
+                   for i, x in enumerate(tier.output_string)]
         nodes += outputs
-
     return nodes, edges
 
 
@@ -174,13 +169,14 @@ def convert(message):
         transducers.append(transducer)
     transducer = CompositeTransducer(transducers)
     if message['data']['index']:
-        output_string, iseq = transducer(
-            message['data']['input_string'], index=True)
-        data, links = return_echart_data(iseq)
+        tg = transducer(
+            message['data']['input_string'])
+        data, links = return_echart_data(tg)
         emit('conversion response', {
-             'output_string': output_string, 'index_data': data, 'index_links': links})
+             'output_string': tg.output_string, 'index_data': data, 'index_links': links})
     else:
-        output_string = transducer(message['data']['input_string'])
+        output_string = transducer(
+            message['data']['input_string']).output_string
         emit('conversion response', {'output_string': output_string})
 
 

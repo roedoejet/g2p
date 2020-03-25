@@ -44,13 +44,7 @@ class LangTest(TestCase):
         # go through each language declared in the test case set up
         for test in self.langs_to_test:
             transducer = make_g2p(test[0], test[1])
-            self.assertEqual(transducer(test[2]), test[3])
-
-    def test_index(self):
-        # go through each language declared in the test case set up
-        for test in self.langs_to_test:
-            transducer = make_g2p(test[0], test[1])
-            self.assertEqual(transducer(test[2], index=True)[0], test[3])
+            self.assertEqual(transducer(test[2]).output_string, test[3])
 
 if __name__ == "__main__":
     main()

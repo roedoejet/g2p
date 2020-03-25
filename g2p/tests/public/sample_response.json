@@ -1,0 +1,120 @@
+
+{
+    "output-text": "HH EH Y",
+    "input-text": "hej",
+    "index": [
+        [
+            [
+                0,
+                0
+            ],
+            [
+                1,
+                1
+            ],
+            [
+                2,
+                2
+            ]
+        ],
+        [
+            [
+                0,
+                0
+            ],
+            [
+                1,
+                1
+            ],
+            [
+                2,
+                2
+            ]
+        ],
+        [
+            [
+                0,
+                0
+            ],
+            [
+                0,
+                1
+            ],
+            [
+                0,
+                2
+            ],
+            [
+                1,
+                3
+            ],
+            [
+                1,
+                4
+            ],
+            [
+                1,
+                5
+            ],
+            [
+                2,
+                6
+            ]
+        ]
+    ],
+    "debugger": [
+        [
+            {
+                "input": "hej",
+                "output": "h\u025bj",
+                "rule": {
+                    "in": "e",
+                    "out": "\u025b",
+                    "context_before": "",
+                    "context_after": ""
+                },
+                "start": 1,
+                "end": 2
+            }
+        ],
+        [],
+        [
+            {
+                "input": "h\u025bj",
+                "output": "hEH j",
+                "rule": {
+                    "in": "\u025b",
+                    "out": "EH",
+                    "context_before": "",
+                    "context_after": ""
+                },
+                "start": 1,
+                "end": 2
+            },
+            {
+                "input": "hEH j",
+                "output": "HH EH j",
+                "rule": {
+                    "in": "h",
+                    "out": "HH",
+                    "context_before": "",
+                    "context_after": ""
+                },
+                "start": 0,
+                "end": 1
+            },
+            {
+                "input": "HH EH j",
+                "output": "HH EH Y",
+                "rule": {
+                    "in": "j",
+                    "out": "Y",
+                    "context_before": "",
+                    "context_after": ""
+                },
+                "start": 6,
+                "end": 7
+            }
+        ]
+    ]
+}

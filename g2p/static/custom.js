@@ -59,6 +59,8 @@ function createSettings(index, data) {
     let reverse = '';
     let active = '';
     let out_delimiter = '';
+    let prevent_feeding = '';
+    let norm_form = 'NFC';
     if (index === 0) {
         active = 'active'
     }
@@ -77,8 +79,14 @@ function createSettings(index, data) {
     if (data['reverse']) {
         reverse = 'checked'
     }
+    if (data['prevent_feeding']) {
+        prevent_feeding = 'checked'
+    }
     if (data['out_delimiter']) {
         out_delimiter = data['out_delimiter']
+    }
+    if (data['norm_form']) {
+        norm_form = data['norm_form']
     }
     let settings_template = `
     <div class='${active} settings'>
@@ -107,8 +115,16 @@ function createSettings(index, data) {
                         <label for='reverse'>Reverse the rules</label>
                 </div>
                 <div>
+                <input ${prevent_feeding} id='prevent_feeding-${index}' type='checkbox' name='prevent_feeding' value='prevent_feeding'>
+                    <label for='reverse'>Prevent all rules from feeding</label>
+                </div>
+                 <div>
+                    <label for='reverse'>Normalization</label>
+                    <input id='norm_form-${index}' type='text' name='norm_form' value='${norm_form}' maxlength='4' minlength='3'>
+                </div>
+                <div>
+                <label for='out_delimiter'>Output Delimiter</label>
                 <input id='out_delimiter-${index}' type='text' name='out_delimiter' value='${out_delimiter}' placeholder='delimiter' maxlength='1'>
-                    <label for='reverse'>Reverse the rules</label>
             </div>
         </fieldset>
     </form>
@@ -195,38 +211,18 @@ function createTable(index, data) {
     }
     $("#table-container").append(el)
     var hotElement = document.querySelector('#hot-' + index);
+    let headers = [...new Set([].concat(...data.map(x => Object.keys(x))))]
+    let headerLabels = headers.map(header => header.replace('_', ' ').split(' ').map(x => { return x.charAt(0).toUpperCase() + x.slice(1) }).join(' '))
     var hotSettings = {
         data: data,
-        columns: [
-            {
-                data: 'in',
-                type: 'text'
-            },
-            {
-                data: 'out',
-                type: 'text'
-            },
-            {
-                data: 'context_before',
-                type: 'text'
-            },
-            {
-                data: 'context_after',
-                type: 'text'
-            }
-        ],
+        columns: headers.map(x => { return { 'data': x, type: 'text' } }),
         stretchH: 'all',
         width: 880,
         autoWrapRow: true,
         height: 287,
         maxRows: 250,
         rowHeaders: true,
-        colHeaders: [
-            'In',
-            'Out',
-            'Context Before',
-            'Context After'
-        ],
+        colHeaders: headerLabels,
         afterRowMove: (rows, target) => {
             convert()
         },
@@ -326,7 +322,9 @@ var getKwargs = function (index) {
     const reverse = document.getElementById(`reverse-${index}`).checked
     const include = document.getElementById(`include-${index}`).checked
     const out_delimiter = document.getElementById(`out_delimiter-${index}`).value
-    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter }
+    const prevent_feeding = document.getElementById(`prevent_feeding-${index}`).checked
+    const norm_form = document.getElementById(`norm_form-${index}`).value
+    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding }
 }
 
 var setKwargs = function (index, kwargs) {
@@ -342,11 +340,17 @@ var setKwargs = function (index, kwargs) {
     if ('reverse' in kwargs) {
         document.getElementById(`reverse-${index}`).checked = kwargs['reverse']
     }
+    if ('prevent_feeding' in kwargs) {
+        document.getElementById(`prevent_feeding-${index}`).checked = kwargs['prevent_feeding']
+    }
     if ('include' in kwargs) {
         document.getElementById(`include-${index}`).checked = kwargs['include']
     }
     if ('out_delimiter' in kwargs) {
         document.getElementById(`out_delimiter-${index}`).value = kwargs['out_delimiter']
+    }
+    if ('norm_form' in kwargs) {
+        document.getElementById(`norm_form-${index}`).value = kwargs['norm_form']
     }
     convert()
 }
@@ -355,7 +359,7 @@ var conversionSocket = io.connect('//' + document.domain + ':' + location.port +
 var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
 var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
-var trackIndex = function(){
+var trackIndex = function () {
     return $('#animated-radio').is(":checked")
 }
 
@@ -398,7 +402,6 @@ conversionSocket.on('conversion response', function (msg) {
         // Convert after any changes to tables
         option.series[0].data = msg.index_data
         option.series[0].links = msg.index_links
-        console.log(option)
         myChart.setOption(option, true)
         $(window).trigger('resize');
     } else {

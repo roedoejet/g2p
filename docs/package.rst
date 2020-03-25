@@ -14,7 +14,7 @@ Then, call it with an argument for :code:`in_lang` and :code:`out_lang`. Both mu
 .. code-block:: python
 
     >>> transducer = make_g2p('dan', 'eng-arpabet')
-    >>> transducer('hej')
+    >>> transducer('hej').output_string
     'HH EH Y'
 
 
@@ -32,4 +32,4 @@ A Transducer object is initialized with a Mapping object and when called, applie
 on the input to produce the resulting output.
 
 .. autoclass:: g2p.transducer.Transducer
-    :members: apply_rules, explicit_indices, return_default_mapping
+    :members: apply_rules, update_default_indices

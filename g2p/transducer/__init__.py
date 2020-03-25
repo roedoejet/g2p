@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-This module contains the Transducer and CompositeTransducer classes 
+This module contains the Transducer and CompositeTransducer classes
 which are responsible for performing transductions in the g2p library.
 """
 
@@ -13,7 +13,6 @@ from g2p.mappings import Mapping
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
-from g2p.transducer.indices import Indices, IndexSequence
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
@@ -29,8 +28,109 @@ Index = Dict
 # The first item (int) in a change is the index of where the change occurs, and the second item (int) is the change offset
 # Example:
 # an insertion of length 1 at index 0 followed by a deletion of length one at index 2
-# [[0,1],[2,-1]] 
+# [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
+
+
+class TransductionGraph():
+    """This is the object returned after performing a transduction using a Transducer.
+
+    Each TransductionGraph must be initialized with an input string.
+    """
+
+    def __init__(self, input_string: str):
+        # Plain strings
+        self._input_string = input_string
+        self._output_string = input_string
+        # Nodes
+        self._input_nodes = [[i, x] for i, x in enumerate(input_string)]
+        self._output_nodes = [[i, x] for i, x in enumerate(input_string)]
+        # Edges
+        self._edges = [[i, i] for i, x in enumerate(input_string)]
+        # Debugger
+        self._debugger = []
+
+    def __str__(self):
+        return self._output_string
+
+    @property
+    def input_string(self):
+        """str: The input string that initialized the TransductionGraph."""
+        return self._input_string
+
+    @input_string.setter
+    def input_string(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the input string to {value} but it cannot be changed')
+
+    @property
+    def output_string(self):
+        """str: The output string."""
+        return self._output_string
+
+    @output_string.setter
+    def output_string(self, value):
+        self._output_string = value
+        self._output_nodes = [[i, x] for i, x in enumerate(value)]
+
+    @property
+    def input_nodes(self):
+        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the input"""
+        return self._input_nodes
+
+    @input_nodes.setter
+    def input_nodes(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the input nodes to {value} but they cannot be changed.')
+
+    @property
+    def output_nodes(self):
+        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the output"""
+        return self._output_nodes
+
+    @output_nodes.setter
+    def output_nodes(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the output nodes to {value} but they cannot be changed directly. Change output_string instead.')
+
+    @property
+    def edges(self):
+        """List[List[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
+        return self._edges
+
+    @edges.setter
+    def edges(self, value):
+        self._edges = value
+
+    @property
+    def debugger(self):
+        """List[dict]: A list of rules applied during the transformation. Useful for debugging."""
+        return self._debugger
+
+    @debugger.setter
+    def debugger(self, value):
+        self._debugger = value
+
+    @property
+    def tiers(self):
+        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the graph"""
+        return self
+
+    @tiers.setter
+    def tiers(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+
+    def pretty_edges(self):
+        edges = copy.deepcopy(self._edges)
+        edges.sort(key=lambda x: x[0])
+        for i, edge in enumerate(edges):
+            if edge[1] != None:
+                edges[i] = [self._input_nodes[edge[0]]
+                            [1], self._output_nodes[edge[1]][1]]
+            else:
+                edges[i] = [self._input_nodes[edge[0]][1], None]
+        return edges
 
 
 class Transducer():
@@ -40,8 +140,8 @@ class Transducer():
 
     Attributes:
         mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
-
     """
+
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
         self.case_sensitive = mapping.kwargs['case_sensitive']
@@ -51,33 +151,27 @@ class Transducer():
         self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
 
     def __repr__(self):
-        return f"{__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
-        
+
         Args:
             to_convert (str): The string to convert.
-            index (bool, optional): Return indices in output. Defaults to False.
-            debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
-        
+
         Returns:
-            Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
-                Either returns a plain string (index=False, debugger=False),
-                               a tuple with the converted string and indices (index=True, debugger=False),
-                               a tuple with the converted string and corresponding rules (index=False, debugger=True),
-                               a tuple with the converted string, indices and rules (index=True, debugger=True)
+            TransductionGraph: Returns an object with all the nodes representing input and output characters and their corresponding edges representing the indices of the transformation.
         """
-        return self.apply_rules(to_convert, index, debugger)
+        return self.apply_rules(to_convert)
 
     @staticmethod
     def _pua_to_index(string: str) -> int:
         """Given a string using with characters in the Supllementary Private Use Area A Unicode block
            Produce the number corresponding to the offset from the beginning of the block.
-        
+
         Args:
             string (str): The string to convert
-        
+
         Returns:
             int: The offset from the beginning of the block.
         """
@@ -87,160 +181,32 @@ class Transducer():
         else:
             return - 1
 
-    @staticmethod
-    def get_offset_index(i: int, index_change_log: ChangeLog):
-        """Given an index i, and a list of changes, determine the original index by undoing any changes that occured before it.
-
-        Args:
-            i: int
-                index
-            index_change_log: ChangeLog
-                the list of previous changes to the indices
-
-        Returns:
-            The return value. True for success, False otherwise.
-        """
-        index_change_log = copy.deepcopy(index_change_log)
-        reversed_changes = [x for x in reversed(index_change_log)]
-        for c_i, change in enumerate(reversed_changes):
-            if change[0] <= i:
-                if abs(change[1]) == 1: 
-                    i -= change[1]
-                elif abs(change[1]) == 0:
-                    continue
-                elif change[1] > 1 and i >= change[0] + change[1] - 1:
-                    i -= change[1]
-                elif change[1] < -1 and i >= change[0] + change[1] + 1:
-                    i -= change[1]
-                else:
-                    i -= min(change[1], i - change[0] + 1)
-                for next_change in reversed_changes[c_i:]:
-                    if next_change[0] >= change[0]:
-                        next_change[0] -= change[1]
-        return i
-
-    @staticmethod
-    def return_incremented_indices(indices: Index, threshold: Tuple[int, int], start: int, diff: int) -> Index:
-        """Given an Index, increment each output index by `diff` beginning at `start` 
-           except for indices whose input are between `threshold[0]` and `threshold[1]`.
-        
-        Args:
-            indices (Index): The index to apply changes to.
-            threshold (Tuple[int, int]): Input index range to not apply changes to.
-            start (int): [description]: Output index where changes begin.
-            diff (int): [description]: The change to apply.
-        
-        Returns:
-            Index: Changed Index
-        """
-        indices = copy.deepcopy(indices)
-        if diff != 0:
-            # For outputs with more than one value
-            # if increment, we reverse order the output keys
-            # if decrement, we forward order the output keys
-            if diff > 0:
-                reverse = True
+    def resolve_intermediate_chars(self, output_string):
+        ''' Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
+            to their mapped equivalents.
+        '''
+        indices_seen = defaultdict(int)
+        for i, char in enumerate(output_string):
+            intermediate_index = self._pua_to_index(char)
+            # if not Private Supplementary Use character
+            if intermediate_index < 0:
+                continue
             else:
-                reverse = False
-            for k, v in indices.items():
-                if k not in range(threshold[0], threshold[1]):
-                    for k_o in sorted([x for x in v['output'].keys()], reverse=reverse):
-                        if k_o >= start:
-                            indices[k]['output'][k_o +
-                                                 diff] = indices[k]['output'].pop(k_o)
-        return indices
+                output_char_index = indices_seen[intermediate_index]
+                try:
+                    output_string = output_string[:i] + \
+                        self.mapping[intermediate_index]['out'][output_char_index] + \
+                        output_string[i+1:]
+                except IndexError:
+                    indices_seen[intermediate_index] = 0
+                    output_char_index = 0
+                    output_string = output_string[:i] + \
+                        self.mapping[intermediate_index]['out'][output_char_index] + \
+                        output_string[i+1:]
+                indices_seen[intermediate_index] += 1
+        return output_string
 
-    @staticmethod
-    def make_debugger_output_safe(debugger_output):
-        new_output = []
-        for x in debugger_output:
-            if isinstance(x, dict):
-                x['rule'] = {k: v for k, v in x['rule'].items() if k != 'match_pattern'}
-                new_output.append(x)
-        return new_output
-
-    @staticmethod
-    def return_default_mapping(input_strings: List[str], output_strings: List[str],
-                               input_index_offsets: List[int], output_index_offsets: List[int]) -> Index:
-        """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
-            It then zips them up 1 by 1. If the input is longer than the output or vice versa, it continues zipping
-            using the last item of either input or output respectively.
-
-        Args:
-            input_strings (List[str]): a list of input characters
-            output_strings (List[str]): a list of output characters
-            input_index_offsets (List[int]): a list of input character indices
-            output_index_offsets (List[int]): a list of output character indices
-
-        Returns:
-            Index: returns an Index with the default mapping between inputs and outputs
-        """
-        
-        new_input = {}
-        # go through each input or output whichever is longer
-        for i in range(0, max(len(input_strings), len(output_strings))):
-            try:
-                input_i = input_index_offsets[i]
-            except IndexError:
-                input_i = input_index_offsets[-1]
-            try:
-                output_i = output_index_offsets[i]
-            except IndexError:
-                output_i = output_index_offsets[-1]
-            try:
-                # if inputs and outputs are the same length, just zip them up
-                new_input[input_i] = {'input_string': input_strings[i],
-                                      'output': {output_i: output_strings[i]}}
-            except IndexError:
-                # but if the input is longer than output, use the last output character
-                if len(input_strings) > len(output_strings):
-                    new_input[input_i] = {'input_string': input_strings[i],
-                                          'output': {output_i: output_strings[-1]}}
-                # conversely if the output is longer than input, use the last input character
-                elif len(input_strings) < len(output_strings):
-                    if input_i in new_input:
-                        intermediate_output = new_input[input_i]['output']
-                    else:
-                        intermediate_output = {}
-                    new_input[input_i] = {'input_string': input_strings[-1],
-                                          'output': {**intermediate_output, **{output_i: output_strings[i]}}}
-        return new_input
-
-    def return_expanded_format(self, input_string: str, output_string: str,
-                               input_index: int, output_index: int) -> Tuple[List[str], List[str], List[int], List[int]]:
-        """Given an input of length n and an output of length m as well as corresponding index offsets,
-           return lists of lengths n & m corresponding to input characters/indices and output characters/indices respectively
-
-        Args:
-            input_string (str): an input string.
-            output_string (str): an output string.
-            input_index (int): the starting index of the input string.
-            output_index (int): the starting index of the output string.
-
-        Returns:
-        Tuple(List[str], List[str], List[int], List[int]):
-            Returns a quadruple consisting of a list of input characters,
-                                              a list of output characters,
-                                              an incremented list of corresponding input indices,
-                                              an incremented list of corresponding output indices
-        """
-        
-        # separate string into chars
-        # add empty string if input/output is empty
-        default_inputs = [x for x in input_string]
-        if not default_inputs:
-            default_inputs.append('')
-        default_outputs = [x for x in output_string]
-        if not default_outputs:
-            default_outputs.append('')
-        # get offsets for each char
-        default_input_offsets = [
-            i + input_index for i, v in enumerate(default_inputs)]
-        default_output_offsets = [
-            i + output_index for i, v in enumerate(default_outputs)]
-        return (default_inputs, default_outputs, default_input_offsets, default_output_offsets)
-
-    def explicit_indices(self, input_string: str, output_string: str, input_index: int, output_index: int) -> Index:
+    def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string):
         """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
             It then zips them up according to the provided indexing notation.
 
@@ -249,256 +215,271 @@ class Transducer():
                 It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
                 For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
                 Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
-        
-        Args:
-            input_string (str): an input string.
-            output_string (str): an output string.
-            input_index (int): the starting index of the input string.
-            output_index (int): the starting index of the output string.
-        
-        Returns:
-            Index: 
         """
-        new_input = {}
         input_char_matches = [x.group()
-                              for x in self._char_match_pattern.finditer(input_string)]
-
+                              for x in self._char_match_pattern.finditer(io['in'])]
         input_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(input_string)]
-        inputs = [{'match_index': m, 'string': input_char_matches[i]}
-                  for i, m in enumerate(input_match_indices)]
-        output_char_matches = [x.group()
-                               for x in self._char_match_pattern.finditer(output_string)]
+            x.group() for x in self._index_match_pattern.finditer(io['in'])]
+        inputs = {}
+        index = 0
+        start = match.start() + intermediate_diff
+        for i, m in enumerate(input_match_indices):
+            for j, char in enumerate(input_char_matches[i]):
+                if m in inputs:
+                    inputs[m].append({'index': index + start, 'string': char})
+                else:
+                    inputs[m] = [{'index': index + start, 'string': char}]
+                index += 1
+        output_char_matches = [
+            x.group() for x in self._char_match_pattern.finditer(out_string)]
         output_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(output_string)]
-        outputs = [{'match_index': m, 'string': output_char_matches[i]}
-                   for i, m in enumerate(output_match_indices)]
-        for match_index in input_match_indices:
-            prev_input = ''
-            # Get single character strings from inputs if they match the match_index
-            explicit_inputs = []
-            # Get offset for inputs by adding the length of the input string up to the match
-            # plus the overall input index/offset
-            explicit_input_offsets = []
-            for v in inputs:
-                if v['match_index'] == match_index:
-                    for y_i, y_v in enumerate(v['string']):
-                        explicit_inputs.append(y_v)
-                        explicit_input_offsets.append(len(prev_input) + input_index + y_i)
-                prev_input += v['string']
-            prev_output = ''
-            # Get single character strings from outputs if they match the match_index
-            explicit_outputs = []
-            # Get offset for outputs by adding the length of the output string up to the match
-            # plus the overall output index/offset
-            explicit_output_offsets = []
-            for v in outputs:
-                if v['match_index'] == match_index:
-                    for y_i, y_v in enumerate(v['string']):
-                        explicit_outputs.append(y_v)
-                        explicit_output_offsets.append(len(prev_output) + output_index + y_i)
-                prev_output += v['string']
-            # Use default mapping to zip them up
-            explicit_index = self.return_default_mapping(
-                explicit_inputs, explicit_outputs, explicit_input_offsets, explicit_output_offsets)
-            new_input = {**new_input, **explicit_index}
-        return new_input
+            x.group() for x in self._index_match_pattern.finditer(out_string)]
+        outputs = {}
+        index = 0
+        for i, m in enumerate(output_match_indices):
+            for j, char in enumerate(output_char_matches[i]):
+                if m in outputs:
+                    outputs[m].append({'index': index + start, 'string': char})
+                else:
+                    outputs[m] = [{'index': index + start, 'string': char}]
+                index += 1
+        out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
+        deleted = 0
+        for match_index, input_matches in inputs.items():
+            try:
+                output_matches = outputs[match_index]
+            except KeyError:
+                output_matches = []
+            if len(input_matches) == len(output_matches):
+                shortest = input_matches
+                longest = output_matches
+                process = 'basic'
+            elif len(input_matches) < len(output_matches):
+                shortest = input_matches
+                longest = output_matches
+                process = 'insert'
+            else:
+                shortest = output_matches
+                longest = input_matches
+                process = 'delete'
+            for i, char in enumerate(longest):
+                if process == 'basic' or i <= len(shortest) - 1:
+                    input_index = input_matches[i]['index'] - intermediate_diff
+                    output_index = output_matches[i]['index']
+                    # don't allow insertion in basic process
+                    if output_index >= len(match.group()) + start:
+                        output_index = len(match.group()) + start - 1
+                    tg.output_string = tg.output_string[:output_index] + \
+                        char['string'] + tg.output_string[output_index+1:]
+                    tg.edges = [x for x in tg.edges if x[1] != output_index]
+                    tg.edges.append([input_index, output_index])
+                else:
+                    if process == 'insert':
+                        input_index = input_matches[-1]['index'] - \
+                            intermediate_diff
+                        output_index = output_matches[i]['index']
+                        tg.output_string = tg.output_string[:output_index] + \
+                            char['string'] + tg.output_string[output_index:]
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] != None and edge[1] >= output_index:
+                                tg.edges[i][1] += 1
+                        tg.edges.append([input_index, output_index])
+                    else:
+                        input_index = input_matches[i]['index'] - \
+                            intermediate_diff
+                        if output_matches:
+                            output_index = output_matches[-1]['index'] - deleted
+                        else:
+                            output_index = input_index + intermediate_diff - deleted
+                        tg.output_string = tg.output_string[:output_index] + \
+                            tg.output_string[output_index + 1:]
+                        deleted += 1
+                        if len(output_matches) > 0:
+                            if [input_index, output_index] not in tg.edges:
+                                tg.edges.append([input_index, output_index])
+                            tg.edges = [
+                                x for x in tg.edges if x[1] != output_index]
+                        else:
+                            for i, edge in enumerate(tg.edges):
+                                if edge[1] != None and edge[1] == output_index:
+                                    tg.edges[i][1] = None
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] != None and edge[1] > output_index:
+                                tg.edges[i][1] -= 1
 
-    def apply_rules(self, to_convert: str,
-                          index: bool = False,
-                          debugger: bool = False):
-        """ Apply all the rules in self.mapping sequentially.
-            Each rule in self.mapping is executed fully across the string (`to_convert`)
-            before going to the next rules.
-            Therefore, rules should be thought of as Phonological Rewrite Rules
-            (https://en.wikipedia.org/wiki/Phonological_rule).
-            Rules are also therefore susceptible to
-            Bleeding/Feeding/CounterBleeding/CounterFeeding relationships
-            (https://linguistics.stackexchange.com/questions/6084/whats-the-difference-between-counterbleeding-bleeding-and-feeding)
-        
-        Args:
-            to_convert (str): The string to convert.
-            index (bool, optional): Return indices in output. Defaults to False.
-            debugger (bool, optional): Return intermediary steps for debugging. Defaults to False.
-        
-        Returns:
-            Union[str, Tuple[str, Index], Tuple[str, List[dict]], Tuple[str, Index, List[dict]]]:
-            Either returns:
-                - a plain string (index=False, debugger=False),
-                - a tuple with the converted string and indices (index=True, debugger=False),
-                - a tuple with the converted string and corresponding rules (index=False, debugger=True),
-                - a tuple with the converted string, indices and rules (index=True, debugger=True)
-        """
-        # Convert input as necessary
+    def update_default_indices(self, tg, match, intermediate_diff, out_string):
+        start = match.start() + intermediate_diff
+        in_string = match.group()
+        in_length = len(in_string)
+        out_length = len(out_string)
+        if in_length == out_length:
+            for i, char in enumerate(out_string):
+                tg.output_string = tg.output_string[:i +
+                                                    start] + char + tg.output_string[i+start+1:]
+            return
+        # default insertion(s)
+        elif in_length < out_length:
+            longest = out_string
+            shortest = in_string
+            process = 'insert'
+        # default deletion(s)
+        else:
+            longest = in_string
+            shortest = out_string
+            process = 'delete'
+        # iterate the longest string
+        deleted = 0
+        last_input_node = start
+        last_output_node = start
+        for i, char in enumerate(longest):
+            # if the shorter string still has that output, keep that index
+            if i <= len(shortest) - 1:
+                tg.output_string = tg.output_string[:i+start] + \
+                    out_string[i] + tg.output_string[i+start+1:]
+                last_input_node = i + start
+                last_output_node = i + start
+            # otherwise...
+            else:
+                # add a new node and increment each following node
+                # log the change in order to update the edges.
+                if process == 'insert':
+                    # Nodes
+                    index_to_add = i + start
+                    tg.output_string = tg.output_string[:index_to_add] + \
+                        char + tg.output_string[index_to_add:]
+                    # Edges
+                    # Remove previously deleted and increment
+                    for i, edge in enumerate(tg.edges):
+                        if edge[1] != None and edge[1] >= index_to_add:
+                            tg.edges[i][1] += 1
+                    # add edge to index of last input character
+                    last_input_node = max(
+                        [x[0] for x in tg.edges if x[1] == last_output_node])
+                    last_output_node = index_to_add
+                    tg.edges.append([last_input_node, index_to_add])
+                # delete the node and decrement each following node
+                # log the change in order to update the edges.
+                else:
+                    # Nodes
+                    index_to_delete = i + start - deleted
+                    tg.output_string = tg.output_string[:index_to_delete] + \
+                        tg.output_string[index_to_delete + 1:]
+                    deleted += 1
+                    # Edges
+                    # delete
+                    last_input_node = max(
+                        [x[0] for x in tg.edges if x[1] == index_to_delete])
+                    # if rule is not just a simple deletion,
+                    # add an edge between the node and the last output node
+                    if out_length > 0:
+                        if [last_input_node, last_output_node] not in tg.edges:
+                            tg.edges.append(
+                                [last_input_node, last_output_node])
+                        tg.edges = [x for x in tg.edges if x[1]
+                                    != index_to_delete]
+                    else:
+                        for i, edge in enumerate(tg.edges):
+                            if edge[1] != None and edge[1] == index_to_delete:
+                                tg.edges[i][1] = None
+                    # decrement
+                    for i, edge in enumerate(tg.edges):
+                        if edge[1] != None and edge[1] > index_to_delete:
+                            tg.edges[i][1] -= 1
+
+    def apply_rules(self, to_convert: str):
+        # perform any normalization
         if not self.case_sensitive:
             to_convert = to_convert.lower()
-
         if self.norm_form:
             to_convert = normalize(to_convert, self.norm_form)
-
-        # Initialize
-        indices = {}
-        rules_applied = []
-        converted = to_convert
-        index_change_log = []
-        intermediate = False
-        for i, char in enumerate(converted):
-            indices[i] = {'input_string': char, 'output': {i: char}}
-
-        # Go through each input/output pair in the provided Mapping object
+        tg = TransductionGraph(to_convert)
+        # initialize values
+        intermediate_forms = False
+        # iterate rules
         for io in self.mapping:
+            # Do not allow empty rules
             if not io['in'] and not io['out']:
                 continue
-            # Make a copy of the input/output pair and reset the delimiter and intermediate diff
             io = copy.deepcopy(io)
             intermediate_diff = 0
-            for match in io['match_pattern'].finditer(converted):
-                intermediate_to_convert = converted
+            for match in io['match_pattern'].finditer(tg.output_string):
+                debug_string = tg.output_string
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
-                start_origin = self.get_offset_index(start, index_change_log)
                 if 'intermediate_form' in io:
                     out_string = io['intermediate_form']
-                    intermediate = True
+                    intermediate_forms = True
                 else:
                     out_string = io['out']
-                # Add delimiter
                 if self.out_delimiter:
                     # if not end segment, add delimiter
-                    if not end >= len(converted):
+                    if not end >= len(tg.output_string):
                         out_string += self.out_delimiter
-
-                # convert the final output
-                output_sub = re.sub(
-                    re.compile(r'{\d+}'), '', out_string)
-                # We need to sub out the whole form because the match pattern could
-                # include lookaheads and lookbehinds outside the match indices
-                subbed = re.sub(io["match_pattern"], output_sub, converted)
-                intermediate_form = converted[:start] + \
-                    subbed[start:(start + len(out_string))] + converted[end:]
-                if debugger and intermediate_form != converted:
-                    applied_rule = {"input": converted,
-                                    "rule": io, "output": intermediate_form,
-                                    "start": start, "end": end}
-                    rules_applied.append(applied_rule)
-                # update intermediate converted form
-                converted = intermediate_form
-                
-                # get the new index tuple
                 if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
-                    new_index = self.explicit_indices(
-                        io['in'], out_string, start_origin, start)
+                    self.update_explicit_indices(
+                        tg, match, io, intermediate_diff, out_string)
                 else:
-                    expanded = self.return_expanded_format(
-                        match.group(), out_string, start_origin, start)
-                    new_index = self.return_default_mapping(*expanded)
-                to_delete = []
-                to_merge = {}
-                for k, v in new_index.items():
-                    if indices[k]['input_string'] != new_index[k]['input_string'] and len(intermediate_to_convert) - 1 >= k and new_index[k]['input_string'] == intermediate_to_convert[k]:
-                        rebased_key = self.get_offset_index(
-                            k, index_change_log)
-                        if rebased_key in new_index.keys():
-                            new_index[rebased_key]['output'].update(
-                                v['output'])
-                        else:
-                            to_merge = {
-                                **{rebased_key: {'output': v['output']}}, **to_merge}
-                        if rebased_key != k:
-                            to_delete.append(k)
-                for k in to_delete:
-                    del new_index[k]
-                if to_merge:
-                    new_index = {**to_merge, **new_index}
-                index_difference = len(out_string) - len(io['in'])
-                # # if it's not empty, then a rule has applied and it can be merged with the other indices
-                # update
-                for k, v in new_index.items():
-                    new_output = v['output']
-                    if len(v['output']) < len(indices[k]['output']) and index_difference >= 0:
-                        indices[k]['output'].update(new_output)
-                    else:
-                        indices[k]['output'] = new_output
-                inputs = new_index.keys()
-                outputs = [x['output'].keys() for x in new_index.values()]
-                values = {}
-                for item in new_index.values():
-                    for k, v in item['output'].items():
-                        values[k] = v
-                all_keys = [x for keys in outputs for x in keys]
-                if index_difference != 0:
-                    diff = 0
-                    # check for (m)any to one:
-                    dupes = {k: all_keys.count(k) for k in all_keys}
-                    for k, v in dupes.items():
-                        if v > 1:
-                            diff = -(v - 1)
-                            indices = self.return_incremented_indices(indices, (min(inputs), max(inputs)+1), k, diff)
-                            for item in index_change_log:
-                                if item[0] >= k:
-                                    item[0] += diff
-                            index_change_log.append([k, diff])
+                    self.update_default_indices(
+                        tg, match, intermediate_diff, out_string)
+                if io['in'] != io['out']:
+                    tg.debugger.append({'input': debug_string,
+                                        'output': tg.output_string,
+                                        'rule': {k: v for k, v in io.items() if k != 'match_pattern'},
+                                        'start': start,
+                                        'end': end})
+                out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
+                intermediate_diff += len(out_string) - len(match.group())
+        if intermediate_forms:
+            tg.output_string = self.resolve_intermediate_chars(
+                tg.output_string)
+        tg.edges = list(dict.fromkeys(
+            [tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])]))
+        return tg
 
-                    # check for one to many:
-                    one_to_many = [x for x in outputs if len(x) > 1]
-                    for val in one_to_many:
-                        min_out = min(val)
-                        max_out = max(val)
-                        diff = (max_out - min_out)
-                        # threshold is equal to the first index where the change occurs
-                        threshold = min(val) + 1
-                        if diff:
-                            indices = self.return_incremented_indices(
-                                indices, (min(inputs), max(inputs)+1), threshold, diff)
-                            for item in index_change_log:
-                                if item[0] >= threshold:
-                                    item[0] += diff
-                            index_change_log.append([threshold, diff])
 
-                    # check deleted
-                    if to_delete:
-                        for k in to_delete:
-                            diff += start - k
-                        if diff > 0:
-                            threshold = max(to_delete)
-                        if diff < 0:
-                            threshold = min(to_delete)
-                        indices = self.return_incremented_indices(
-                            indices, (min(new_index.keys()), max(new_index.keys()) + 1), threshold, diff)
-                        for item in index_change_log:
-                            if item[0] >= threshold:
-                                item[0] += diff
-                        index_change_log.append([threshold, diff])
-                    intermediate_diff += diff
-                # normalize
-                for k, v in indices.items():
-                    for k_o in v['output'].keys():
-                        if k_o in all_keys:
-                            indices[k]['output'][k_o] = values[k_o]
-        if intermediate:
-            indices_seen = defaultdict(int)
-            for k, v in indices.items():
-                for k_o, v_o in v['output'].items():
-                    intermediate_index = self._pua_to_index(v_o)
-                    if intermediate_index < 0:
-                        continue
-                    else:
-                        output_char_index = indices_seen[intermediate_index]
-                        try:
-                            indices[k]['output'][k_o] = self.mapping[intermediate_index]['out'][output_char_index]
-                        except IndexError:
-                            indices_seen[intermediate_index] = 0
-                            output_char_index = indices_seen[intermediate_index]
-                            indices[k]['output'][k_o] = self.mapping[intermediate_index]['out'][output_char_index]
-                        indices_seen[intermediate_index] += 1
-        io_states = Indices(indices)
-        if index and debugger:
-            return (io_states.output(), io_states, rules_applied)
-        if debugger:
-            return (converted, rules_applied)
-        if index:
-            return (io_states.output(), io_states)
-        return io_states.output()
+class CompositeTransductionGraph(TransductionGraph):
+    """This is the object returned after performing a transduction using a CompositeTransducer.
+
+    Each CompositeTransductionGraph must be initialized with a list of TransductionGraph objects.
+    """
+
+    def __init__(self, tg_list):
+        # Plain strings
+        self._input_string = tg_list[0].input_string
+        self._output_string = tg_list[-1].output_string
+        # Nodes
+        self._input_nodes = tg_list[0].input_nodes
+        self._output_nodes = tg_list[-1].output_nodes
+        # Edges
+        self._edges = [x.edges for x in tg_list]
+        # Debugger
+        self._debugger = [x.debugger for x in tg_list]
+        # Tiers
+        self._tiers = tg_list
+
+    @property
+    def tiers(self):
+        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the CompositeTransducer"""
+        return self._tiers
+
+    @tiers.setter
+    def tiers(self, value):
+        raise ValueError(
+            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+
+    def pretty_edges(self):
+        pretty_edges = []
+        for tier_i, edges in enumerate(self._edges):
+            edges = copy.deepcopy(edges)
+            edges.sort(key=lambda x: x[0])
+            for i, edge in enumerate(edges):
+                if edge[1] != None:
+                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]]
+                                [1], self.tiers[tier_i].output_nodes[edge[1]][1]]
+                else:
+                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
+            pretty_edges.append(edges)
+        return pretty_edges
 
 
 class CompositeTransducer():
@@ -507,36 +488,20 @@ class CompositeTransducer():
     Attributes:
         transducers (List[Transducer]): A list of Transducer objects to compose.
     """
-    
+
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
+        self._tiers = []
 
     def __repr__(self):
-        return f"{__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
 
-    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
-        return self.apply_rules(to_convert, index, debugger)
+    def __call__(self, to_convert: str):
+        return self.apply_rules(to_convert)
 
-    def apply_rules(self, to_convert: str, index: bool = False, debugger: bool = False):
-        converted = to_convert
-        indexed = []
-        debugged = []
+    def apply_rules(self, to_convert: str):
         for transducer in self._transducers:
-            response = transducer(converted, index, debugger)
-            if index:
-                indexed.append(response[1])
-                if debugger:
-                    debugged += response[2]
-            if debugger:
-                debugged += response[1]
-            if index or debugger:
-                converted = response[0]
-            else:
-                converted = response
-        if index and debugger:
-            return (converted, IndexSequence(*indexed), debugged)
-        if index:
-            return (converted, IndexSequence(*indexed))
-        if debugger:
-            return (converted, debugged)
-        return converted
+            tg = transducer(to_convert)
+            self._tiers.append(tg)
+            to_convert = tg.output_string
+        return CompositeTransductionGraph(self._tiers)

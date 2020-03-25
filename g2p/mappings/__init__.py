@@ -44,6 +44,9 @@ class Mapping():
         @param norm_form: str = "NFD"
             Normalization standard to follow. NFC | NKFC | NFD | NKFD | none
 
+        @param out_delimiter: str = ""
+            Separate output transformations with a delimiter
+
         @param reverse: bool = False
             Reverse all mappings
 
@@ -171,7 +174,7 @@ class Mapping():
     def plain_mapping(self):
         ''' Return mapping
         '''
-        return [{k: v for k, v in io.items() if k in ['in', 'out', 'context_before', 'context_after']} for io in self.mapping]
+        return [{k: v for k, v in io.items() if k not in ['match_pattern', 'intermediate_form']} for io in self.mapping]
 
     def process_kwargs(self, mapping):
         ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
@@ -189,6 +192,10 @@ class Mapping():
             self.kwargs['reverse'] = False
         if 'prevent_feeding' not in self.kwargs:
             self.kwargs['prevent_feeding'] = False
+        if 'in_lang' not in self.kwargs:
+            self.kwargs['in_lang'] = 'und'
+        if 'out_lang' not in self.kwargs:
+            self.kwargs['out_lang'] = 'und'
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
             if kwarg == 'as_is' and not val:
@@ -259,10 +266,12 @@ class Mapping():
             else:
                 rule_regex = re.compile(inp)
         except:
-            LOGGER.error(f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+            in_lang = self.kwargs.get('in_lang', 'und')
+            out_lang = self.kwargs.get('out_lang', 'und')
+            LOGGER.error(f'Your regex in mapping between {in_lang} and {out_lang} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
             raise Exception(
-                f'Your regex in mapping between {self.kwargs["in_lang"]} and {self.kwargs["out_lang"]} is malformed. \
+                f'Your regex in mapping between {in_lang} and {out_lang} is malformed. \
                     Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?')
         return rule_regex
 

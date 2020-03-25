@@ -77,17 +77,14 @@ class Text(Resource):
         debugger = args['debugger']
         try:
             transducer = make_g2p(in_lang, out_lang)
-            if debugger and index:
-                text, index, debugger = transducer(text, index=index, debugger=debugger)
-                index = index.reduced()
-                debugger = Transducer.make_debugger_output_safe(debugger)
-            elif index:
-                text, index = transducer(text, index=index, debugger=debugger)
-                index = index.reduced()
-            elif debugger:
-                text, debugger = transducer(text, index=index, debugger=debugger)
-                debugger = Transducer.make_debugger_output_safe(debugger[1])
-            return {'output-text': text, 'index': index, 'debugger': debugger}
+            tg = transducer(text)
+            text = tg.output_string
+            input_text = tg.input_string
+            if debugger:
+                debugger = tg.debugger
+            if index:
+                index = tg.edges
+            return {'input-text': input_text, 'output-text': text, 'index': index, 'debugger': debugger}
         except NetworkXNoPath:
             abort(400)
         except FileNotFoundError:
