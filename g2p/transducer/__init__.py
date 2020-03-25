@@ -381,7 +381,6 @@ class Transducer():
                         for i, edge in enumerate(tg.edges):
                             if edge[1] != None and edge[1] == index_to_delete:
                                 tg.edges[i][1] = None
-                    last_output_node = index_to_delete
                     # decrement
                     for i, edge in enumerate(tg.edges):
                         if edge[1] != None and edge[1] > index_to_delete:

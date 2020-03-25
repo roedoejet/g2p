@@ -161,6 +161,7 @@ class IndicesTest(TestCase):
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
         self.test_mapping_nine = Mapping([{'in': 'aa', 'out': ''}])
+        self.test_mapping_ten = Mapping([{'in': 'abc', 'out': 'a'}])
         self.test_mapping_combining = Mapping(
             [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}])
         self.test_mapping_wacky = Mapping(
@@ -184,6 +185,7 @@ class IndicesTest(TestCase):
         self.trans_seven_as_is = Transducer(self.test_mapping_seven_as_is)
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_nine = Transducer(self.test_mapping_nine)
+        self.trans_ten = Transducer(self.test_mapping_ten)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
         self.trans_wacky_lite = Transducer(self.test_mapping_wacky_lite)
@@ -302,6 +304,11 @@ class IndicesTest(TestCase):
         transducer = self.trans_nine('aa')
         self.assertEqual(transducer.output_string, '')
         self.assertEqual(transducer.edges, [(0, None), (1, None)])
+
+    def test_case_ten(self):
+        transducer = self.trans_ten('abc')
+        self.assertEqual(transducer.output_string, 'a')
+        self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 0)])
 
     def test_case_acdc(self):
         transducer = Transducer(
