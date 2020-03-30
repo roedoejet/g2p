@@ -7,8 +7,8 @@ mappings:
     out_lang: lml-ipa
     case_sensitive: false
     norm_form: NFD
-    as_is: true
+    as_is: false
     abbreviations: abbreviations.csv
     authors:
-      - Aidan Pine
+      - Fineen Davis
     <<: *shared
