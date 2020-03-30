@@ -55,3 +55,15 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
+  - as_is: true
+    authors:
+      - Generated 2020-03-30 13:17:41.062858
+    case_sensitive: true
+    display_name: lml-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: lml-ipa
+    language_name: lml-ipa
+    mapping: lml-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    reverse: false

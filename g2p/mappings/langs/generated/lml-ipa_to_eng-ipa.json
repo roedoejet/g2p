@@ -1,0 +1,38 @@
+[
+    {
+        "in": "\u014b",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014bg",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0251",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261",
+        "out": "\u0261",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0263",
+        "out": "\u0261",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0279",
+        "out": "\u0279",
+        "context_before": "",
+        "context_after": ""
+    }
+]
