@@ -10,5 +10,5 @@ mappings:
     as_is: true
     abbreviations: abbreviations.csv
     authors:
-      - Aidan Pine
+      - Fineen Davis
     <<: *shared
