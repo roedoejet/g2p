@@ -16,15 +16,16 @@ sh,ʃ,,
 s,z,Vowels,Vowels
 ss,s,,
 s,s,,
+ç,s,,
 c,s,,[eiy]
 c,k,,
-ç,s,,
 d,d,,
 f,f,,
 ph,f,,
 ge,ʒ,,[aouɛ]
 g,ʒ,,[eiy]
 gn,ɲ,,
+ù,u,,
 gu,ɡ,,
 ng,ŋ,,\s|$
 g,ɡ,,
@@ -87,6 +88,7 @@ é,ɜ,,
 ae,ɜ,,
 æ,ɜ,,
 ai,ɜ,,
+ê,ɛː,,
 e,,,\s|$
 e,ʌ,,
 ɜ,e,,
@@ -95,7 +97,6 @@ e,ʌ,,
 a,a,,
 oin,wɛ,,
 oi,wa,,
-ê,ɛː,,
 ay,ɛj,,Vowels
 ay,e,,
 oy,waj,,Vowels

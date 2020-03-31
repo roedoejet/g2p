@@ -32,7 +32,7 @@ class LangTest(TestCase):
                 delimiter = '|'
             elif fn.endswith('tsv'):
                 delimiter = '\t'
-            with open(fn) as csvfile:
+            with open(fn, encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
                     if len(row) != 4:
