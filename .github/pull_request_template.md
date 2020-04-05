@@ -9,5 +9,6 @@ Pull request template for adding a new language
 - [ ] Language folder and files use appropriate [ISO 639-3 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-3_codes)
 - [ ] Config.yaml file includes all author names, and settings necessary
 - [ ] Please add some test data in `g2p/tests/public/data`. The added file should be a csv/tsv/psv file and each row should have the format `[input_mapping_code,output_mapping_code,input_string,output_string]`
+- [ ] As the last step, G2P has been updated by running `g2p update` locally and committing the change
 
 * **Other information**:

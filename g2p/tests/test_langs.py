@@ -12,7 +12,14 @@ from g2p.tests.public.data import __file__ as data_dir
 
 
 class LangTest(TestCase):
-    ''' Basic Test for individual lookup tables
+    '''Basic Test for individual lookup tables.
+
+    Test files (in g2p/tests/public/data) are either .csv, .psv, or
+    .tsv files, the only difference being the delimiter used (comma,
+    pipe, or tab).
+
+    Each line in the test file consists of SOURCE,TARGET,INPUT,OUTPUT
+
     '''
 
     def setUp(self):
@@ -25,7 +32,7 @@ class LangTest(TestCase):
                 delimiter = '|'
             elif fn.endswith('tsv'):
                 delimiter = '\t'
-            with open(fn) as csvfile:
+            with open(fn, encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
                     if len(row) != 4:
