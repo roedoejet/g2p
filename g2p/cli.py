@@ -23,8 +23,10 @@ PRINTER = pp(indent=4)
 def create_app():
     return APP
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
 @click.version_option(version=VERSION, prog_name="g2p")
-@click.group(cls=FlaskGroup, create_app=create_app)
+@click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
 def cli():
     '''Management script for G2P'''
 
@@ -32,7 +34,7 @@ def cli():
 @click.option('--ipa/--no-ipa', default=False)
 @click.option('--dummy/--no-dummy', default=False)
 @click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping(in_lang, dummy, ipa, out_dir):
     ''' Generate English mapping
     '''
@@ -49,7 +51,7 @@ def generate_mapping(in_lang, dummy, ipa, out_dir):
         dummy_config, dummy_mapping = align_to_dummy_fallback(new_mapping, write_to_file=True, out_dir=out_dir)
 
 @click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True))
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping_network(path):
     ''' Generate a png of the network of mapping languages. Requires matplotlib.
     '''
@@ -62,7 +64,7 @@ def generate_mapping_network(path):
 @click.argument('out_lang', default='')
 @click.argument('in_lang', default='')
 @click.argument('input_text', type=click.STRING)
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 def convert(in_lang, out_lang, input_text, path, debugger):
     '''Convert from in-lang to out-lang. Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of options.
     '''
@@ -81,7 +83,7 @@ def convert(in_lang, out_lang, input_text, path, debugger):
         output = tg.output_string
         click.echo(output)
 
-@cli.command()
+@cli.command(context_settings=CONTEXT_SETTINGS)
 def update():
     ''' Update cached language files
     '''
