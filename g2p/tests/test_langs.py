@@ -42,9 +42,26 @@ class LangTest(TestCase):
 
     def test_io(self):
         # go through each language declared in the test case set up
+        # Instead of asserting immediately, we go through all the cases first, so that
+        # running test_langs.py prints all the errors at once, to help debugging a given g2p mapping.
+        # Then we call assertEqual on the first failed case, to make unittest register the failure.
+        error_count = 0
         for test in self.langs_to_test:
             transducer = make_g2p(test[0], test[1])
-            self.assertEqual(transducer(test[2]).output_string, test[3])
+            output_string = transducer(test[2]).output_string
+            if output_string != test[3]:
+                print("test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
+                if error_count == 0:
+                    first_failed_test = test
+                error_count += 1
+
+        if error_count > 0:
+            transducer = make_g2p(first_failed_test[0], first_failed_test[1])
+            self.assertEqual(transducer(first_failed_test[2]).output_string, first_failed_test[3])
+
+        #for test in self.langs_to_test:
+        #    transducer = make_g2p(test[0], test[1])
+        #    self.assertEqual(transducer(test[2]).output_string, test[3])
 
 if __name__ == "__main__":
     main()
