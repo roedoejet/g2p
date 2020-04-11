@@ -9,9 +9,9 @@
 
 > Grapheme-to-Phoneme transformations that preserve input and output indices!
 
-![indices](https://raw.githubusercontent.com/roedoejet/g2p/master/g2p/static/assets/bonjour.png)
-
 This library is for handling arbitrary conversions between input and output segments while preserving indices.
+
+![indices](https://raw.githubusercontent.com/roedoejet/g2p/master/g2p/static/assets/bonjour.png)
 
 ## Table of Contents
 - [Gⁱ-2-Pⁱ](#g%e2%81%b1-2-p%e2%81%b1)
