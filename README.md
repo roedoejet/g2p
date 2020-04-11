@@ -9,6 +9,8 @@
 
 > Grapheme-to-Phoneme transformations that preserve input and output indices!
 
+![indices](https://raw.githubusercontent.com/roedoejet/g2p/master/g2p/static/assets/bonjour.png)
+
 This library is for handling arbitrary conversions between input and output segments while preserving indices.
 
 ## Table of Contents
