@@ -11,4 +11,5 @@ mappings:
     abbreviations: abbreviations.csv
     authors:
       - Fineen Davis
+      - Codrington Hinge
     <<: *shared
