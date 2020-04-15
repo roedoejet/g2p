@@ -1,6 +1,6 @@
 openpyxl
 click
-coloredlogs==10.0
+coloredlogs
 eventlet
 flask-cors
 Flask>=1.0.2
