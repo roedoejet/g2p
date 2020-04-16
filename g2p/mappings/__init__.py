@@ -204,8 +204,6 @@ class Mapping():
                     x["in"]), reverse=True)
             elif kwarg == 'escape_special' and val:
                 mapping = [escape_special_characters(x) for x in mapping]
-            elif kwarg == 'case_sensitive' and not val:
-                mapping = self.lower_mappings(mapping)
             elif kwarg == 'norm_form' and val:
                 for io in mapping:
                     for k, v in io.items():
