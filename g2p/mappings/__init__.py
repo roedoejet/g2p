@@ -280,15 +280,6 @@ class Mapping():
             io['in'], io['out'] = io['out'], io['in']
         return mapping
 
-    def lower_mappings(self, mapping):
-        ''' Lower the mapping
-        '''
-        for io in mapping:
-            for k, v in io.items():
-                if k in ['in', 'out', 'context_before', 'context_after']:
-                    io[k] = v.lower()
-        return mapping
-
     def add_abbreviations(self, abbs, mappings):
         ''' Return abbreviated forms, given a list of abbreviations.
 
