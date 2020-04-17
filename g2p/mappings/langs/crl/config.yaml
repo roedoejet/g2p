@@ -1,8 +1,16 @@
 <<: &shared
   language_name: Northern East Cree
 mappings:
-  - display_name: Northern East Cree to IPA
+  - display_name: Northern East Cree Normalization
     in_lang: crl
+    out_lang: crl-norm
+    type: mapping
+    authors:
+      - Aidan Pine
+    mapping: crl_norm.json
+    <<: *shared
+  - display_name: Northern East Cree to IPA
+    in_lang: crl-norm
     out_lang: crl-ipa
     type: mapping
     authors:
@@ -15,4 +23,5 @@ mappings:
     out_lang: eng-ipa
     type: mapping
     mapping: crl_ipa_to_eng_ipa.json
+    as_is: false
     <<: *shared
