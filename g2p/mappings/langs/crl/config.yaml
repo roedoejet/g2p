@@ -6,6 +6,7 @@ mappings:
     out_lang: crl-norm
     type: mapping
     authors:
+      - Delasie Torkornoo
       - Aidan Pine
     mapping: crl_norm.json
     <<: *shared
@@ -16,6 +17,7 @@ mappings:
     authors:
       - David Huggins Daines
       - Patrick Littell
+      - Delasie Torkornoo
     mapping: crl_to_ipa.json
     <<: *shared
   - display_name: Northern East Cree IPA to English IPA
