@@ -30,7 +30,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def cli():
     '''Management script for G2P'''
 
-@click.option('--out-dir', default='', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@click.option('--out-dir', default='.', type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.option('--ipa/--no-ipa', default=False)
 @click.option('--dummy/--no-dummy', default=False)
 @click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
