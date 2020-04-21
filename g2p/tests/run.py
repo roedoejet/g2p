@@ -17,6 +17,7 @@ from g2p.tests.test_cli import CliTest
 from g2p.tests.test_utils import UtilsTest
 from g2p.tests.test_fallback import FallbackTest
 from g2p.tests.test_api_resources import ResourceIntegrationTest
+from g2p.tests.test_studio import StudioTest
 
 
 LOADER = TestLoader()
@@ -48,7 +49,7 @@ LANGS_TESTS = [
 
 INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test) for test in [
-        CliTest, ResourceIntegrationTest
+        CliTest, ResourceIntegrationTest, StudioTest
     ]
 ]
 
@@ -66,6 +67,8 @@ def run_tests(suite):
         suite = TestSuite(LANGS_TESTS)
     if suite == 'mappings':
         suite = TestSuite(MAPPINGS_TESTS)
+    if suite == 'integ':
+        suite = TestSuite(INTEGRATION_TESTS)
     elif suite == 'dev':
         suite = TestSuite(DEV_TESTS)
     runner = TextTestRunner(verbosity=3)

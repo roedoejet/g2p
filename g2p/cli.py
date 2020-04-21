@@ -64,8 +64,8 @@ def generate_mapping_network(path):
 
 @click.option('--debugger/--no-debugger', default=False)
 @click.option('--path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
-@click.argument('out_lang', default='')
-@click.argument('in_lang', default='')
+@click.argument('out_lang')
+@click.argument('in_lang')
 @click.argument('input_text', type=click.STRING)
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def convert(in_lang, out_lang, input_text, path, debugger):
