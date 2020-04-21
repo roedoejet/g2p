@@ -53,7 +53,7 @@ with open(LANGS_PKL, 'rb') as f:
     LANGS = pickle.load(f)
 
 LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
-LANGS_AVAILABLE = [{k: v['language_name']} for k, v in LANGS.items() if k != 'generated']
+LANGS_AVAILABLE = [{k: v['language_name']} for k, v in LANGS.items() if k not in ['generated', 'font-encodings']]
 MAPPINGS_AVAILABLE = [mapping for k, v in LANGS.items() for mapping in v['mappings']]
 
 if __name__ == "__main__":
