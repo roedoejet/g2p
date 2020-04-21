@@ -10,6 +10,7 @@ on:
     tags: 
       - release
       - build
+      - v*.*.*
 jobs:
   deploy:
 
