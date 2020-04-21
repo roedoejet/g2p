@@ -348,7 +348,15 @@ class Mapping():
         if add_config:
             with open(fn, encoding='utf8') as f:
                 existing_data=yaml.safe_load(f.read())
-            existing_data['mappings'].append(template['mappings'][0])
+            updated = False
+            for i, mapping in enumerate(existing_data['mappings']):
+                # if the mapping exists, just update the generation data
+                if mapping['in_lang'] == template['mappings'][0]['in_lang'] and mapping['out_lang'] == template['mappings'][0]['out_lang']:
+                    existing_data['mappings'][i]['authors'] = template['mappings'][0]['authors']
+                    updated = True
+                    break
+            if not updated:  
+                existing_data['mappings'].append(template['mappings'][0])
             template=existing_data
         with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,

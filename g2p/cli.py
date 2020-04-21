@@ -30,16 +30,19 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 def cli():
     '''Management script for G2P'''
 
-@click.option('--out-dir', default='.', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@click.option('--out-dir', type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.option('--ipa/--no-ipa', default=False)
 @click.option('--dummy/--no-dummy', default=False)
 @click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping(in_lang, dummy, ipa, out_dir):
-    ''' Generate English mapping
+    ''' Generate English mapping.
     '''
     if not ipa and not dummy:
         click.echo('You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information.')
+    if out_dir and (os.path.exists(os.path.join(out_dir, 'config.yaml')) or os.path.exists(os.path.join(out_dir, 'config.yaml'))):
+        click.echo(f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
+        return
     if ipa:
         eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
         new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
