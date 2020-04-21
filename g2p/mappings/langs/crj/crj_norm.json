@@ -1,0 +1,307 @@
+[
+    {
+        "in": "ᐧᐋ",
+        "out": "ᐙ"
+    },
+    {
+        "roman": "thwe",
+        "in": "ᐧᕧ",
+        "out": "ᕨ"
+    },
+    {
+        "roman": "chwe",
+        "in": "ᐧᒉ",
+        "out": "ᒒ"
+    },
+    {
+        "roman": "shwe",
+        "in": "ᐧᔐ",
+        "out": "ᔗ"
+    },
+    {
+        "roman": "shwi",
+        "in": "ᐧᔑ",
+        "out": "ᔙ"
+    },
+    {
+        "roman": "shwî",
+        "in": "ᐧᔒ",
+        "out": "ᔛ"
+    },
+    {
+        "roman": "shwû",
+        "in": "ᐧᔔ",
+        "out": "ᔟ"
+    },
+    {
+        "roman": "shwa",
+        "in": "ᐧᔕ",
+        "out": "ᔡ"
+    },
+    {
+        "roman": "shwâ",
+        "in": "ᐧᔖ",
+        "out": "ᔣ"
+    },
+    {
+        "roman": "pwe",
+        "in": "ᐧᐯ",
+        "out": "ᐺ"
+    },
+    {
+        "roman": "pwi",
+        "in": "ᐧᐱ",
+        "out": "ᐼ"
+    },
+    {
+        "roman": "pwî",
+        "in": "ᐧᐲ",
+        "out": "ᐾ"
+    },
+    {
+        "roman": "pwa",
+        "in": "ᐧᐸ",
+        "out": "ᑄ"
+    },
+    {
+        "roman": "pwâ",
+        "in": "ᐧᐹ",
+        "out": "ᑆ"
+    },
+    {
+        "roman": "twe",
+        "in": "ᐧᑌ",
+        "out": "ᑗ"
+    },
+    {
+        "roman": "twi",
+        "in": "ᐧᑎ",
+        "out": "ᑙ"
+    },
+    {
+        "roman": "twâ",
+        "in": "ᐧᑖ",
+        "out": "ᑣ"
+    },
+    {
+        "roman": "twî",
+        "in": "ᐧᑏ",
+        "out": "ᑛ"
+    },
+    {
+        "roman": "twa",
+        "in": "ᐧᑕ",
+        "out": "ᑡ"
+    },
+    {
+        "roman": "kwe",
+        "in": "ᐧᑫ",
+        "out": "ᑴ"
+    },
+    {
+        "roman": "kwi",
+        "in": "ᐧᑭ",
+        "out": "ᑶ"
+    },
+    {
+        "roman": "kwî",
+        "in": "ᐧᑮ",
+        "out": "ᑸ"
+    },
+    {
+        "roman": "kwa",
+        "in": "ᐧᑲ",
+        "out": "ᑾ"
+    },
+    {
+        "roman": "kwâ",
+        "in": "ᐧᑳ",
+        "out": "ᒀ"
+    },
+    {
+        "roman": "mwe",
+        "in": "ᐧᒣ",
+        "out": "ᒬ"
+    },
+    {
+        "roman": "mwi",
+        "in": "ᐧᒥ",
+        "out": "ᒮ"
+    },
+    {
+        "roman": "mwî",
+        "in": "ᐧᒦ",
+        "out": "ᒰ"
+    },
+    {
+        "roman": "mwa",
+        "in": "ᐧᒪ",
+        "out": "ᒶ"
+    },
+    {
+        "roman": "mwâ",
+        "in": "ᐧᒫ",
+        "out": "ᒸ"
+    },
+    {
+        "roman": "nwe",
+        "in": "ᐧᓀ",
+        "out": "ᓉ"
+    },
+    {
+        "roman": "nwa",
+        "in": "ᐧᓇ",
+        "out": "ᓋ"
+    },
+    {
+        "roman": "nwâ",
+        "in": "ᐧᓈ",
+        "out": "ᓍ"
+    },
+    {
+        "roman": "lwe",
+        "in": "ᐧᓓ",
+        "out": "ᓜ"
+    },
+    {
+        "roman": "lwi",
+        "in": "ᐧᓕ",
+        "out": "ᓞ"
+    },
+    {
+        "roman": "lwî",
+        "in": "ᐧᓖ",
+        "out": "ᓠ"
+    },
+    {
+        "roman": "lwa",
+        "in": "ᐧᓚ",
+        "out": "ᓦ"
+    },
+    {
+        "roman": "lwâ",
+        "in": "ᐧᓛ",
+        "out": "ᓨ"
+    },
+    {
+        "roman": "swe",
+        "in": "ᐧᓭ",
+        "out": "ᓶ"
+    },
+    {
+        "roman": "swa",
+        "in": "ᐧᓴ",
+        "out": "ᔀ"
+    },
+    {
+        "roman": "swâ",
+        "in": "ᐧᓵ",
+        "out": "ᔂ"
+    },
+    {
+        "roman": "swi",
+        "in": "ᐧᓯ",
+        "out": "ᓸ"
+    },
+    {
+        "roman": "swî",
+        "in": "ᐧᓰ",
+        "out": "ᓺ"
+    },
+    {
+        "roman": "ywe",
+        "in": "ᐧᔦ",
+        "out": "ᔯ"
+    },
+    {
+        "roman": "ywi",
+        "in": "ᐧᔨ",
+        "out": "ᔱ"
+    },
+    {
+        "roman": "ywî",
+        "in": "ᐧᔩ",
+        "out": "ᔳ"
+    },
+    {
+        "roman": "ywa",
+        "in": "ᐧᔭ",
+        "out": "ᔹ"
+    },
+    {
+        "roman": "ywâ",
+        "in": "ᐧᔮ",
+        "out": "ᔻ"
+    },
+    {
+        "roman": "rwe",
+        "in": "ᐧᕃ",
+        "out": "ᣎ"
+    },
+    {
+        "roman": "rwâ",
+        "in": "ᐧᕌ",
+        "out": "ᕎ"
+    },
+    
+    {
+        "roman": "vwâ",
+        "in": "ᐧᕚ",
+        "out": "ᕛ"
+    },
+    {
+        "roman": "kw",
+        "in": "ᐧᒃ",
+        "out": "ᒄ"
+    },
+    {
+        "roman": "mw",
+        "in": "ᐧᒻ",
+        "out": "ᒽ"
+    },
+    {
+        "roman": "we",
+        "in": "ᐧᐁ",
+        "out": "ᐌ"
+    },
+    {
+        "in": "ᐧᐃ",
+        "out": "ᐎ",
+        "roman": "wi"
+    },
+    {
+        "in": "ᐧᐄ",
+        "out": "ᐐ",
+        "roman": "wii"
+    },
+    {
+        "in": "ᐧᐅ",
+        "out": "ᐒ",
+        "roman": "wu"
+    },
+    {
+        "in": "ᐧᐆ",
+        "out": "ᐔ",
+        "roman": "wuu"
+    },
+    {
+        "in": "ᐧᐊ",
+        "out": "ᐗ",
+        "roman": "wa"
+    },
+    {
+        "in": "ᐧᐋ",
+        "out": "ᐙ",
+        "roman": "waa"
+    },
+    {
+        "in": "ᐧᒑ",
+        "out": "ᒞ",
+        "roman": "cwaa"
+    },
+    {
+        "in": "ᐧᒐ",
+        "out": "ᒜ",
+        "roman": "cwa"
+    }
+]

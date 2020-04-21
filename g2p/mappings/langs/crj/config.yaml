@@ -1,8 +1,17 @@
 <<: &shared
   language_name: Southern East Cree
 mappings:
-  - display_name: Southern East Cree to IPA
+  - display_name: Northern East Cree Normalization
     in_lang: crj
+    out_lang: crj-norm
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Aidan Pine
+    mapping: crj_norm.json
+    <<: *shared
+  - display_name: Southern East Cree to IPA
+    in_lang: crj-norm
     out_lang: crj-ipa
     type: mapping
     authors:
