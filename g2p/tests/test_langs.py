@@ -50,7 +50,7 @@ class LangTest(TestCase):
             transducer = make_g2p(test[0], test[1])
             output_string = transducer(test[2]).output_string
             if output_string != test[3]:
-                print("test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
+                LOGGER.warning("test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
                 if error_count == 0:
                     first_failed_test = test
                 error_count += 1

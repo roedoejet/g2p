@@ -37,7 +37,7 @@ class CliTest(TestCase):
         for test in self.langs_to_test:
             output_string = self.runner.invoke(convert, [test[2], test[0], test[1]]).stdout.strip()
             if output_string != test[3]:
-                print("test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
+                LOGGER.warning("test_cli.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
                 if error_count == 0:
                     first_failed_test = test
                 error_count += 1
