@@ -1,29 +1,5 @@
 [
     {
-        "in": "\u00e3\u02d0",
-        "out": "",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u1ebd:",
-        "out": "",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0129:",
-        "out": "",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u00f5:",
-        "out": "",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
         "in": "\u014b",
         "out": "\u014b",
         "context_before": "",

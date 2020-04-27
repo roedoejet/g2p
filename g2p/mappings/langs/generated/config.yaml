@@ -69,7 +69,7 @@ mappings:
     reverse: false
   - as_is: true
     authors:
-      - Generated 2020-04-27 01:19:16.646658
+      - Generated 2020-04-27 01:30:32.371649
     case_sensitive: false
     display_name: oji-ipa IPA to eng-ipa IPA
     escape_special: false
