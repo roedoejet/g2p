@@ -337,6 +337,7 @@ class Mapping():
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
                 "as_is": self.kwargs.get('as_is', True),
+                "prevent_feeding": self.kwargs.get('prevent_feeding', False),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
                 "norm_form": self.kwargs.get('norm_form', "NFD"),
