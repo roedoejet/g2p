@@ -1,0 +1,74 @@
+[
+    {
+        "in": "d\u0292",
+        "out": "d\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "e:",
+        "out": "e\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "i:",
+        "out": "i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "j",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "o:",
+        "out": "o\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t\u0283",
+        "out": "t\u0283",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0251:",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0283",
+        "out": "\u0283",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u028c",
+        "out": "\u028c",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0292",
+        "out": "\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0294",
+        "out": "\u0294",
+        "context_before": "",
+        "context_after": ""
+    }
+]
