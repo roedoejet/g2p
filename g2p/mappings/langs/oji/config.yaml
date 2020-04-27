@@ -8,6 +8,7 @@ mappings:
       - David Huggins-Daines
     type: mapping
     mapping: oji_to_ipa.csv
+    prevent_feeding: true
     as_is: true
     case_sensitive: false
     norm_form: NFC
