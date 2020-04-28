@@ -37,7 +37,12 @@ class FallbackTest(TestCase):
         self.assertEqual(test_out.mapping, [{'in': 'æ', 'out': 'ɑi', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('æ')}, {'in': 'ɐ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɐ')}, {'in': 'ɑ̃', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɑ̃')}, {
                          'in': 'β', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('β')}, {'in': 'ɡ', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɡ')}, {'in': 'g', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('g')}, {'in': 'ةُ', 'out': 'ɑu', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ةُ')}])
         test_ipa = align_to_dummy_fallback(ipa_mapping, 'out')
-        self.assertEqual(test_ipa.mapping, [{'in': 'æ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('æ')}, {'in': 'ɐ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɐ')}, {'in': 'ɑ̃', 'out': 'ɑ', 'context_before': '',
-                                                                                                                                                                                                                                                    'context_after': '', 'match_pattern': re.compile('ɑ̃')}, {'in': 'ɡ', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɡ')}, {'in': 'β', 'out': 's', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('β')}])
+        self.assertEqual(
+            test_ipa.mapping,
+            [{'in': 'æ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('æ')},
+             {'in': 'ɐ', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɐ')},
+             {'in': 'ɑ̃', 'out': 'ɑ', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɑ̃')},
+             {'in': 'β', 'out': 's', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('β')},
+             {'in': 'ɡ', 'out': 't', 'context_before': '', 'context_after': '', 'match_pattern': re.compile('ɡ')}])
 if __name__ == "__main__":
     main()

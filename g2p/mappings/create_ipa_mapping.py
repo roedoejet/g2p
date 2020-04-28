@@ -82,7 +82,18 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     mapping = align_inventories(mapping_1.inventory(mapping_1_io), mapping_2.inventory(mapping_2_io),
                                 l1_is_xsampa, l2_is_xsampa)
 
-    config = {'in_lang': map_1_name, 'out_lang': map_2_name}
+    # Initialize mapping with input language parameters (as_is,
+    # case_sensitive, prevent_feeding, etc)
+    config = mapping_1.kwargs.copy()
+    # Fix up names, etc.
+    if 'authors' in config:
+        del config['authors']
+    if 'display_name' in config:
+        del config['display_name']
+    if 'language_name' in config:
+        del config['language_name']
+    config['in_lang'] = map_1_name
+    config['out_lang'] = map_2_name
     config['mapping'] = mapping
     mapping = Mapping(**config)
     if write_to_file:
@@ -144,8 +155,6 @@ def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
 def align_inventories(inventory_l1, inventory_l2,
                       l1_is_xsampa=False, l2_is_xsampa=False):
     mapping = []
-    inventory_l1 = sorted(set(inventory_l1))
-    inventory_l2 = list(set(inventory_l2))
     pbar = tqdm(total=100)
     step = 1/len(inventory_l1)*100
     for i1, p1 in enumerate(process_characters(inventory_l1,

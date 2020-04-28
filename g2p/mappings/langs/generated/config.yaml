@@ -67,3 +67,16 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
+  - as_is: true
+    authors:
+      - Generated 2020-04-27 01:30:32.371649
+    case_sensitive: false
+    display_name: oji-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: oji-ipa
+    language_name: oji-ipa
+    mapping: oji-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
