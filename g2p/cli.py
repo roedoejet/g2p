@@ -20,15 +20,19 @@ from g2p import make_g2p
 
 PRINTER = pp(indent=4)
 
+
 def create_app():
     return APP
 
+
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
 
 @click.version_option(version=VERSION, prog_name="g2p")
 @click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
 def cli():
     '''Management script for G2P'''
+
 
 @click.option('--out-dir', type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @click.option('--ipa/--no-ipa', default=False)
@@ -41,17 +45,21 @@ def generate_mapping(in_lang, dummy, ipa, out_dir):
     if not ipa and not dummy:
         click.echo('You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information.')
     if out_dir and (os.path.exists(os.path.join(out_dir, 'config.yaml')) or os.path.exists(os.path.join(out_dir, 'config.yaml'))):
-        click.echo(f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
+        click.echo(
+            f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
         return
     if ipa:
         eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
         new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
         click.echo(f"Writing English IPA mapping for {in_lang} to file")
-        create_mapping(new_mapping, eng_ipa, write_to_file=True, out_dir=out_dir)
+        create_mapping(new_mapping, eng_ipa,
+                       write_to_file=True, out_dir=out_dir)
     if dummy:
         new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
         click.echo(f"Writing dummy fallback mapping for {in_lang} to file")
-        dummy_config, dummy_mapping = align_to_dummy_fallback(new_mapping, write_to_file=True, out_dir=out_dir)
+        dummy_config, dummy_mapping = align_to_dummy_fallback(
+            new_mapping, write_to_file=True, out_dir=out_dir)
+
 
 @click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @cli.command(context_settings=CONTEXT_SETTINGS)
@@ -62,6 +70,7 @@ def generate_mapping_network(path):
     draw(LANGS_NETWORK, with_labels=True)
     plt.show()
 
+
 @click.option('--debugger/--no-debugger', default=False)
 @click.option('--path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument('out_lang')
@@ -71,6 +80,20 @@ def generate_mapping_network(path):
 def convert(in_lang, out_lang, input_text, path, debugger):
     '''Convert from in-lang to out-lang. Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of options.
     '''
+    # Check valid input
+    # Check input != output
+    if in_lang == out_lang:
+        raise click.UsageError(
+            "Values must be different for 'IN_LANG' and 'OUT_LANG'")
+    # Check input lang exists
+    if not in_lang in LANGS_NETWORK.nodes:
+        raise click.UsageError(
+            f"'{in_lang}' is not a valid value for 'IN_LANG'")
+    # Check output lang exists
+    if not out_lang in LANGS_NETWORK.nodes:
+        raise click.UsageError(
+            f"'{out_lang}' is not a valid value for 'OUT_LANG'")
+
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
@@ -85,6 +108,7 @@ def convert(in_lang, out_lang, input_text, path, debugger):
     else:
         output = tg.output_string
         click.echo(output)
+
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update():
