@@ -14,10 +14,10 @@ from g2p.mappings.langs import LANGS_NETWORK
 from g2p.transducer import CompositeTransducer, Transducer
 from g2p.log import LOGGER
 
-if sys.stdout.encoding != 'utf8':
+if sys.stdout.encoding != 'utf8' and hasattr(sys.stdout, 'buffer'):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
 
-if sys.stderr.encoding != 'utf8':
+if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 def make_g2p(in_lang: str, out_lang: str):
