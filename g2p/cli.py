@@ -4,7 +4,7 @@ import yaml
 from pprint import PrettyPrinter as pp
 from flask.cli import FlaskGroup
 from collections import OrderedDict
-from networkx import draw
+from networkx import draw, has_path
 
 from g2p.transducer import CompositeTransducer, Transducer
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
@@ -93,7 +93,10 @@ def convert(in_lang, out_lang, input_text, path, debugger):
     if not out_lang in LANGS_NETWORK.nodes:
         raise click.UsageError(
             f"'{out_lang}' is not a valid value for 'OUT_LANG'")
-
+    # Check if path exists
+    if not has_path(LANGS_NETWORK, in_lang, out_lang):
+        raise click.UsageError(
+            f"Path between '{in_lang}' and '{out_lang}' does not exist")
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
