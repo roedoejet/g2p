@@ -21,9 +21,9 @@ mappings:
     authors:
       - Aidan Pine
   - display_name: First Nations Unicode
-    mapping: fv_unicode.csv
-    in_lang: fv-unicode-font
-    out_lang: fv-unicode
+    mapping: fn_unicode.csv
+    in_lang: fn-unicode-font
+    out_lang: fn-unicode
     norm_form: NFD
     escape_special: true
     case_sensitive: false
