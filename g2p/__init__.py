@@ -22,12 +22,12 @@ if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
 
 def make_g2p(in_lang: str, out_lang: str):
     # Check in_lang is a node in network
-    if not in_lang in LANGS_NETWORK.nodes:
+    if in_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called {in_lang}. Please try again.")
         raise(FileNotFoundError("No lang called {in_lang}."))
-    
+
     # Check out_lang is a node in network
-    if not out_lang in LANGS_NETWORK.nodes:
+    if out_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called {out_lang}. Please try again.")
         raise(FileNotFoundError("No lang called {out_lang}."))
 
@@ -47,7 +47,7 @@ def make_g2p(in_lang: str, out_lang: str):
             mappings_needed.append(mapping)
         except IndexError:
             continue
-    
+
     # Either return Transducer or Composite Transducer
     if len(mappings_needed) == 1:
         return Transducer(mappings_needed[0])

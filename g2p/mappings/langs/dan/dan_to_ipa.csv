@@ -8,10 +8,12 @@ r,ɐ̯,VOWEL
 o,ɔ
 \u0061\u030A,oː
 \u00E5,oː
-d,ð,VOWEL,\b|CONSONANT|FRONT
+d,ð̠˕ˠ,VOWEL,\b|CONSONANT|FRONT
 t,ð,VOWEL,\b|CONSONANT
 g,ɪ̯,FRONT
 g,ʊ̯,BACK
+af,a,\b,\b
+g,,,\b
 g,ɡ
 r,ɐ̯,,\b
 c,s
@@ -23,3 +25,4 @@ r,ʁ
 ø,œ
 y,u
 p,p
+(œ|ɑ|æ|ɛ|ʊ̯|ɪ̯|ɔ|VOWEL),,,ɐ̯
