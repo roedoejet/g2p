@@ -12,6 +12,7 @@ mappings:
   - display_name: Inuktitut IPA to English IPA
     in_lang: iku-ipa
     out_lang: eng-ipa
+    as_is: false
     type: mapping
     mapping: iku_ipa_to_eng_ipa.json
     <<: *shared
