@@ -1,70 +1,158 @@
 [
     {
-        "in": "d",
-        "out": "d"
-    },
-    {
-        "in": "o\u02d0",
-        "out": "o\u02d0"
-    },
-    {
-        "in": "p",
-        "out": "p"
-    },
-    {
-        "in": "s",
-        "out": "s"
-    },
-    {
-        "in": "u",
-        "out": "u"
-    },
-    {
-        "in": "\u00e6",
-        "out": "\u00e6"
-    },
-    {
         "in": "\u00f0",
-        "out": "\u00f0"
+        "out": "\u00f0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "d",
+        "out": "d",
+        "context_before": "",
+        "context_after": ""
     },
     {
         "in": "\u014b",
-        "out": "\u014b"
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
     },
     {
-        "in": "\u0153",
-        "out": "\u0254"
+        "in": "\u014b",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
     },
     {
-        "in": "\u0250\u032f",
-        "out": "j"
-    },
-    {
-        "in": "\u0251",
-        "out": "\u0251"
-    },
-    {
-        "in": "\u0254",
-        "out": "\u0254"
-    },
-    {
-        "in": "\u025b",
-        "out": "\u025b"
-    },
-    {
-        "in": "\u0261",
-        "out": "\u0261"
-    },
-    {
-        "in": "\u026a\u032f",
-        "out": "j"
+        "in": "s",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
     },
     {
         "in": "\u0281",
-        "out": "\u0292"
+        "out": "\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0250\u032f",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0254",
+        "out": "\u0254",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "o\u02d0",
+        "out": "o\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "o\u02d0",
+        "out": "o\u02d0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u00f0\u0320\u02d5\u02e0",
+        "out": "\u00f0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u00f0",
+        "out": "\u00f0",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026a\u032f",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
     },
     {
         "in": "\u028a\u032f",
-        "out": "w"
+        "out": "w",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "a",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261",
+        "out": "\u0261",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0250\u032f",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "s",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u025b",
+        "out": "\u025b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u00e6",
+        "out": "\u00e6",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0251",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0251",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281",
+        "out": "\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0153",
+        "out": "\u0254",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "u",
+        "out": "u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "p",
+        "out": "p",
+        "context_before": "",
+        "context_after": ""
     }
 ]

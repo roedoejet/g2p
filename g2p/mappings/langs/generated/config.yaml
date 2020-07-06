@@ -8,6 +8,8 @@ mappings:
     out_lang: eng-ipa
   - as_is: false
     author: Generated 2019-09-26 13:48:19.852180
+    authors:
+      - Generated 2020-07-06 16:39:58.770641
     display_name: Danish IPA to English IPA
     in_lang: dan-ipa
     language_name: Danish
