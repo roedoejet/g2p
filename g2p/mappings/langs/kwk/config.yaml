@@ -25,3 +25,27 @@ mappings:
     authors:
       - Patrick Littell
     <<: *shared
+  - display_name: Kwak'wala (U'mista) Conversion
+    mapping: umista_trans.csv
+    in_lang: kwk-umista
+    out_lang: kwk-umista(con)
+    as_is: false
+    authors:
+      - Fineen Davis
+    <<: *shared
+  - display_name: Kwak'wala (NAPA) Conversion
+    mapping: napa_trans_ubc.csv
+    in_lang: kwk-napa(ubc)
+    out_lang: kwk-napa(ubc)(con)
+    as_is: false
+    authors:
+      - Fineen Davis
+    <<: *shared
+  - display_name: Kwak'wala (NAPA) Conversion
+    mapping: napa_trans_uvic.csv
+    in_lang: kwk-napa(uvic)
+    out_lang: kwk-napa(uvic)(con)
+    as_is: false
+    authors:
+      - Fineen Davis
+    <<: *shared
