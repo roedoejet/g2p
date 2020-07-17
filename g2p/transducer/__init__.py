@@ -353,8 +353,11 @@ class Transducer():
                         if edge[1] != None and edge[1] >= index_to_add:
                             tg.edges[i][1] += 1
                     # add edge to index of last input character
-                    last_input_node = max(
-                        [x[0] for x in tg.edges if x[1] == last_output_node])
+                    try:
+                        last_input_node = max(
+                            [x[0] for x in tg.edges if x[1] == last_output_node])
+                    except:
+                        breakpoint()
                     last_output_node = index_to_add
                     tg.edges.append([last_input_node, index_to_add])
                 # delete the node and decrement each following node
@@ -419,6 +422,8 @@ class Transducer():
                     self.update_explicit_indices(
                         tg, match, io, intermediate_diff, out_string)
                 else:
+                    if match.group() == '':
+                        breakpoint()
                     self.update_default_indices(
                         tg, match, intermediate_diff, out_string)
                 if io['in'] != io['out']:
