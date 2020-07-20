@@ -419,8 +419,6 @@ class Transducer():
                     self.update_explicit_indices(
                         tg, match, io, intermediate_diff, out_string)
                 else:
-                    if match.group() == '':
-                        breakpoint()
                     self.update_default_indices(
                         tg, match, intermediate_diff, out_string)
                 if io['in'] != io['out']:
