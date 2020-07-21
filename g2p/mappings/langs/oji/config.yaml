@@ -13,3 +13,15 @@ mappings:
     case_sensitive: false
     norm_form: NFC
     <<: *shared
+  - display_name: Anishinaabemowin Syllabics to Romanized
+    in_lang: oji-syl
+    out_lang: oji
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: oji_syllabics_to_orth.csv
+    prevent_feeding: true
+    as_is: true
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
