@@ -82,3 +82,16 @@ mappings:
     out_lang: eng-ipa
     prevent_feeding: true
     reverse: false
+  - as_is: false
+    authors:
+      - Generated 2020-07-28 14:28:24.895117
+    case_sensitive: false
+    display_name: gla-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: gla-ipa
+    language_name: gla-ipa
+    mapping: gla-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
