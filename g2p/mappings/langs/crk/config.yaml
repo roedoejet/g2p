@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: Plains Cree
+mappings:
+  - display_name: Plains Cree (SRO) to IPA
+    in_lang: crk
+    out_lang: crk-ipa
+    type: mapping
+    norm_form: NFD
+    as_is: true
+    prevent_feeding: true
+    authors:
+      - Eddie Antonio Santos
+    mapping: crk_to_ipa.json
+    <<: *shared
