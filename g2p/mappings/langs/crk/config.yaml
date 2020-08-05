@@ -6,7 +6,7 @@ mappings:
     out_lang: crk-ipa
     type: mapping
     norm_form: NFD
-    as_is: false
+    as_is: true
     prevent_feeding: true
     authors:
       - Eddie Antonio Santos
