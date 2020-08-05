@@ -5,6 +5,9 @@ mappings:
     in_lang: crk
     out_lang: crk-ipa
     type: mapping
+    norm_form: NFD
+    as_is: false
+    prevent_feeding: true
     authors:
       - Eddie Antonio Santos
     mapping: crk_to_ipa.json
