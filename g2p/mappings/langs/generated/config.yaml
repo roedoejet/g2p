@@ -97,7 +97,7 @@ mappings:
     reverse: false
   - as_is: true
     authors:
-      - Generated 2020-08-05 10:41:01.443810
+      - Generated 2020-08-06 15:47:17.002236
     case_sensitive: true
     display_name: crk-ipa IPA to eng-ipa IPA
     escape_special: false

@@ -1,11 +1,5 @@
 [
     {
-        "in": "t\u0361s",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
         "in": "e\u02d0",
         "out": "e\u02d0",
         "context_before": "",
@@ -13,19 +7,19 @@
     },
     {
         "in": "i\u02d0",
-        "out": "i",
+        "out": "e\u02d0",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "o\u02d0",
-        "out": "o\u02d0",
+        "in": "o\u028a",
+        "out": "o\u028a",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "a\u02d0",
-        "out": "\u0251",
+        "out": "e\u02d0",
         "context_before": "",
         "context_after": ""
     },
@@ -37,7 +31,7 @@
     },
     {
         "in": "o",
-        "out": "o\u02d0",
+        "out": "\u0254",
         "context_before": "",
         "context_after": ""
     },
@@ -74,6 +68,12 @@
     {
         "in": "n",
         "out": "n",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t\u0361s",
+        "out": "ts",
         "context_before": "",
         "context_after": ""
     },
