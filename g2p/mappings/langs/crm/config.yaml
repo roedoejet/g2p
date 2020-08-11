@@ -26,6 +26,6 @@ mappings:
     in_lang: crm-ipa
     out_lang: eng-ipa
     type: mapping
-    mapping: csw_ipa_to_eng_ipa.json
+    mapping: crm_ipa_to_eng_ipa.json
     as_is: false
     <<: *shared
