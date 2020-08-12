@@ -1,0 +1,200 @@
+[
+    {
+        "in": "pʰ",
+        "out": "p",
+        "prevent_feeding": true
+    },
+    {
+        "in": "p",
+        "out": "b"
+    },
+    {
+        "in": "m",
+        "out": "m"
+    },
+    {
+        "in": "f",
+        "out": "f"
+    },
+    {
+        "in": "n",
+        "out": "n"
+    },
+    {
+        "in": "w",
+        "out": "w"
+    },
+    {
+        "in": "t͡ɬʼ",
+        "out": "ts",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡ɬʰ",
+        "out": "ts",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡ɬ",
+        "out": "dz",
+        "prevent_feeding": true
+    },
+    {
+        "in": "ɬ",
+        "out": "s"
+    },
+    {
+        "in": "l",
+        "out": "l"
+    },
+    {
+        "in": "t͡sʼ",
+        "out": "ts",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡sʰ",
+        "out": "ts",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡s",
+        "out": "dz",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡ʃʼ",
+        "out": "tʃ",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡ʃʰ",
+        "out": "tʃ",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t͡ʃ",
+        "out": "dʒ",
+        "prevent_feeding": true
+    },
+    {
+        "in": "ʃ",
+        "out": "ʃ"
+    },
+    {
+        "in": "ʒ",
+        "out": "ʒ"
+    },
+    {
+        "in": "tʼ",
+        "out": "t",
+        "prevent_feeding": true
+    },
+    {
+        "in": "tʰ",
+        "out": "t",
+        "prevent_feeding": true
+    },
+    {
+        "in": "t",
+        "out": "d"
+    },
+    {
+        "in": "kʼ",
+        "out": "k",
+        "prevent_feeding": true
+    },
+    {
+        "in": "ɣ",
+        "out": "ɡ"
+    },
+    {
+        "in": "kʰ",
+        "out": "k",
+        "prevent_feeding": true
+    },
+    {
+        "in": "k",
+        "out": "ɡ"
+    },
+    {
+        "in": "j",
+        "out": "j"
+    },
+    {
+        "in": "h",
+        "out": "h"
+    },
+    {
+        "in": "ʔ",
+        "out": "ʔ"
+    },
+    {
+        "in": "ʌ",
+        "out": "ʌ"
+    },
+    {
+        "in": "ɛ",
+        "out": "ɛ"
+    },
+    {
+        "in": "ɪ",
+        "out": "ɪ"
+    },
+    {
+        "in": "ʊ",
+        "out": "ʊ"
+    },
+    {
+        "in": "ː",
+        "out": ""
+    },
+    {
+        "in": "ɑ",
+        "out": "ɑ"
+    },
+    {
+        "in": "æ",
+        "out": "eː"
+    },
+    {
+        "in": "i",
+        "out": "i"
+    },
+    {
+        "in": "o",
+        "out": "oː"
+    },
+    {
+        "in": "u",
+        "out": "u"
+    },
+    {
+        "in": "\u030c",
+        "out": ""
+    },
+    {
+        "in": "\u0301",
+        "out": ""
+    },
+    {
+        "in": "\u0302",
+        "out": ""
+    },
+    {
+        "in": "\u0303",
+        "out": "n"
+    },
+    {
+        "in": "\u030d",
+        "out": ""
+    },
+    {
+        "in": "\u0325",
+        "out": ""
+    },
+    {
+        "in": "\u0329",
+        "out": ""
+    }
+]
