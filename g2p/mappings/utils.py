@@ -13,7 +13,6 @@ from copy import deepcopy
 from pathlib import Path
 import datetime as dt
 import yaml
-
 import unicodedata as ud
 
 from openpyxl import load_workbook
