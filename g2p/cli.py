@@ -50,6 +50,7 @@ def generate_mapping(in_lang, dummy, ipa, out_dir):
             f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
         return
     if ipa:
+        check_ipa_known_segs([f'{in_lang}-ipa'])
         eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
         new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
         click.echo(f"Writing English IPA mapping for {in_lang} to file")
