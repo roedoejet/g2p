@@ -1,0 +1,15 @@
+<<: &shared
+  language_name: Michif
+mappings:
+  - display_name: Michif TMD to Michif IPA
+    mapping: crg-tmd-to-crg-ipa.csv
+    in_lang: crg-tmd
+    out_lang: crg-ipa
+    case_sensitive: false
+    abbreviations: abbreviations.csv
+    authors:
+      - Fineen Davis
+      - Olivia Sammons
+      - Heather Souter
+      - Christopher Cox
+    <<: *shared
