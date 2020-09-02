@@ -121,6 +121,22 @@ class MappingTest(TestCase):
         self.assertEqual(mapping.kwargs['norm_form'], 'NFD')
         self.assertTrue(mapping.kwargs['reverse'])
 
+    def test_rule_ordering_from_config(self):
+        """
+        Same as test_minimal, but uses "rule-ordering" instead of "as-is" in the config.
+        """
+        mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'rule-ordering.yaml'))
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer('abb').output_string, 'aab')
+        self.assertEqual(transducer('a').output_string, 'a')
+        # Note: this may not be exposed as "as_is" in future versions!
+        self.assertTrue(mapping.kwargs['as_is'])
+        self.assertEqual(mapping.kwargs['rule_ordering'], 'as-written')
+        self.assertFalse(mapping.kwargs['case_sensitive'])
+        self.assertTrue(mapping.kwargs['escape_special'])
+        self.assertEqual(mapping.kwargs['norm_form'], 'NFD')
+        self.assertTrue(mapping.kwargs['reverse'])
+
     def test_null_input(self):
         mapping = Mapping([{'in': '', 'out': 'a'}])
         self.assertFalse(mapping())
