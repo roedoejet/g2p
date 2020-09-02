@@ -3,7 +3,7 @@ display_name: Minimal to Minimal
 mapping: minimal.csv
 in_lang: min
 out_lang: min
-rule-ordering: as-written
+rule_ordering: apply-longest-first
 case_sensitive: false
 escape_special: true
 norm_form: 'NFD'
