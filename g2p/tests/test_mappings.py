@@ -60,6 +60,11 @@ class MappingTest(TestCase):
         transducer_default = Transducer(Mapping(rules))
         self.assertEqual(transducer_default('aa').output_string, 'bb')
 
+        # If given an invalid setting, it should crash:
+        with self.assertRaises(ValueError) as context:
+            Mapping(rules, rule_ordering="longest-first")
+        self.assertIn("apply-longest-first", str(context.exception))
+
     def test_case_sensitive(self):
         mapping = Mapping([{'in': 'A', "out": 'b'}], case_sensitive=False)
         mapping_case_sensitive = Mapping([{'in': 'A', "out": 'b'}])
