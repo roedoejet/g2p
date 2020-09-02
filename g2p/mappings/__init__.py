@@ -35,6 +35,13 @@ class Mapping():
             Evaluate g2p rules in mapping in the order they are.
             If False, rules will be reverse sorted by length.
 
+        @param rule_ordering: str = "as-written"
+            In which order to evaluate rules.
+            If "as-written", rules are applied from top-to-bottom in the order that they
+            are written in the source file.
+            if "apply-longest-first", rules are first sorted such that rules with the longest
+            input are applied first.
+
         @param case_sensitive: bool = True
             Lower all rules and conversion input
 
@@ -57,8 +64,9 @@ class Mapping():
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
         # should these just be explicit instead of kwargs...
+        # yes, they should
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
-                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive',
+                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'rule_ordering',
                                  'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
@@ -180,6 +188,18 @@ class Mapping():
         ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
         '''
         # Add defaults
+        if 'rule_ordering' in self.kwargs:
+            # right now, "rule-ordering" is a more explict alias of the "as-is" option.
+            ordering = self.kwargs["rule_ordering"]
+            if ordering == "as-written":
+                self.kwargs['as_is'] = True
+            elif ordering == "apply-longest-first":
+                self.kwargs['as_is'] = False
+            else:
+                raise ValueError(
+                    "rule_ordering must be one of "
+                    '"as-written" or "apply-longest-first"'
+                )
         if 'as_is' not in self.kwargs:
             self.kwargs['as_is'] = True
         if 'case_sensitive' not in self.kwargs:
@@ -356,7 +376,7 @@ class Mapping():
                     existing_data['mappings'][i]['authors'] = template['mappings'][0]['authors']
                     updated = True
                     break
-            if not updated:  
+            if not updated:
                 existing_data['mappings'].append(template['mappings'][0])
             template=existing_data
         with open(fn, 'w', encoding='utf8') as f:
