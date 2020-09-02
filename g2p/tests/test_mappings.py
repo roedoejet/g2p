@@ -15,7 +15,7 @@ class MappingTest(TestCase):
         self.test_mapping_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}])
         with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json'), encoding='utf8') as f:
             self.json_map = json.load(f)
-    
+
     def test_normalization(self):
         self.assertEqual(ud.normalize('NFD', '\u00e1'), self.test_mapping_norm.mapping[0]['in'])
         self.assertNotEqual(self.test_mapping_norm.mapping[0]['in'], '\u00e1')
@@ -37,6 +37,28 @@ class MappingTest(TestCase):
         transducer_as_is = Transducer(mapping_as_is)
         self.assertEqual(transducer('aa').output_string, 'c')
         self.assertEqual(transducer_as_is('aa').output_string, 'bb')
+
+    def test_rule_ordering(self):
+        """
+        Test the config option:
+
+        rule-ordering: 'as-written' (default)
+
+        or
+
+        rule-ordering: 'apply-shortest-first'
+        """
+        rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
+        mapping_default = Mapping(rules)
+
+        transducer_longest_first = Transducer(Mapping(rules, rule_ordering='apply-longest-first'))
+        self.assertEqual(transducer_longest_first('aa').output_string, 'c')
+
+        transducer_as_written = Transducer(Mapping(rules, rule_ordering='as-written'))
+        self.assertEqual(transducer_as_written('aa').output_string, 'bb')
+
+        transducer_default = Transducer(Mapping(rules))
+        self.assertEqual(transducer_default('aa').output_string, 'bb')
 
     def test_case_sensitive(self):
         mapping = Mapping([{'in': 'A', "out": 'b'}], case_sensitive=False)
