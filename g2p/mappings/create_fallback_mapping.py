@@ -8,8 +8,9 @@ from g2p.mappings import Mapping
 from g2p.mappings.create_ipa_mapping import align_inventories
 from g2p.mappings.utils import is_ipa, unicode_escape
 
+dummy_inventory = ["ɑ", "i", "u", "t", "s", "n"]
+
 def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False, out_dir: str = ''):
-    dummy_inventory = ["ɑ", "i", "u", "t", "s", "n"]
     display_name = mapping.kwargs.get('language_name', 'No Language display name in Config')
     config = {'in_lang': mapping.kwargs[f'{io}_lang'], 'out_lang': 'dummy'}
     default_char = 't'

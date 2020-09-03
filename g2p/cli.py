@@ -7,7 +7,7 @@ from collections import OrderedDict
 from networkx import draw, has_path
 
 from g2p.transducer import CompositeTransducer, Transducer
-from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
+from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, dummy_inventory
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.create_ipa_mapping import create_mapping
@@ -35,20 +35,31 @@ def cli():
     '''Management script for G2P'''
 
 
-@click.option('--out-dir', type=click.Path(exists=True, file_okay=False, dir_okay=True))
-@click.option('--ipa/--no-ipa', default=False)
-@click.option('--dummy/--no-dummy', default=False)
+@click.option('--out-dir', type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Output results in DIRECTORY instead of the global "generated" directory.')
+@click.option('--list-dummy', default=False, is_flag=True, help="List the dummy phone inventory.")
+@click.option('--dummy/--no-dummy', default=False, help="Generate dummy fallback mapping to minimalist phone inventory.")
+@click.option('--ipa/--no-ipa', default=False, help="Generate mapping from LANG-ipa to eng-ipa.")
 @click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
-@cli.command(context_settings=CONTEXT_SETTINGS)
-def generate_mapping(in_lang, dummy, ipa, out_dir):
-    ''' Generate English mapping.
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Generate English mapping.")
+def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
+    ''' For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
+        or from IN_LANG-ipa to a dummy minimalist phone inventory.
+
+        If you just modified or wrote the IN_LANG to IN_LANG-ipa mapping, don't forget
+        to call "g2p update" first so "g2p generate-mapping" sees the latest version.
+
+        Call "g2p update" again after calling "g2p generate-mapping" to make the new
+        IN_LANG-ipa to eng-ipa mapping available.
     '''
-    if not ipa and not dummy:
+    if not ipa and not dummy and not list_dummy:
         click.echo('You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information.')
     if out_dir and (os.path.exists(os.path.join(out_dir, 'config.yaml')) or os.path.exists(os.path.join(out_dir, 'config.yaml'))):
         click.echo(
             f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
         return
+    if list_dummy:
+        print("Dummy phone inventory: {}".format(dummy_inventory))
     if ipa:
         check_ipa_known_segs([f'{in_lang}-ipa'])
         eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
