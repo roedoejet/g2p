@@ -125,7 +125,12 @@ def convert(in_lang, out_lang, input_text, path, debugger):
         output = tg.output_string
         click.echo(output)
 
-@click.option('--mapping', '-m', multiple=True, help="Check a specific mapping, given its output. Please visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of possibilities.")
+# Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
+# If more checks are added that apply to non-IPA mappings, remove the if is_ipa() filter.
+_ALL_IPA_MAPPINGS=[x['out_lang'] for x in MAPPINGS_AVAILABLE if is_ipa(x['out_lang'])]
+@click.option('--mapping', '-m', multiple=True,
+    type=click.Choice(_ALL_IPA_MAPPINGS, case_sensitive=True),
+    help="Check specified IPA mapping(s) (default: check all IPA mappings).")
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def doctor(mapping):
     ''' Check for common errors in mappings.
@@ -133,11 +138,8 @@ def doctor(mapping):
 
         1. Characters that are in IPA mappings but are not recognized by panphon library.
     '''
-    for m in mapping:
-        if m not in [x['out_lang'] for x in MAPPINGS_AVAILABLE]:
-            raise click.UsageError(f"'{m}' is not a valid value for 'OUT_LANG'")
     if not mapping:
-        LOGGER.info("Checking all IPA mappings")
+        LOGGER.info("Checking all IPA mappings.")
     else:
         LOGGER.info('Checking the following mappings: \n' + '\n'.join(mapping))
     check_ipa_known_segs(list(mapping))

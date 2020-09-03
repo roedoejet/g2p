@@ -12,7 +12,7 @@ from g2p.mappings.langs import MAPPINGS_AVAILABLE
 def check_ipa_known_segs(mappings_to_check=False):
     dst = distance.Distance()
     if not mappings_to_check:
-        mappings_to_check = MAPPINGS_AVAILABLE
+        mappings_to_check = [x['out_lang'] for x in MAPPINGS_AVAILABLE]
     for mapping in [x for x in MAPPINGS_AVAILABLE if x['out_lang'] in mappings_to_check]:
         if mapping['out_lang'].endswith('-ipa'):
             for rule in mapping['mapping_data']:
