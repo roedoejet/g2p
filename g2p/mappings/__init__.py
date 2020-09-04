@@ -194,6 +194,9 @@ class Mapping():
                 appropriate_setting = "as-written"
             else:
                 appropriate_setting = "apply-longest-first"
+
+            self.kwargs["rule_ordering"] = appropriate_setting
+
             LOGGER.warning(
                 f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
                 'has is using the deprecated parameter "as_is"; '
@@ -205,19 +208,15 @@ class Mapping():
         if 'rule_ordering' in self.kwargs:
             # right now, "rule-ordering" is a more explict alias of the "as-is" option.
             ordering = self.kwargs["rule_ordering"]
-            if ordering == "as-written":
-                self.kwargs['as_is'] = True
-            elif ordering == "apply-longest-first":
-                self.kwargs['as_is'] = False
-            else:
+            if ordering not in ("as-written", "apply-longest-first"):
                 LOGGER.error(
                     f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
                     f"has invalid value '{ordering}' for rule_ordering parameter; "
                     "rule_ordering must be one of "
                     '"as-written" or "apply-longest-first"'
                 )
-        if 'as_is' not in self.kwargs:
-            self.kwargs['as_is'] = True
+        else:
+            self.kwargs["rule_ordering"] = "as-written"
         if 'case_sensitive' not in self.kwargs:
             self.kwargs['case_sensitive'] = True
         if 'escape_special' not in self.kwargs:
@@ -235,8 +234,7 @@ class Mapping():
 
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
-            # Kind of a hacky way to get the current value or as_is.
-            if kwarg in ('as_is', 'rule_ordering') and self.wants_rules_sorted():
+            if kwarg == 'rule_ordering' and self.wants_rules_sorted():
                 # sort by reverse len
                 mapping = sorted(mapping, key=lambda x: len(
                     x["in"]), reverse=True)
@@ -266,11 +264,7 @@ class Mapping():
         Returns:
             bool: True if the rules should be sorted.
         """
-        if 'rule_ordering' in self.kwargs:
-            return self.kwargs['rule_ordering'] == 'apply-longest-first'
-
-        # Otherwise, determine it from the deprecated 'as_is' setting.
-        return self.kwargs.get('as_is', True) == False
+        return self.kwargs['rule_ordering'] == 'apply-longest-first'
 
     def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -386,7 +380,7 @@ class Mapping():
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
-                "as_is": self.kwargs.get('as_is', True),
+                "as_is": not self.wants_rules_sorted(),
                 # TODO: rule_ordering
                 "prevent_feeding": self.kwargs.get('prevent_feeding', False),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),

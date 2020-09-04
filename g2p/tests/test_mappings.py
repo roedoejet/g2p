@@ -153,7 +153,7 @@ class MappingTest(TestCase):
         transducer = Transducer(mapping)
         self.assertEqual(transducer('abb').output_string, 'aab')
         self.assertEqual(transducer('a').output_string, 'a')
-        self.assertTrue(mapping.kwargs['as_is'])
+        self.assertFalse(mapping.wants_rules_sorted())
         self.assertFalse(mapping.kwargs['case_sensitive'])
         self.assertTrue(mapping.kwargs['escape_special'])
         self.assertEqual(mapping.kwargs['norm_form'], 'NFD')
@@ -167,8 +167,7 @@ class MappingTest(TestCase):
         transducer = Transducer(mapping)
         self.assertEqual(transducer('abb').output_string, 'aab')
         self.assertEqual(transducer('a').output_string, 'a')
-        # Note: this may not be exposed as "as_is" in future versions!
-        self.assertFalse(mapping.kwargs['as_is'])
+        self.assertTrue(mapping.wants_rules_sorted())
         self.assertEqual(mapping.kwargs['rule_ordering'], 'apply-longest-first')
         self.assertFalse(mapping.kwargs['case_sensitive'])
         self.assertTrue(mapping.kwargs['escape_special'])
