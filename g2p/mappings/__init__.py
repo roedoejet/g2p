@@ -196,7 +196,9 @@ class Mapping():
             elif ordering == "apply-longest-first":
                 self.kwargs['as_is'] = False
             else:
-                raise ValueError(
+                LOGGER.error(
+                    f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
+                    f"has invalid value '{ordering}' for rule_ordering parameter; "
                     "rule_ordering must be one of "
                     '"as-written" or "apply-longest-first"'
                 )
