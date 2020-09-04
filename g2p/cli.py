@@ -84,14 +84,25 @@ def generate_mapping_network(path):
     plt.show()
 
 
-@click.option('--debugger/--no-debugger', default=False)
-@click.option('--path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.option('--debugger/--no-debugger', '-d',
+    default=False, help="Show all the conversion steps applied."
+)
+@click.option('--path',
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    help="Read text to convert from FILE.",
+)
 @click.argument('out_lang')
 @click.argument('in_lang')
 @click.argument('input_text', type=click.STRING)
-@cli.command(context_settings=CONTEXT_SETTINGS)
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Convert text through a g2p mapping path.")
 def convert(in_lang, out_lang, input_text, path, debugger):
-    '''Convert from in-lang to out-lang. Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of options.
+    '''Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
+
+       Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of languages.
+
+       There must be a path from IN_LANG to OUT_LANG, possibly via some intermediates.
+       For example, mapping from fra to eng-arpabet will successively apply
+       fra->fra-ipa, fra-ipa->eng-ipa and eng-ipa->eng-arpabet.
     '''
     # Check valid input
     # Check input != output
