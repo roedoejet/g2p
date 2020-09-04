@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 from unittest import main, TestCase
 from g2p.mappings import Mapping

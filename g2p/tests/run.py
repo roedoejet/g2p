@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """ Organize tests into Test Suites
 """
 
