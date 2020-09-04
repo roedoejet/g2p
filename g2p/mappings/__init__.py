@@ -35,12 +35,16 @@ class Mapping():
             Evaluate g2p rules in mapping in the order they are.
             If False, rules will be reverse sorted by length.
 
+            .. deprecated:: 0.6
+                use ``rule_ordering`` instead
+
         @param rule_ordering: str = "as-written"
-            In which order to evaluate rules.
-            If "as-written", rules are applied from top-to-bottom in the order that they
+            Affects in what order the rules are applied.
+            If set to "as-written", rules are applied from top-to-bottom, in the order that they
             are written in the source file.
-            if "apply-longest-first", rules are first sorted such that rules with the longest
-            input are applied first.
+            If set to "apply-longest-first", rules are first sorted such that rules with the longest
+            input are applied first. Sorting the rules like this prevents shorter rules
+            from taking part in unwanted feeding relations.
 
         @param case_sensitive: bool = True
             Lower all rules and conversion input
