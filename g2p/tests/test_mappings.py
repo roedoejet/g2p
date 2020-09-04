@@ -33,8 +33,31 @@ class MappingTest(TestCase):
         self.assertTrue(json_map.kwargs['in_metadata']['case_insensitive'])
 
     def test_as_is(self):
-        mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        """
+        Test deprecated config: as_is.
+        """
+
+        # explicitly set as_is=False
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        self.assertTrue(mapping.wants_rules_sorted())
+        self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
+        self.assertIn("apply-longest-first", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+
+        # explicitly set as_is=True
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=True)
+        self.assertFalse(mapping.wants_rules_sorted())
+        self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
+        self.assertIn("as-written", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+
+        # test the default (rule_ordering="as-written")
         mapping_as_is = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}])
+        self.assertFalse(mapping.wants_rules_sorted())
+
+        # test the alternative (rule_ordering="apply-longest-first")
         transducer = Transducer(mapping)
         transducer_as_is = Transducer(mapping_as_is)
         self.assertEqual(transducer('aa').output_string, 'c')
