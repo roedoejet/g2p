@@ -1,6 +1,8 @@
 from unittest import main, TestCase
+import io
 import os
 import json
+from contextlib import redirect_stderr
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 from g2p.tests.public import __file__ as public_data
@@ -60,10 +62,23 @@ class MappingTest(TestCase):
         transducer_default = Transducer(Mapping(rules))
         self.assertEqual(transducer_default('aa').output_string, 'bb')
 
-        # If given an invalid setting, it should crash:
-        with self.assertRaises(ValueError) as context:
-            Mapping(rules, rule_ordering="longest-first")
-        self.assertIn("apply-longest-first", str(context.exception))
+    def test_rule_ordering_given_invalid_value(self):
+        """
+        It should log an error messages if given an invalid value for
+        rule_ordering=...
+        """
+        rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
+
+        # typo in the valid setting:
+        incorrect_value = "apply-longest-frist"
+        correct_value = "apply-longest-first"
+
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            Mapping(rules, rule_ordering=incorrect_value)
+
+        self.assertIn(incorrect_value, log_output.getvalue())
+        self.assertIn(correct_value, log_output.getvalue())
 
     def test_case_sensitive(self):
         mapping = Mapping([{'in': 'A', "out": 'b'}], case_sensitive=False)
