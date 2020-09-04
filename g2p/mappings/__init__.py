@@ -58,13 +58,13 @@ class Mapping():
         @param rule_ordering: str = "as-written"
             Affects in what order the rules are applied.
 
-            If set to ``"as-written"``, rules are applied from top-to-bottom, in the order that they
+            If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
             are written in the source file
             (previously this was accomplished with ``as_is=True``).
 
             If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
             input are applied first. Sorting the rules like this prevents shorter rules
-            from taking part in unwanted feeding relations
+            from taking part in feeding relations
             (previously this was accomplished with ``as_is=False``).
 
         @param prevent_feeding: bool = False
@@ -209,9 +209,8 @@ class Mapping():
 
             LOGGER.warning(
                 f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
-                'has is using the deprecated parameter "as_is"; '
-                f"delete as_is: {as_is}, and replace it with "
-                f"rule_ordering: {appropriate_setting}"
+                'is using the deprecated parameter "as_is"; '
+                f"replace `as_is: {as_is}` with `rule_ordering: {appropriate_setting}`"
             )
 
         # Add defaults
