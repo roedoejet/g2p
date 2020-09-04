@@ -218,9 +218,11 @@ class Mapping():
             self.kwargs['in_lang'] = 'und'
         if 'out_lang' not in self.kwargs:
             self.kwargs['out_lang'] = 'und'
+
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
-            if kwarg == 'as_is' and not val:
+            # Kind of a hacky way to get the current value or as_is.
+            if kwarg in ('as_is', 'rule_ordering') and self.wants_rules_sorted():
                 # sort by reverse len
                 mapping = sorted(mapping, key=lambda x: len(
                     x["in"]), reverse=True)
@@ -243,6 +245,18 @@ class Mapping():
                 mapping.remove(io)
         self.processed = True
         return mapping
+
+    def wants_rules_sorted(self) -> bool:
+        """Returns whether the rules will be sorted prior to finalizing the mapping.
+
+        Returns:
+            bool: True if the rules should be sorted.
+        """
+        if 'rule_ordering' in self.kwargs:
+            return self.kwargs['rule_ordering'] == 'apply-longest-first'
+
+        # Otherwise, determine it from the deprecated 'as_is' setting.
+        return self.kwargs.get('as_is', True) == False
 
     def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -359,6 +373,7 @@ class Mapping():
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
                 "as_is": self.kwargs.get('as_is', True),
+                # TODO: rule_ordering
                 "prevent_feeding": self.kwargs.get('prevent_feeding', False),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
