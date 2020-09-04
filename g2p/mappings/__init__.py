@@ -187,6 +187,20 @@ class Mapping():
     def process_kwargs(self, mapping):
         ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
         '''
+
+        if 'as_is' in self.kwargs:
+            as_is = self.kwargs['as_is']
+            if as_is:
+                appropriate_setting = "as-written"
+            else:
+                appropriate_setting = "apply-longest-first"
+            LOGGER.warning(
+                f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
+                'has is using the deprecated parameter "as_is"; '
+                f"delete as_is: {as_is}, and replace it with "
+                f"rule_ordering: {appropriate_setting}"
+            )
+
         # Add defaults
         if 'rule_ordering' in self.kwargs:
             # right now, "rule-ordering" is a more explict alias of the "as-is" option.

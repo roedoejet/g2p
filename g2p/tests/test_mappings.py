@@ -40,8 +40,8 @@ class MappingTest(TestCase):
         # explicitly set as_is=False
         log_output = io.StringIO()
         with redirect_stderr(log_output):
-            mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
-        self.assertTrue(mapping.wants_rules_sorted())
+            mapping_sorted = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        self.assertTrue(mapping_sorted.wants_rules_sorted())
         self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
         self.assertIn("apply-longest-first", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
 
@@ -58,7 +58,7 @@ class MappingTest(TestCase):
         self.assertFalse(mapping.wants_rules_sorted())
 
         # test the alternative (rule_ordering="apply-longest-first")
-        transducer = Transducer(mapping)
+        transducer = Transducer(mapping_sorted)
         transducer_as_is = Transducer(mapping_as_is)
         self.assertEqual(transducer('aa').output_string, 'c')
         self.assertEqual(transducer_as_is('aa').output_string, 'bb')
