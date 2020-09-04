@@ -19,7 +19,7 @@ def check_ipa_known_segs(mappings_to_check=False):
             for rule in mapping['mapping_data']:
                 joined_ipa_segs = ''.join(dst.fm.ipa_segs(rule['out']))
                 if not joined_ipa_segs == rule['out']:
-                    LOGGER.warn(f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} and {mapping['out_lang']} is not recognized as valid IPA by panphon. You may ignore this warning if you know it gets remapped to IPA later.")
+                    LOGGER.warning(f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} and {mapping['out_lang']} is not recognized as valid IPA by panphon. You may ignore this warning if you know it gets remapped to IPA later.")
                     found_error = True
     if found_error:
-        LOGGER.warn("Please refer to https://github.com/dmort27/panphon for information about panphon.")
+        LOGGER.warning("Please refer to https://github.com/dmort27/panphon for information about panphon.")

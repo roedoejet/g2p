@@ -18,6 +18,7 @@ from g2p.tests.test_utils import UtilsTest
 from g2p.tests.test_fallback import FallbackTest
 from g2p.tests.test_api_resources import ResourceIntegrationTest
 from g2p.tests.test_studio import StudioTest
+from g2p.tests.test_doctor import DoctorTest
 
 
 LOADER = TestLoader()
@@ -49,7 +50,7 @@ LANGS_TESTS = [
 
 INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test) for test in [
-        CliTest, ResourceIntegrationTest, StudioTest
+        CliTest, ResourceIntegrationTest, StudioTest, DoctorTest
     ]
 ]
 

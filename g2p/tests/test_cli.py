@@ -5,7 +5,7 @@ from glob import glob
 
 from g2p.app import APP
 from g2p.log import LOGGER
-from g2p.cli import convert, update
+from g2p.cli import convert, update, doctor
 from g2p.tests.public.data import __file__ as data_dir
 
 class CliTest(TestCase):
@@ -45,6 +45,16 @@ class CliTest(TestCase):
         if error_count > 0:
             output_string = self.runner.invoke(convert, [first_failed_test[2], first_failed_test[0], first_failed_test[1]]).stdout.strip()
             self.assertEqual(output_string, first_failed_test[3])
+
+    def test_doctor(self):
+        result = self.runner.invoke(doctor, "-m fra")
+        self.assertEqual(result.exit_code, 2)
+        result = self.runner.invoke(doctor, "-m fra-ipa")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("vagon", result.stdout)
+        result = self.runner.invoke(doctor)
+        self.assertEqual(result.exit_code, 0)
+        self.assertGreaterEqual(len(result.stdout), 10000)
 
 if __name__ == '__main__':
     main()
