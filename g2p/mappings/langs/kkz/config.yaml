@@ -5,7 +5,7 @@ mappings:
     mapping: kkz_to_ipa.json
     in_lang: kkz
     out_lang: kkz-ipa
-    as_is: false
+    rule_ordering: apply-longest-first
     norm_form: NFD
     case_sensitive: false
     authors:
@@ -16,7 +16,7 @@ mappings:
     in_lang: kkz-ipa
     out_lang: eng-ipa
     norm_form: NFD
-    as_is: false
+    rule_ordering: apply-longest-first
     case_sensitive: false
     authors:
       - Christopher Cox

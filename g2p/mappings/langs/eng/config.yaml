@@ -9,6 +9,6 @@ mappings:
     authors:
       - Patrick Littell
     mapping: eng_ipa_to_arpabet.json
-    as_is: false
+    rule_ordering: apply-longest-first
     <<: *shared
     # TODO: Need lexicon mapping

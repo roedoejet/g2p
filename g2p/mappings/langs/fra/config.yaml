@@ -9,7 +9,7 @@ mappings:
     type: mapping
     mapping: fra_to_ipa.csv
     abbreviations: fra_abbs.csv
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     norm_form: 'NFD'
     <<: *shared
