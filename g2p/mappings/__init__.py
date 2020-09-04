@@ -32,19 +32,13 @@ class Mapping():
     """ Class for lookup tables
 
         @param as_is: bool = True
-            Evaluate g2p rules in mapping in the order they are.
+            Affects whether or not rules are sorted or left as is.
+            Please use ``rule_ordering`` instead.
+            If True, Evaluate g2p rules in mapping in the order they are written.
             If False, rules will be reverse sorted by length.
 
             .. deprecated:: 0.6
                 use ``rule_ordering`` instead
-
-        @param rule_ordering: str = "as-written"
-            Affects in what order the rules are applied.
-            If set to "as-written", rules are applied from top-to-bottom, in the order that they
-            are written in the source file.
-            If set to "apply-longest-first", rules are first sorted such that rules with the longest
-            input are applied first. Sorting the rules like this prevents shorter rules
-            from taking part in unwanted feeding relations.
 
         @param case_sensitive: bool = True
             Lower all rules and conversion input
@@ -60,6 +54,18 @@ class Mapping():
 
         @param reverse: bool = False
             Reverse all mappings
+
+        @param rule_ordering: str = "as-written"
+            Affects in what order the rules are applied.
+
+            If set to ``"as-written"``, rules are applied from top-to-bottom, in the order that they
+            are written in the source file
+            (previously this was accomplished with ``as_is=True``).
+
+            If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
+            input are applied first. Sorting the rules like this prevents shorter rules
+            from taking part in unwanted feeding relations
+            (previously this was accomplished with ``as_is=False``).
 
         @param prevent_feeding: bool = False
             Converts each rule into an intermediary form
