@@ -51,12 +51,30 @@ class CliTest(TestCase):
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")
         self.assertEqual(result.exit_code, 2)
+
         result = self.runner.invoke(doctor, "-m fra-ipa")
         self.assertEqual(result.exit_code, 0)
         self.assertIn("vagon", result.stdout)
+
         result = self.runner.invoke(doctor)
         self.assertEqual(result.exit_code, 0)
         self.assertGreaterEqual(len(result.stdout), 10000)
+
+        result = self.runner.invoke(doctor, "-m eng-arpabet")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("No checks implemented", result.stdout)
+
+    def test_doctor_lists(self):
+        result = self.runner.invoke(doctor, "--list-all")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("eng-arpabet:", result.stdout)
+        self.assertIn("eng-ipa:", result.stdout)
+
+        result = self.runner.invoke(doctor, "--list-ipa")
+        self.assertEqual(result.exit_code, 0)
+        self.assertNotIn("eng-arpabet:", result.stdout)
+        self.assertIn("eng-ipa:", result.stdout)
+
 
 if __name__ == '__main__':
     main()

@@ -136,24 +136,54 @@ def convert(in_lang, out_lang, input_text, path, debugger):
         output = tg.output_string
         click.echo(output)
 
+
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
-# If more checks are added that apply to non-IPA mappings, remove the if is_ipa() filter.
-_ALL_IPA_MAPPINGS=[x['out_lang'] for x in MAPPINGS_AVAILABLE if is_ipa(x['out_lang'])]
-@click.option('--mapping', '-m', multiple=True,
-    type=click.Choice(_ALL_IPA_MAPPINGS, case_sensitive=True),
-    help="Check specified IPA mapping(s) (default: check all IPA mappings).")
+@click.option("--list-all", is_flag=True, help="List all mappings that can be specified")
+@click.option("--list-ipa", is_flag=True, help="List IPA mappings that can be specified")
+@click.option(
+    "--mapping", "-m", multiple=True,
+    help="Check specified IPA mapping(s) (default: check all IPA mappings)."
+)
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def doctor(mapping):
-    ''' Check for common errors in mappings.
-        Currently checks for:
+def doctor(mapping, list_all, list_ipa):
+    """ Check for common errors in mappings.
+        There should eventually be more checks here, but doctor currently checks for:
 
         1. Characters that are in IPA mappings but are not recognized by panphon library.
-    '''
+
+        You can list available mappings with --list-all or --list-ipa, or by visiting
+        http://g2p-studio.herokuapp.com/api/v1/langs .
+    """
+    if list_all or list_ipa:
+        out_langs = sorted(set([x["out_lang"] for x in MAPPINGS_AVAILABLE]))
+        if list_ipa:
+            out_langs = [x for x in out_langs if is_ipa(x)]
+        print("Specifying an output language will check all mappings into that language:")
+        for m in out_langs:
+            print(f"{m}:", end="")
+            for n in sorted([x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]):
+                print(f" {n}->{m}", end="")
+            print("")
+        return
+
+    for m in mapping:
+        if m not in [x["out_lang"] for x in MAPPINGS_AVAILABLE]:
+            raise click.UsageError(
+                f"No known mappings into '{m}'. "
+                "Use --list-all or --list-ipa to list valid options."
+            )
+        if not is_ipa(m):
+            LOGGER.warning(
+                f"No checks implemented yet for non-IPA mappings: '{m}' will not be checked."
+            )
+
     if not mapping:
         LOGGER.info("Checking all IPA mappings.")
     else:
-        LOGGER.info('Checking the following mappings: \n' + '\n'.join(mapping))
+        LOGGER.info("Checking the following mappings: \n" + "\n".join(mapping))
+
     check_ipa_known_segs(list(mapping))
+
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update():
