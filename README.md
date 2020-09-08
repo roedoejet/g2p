@@ -202,7 +202,7 @@ mappings:
       - Aidan Pine
     mapping: dan_to_ipa.csv
     abbreviations: dan_abbs.csv
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     norm_form: 'none'
     <<: *shared

@@ -18,10 +18,10 @@ class TransducerTest(TestCase):
             [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}])
         cls.test_mapping_ordered_counter_feed = Mapping(
             [{"in": "b", "out": "c"}, {"in": "a", "out": "b"}])
-        cls.test_as_is_mapping = Mapping(
+        cls.test_longest_first = Mapping(
             [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}])
-        cls.test_not_as_is_mapping = Mapping(
-            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}], as_is=False)
+        cls.test_rules_as_written_mapping = Mapping(
+            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}], rule_ordering="apply-longest-first")
         cls.test_case_sensitive_mapping = Mapping(
             [{"in": "'n", "out": "n̓"}], case_sensitive=True)
         cls.test_case_insensitive_mapping = Mapping(
@@ -30,8 +30,8 @@ class TransducerTest(TestCase):
             cls.test_case_sensitive_mapping)
         cls.test_case_insensitive_transducer = Transducer(
             cls.test_case_insensitive_mapping)
-        cls.test_trans_as_is = Transducer(cls.test_as_is_mapping)
-        cls.test_trans_not_as_is = Transducer(cls.test_not_as_is_mapping)
+        cls.test_trans_as_written = Transducer(cls.test_longest_first)
+        cls.test_trans_longest_first = Transducer(cls.test_rules_as_written_mapping)
         cls.test_trans = Transducer(cls.test_mapping)
         cls.test_trans_ordered_feed = Transducer(
             cls.test_mapping_ordered_feed)
@@ -80,9 +80,9 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_composite('aba').output_string, 'aaa')
         self.assertEqual(self.test_trans_composite_2('aba').output_string, 'bbb')
 
-    def test_as_is(self):
-        self.assertEqual(self.test_trans_as_is("'y").output_string, "jˀ")
-        self.assertEqual(self.test_trans_not_as_is("'y").output_string, "ʣˀ")
+    def test_rule_ordering(self):
+        self.assertEqual(self.test_trans_as_written("'y").output_string, "jˀ")
+        self.assertEqual(self.test_trans_longest_first("'y").output_string, "ʣˀ")
 
     def test_case_sensitive(self):
         self.assertEqual(self.test_case_sensitive_transducer("'N").output_string, "'N")

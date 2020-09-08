@@ -13,7 +13,7 @@ mappings:
     mapping: win_ipa_to_eng_ipa.json
     in_lang: win-ipa
     out_lang: eng-ipa
-    as_is: false
+    rule_ordering: apply-longest-first
     authors:
       - David Huggins Daines
     <<: *shared
