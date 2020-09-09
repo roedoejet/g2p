@@ -158,11 +158,11 @@ def doctor(mapping, list_all, list_ipa):
         out_langs = sorted(set([x["out_lang"] for x in MAPPINGS_AVAILABLE]))
         if list_ipa:
             out_langs = [x for x in out_langs if is_ipa(x)]
-        print("Specifying an output language will check all mappings into that language:")
+        LOGGER.info("Specifying an output language will check all mappings into that language:\n")
         for m in out_langs:
             print(f"{m}:", end="")
             for n in sorted([x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]):
-                print(f" {n}->{m}", end="")
+                print(f" {n}->{m}\n\t", end="")
             print("")
         return
 
