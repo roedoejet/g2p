@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from unittest import main, TestCase
 import io
 import os
