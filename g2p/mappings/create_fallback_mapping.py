@@ -15,11 +15,11 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
     config = {'in_lang': mapping.kwargs[f'{io}_lang'], 'out_lang': 'dummy'}
     default_char = 't'
     if is_ipa(mapping.kwargs[f'{io}_lang']):
-        mapping = align_inventories(mapping.inventory(io), dummy_inventory)
+        mapping = align_inventories(mapping.inventory(io), DUMMY_INVENTORY)
     else:
         und_g2p = make_g2p('und', 'und-ipa')
         mapping = [{"in": unicode_escape(x), "out": und_g2p(unidecode(x).lower()).output_string} for x in mapping.inventory(io)]
-        dummy_list = align_inventories([x['out'] for x in mapping], dummy_inventory)
+        dummy_list = align_inventories([x['out'] for x in mapping], DUMMY_INVENTORY)
         dummy_dict = {}
         for x in dummy_list:
             if x['in']:
