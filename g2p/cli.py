@@ -7,7 +7,7 @@ from collections import OrderedDict
 from networkx import draw, has_path
 
 from g2p.transducer import CompositeTransducer, Transducer
-from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, dummy_inventory
+from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, DUMMY_INVENTORY
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.create_ipa_mapping import create_mapping
@@ -59,7 +59,7 @@ def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
             f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
         return
     if list_dummy:
-        print("Dummy phone inventory: {}".format(dummy_inventory))
+        print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
     if ipa:
         check_ipa_known_segs([f'{in_lang}-ipa'])
         eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
