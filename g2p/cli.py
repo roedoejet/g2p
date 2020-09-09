@@ -41,7 +41,7 @@ def cli():
 @click.option('--dummy/--no-dummy', default=False, help="Generate dummy fallback mapping to minimalist phone inventory.")
 @click.option('--ipa/--no-ipa', default=False, help="Generate mapping from LANG-ipa to eng-ipa.")
 @click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
-@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Generate English mapping.")
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Generate English IPA or dummy mapping.")
 def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
     ''' For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
         or from IN_LANG-ipa to a dummy minimalist phone inventory.
