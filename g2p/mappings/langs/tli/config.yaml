@@ -9,7 +9,7 @@ mappings:
     type: mapping
     mapping: tli_norm.csv
     prevent_feeding: false
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     norm_form: NFC
     <<: *shared
