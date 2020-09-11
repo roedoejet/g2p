@@ -21,7 +21,7 @@ mappings:
     type: mapping
     mapping: tli_to_ipa.csv
     prevent_feeding: true
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     norm_form: NFC
     <<: *shared
