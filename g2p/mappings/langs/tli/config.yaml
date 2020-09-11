@@ -1,8 +1,20 @@
 <<: &shared
   language_name: Tlingit
 mappings:
-  - display_name: Tlingit to IPA
+  - display_name: Tlingit normalization
     in_lang: tli
+    out_lang: tli-norm
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: tli_norm.csv
+    prevent_feeding: false
+    as_is: true
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
+  - display_name: Tlingit to IPA
+    in_lang: tli-norm
     out_lang: tli-ipa
     authors:
       - Shankhalika Srikanth
@@ -13,3 +25,4 @@ mappings:
     case_sensitive: false
     norm_form: NFC
     <<: *shared
+    
