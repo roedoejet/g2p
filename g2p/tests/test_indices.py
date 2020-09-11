@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
+
 """
     Unittests for index preservation
-
 """
 
 from unittest import main, TestCase
@@ -154,9 +155,9 @@ class IndicesTest(TestCase):
             [{"in": "e{1}s{2}", "out": "s{2}e{1}"}]
         )
         self.test_mapping_seven = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], as_is=False
+            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}], rule_ordering="apply-longest-first"
         )
-        self.test_mapping_seven_as_is = Mapping(
+        self.test_mapping_seven_as_written = Mapping(
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}])
         self.test_mapping_eight = Mapping([{"in": "te", "out": "che"},
                                            {"in": "t", "out": "s"}])
@@ -182,7 +183,7 @@ class IndicesTest(TestCase):
         self.trans_five = Transducer(self.test_mapping_five)
         self.trans_six = Transducer(self.test_mapping_six)
         self.trans_seven = Transducer(self.test_mapping_seven)
-        self.trans_seven_as_is = Transducer(self.test_mapping_seven_as_is)
+        self.test_seven_as_written = Transducer(self.test_mapping_seven_as_written)
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_nine = Transducer(self.test_mapping_nine)
         self.trans_ten = Transducer(self.test_mapping_ten)
@@ -279,9 +280,9 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.output_string, 'sesese')
 
     def test_case_seven(self):
-        transducer_as_is = self.trans_seven_as_is('test')
-        self.assertEqual(transducer_as_is.output_string, 'test')
-        self.assertEqual(transducer_as_is.edges, [
+        transducer_as_written = self.test_seven_as_written('test')
+        self.assertEqual(transducer_as_written.output_string, 'test')
+        self.assertEqual(transducer_as_written.edges, [
                          (0, 0), (1, 1), (2, 2), (3, 3)])
         transducer = self.trans_seven('test')
         self.assertEqual(transducer.output_string, 'tesht')

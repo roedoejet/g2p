@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from unittest import main, TestCase
 import os
 import csv
@@ -5,7 +7,7 @@ from glob import glob
 
 from g2p.app import APP
 from g2p.log import LOGGER
-from g2p.cli import convert, update
+from g2p.cli import convert, update, doctor
 from g2p.tests.public.data import __file__ as data_dir
 
 class CliTest(TestCase):
@@ -45,6 +47,34 @@ class CliTest(TestCase):
         if error_count > 0:
             output_string = self.runner.invoke(convert, [first_failed_test[2], first_failed_test[0], first_failed_test[1]]).stdout.strip()
             self.assertEqual(output_string, first_failed_test[3])
+
+    def test_doctor(self):
+        result = self.runner.invoke(doctor, "-m fra")
+        self.assertEqual(result.exit_code, 2)
+
+        result = self.runner.invoke(doctor, "-m fra-ipa")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("vagon", result.stdout)
+
+        result = self.runner.invoke(doctor)
+        self.assertEqual(result.exit_code, 0)
+        self.assertGreaterEqual(len(result.stdout), 10000)
+
+        result = self.runner.invoke(doctor, "-m eng-arpabet")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("No checks implemented", result.stdout)
+
+    def test_doctor_lists(self):
+        result = self.runner.invoke(doctor, "--list-all")
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("eng-arpabet:", result.stdout)
+        self.assertIn("eng-ipa:", result.stdout)
+
+        result = self.runner.invoke(doctor, "--list-ipa")
+        self.assertEqual(result.exit_code, 0)
+        self.assertNotIn("eng-arpabet:", result.stdout)
+        self.assertIn("eng-ipa:", result.stdout)
+
 
 if __name__ == '__main__':
     main()

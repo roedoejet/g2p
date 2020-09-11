@@ -2,20 +2,18 @@
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
 name: Upload Python Package
-
 on:
   release:
     types: [created]
   push:
+    branches: [ release ]
     tags: 
       - release
       - build
       - v*.*.*
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -33,3 +31,14 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+    - name: trigger convertextract build
+      run: |
+        curl --location --request POST 'https://api.github.com/repos/roedoejet/convertextract/dispatches' \
+        --header 'Accept: application/vnd.github.everest-preview+json' \
+        --header 'Content-Type: application/json' \
+        --header 'Authorization: Bearer ${{ secrets.G2P_PAT }}' \
+        --header 'Content-Type: text/plain' \
+        --data-raw '{
+          "event_type": "g2p-published",
+          "client_payload": {}
+        }'

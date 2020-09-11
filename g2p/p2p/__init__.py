@@ -46,7 +46,6 @@ from g2p.log import LOGGER
 #
 #################################
 
-
 def panphon_preprocess(inventory: List[str], is_xsampa: bool = False):
     xsampa_converter = XSampa()
     panphon_preprocessor = Transducer(Mapping(id='panphon_preprocessor'))
@@ -54,7 +53,7 @@ def panphon_preprocess(inventory: List[str], is_xsampa: bool = False):
     for x in inventory:
         if is_xsampa:
             x = xsampa_converter.convert(x)
-        x = panphon_preprocessor(x)
+        x = panphon_preprocessor(x).output_string
         new_inventory.append(x)
     return new_inventory
 

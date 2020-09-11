@@ -25,5 +25,5 @@ mappings:
     out_lang: eng-ipa
     type: mapping
     mapping: crl_ipa_to_eng_ipa.json
-    as_is: false
+    rule_ordering: apply-longest-first
     <<: *shared

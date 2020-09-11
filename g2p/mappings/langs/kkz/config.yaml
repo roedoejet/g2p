@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: Kaska
+mappings:
+  - display_name: Kaska to IPA
+    mapping: kkz_to_ipa.json
+    in_lang: kkz
+    out_lang: kkz-ipa
+    rule_ordering: apply-longest-first
+    norm_form: NFD
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared
+  - display_name: Kaska IPA to English IPA
+    mapping: kkz_ipa_to_eng_ipa.json
+    in_lang: kkz-ipa
+    out_lang: eng-ipa
+    norm_form: NFD
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared

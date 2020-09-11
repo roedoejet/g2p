@@ -1,0 +1,13 @@
+<<: &shared
+  language_name: Scottish Gaelic
+mappings:
+  - display_name: Scottish Gaelic to IPA
+    in_lang: gla
+    out_lang: gla-ipa
+    type: mapping
+    case_sensitive: false
+    rule_ordering: apply-longest-first
+    authors:
+      - Aidan Pine
+    mapping: gla_to_ipa.json
+    <<: *shared

@@ -8,7 +8,7 @@ mappings:
       - Eric Joanis
     type: mapping
     mapping: alq_to_ipa.csv
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     norm_form: 'NFD'
     <<: *shared

@@ -41,10 +41,10 @@ def cache_langs():
     lang_network.add_edges_from(mappings_legal_pairs)
 
     with open(LANGS_NWORK_PATH, 'wb') as f:
-        write_gpickle(lang_network, f)
+        write_gpickle(lang_network, f, protocol=4)
 
     with open(LANGS_PKL, 'wb') as f:
-        pickle.dump(langs, f)
+        pickle.dump(langs, f, protocol=4)
 
     return langs
 

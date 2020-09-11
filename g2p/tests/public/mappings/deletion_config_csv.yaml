@@ -3,7 +3,7 @@ display_name: Minimal to Minimal
 mapping: deletion.csv
 in_lang: min
 out_lang: min
-as_is: true
+rule_ordering: as-written
 case_sensitive: false
 escape_special: true
 norm_form: 'NFD'

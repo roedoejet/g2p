@@ -7,7 +7,7 @@ mappings:
     out_lang: moh-ipa
     case_sensitive: false
     norm_form: NFD
-    as_is: true
+    rule_ordering: as-written
     abbreviations: abbreviations.csv
     authors:
       - Aidan Pine

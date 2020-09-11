@@ -1,6 +1,10 @@
+#!/usr/bin/env python3
+
 from unittest import main, TestCase
+import io
 import os
 import json
+from contextlib import redirect_stderr
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 from g2p.tests.public import __file__ as public_data
@@ -15,7 +19,7 @@ class MappingTest(TestCase):
         self.test_mapping_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}])
         with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json'), encoding='utf8') as f:
             self.json_map = json.load(f)
-    
+
     def test_normalization(self):
         self.assertEqual(ud.normalize('NFD', '\u00e1'), self.test_mapping_norm.mapping[0]['in'])
         self.assertNotEqual(self.test_mapping_norm.mapping[0]['in'], '\u00e1')
@@ -31,12 +35,75 @@ class MappingTest(TestCase):
         self.assertTrue(json_map.kwargs['in_metadata']['case_insensitive'])
 
     def test_as_is(self):
-        mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        """
+        Test deprecated config: as_is.
+        """
+
+        # explicitly set as_is=False
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            mapping_sorted = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
+        self.assertTrue(mapping_sorted.wants_rules_sorted())
+        self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
+        self.assertIn("apply-longest-first", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+
+        # explicitly set as_is=True
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            mapping = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=True)
+        self.assertFalse(mapping.wants_rules_sorted())
+        self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
+        self.assertIn("as-written", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+
+        # test the default (rule_ordering="as-written")
         mapping_as_is = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}])
-        transducer = Transducer(mapping)
+        self.assertFalse(mapping.wants_rules_sorted())
+
+        # test the alternative (rule_ordering="apply-longest-first")
+        transducer = Transducer(mapping_sorted)
         transducer_as_is = Transducer(mapping_as_is)
         self.assertEqual(transducer('aa').output_string, 'c')
         self.assertEqual(transducer_as_is('aa').output_string, 'bb')
+
+    def test_rule_ordering(self):
+        """
+        Test the config option:
+
+        rule-ordering: 'as-written' (default)
+
+        or
+
+        rule-ordering: 'apply-shortest-first'
+        """
+        rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
+        mapping_default = Mapping(rules)
+
+        transducer_longest_first = Transducer(Mapping(rules, rule_ordering='apply-longest-first'))
+        self.assertEqual(transducer_longest_first('aa').output_string, 'c')
+
+        transducer_as_written = Transducer(Mapping(rules, rule_ordering='as-written'))
+        self.assertEqual(transducer_as_written('aa').output_string, 'bb')
+
+        transducer_default = Transducer(Mapping(rules))
+        self.assertEqual(transducer_default('aa').output_string, 'bb')
+
+    def test_rule_ordering_given_invalid_value(self):
+        """
+        It should log an error messages if given an invalid value for
+        rule_ordering=...
+        """
+        rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
+
+        # typo in the valid setting:
+        incorrect_value = "apply-longest-frist"
+        correct_value = "apply-longest-first"
+
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            Mapping(rules, rule_ordering=incorrect_value)
+
+        self.assertIn(incorrect_value, log_output.getvalue())
+        self.assertIn(correct_value, log_output.getvalue())
 
     def test_case_sensitive(self):
         mapping = Mapping([{'in': 'A', "out": 'b'}], case_sensitive=False)
@@ -88,7 +155,22 @@ class MappingTest(TestCase):
         transducer = Transducer(mapping)
         self.assertEqual(transducer('abb').output_string, 'aab')
         self.assertEqual(transducer('a').output_string, 'a')
-        self.assertTrue(mapping.kwargs['as_is'])
+        self.assertFalse(mapping.wants_rules_sorted())
+        self.assertFalse(mapping.kwargs['case_sensitive'])
+        self.assertTrue(mapping.kwargs['escape_special'])
+        self.assertEqual(mapping.kwargs['norm_form'], 'NFD')
+        self.assertTrue(mapping.kwargs['reverse'])
+
+    def test_rule_ordering_from_config(self):
+        """
+        Same as test_minimal, but uses "rule-ordering" instead of "as-is" in the config.
+        """
+        mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'rule-ordering.yaml'))
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer('abb').output_string, 'aab')
+        self.assertEqual(transducer('a').output_string, 'a')
+        self.assertTrue(mapping.wants_rules_sorted())
+        self.assertEqual(mapping.kwargs['rule_ordering'], 'apply-longest-first')
         self.assertFalse(mapping.kwargs['case_sensitive'])
         self.assertTrue(mapping.kwargs['escape_special'])
         self.assertEqual(mapping.kwargs['norm_form'], 'NFD')

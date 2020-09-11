@@ -1,0 +1,12 @@
+language_name: Minimal
+display_name: Minimal to Minimal
+mapping: minimal.csv
+in_lang: min
+out_lang: min
+rule_ordering: apply-longest-first
+case_sensitive: false
+escape_special: true
+norm_form: 'NFD'
+reverse: true
+authors:
+  - Eddie Antonio Santos
