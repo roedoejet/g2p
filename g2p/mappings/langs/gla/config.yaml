@@ -6,7 +6,7 @@ mappings:
     out_lang: gla-ipa
     type: mapping
     case_sensitive: false
-    as_is: false
+    rule_ordering: apply-longest-first
     authors:
       - Aidan Pine
     mapping: gla_to_ipa.json

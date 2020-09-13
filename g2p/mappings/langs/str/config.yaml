@@ -5,7 +5,7 @@ mappings:
     mapping: str_to_ipa.json
     in_lang: str
     out_lang: str-ipa
-    as_is: true
+    rule_ordering: as-written
     norm_form: NFD
     case_sensitive: false
     authors:

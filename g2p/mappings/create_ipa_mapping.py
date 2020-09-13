@@ -29,6 +29,7 @@ from tqdm import tqdm
 import yaml
 
 from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
+from g2p.transducer import Transducer
 from g2p.mappings import Mapping
 from g2p.log import LOGGER
 
@@ -52,7 +53,8 @@ xsampa_converter = XSampa()
 def process_character(p, is_xsampa=False):
     if is_xsampa:
         p = xsampa_converter.convert(p)
-    return p.replace("ʷ", "w").replace("ʲ", "j").replace("͡", "")
+    panphon_preprocessor = Transducer(Mapping(id='panphon_preprocessor'))
+    return panphon_preprocessor(p).output_string
 
 
 def process_characters(inv, is_xsampa=False):

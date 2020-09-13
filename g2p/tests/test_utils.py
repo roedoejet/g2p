@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """ Test Mapping utility functions
 """
 
@@ -97,7 +99,7 @@ class UtilsTest(TestCase):
             self.assertEqual(abbs['VOWEL'], ['a', 'e', 'i', 'o', 'u'])
 
     def test_generated_mapping(self):
-        config = {'in_lang': 'test', 'out_lang': 'test-out', 'as_is': False}
+        config = {'in_lang': 'test', 'out_lang': 'test-out', 'rule_ordering': "apply-longest-first"}
         # config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
         config['mapping'] = [{'in': 'a', 'out': 'b'}]
         mapping = Mapping(**config)

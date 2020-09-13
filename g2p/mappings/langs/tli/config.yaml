@@ -1,27 +1,28 @@
 <<: &shared
-  language_name: Ojibwe
+  language_name: Tlingit
 mappings:
-  - display_name: Ojibwe to IPA
-    in_lang: oji
-    out_lang: oji-ipa
-    authors:
-      - David Huggins-Daines
-    type: mapping
-    mapping: oji_to_ipa.csv
-    prevent_feeding: true
-    rule_ordering: as-written
-    case_sensitive: false
-    norm_form: NFC
-    <<: *shared
-  - display_name: Anishinaabemowin Syllabics to Romanized
-    in_lang: oji-syl
-    out_lang: oji
+  - display_name: Tlingit normalization
+    in_lang: tli
+    out_lang: tli-norm
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: oji_syllabics_to_orth.csv
+    mapping: tli_norm.csv
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
+  - display_name: Tlingit to IPA
+    in_lang: tli-norm
+    out_lang: tli-ipa
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: tli_to_ipa.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false
     norm_form: NFC
     <<: *shared
+    

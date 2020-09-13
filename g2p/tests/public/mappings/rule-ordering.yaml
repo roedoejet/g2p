@@ -1,12 +1,12 @@
 language_name: Minimal
 display_name: Minimal to Minimal
-mapping: deletion.csv
+mapping: minimal.csv
 in_lang: min
 out_lang: min
-rule_ordering: as-written
+rule_ordering: apply-longest-first
 case_sensitive: false
 escape_special: true
 norm_form: 'NFD'
-reverse: false
+reverse: true
 authors:
-  - Aidan Pine
+  - Eddie Antonio Santos

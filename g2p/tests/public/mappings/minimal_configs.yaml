@@ -6,7 +6,7 @@ mappings:
     mapping: minimal.csv
     in_lang: min
     out_lang: min
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     escape_special: true
     norm_form: 'NFD'
@@ -19,7 +19,7 @@ mappings:
     mapping: minimal.tsv
     in_lang: min
     out_lang: min
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     escape_special: true
     norm_form: 'NFD'
@@ -32,7 +32,7 @@ mappings:
     mapping: minimal.psv
     in_lang: min
     out_lang: min
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     escape_special: true
     norm_form: 'NFD'
@@ -45,7 +45,7 @@ mappings:
     mapping: minimal.json
     in_lang: min
     out_lang: min
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     escape_special: true
     norm_form: 'NFD'
@@ -58,7 +58,7 @@ mappings:
     mapping: minimal.xlsx
     in_lang: min
     out_lang: min
-    as_is: true
+    rule_ordering: as-written
     case_sensitive: false
     escape_special: true
     norm_form: 'NFD'

@@ -25,3 +25,6 @@ flask_session
 
 # Sphinx documentation
 docs/_build/
+
+# coverage annotation output
+*,cover

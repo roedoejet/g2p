@@ -11,7 +11,7 @@ from networkx.exception import NetworkXError, NetworkXNoPath
 from networkx.algorithms.dag import ancestors, descendants
 from g2p.static import __file__ as static_file
 from g2p.transducer import Transducer
-from g2p.mappings.langs import LANGS_NETWORK
+from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.log import LOGGER
 from g2p import make_g2p
 
@@ -33,8 +33,29 @@ class Descendants(Resource):
 
 
 class Langs(Resource):
+    def __init__(self):
+        self.AVAILABLE_MAPPINGS = sorted(
+            [
+                {k: v for k, v in x.items() if k not in [
+                    'mapping_data', 'abbreviations_data']}
+                for x in MAPPINGS_AVAILABLE
+            ],
+            key=lambda x: x['in_lang'])
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument(
+            'verbose', dest='verbose',
+            type=bool, location='args',
+            default=False, required=False,
+            help="Return verbose mappings information"
+        )
+
     def get(self):
-        return sorted([x for x in LANGS_NETWORK.nodes])
+        args = self.parser.parse_args()
+        verbose = args['verbose']
+        if verbose:
+            return self.AVAILABLE_MAPPINGS
+        else:
+            return sorted([x for x in LANGS_NETWORK.nodes])
 
 
 class Text(Resource):
@@ -89,6 +110,7 @@ class Text(Resource):
             abort(400)
         except FileNotFoundError:
             abort(404)
+
 
 def update_docs():
     ''' Update the swagger documentation with all nodes from the network

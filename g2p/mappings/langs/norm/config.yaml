@@ -6,7 +6,7 @@ mappings:
     id: panphon_preprocessor
     in_lang: ipa
     out_lang: ipa
-    as_is: true
+    rule_ordering: as-written
     authors:
       - Patrick Littell
     <<: *shared

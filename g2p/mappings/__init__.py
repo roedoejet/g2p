@@ -32,8 +32,13 @@ class Mapping():
     """ Class for lookup tables
 
         @param as_is: bool = True
-            Evaluate g2p rules in mapping in the order they are.
+            Affects whether or not rules are sorted or left as is.
+            Please use ``rule_ordering`` instead.
+            If True, Evaluate g2p rules in mapping in the order they are written.
             If False, rules will be reverse sorted by length.
+
+            .. deprecated:: 0.6
+                use ``rule_ordering`` instead
 
         @param case_sensitive: bool = True
             Lower all rules and conversion input
@@ -50,6 +55,18 @@ class Mapping():
         @param reverse: bool = False
             Reverse all mappings
 
+        @param rule_ordering: str = "as-written"
+            Affects in what order the rules are applied.
+
+            If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
+            are written in the source file
+            (previously this was accomplished with ``as_is=True``).
+
+            If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
+            input are applied first. Sorting the rules like this prevents shorter rules
+            from taking part in feeding relations
+            (previously this was accomplished with ``as_is=False``).
+
         @param prevent_feeding: bool = False
             Converts each rule into an intermediary form
 
@@ -57,8 +74,9 @@ class Mapping():
 
     def __init__(self, mapping=None, abbreviations: Union[str, DefaultDict[str, List[str]]] = False, **kwargs):
         # should these just be explicit instead of kwargs...
+        # yes, they should
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
-                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive',
+                                 'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'rule_ordering',
                                  'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
@@ -179,9 +197,35 @@ class Mapping():
     def process_kwargs(self, mapping):
         ''' Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
         '''
+
+        if 'as_is' in self.kwargs:
+            as_is = self.kwargs['as_is']
+            if as_is:
+                appropriate_setting = "as-written"
+            else:
+                appropriate_setting = "apply-longest-first"
+
+            self.kwargs["rule_ordering"] = appropriate_setting
+
+            LOGGER.warning(
+                f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
+                'is using the deprecated parameter "as_is"; '
+                f"replace `as_is: {as_is}` with `rule_ordering: {appropriate_setting}`"
+            )
+
         # Add defaults
-        if 'as_is' not in self.kwargs:
-            self.kwargs['as_is'] = True
+        if 'rule_ordering' in self.kwargs:
+            # right now, "rule-ordering" is a more explict alias of the "as-is" option.
+            ordering = self.kwargs["rule_ordering"]
+            if ordering not in ("as-written", "apply-longest-first"):
+                LOGGER.error(
+                    f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
+                    f"has invalid value '{ordering}' for rule_ordering parameter; "
+                    "rule_ordering must be one of "
+                    '"as-written" or "apply-longest-first"'
+                )
+        else:
+            self.kwargs["rule_ordering"] = "as-written"
         if 'case_sensitive' not in self.kwargs:
             self.kwargs['case_sensitive'] = True
         if 'escape_special' not in self.kwargs:
@@ -196,9 +240,10 @@ class Mapping():
             self.kwargs['in_lang'] = 'und'
         if 'out_lang' not in self.kwargs:
             self.kwargs['out_lang'] = 'und'
+
         # Process kwargs in order received
         for kwarg, val in self.kwargs.items():
-            if kwarg == 'as_is' and not val:
+            if kwarg == 'rule_ordering' and self.wants_rules_sorted():
                 # sort by reverse len
                 mapping = sorted(mapping, key=lambda x: len(
                     x["in"]), reverse=True)
@@ -221,6 +266,14 @@ class Mapping():
                 mapping.remove(io)
         self.processed = True
         return mapping
+
+    def wants_rules_sorted(self) -> bool:
+        """Returns whether the rules will be sorted prior to finalizing the mapping.
+
+        Returns:
+            bool: True if the rules should be sorted.
+        """
+        return self.kwargs['rule_ordering'] == 'apply-longest-first'
 
     def rule_to_regex(self, rule: dict) -> Pattern:
         """Turns an input string (and the context) from an input/output pair
@@ -336,7 +389,8 @@ class Mapping():
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
-                "as_is": self.kwargs.get('as_is', True),
+                "as_is": not self.wants_rules_sorted(),
+                # TODO: rule_ordering
                 "prevent_feeding": self.kwargs.get('prevent_feeding', False),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
@@ -356,7 +410,7 @@ class Mapping():
                     existing_data['mappings'][i]['authors'] = template['mappings'][0]['authors']
                     updated = True
                     break
-            if not updated:  
+            if not updated:
                 existing_data['mappings'].append(template['mappings'][0])
             template=existing_data
         with open(fn, 'w', encoding='utf8') as f:
