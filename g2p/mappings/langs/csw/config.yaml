@@ -27,5 +27,5 @@ mappings:
     out_lang: eng-ipa
     type: mapping
     mapping: csw_ipa_to_eng_ipa.json
-    as_is: false
+    as_is: true
     <<: *shared

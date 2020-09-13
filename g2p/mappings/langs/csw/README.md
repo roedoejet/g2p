@@ -1,5 +1,5 @@
 Language-specific files for Swampy Cree
 
 Authors:
-Delasie Torkornoo
+Delasie Torkornoo,
 Bradley Ellert
