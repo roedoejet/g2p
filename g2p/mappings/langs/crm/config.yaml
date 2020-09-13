@@ -1,0 +1,31 @@
+<<: &shared
+  language_name: Moose Cree
+mappings:
+  - display_name: Moose Cree Normalization
+    in_lang: crm
+    out_lang: crm-norm
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Bradley Ellert
+      - Aidan Pine
+    mapping: crm_norm.json
+    <<: *shared
+  - display_name: Moose Cree to IPA
+    in_lang: crm-norm
+    out_lang: crm-ipa
+    type: mapping
+    authors:
+      - David Huggins Daines
+      - Patrick Littell
+      - Delasie Torkornoo
+      - Bradley Ellert
+    mapping: crm_to_ipa.json
+    <<: *shared
+  - display_name: Moose Cree IPA to English IPA
+    in_lang: crm-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: crm_ipa_to_eng_ipa.json
+    rule_ordering: as-written
+    <<: *shared
