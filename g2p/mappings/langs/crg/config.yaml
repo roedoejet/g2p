@@ -6,7 +6,22 @@ mappings:
     in_lang: crg-tmd
     out_lang: crg-ipa
     case_sensitive: false
+    as_is: true
+    prevent_feeding: true
     abbreviations: abbreviations.csv
+    authors:
+      - Fineen Davis
+      - Olivia Sammons
+      - Heather Souter
+      - Christopher Cox
+    <<: *shared
+  - display_name: Michif Double Vowel (DV) to Michif IPA
+    mapping: crg-dv-to-crg-ipa.csv
+    in_lang: crg-dv
+    out_lang: crg-ipa
+    as_is: true
+    prevent_feeding: true
+    case_sensitive: false
     authors:
       - Fineen Davis
       - Olivia Sammons
