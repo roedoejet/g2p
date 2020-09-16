@@ -1,0 +1,31 @@
+<<: &shared
+  language_name: Swampy Cree
+mappings:
+  - display_name: Swampy Cree Normalization
+    in_lang: csw
+    out_lang: csw-norm
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Bradley Ellert
+      - Aidan Pine
+    mapping: csw_norm.json
+    <<: *shared
+  - display_name: Swampy Cree to IPA
+    in_lang: csw-norm
+    out_lang: csw-ipa
+    type: mapping
+    authors:
+      - David Huggins Daines
+      - Patrick Littell
+      - Delasie Torkornoo
+      - Bradley Ellert
+    mapping: csw_to_ipa.json
+    <<: *shared
+  - display_name: Swampy Cree IPA to English IPA
+    in_lang: csw-ipa
+    out_lang: eng-ipa
+    type: mapping
+    mapping: csw_ipa_to_eng_ipa.json
+    rule_ordering: as-written
+    <<: *shared
