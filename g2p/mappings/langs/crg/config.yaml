@@ -1,12 +1,12 @@
 <<: &shared
   language_name: Michif
 mappings:
-  - display_name: Michif TMD to Michif IPA
+  - display_name: Michif Turtle Mountain Dictionary (TMD) to Michif IPA
     mapping: crg-tmd-to-crg-ipa.csv
     in_lang: crg-tmd
     out_lang: crg-ipa
     case_sensitive: false
-    as_is: true
+    rule_ordering: as-written
     prevent_feeding: true
     abbreviations: abbreviations.csv
     authors:
@@ -19,7 +19,7 @@ mappings:
     mapping: crg-dv-to-crg-ipa.csv
     in_lang: crg-dv
     out_lang: crg-ipa
-    as_is: true
+    rule_ordering: as-written
     prevent_feeding: true
     case_sensitive: false
     authors:
