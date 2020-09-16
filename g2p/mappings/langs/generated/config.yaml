@@ -1,13 +1,12 @@
 language_name: generated
 mappings:
-  - rule_ordering: apply-longest-first
-    display_name: Atikamekw IPA to English IPA
+  - display_name: Atikamekw IPA to English IPA
     in_lang: atj-ipa
     language_name: Atikamekw
     mapping: atj-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - rule_ordering: apply-longest-first
-    author: Generated 2019-09-26 13:48:19.852180
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-09-26 13:48:19.852180
     authors:
       - Generated 2020-07-06 16:39:58.770641
     display_name: Danish IPA to English IPA
@@ -15,29 +14,29 @@ mappings:
     language_name: Danish
     mapping: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - rule_ordering: apply-longest-first
-    author: Generated 2020-02-06 11:01:41.458466
+    rule_ordering: apply-longest-first
+  - author: Generated 2020-02-06 11:01:41.458466
     display_name: French IPA to English IPA
     in_lang: fra-ipa
     language_name: French
     mapping: fra-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - rule_ordering: apply-longest-first
-    author: Generated 2019-10-24 16:21:41.605592
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-10-24 16:21:41.605592
     display_name: "SEN\u0106O\u0166EN IPA to English IPA"
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
     mapping: str-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - rule_ordering: apply-longest-first
-    author: Generated 2019-10-23 11:18:26.278696
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-10-23 11:18:26.278696
     display_name: Algonquin IPA to English IPA
     in_lang: alq-ipa
     language_name: Algonquin
     mapping: alq-ipa_to_eng-ipa.json
     out_lang: eng-ipa
-  - rule_ordering: apply-longest-first
-    author: Generated 2019-12-06 15:24:08.036823
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-12-06 15:24:08.036823
     display_name: Mohawk IPA to English IPA
     in_lang: moh-ipa
     language_name: Mohawk
@@ -45,8 +44,8 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
-  - rule_ordering: as-written
-    authors:
+    rule_ordering: apply-longest-first
+  - authors:
       - Generated 2020-03-06 00:15:29.676518
     case_sensitive: true
     display_name: see-ipa IPA to eng-ipa IPA
@@ -57,8 +56,8 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
-  - rule_ordering: as-written
-    authors:
+    rule_ordering: as-written
+  - authors:
       - Generated 2020-03-30 13:17:41.062858
     case_sensitive: true
     display_name: lml-ipa IPA to eng-ipa IPA
@@ -69,8 +68,8 @@ mappings:
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
-  - rule_ordering: as-written
-    authors:
+    rule_ordering: as-written
+  - authors:
       - Generated 2020-04-27 01:30:32.371649
     case_sensitive: false
     display_name: oji-ipa IPA to eng-ipa IPA
@@ -82,8 +81,8 @@ mappings:
     out_lang: eng-ipa
     prevent_feeding: true
     reverse: false
-  - rule_ordering: apply-longest-first
-    authors:
+    rule_ordering: as-written
+  - authors:
       - Generated 2020-07-28 14:28:24.895117
     case_sensitive: false
     display_name: gla-ipa IPA to eng-ipa IPA
@@ -95,8 +94,8 @@ mappings:
     out_lang: eng-ipa
     prevent_feeding: false
     reverse: false
-  - rule_ordering: as-written
-    authors:
+    rule_ordering: apply-longest-first
+  - authors:
       - Generated 2020-08-06 16:06:34.805350
     case_sensitive: true
     display_name: crk-ipa IPA to eng-ipa IPA
@@ -104,6 +103,20 @@ mappings:
     in_lang: crk-ipa
     language_name: crk-ipa
     mapping: crk-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: as-written
+  - as_is: true
+    authors:
+      - Generated 2020-09-16 17:14:33.602655
+    case_sensitive: false
+    display_name: crg-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: crg-ipa
+    language_name: crg-ipa
+    mapping: crg-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
