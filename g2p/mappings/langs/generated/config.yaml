@@ -108,8 +108,7 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
-  - as_is: true
-    authors:
+  - authors:
       - Generated 2020-09-16 17:14:33.602655
     case_sensitive: false
     display_name: crg-ipa IPA to eng-ipa IPA
@@ -121,3 +120,17 @@ mappings:
     out_lang: eng-ipa
     prevent_feeding: true
     reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2020-09-18 10:40:15.289530
+    case_sensitive: false
+    display_name: Tlingit IPA to English IPA
+    escape_special: false
+    in_lang: tli-ipa
+    language_name: Tlingit IPA
+    mapping: tli-norm-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
