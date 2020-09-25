@@ -1,6 +1,7 @@
 import os
 import click
 import yaml
+import re
 from pprint import PrettyPrinter as pp
 from flask.cli import FlaskGroup
 from collections import OrderedDict
@@ -195,3 +196,38 @@ def update():
     cache_langs()
     update_docs()
     network_to_echart(write_to_file=True)
+
+@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument('lang')
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Scan a document for non target language characters.")
+def scan(lang, path):
+    """
+    Returns the set of non-mapped characters in a document.
+    """
+    # Check input lang exists
+    if not lang in LANGS_NETWORK.nodes:
+        raise click.UsageError(
+            f"'{lang}' is not a valid value for 'LANG'")
+    
+    # Retrieve the mapping for lang
+    for mapping in MAPPINGS_AVAILABLE:
+        if mapping['in_lang'] == lang:
+            break
+    
+    # Get input chars in mapping
+    mapped_chars = set()
+    for x in mapping['mapping_data']:
+        input = x['in']
+        for c in input:
+            mapped_chars.add(c)
+
+    # Find unmapped chars
+    mapped_string = ''.join(mapped_chars)
+    pattern = '[^' + mapped_string + '.]'
+    prog = re.compile(pattern, re.IGNORECASE)
+    # print(mapped_string)
+    with open(path, 'r') as file:
+        data = file.read()
+        not_mapped = set(prog.findall(data))
+        print(not_mapped)
+    
