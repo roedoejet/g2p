@@ -15,7 +15,7 @@ mappings:
     <<: *shared
   - display_name: Southern Tutchone to IPA
     in_lang: tce-norm
-    out_lang: tce-ipa
+    out_lang: tce-norm-ipa
     authors:
       - Shankhalika Srikanth
     type: mapping
