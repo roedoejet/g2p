@@ -206,6 +206,7 @@ class Mapping():
                 appropriate_setting = "apply-longest-first"
 
             self.kwargs["rule_ordering"] = appropriate_setting
+            del self.kwargs["as_is"]
 
             LOGGER.warning(
                 f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
@@ -389,8 +390,7 @@ class Mapping():
                 "in_lang": self.kwargs.get('in_lang', 'und'),
                 "out_lang": self.kwargs.get('out_lang', 'und'),
                 "authors": self.kwargs.get('authors', [f'Generated {dt.datetime.now()}']),
-                "as_is": not self.wants_rules_sorted(),
-                # TODO: rule_ordering
+                "rule_ordering": self.kwargs.get("rule_ordering", "as-written"),
                 "prevent_feeding": self.kwargs.get('prevent_feeding', False),
                 "case_sensitive": self.kwargs.get('case_sensitive', True),
                 "escape_special": self.kwargs.get('escape_special', False),
