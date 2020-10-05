@@ -112,10 +112,10 @@ mappings:
     authors:
       - Generated 2020-10-05 17:07:26.834691
     case_sensitive: false
-    display_name: tce-norm-ipa IPA to eng-ipa IPA
+    display_name: tce-ipa IPA to eng-ipa IPA
     escape_special: false
-    in_lang: tce-norm-ipa
-    language_name: tce-norm-ipa
+    in_lang: tce-ipa
+    language_name: tce-ipa
     mapping: tce-norm-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
