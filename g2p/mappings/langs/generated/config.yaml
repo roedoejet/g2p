@@ -108,7 +108,7 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
-  - as_is: true
+  - rule_ordering: as-written
     authors:
       - Generated 2020-10-05 17:07:26.834691
     case_sensitive: false
