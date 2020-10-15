@@ -2,6 +2,7 @@ import os
 import click
 import yaml
 import re
+import codecs
 from pprint import PrettyPrinter as pp
 from flask.cli import FlaskGroup
 from collections import OrderedDict
@@ -217,17 +218,34 @@ def scan(lang, path):
     # Get input chars in mapping
     mapped_chars = set()
     for x in mapping['mapping_data']:
-        input = x['in']
-        for c in input:
-            mapped_chars.add(c)
+        mapped_item = x['in']
+        # for c in input.encode().decode('utf-8'):
+            # mapped_chars.add(c)
+            # bytes(myString, "utf-8").decode("unicode_escape")
+        mapped_item = decode_escapes(mapped_item)
+        mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
+    print(mapped_chars)
+    # # Find unmapped chars
+    # mapped_string = ''.join(mapped_chars)
+    # pattern = '[^' + mapped_string + '.]'
+    # prog = re.compile(pattern, re.IGNORECASE)
+    # # print(mapped_string)
+    # with open(path, 'r') as file:
+    #     data = file.read()
+    #     not_mapped = set(prog.findall(data))
+    #     print(not_mapped)
 
-    # Find unmapped chars
-    mapped_string = ''.join(mapped_chars)
-    pattern = '[^' + mapped_string + '.]'
-    prog = re.compile(pattern, re.IGNORECASE)
-    # print(mapped_string)
-    with open(path, 'r') as file:
-        data = file.read()
-        not_mapped = set(prog.findall(data))
-        print(not_mapped)
-    
+ESCAPE_SEQUENCE_RE = re.compile(r'''
+    ( \\U........      # 8-digit hex escapes
+    | \\u....          # 4-digit hex escapes
+    | \\x..            # 2-digit hex escapes
+    | \\[0-7]{1,3}     # Octal escapes
+    | \\N\{[^}]+\}     # Unicode characters by name
+    | \\[\\'"abfnrtv]  # Single-character escapes
+    )''', re.UNICODE | re.VERBOSE)
+
+def decode_escapes(s):
+    def decode_match(match):
+        return codecs.decode(match.group(0), 'unicode-escape')
+
+    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
