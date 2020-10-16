@@ -202,31 +202,39 @@ def update():
 @click.argument('lang')
 @cli.command(context_settings=CONTEXT_SETTINGS, short_help="Scan a document for non target language characters.")
 def scan(lang, path):
-    """
-    Returns the set of non-mapped characters in a document.
+    """ Returns the set of non-mapped characters in a document.
+        Accounts for case sensitivity in the configuration.
     """
     # Check input lang exists
     if not lang in LANGS_NETWORK.nodes:
         raise click.UsageError(
             f"'{lang}' is not a valid value for 'LANG'")
     
-    # Retrieve the mapping for lang
+    # Retrieve the mappings for lang
+    case_sensitive = True
+    mappings = []
     for mapping in MAPPINGS_AVAILABLE:
-        if mapping['in_lang'] == lang:
-            break
+        if mapping['in_lang'].startswith(lang):
+            mappings.append(mapping)
+        case_sensitive = case_sensitive and mapping['case_sensitive']
+    
     # Get input chars in mapping
     mapped_chars = set()
-    for x in mapping['mapping_data']:
-        mapped_item = x['in']
-        mapped_item = decode_escapes(mapped_item)
-        # Read BOM
-        mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
+    for lang_mapping in mappings:
+        for x in lang_mapping['mapping_data']:
+            mapped_item = x['in']
+            mapped_item = decode_escapes(mapped_item)
+            # Read BOM
+            mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
     # Find unmapped chars
     mapped_string = ''.join(mapped_chars)
     pattern = '[^' + mapped_string + '.]'
-    prog = re.compile(pattern, re.IGNORECASE)
+    prog = re.compile(pattern)
+
     with open(path, 'r') as file:
         data = file.read()
+        if not case_sensitive:
+             data = data.lower()
         unmapped = set(prog.findall(data))
         if unmapped:
             LOGGER.warning('The following characters are not mapped:')
