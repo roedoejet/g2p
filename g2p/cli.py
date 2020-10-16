@@ -214,26 +214,23 @@ def scan(lang, path):
     for mapping in MAPPINGS_AVAILABLE:
         if mapping['in_lang'] == lang:
             break
-    
     # Get input chars in mapping
     mapped_chars = set()
     for x in mapping['mapping_data']:
         mapped_item = x['in']
-        # for c in input.encode().decode('utf-8'):
-            # mapped_chars.add(c)
-            # bytes(myString, "utf-8").decode("unicode_escape")
         mapped_item = decode_escapes(mapped_item)
+        # Read BOM
         mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
-    print(mapped_chars)
-    # # Find unmapped chars
-    # mapped_string = ''.join(mapped_chars)
-    # pattern = '[^' + mapped_string + '.]'
-    # prog = re.compile(pattern, re.IGNORECASE)
-    # # print(mapped_string)
-    # with open(path, 'r') as file:
-    #     data = file.read()
-    #     not_mapped = set(prog.findall(data))
-    #     print(not_mapped)
+    # Find unmapped chars
+    mapped_string = ''.join(mapped_chars)
+    pattern = '[^' + mapped_string + '.]'
+    prog = re.compile(pattern, re.IGNORECASE)
+    with open(path, 'r') as file:
+        data = file.read()
+        unmapped = set(prog.findall(data))
+        if unmapped:
+            LOGGER.warning('The following characters are not mapped:')
+            print(unmapped)
 
 ESCAPE_SEQUENCE_RE = re.compile(r'''
     ( \\U........      # 8-digit hex escapes
