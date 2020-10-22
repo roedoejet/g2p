@@ -7,7 +7,7 @@ mappings:
     out_lang: str-ipa
     rule_ordering: as-written
     norm_form: NFD
-    case_sensitive: false
+    case_sensitive: true
     authors:
       - Aidan Pine
     <<: *shared
