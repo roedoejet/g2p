@@ -15,7 +15,8 @@
         "in": "o\u02d0",
         "out": "o\u02d0",
         "context_before": "",
-        "context_after": ""
+        "context_after": "",
+        "prevent_feeding": true
     },
     {
         "in": "a\u02d0",
