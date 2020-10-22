@@ -106,7 +106,7 @@ mappings:
     mapping: crk-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: true
+    prevent_feeding: false
     reverse: false
     rule_ordering: as-written
   - rule_ordering: as-written
