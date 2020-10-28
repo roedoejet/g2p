@@ -160,6 +160,13 @@ def load_from_csv(language, delimiter=','):
     for entry in work_sheet:
         new_io = {"in": "", "out": "",
                   "context_before": "", "context_after": ""}
+        if len(entry) == 0:
+            # Just ignore empty lines in the CSV file
+            continue
+
+        if len(entry) == 1:
+            raise exceptions.MalformedMapping('Entry {} in mapping {} has no "out" value.'.format(entry, language))
+
         new_io['in'] = entry[0]
         new_io['out'] = entry[1]
         try:
@@ -193,7 +200,7 @@ def load_from_file(path: str) -> list:
             mapping = json.load(f)
     else:
         raise TypeError(f"Path at {path} is not a valid filetype.")
-    return validate(mapping)
+    return validate(mapping, path)
 
 def load_mapping_from_path(path_to_mapping_config, index=0):
     ''' Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
@@ -224,7 +231,7 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
                 os.path.join(path.parent, mapping['mapping']))
         else:
             # Is "mapping" key missing?
-            raise exceptions.MalformedMapping
+            raise exceptions.MalformedMapping('Key "mapping:" missing from a mapping in {}.'.format(path))
         # load any abbreviations
         if 'abbreviations' in mapping:
             mapping['abbreviations_data'] = load_abbreviations_from_file(
@@ -243,7 +250,7 @@ def find_mapping(in_lang: str, out_lang: str) -> list:
             return deepcopy(mapping)
     raise exceptions.MappingMissing(in_lang, out_lang)
 
-def validate(mapping):
+def validate(mapping, path):
     try:
         for io in mapping:
             if not 'context_before' in io:
@@ -253,11 +260,11 @@ def validate(mapping):
         valid = all('in' in d for d in mapping) and all(
             'out' in d for d in mapping)
         if not valid:
-            raise exceptions.MalformedMapping()
+            raise exceptions.MalformedMapping('Missing "in" or "out" in an entry in {}.'.format(path))
         return mapping
     except TypeError:
         # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
-        raise exceptions.MalformedMapping()
+        raise exceptions.MalformedMapping('Formatting error in mapping in {}.'.format(path))
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
     for k, v in to_escape.items():
