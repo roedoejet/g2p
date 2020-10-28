@@ -8,6 +8,8 @@ from contextlib import redirect_stderr
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 from g2p.tests.public import __file__ as public_data
+from g2p import exceptions
+from tempfile import NamedTemporaryFile
 import unicodedata as ud
 
 class MappingTest(TestCase):
@@ -184,6 +186,25 @@ class MappingTest(TestCase):
         mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'no_escape.csv'))
         transducer = Transducer(mapping)
         self.assertEqual(transducer('?').output_string, 'ʔ')
+
+    def test_invalid_rules_json(self):
+        rules = [{'in': 'a'}, {'out': 'c'}]
+        self.assertRaises(exceptions.MalformedMapping, Mapping, rules)
+
+    def test_invalid_rules_csv(self):
+        tf = NamedTemporaryFile(prefix="test_invalid_rules_", mode="w", suffix=".csv", delete=False)
+        tf.write("good-in,good-out\n\ngood-in-no-out\n")
+        tf.close()
+        self.assertRaises(exceptions.MalformedMapping, Mapping, tf.name)
+        os.unlink(tf.name)
+
+    def test_invalid_rules_filetype(self):
+        tf = NamedTemporaryFile(prefix="test_invalid_rules_", mode="w", suffix=".foo", delete=False)
+        tf.write("good-in,good-out\n\ngood-in-no-out\n")
+        tf.close()
+        self.assertRaises(TypeError, Mapping, tf.name)
+        os.unlink(tf.name)
+
 
 if __name__ == "__main__":
     main()
