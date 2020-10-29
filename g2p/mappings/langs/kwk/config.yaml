@@ -54,6 +54,7 @@ mappings:
     in_lang: kwk-boas
     out_lang: kwk-umista
     rule_ordering: apply-longest-first
+    prevent_feeding: true
     authors:
       - Fineen Davis
     <<: *shared
