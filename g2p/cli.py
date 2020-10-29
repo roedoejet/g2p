@@ -227,8 +227,9 @@ def scan(lang, path):
             # Read BOM
             mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
     # Find unmapped chars
+    filter_chars = ' \n'
     mapped_string = ''.join(mapped_chars)
-    pattern = '[^' + mapped_string + '.]'
+    pattern = '[^' + mapped_string + filter_chars + '.]'
     prog = re.compile(pattern)
 
     with open(path, 'r') as file:
