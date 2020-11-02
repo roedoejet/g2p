@@ -163,7 +163,7 @@ def doctor(mapping, list_all, list_ipa):
             print(f"{m}: ", end="")
             print(
                 ("\n" + " " * len(m) + "  ").join(
-                    [x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]
+                    sorted([x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m])
                 )
             )
             print("")
