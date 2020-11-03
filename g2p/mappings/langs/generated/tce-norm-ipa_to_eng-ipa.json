@@ -844,5 +844,11 @@
         "out": "j",
         "context_before": "",
         "context_after": ""
+    },
+    {
+        "in": "ʰ",
+        "out": "h",
+        "context_before": "",
+        "context_after": ""
     }
 ]
