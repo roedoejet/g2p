@@ -49,3 +49,12 @@ mappings:
     authors:
       - Fineen Davis
     <<: *shared
+  - display_name: Kwak'wala (Boas) to Umista
+    mapping: kwk_boas_to_umista.csv
+    in_lang: kwk-boas
+    out_lang: kwk-umista
+    rule_ordering: apply-longest-first
+    prevent_feeding: true
+    authors:
+      - Fineen Davis
+    <<: *shared
