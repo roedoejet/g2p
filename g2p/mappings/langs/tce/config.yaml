@@ -11,7 +11,7 @@ mappings:
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
-    norm_form: NFC
+    norm_form: NFD
     <<: *shared
   - display_name: Southern Tutchone to IPA
     in_lang: tce-norm
@@ -23,5 +23,5 @@ mappings:
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false
-    norm_form: NFC
+    norm_form: NFD
     <<: *shared

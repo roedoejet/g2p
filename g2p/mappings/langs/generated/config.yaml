@@ -118,7 +118,7 @@ mappings:
     in_lang: tce-ipa
     language_name: tce-ipa
     mapping: tce-norm-ipa_to_eng-ipa.json
-    norm_form: NFC
+    norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
     reverse: false
