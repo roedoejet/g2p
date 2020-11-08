@@ -7,7 +7,7 @@ from glob import glob
 
 from g2p.app import APP
 from g2p.log import LOGGER
-from g2p.cli import convert, update, doctor
+from g2p.cli import convert, update, doctor, scan
 from g2p.tests.public.data import __file__ as data_dir
 
 class CliTest(TestCase):
@@ -75,6 +75,16 @@ class CliTest(TestCase):
         self.assertNotIn("eng-arpabet:", result.stdout)
         self.assertIn("eng-ipa:", result.stdout)
 
+    def test_scan_fra(self):
+        result = self.runner.invoke(scan, "fra g2p/tests/public/fra_panagrams.txt")
+        self.assertEqual(result.exit_code, 0)
+        self.assertLogs(level='WARNING')
+        diacritics = 'àâéèêëîïôùûüç'
+        for d in diacritics:
+            self.assertNotIn(d, result.stdout)
+        unmapped_chars = ":/.,'-&()2"
+        for c in unmapped_chars:
+            self.assertIn(c, result.stdout)
 
 if __name__ == '__main__':
     main()
