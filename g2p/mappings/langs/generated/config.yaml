@@ -148,3 +148,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2020-10-13 10:40:15.289530
+    case_sensitive: false
+    display_name: Gwich'in IPA to English IPA
+    escape_special: false
+    in_lang: gwi-ipa
+    language_name: Gwich'in IPA
+    mapping: gwi-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
