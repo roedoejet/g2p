@@ -324,18 +324,6 @@
         "context_after": ""
     },
     {
-        "in": "o\u02d0",
-        "out": "o\u02d0",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "o\u0303\u02d0",
-        "out": "o\u0303\u02d0",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
         "in": "\u0251\u02d0",
         "out": "\u0251",
         "context_before": "",
