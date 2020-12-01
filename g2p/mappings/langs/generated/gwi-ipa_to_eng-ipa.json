@@ -36,7 +36,7 @@
         "context_after": ""
     },
     {
-        "in": "\u0288\u0282",
+        "in": "\u0288\u0282\u02b0",
         "out": "t\u0283",
         "context_before": "",
         "context_after": ""
@@ -168,14 +168,20 @@
         "context_after": ""
     },
     {
-        "in": "\u207ft\u0283",
-        "out": "nt\u0361\u0283",
+        "in": "\u207ft",
+        "out": "nt",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "t\u02bc",
         "out": "t",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ts\u02b0",
+        "out": "ts",
         "context_before": "",
         "context_after": ""
     },

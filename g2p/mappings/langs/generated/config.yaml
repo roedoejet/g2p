@@ -149,7 +149,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2020-10-13 10:40:15.289530
+      - Generated 2020-11-30 22:36:15.639360
     case_sensitive: false
     display_name: Gwich'in IPA to English IPA
     escape_special: false
