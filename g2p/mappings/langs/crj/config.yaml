@@ -3,7 +3,7 @@
 mappings:
   - display_name: Northern East Cree Normalization
     in_lang: crj
-    out_lang: crj-norm
+    out_lang: crj-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
@@ -12,7 +12,7 @@ mappings:
     rule_ordering: as-written
     <<: *shared
   - display_name: Southern East Cree to IPA
-    in_lang: crj-norm
+    in_lang: crj-equiv
     out_lang: crj-ipa
     type: mapping
     authors:

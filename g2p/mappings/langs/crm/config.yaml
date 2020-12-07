@@ -3,7 +3,7 @@
 mappings:
   - display_name: Moose Cree Normalization
     in_lang: crm
-    out_lang: crm-norm
+    out_lang: crm-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
@@ -12,7 +12,7 @@ mappings:
     mapping: crm_norm.json
     <<: *shared
   - display_name: Moose Cree to IPA
-    in_lang: crm-norm
+    in_lang: crm-equiv
     out_lang: crm-ipa
     type: mapping
     authors:

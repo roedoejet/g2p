@@ -3,7 +3,7 @@
 mappings:
   - display_name: Southern Tutchone normalization
     in_lang: tce
-    out_lang: tce-norm
+    out_lang: tce-equiv
     authors:
       - Shankhalika Srikanth
     type: mapping
@@ -14,7 +14,7 @@ mappings:
     norm_form: NFC
     <<: *shared
   - display_name: Southern Tutchone to IPA
-    in_lang: tce-norm
+    in_lang: tce-equiv
     out_lang: tce-ipa
     authors:
       - Shankhalika Srikanth

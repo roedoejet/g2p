@@ -3,7 +3,7 @@
 mappings:
   - display_name: Northern East Cree Normalization
     in_lang: crl
-    out_lang: crl-norm
+    out_lang: crl-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
@@ -11,7 +11,7 @@ mappings:
     mapping: crl_norm.json
     <<: *shared
   - display_name: Northern East Cree to IPA
-    in_lang: crl-norm
+    in_lang: crl-equiv
     out_lang: crl-ipa
     type: mapping
     authors:

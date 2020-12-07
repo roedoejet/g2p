@@ -3,7 +3,7 @@
 mappings:
   - display_name: Swampy Cree Normalization
     in_lang: csw
-    out_lang: csw-norm
+    out_lang: csw-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
@@ -12,7 +12,7 @@ mappings:
     mapping: csw_norm.json
     <<: *shared
   - display_name: Swampy Cree to IPA
-    in_lang: csw-norm
+    in_lang: csw-equiv
     out_lang: csw-ipa
     type: mapping
     authors:

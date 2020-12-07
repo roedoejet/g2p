@@ -19,7 +19,7 @@ mappings:
     <<: *shared
   - display_name: Unicode Normalization
     in_lang: git
-    out_lang: git-norm
+    out_lang: git-equiv
     authors:
       - Aidan Pine
     mapping: norm.csv

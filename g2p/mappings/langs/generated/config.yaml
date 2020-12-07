@@ -117,7 +117,7 @@ mappings:
     escape_special: false
     in_lang: tce-ipa
     language_name: tce-ipa
-    mapping: tce-norm-ipa_to_eng-ipa.json
+    mapping: tce-equiv-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -142,7 +142,7 @@ mappings:
     escape_special: false
     in_lang: tli-ipa
     language_name: Tlingit IPA
-    mapping: tli-norm-ipa_to_eng-ipa.json
+    mapping: tli-equiv-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: false
