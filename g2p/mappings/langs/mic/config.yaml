@@ -1,0 +1,16 @@
+<<: &shared
+  language_name: Mi'kmaq
+mappings:
+  - display_name: Mi'kmaq to IPA
+    mapping: mic_to_ipa.json
+    in_lang: mic
+    out_lang: mic-ipa
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: as-written
+    abbreviations: abbreviations.csv
+    authors:
+      - Aidan Pine
+    notes:
+      - Based on the Francis-Smith orthography
+    <<: *shared
