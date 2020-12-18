@@ -13,7 +13,7 @@ from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, DUMMY_
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.create_ipa_mapping import create_mapping
-from g2p.mappings.utils import is_ipa, is_xsampa
+from g2p.mappings.utils import is_ipa, is_xsampa, normalize
 from g2p.mappings import Mapping
 from g2p._version import VERSION
 from g2p.app import APP, SOCKETIO, network_to_echart
@@ -222,10 +222,7 @@ def scan(lang, path):
     mapped_chars = set()
     for lang_mapping in mappings:
         for x in lang_mapping['mapping_data']:
-            mapped_item = x['in']
-            mapped_item = decode_escapes(mapped_item)
-            # Read BOM
-            mapped_chars.add(mapped_item.encode().decode('utf-8-sig'))
+            mapped_chars.add(normalize(x['in'],"NFD"))
     # Find unmapped chars
     filter_chars = ' \n'
     mapped_string = ''.join(mapped_chars)
@@ -233,25 +230,10 @@ def scan(lang, path):
     prog = re.compile(pattern)
 
     with open(path, 'r') as file:
-        data = file.read()
+        data = normalize(file.read(), "NFD")
         if not case_sensitive:
              data = data.lower()
         unmapped = set(prog.findall(data))
         if unmapped:
             LOGGER.warning('The following characters are not mapped:')
             print(unmapped)
-
-ESCAPE_SEQUENCE_RE = re.compile(r'''
-    ( \\U........      # 8-digit hex escapes
-    | \\u....          # 4-digit hex escapes
-    | \\x..            # 2-digit hex escapes
-    | \\[0-7]{1,3}     # Octal escapes
-    | \\N\{[^}]+\}     # Unicode characters by name
-    | \\[\\'"abfnrtv]  # Single-character escapes
-    )''', re.UNICODE | re.VERBOSE)
-
-def decode_escapes(s):
-    def decode_match(match):
-        return codecs.decode(match.group(0), 'unicode-escape')
-
-    return ESCAPE_SEQUENCE_RE.sub(decode_match, s)
