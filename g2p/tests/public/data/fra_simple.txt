@@ -1,0 +1,2 @@
+Un texte simple en français, qui passe avec scan.
+Testons quand même quelques accents: èéà.
