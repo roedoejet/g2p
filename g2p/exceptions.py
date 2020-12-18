@@ -36,8 +36,11 @@ class InvalidNormalization(CommandLineError):
         ))
 
 class MalformedMapping(CommandLineError):
-    def __init__(self):
-        pass
+    def __init__(self, message=""):
+        if message:
+            self.message = "\n\n" + message
+        else:
+            self.message = ""
     
     def __str__(self):
         return self.render((
@@ -46,6 +49,7 @@ class MalformedMapping(CommandLineError):
             'You might be missing some keywords or \n'
             'Not all of the input and output pairs in your mapping have values for "in" and "out"\n'
             'Please refer to the documentation and fix your mapping.'
+            + self.message
         ))
 
 class MalformedLookup(CommandLineError):
