@@ -17,12 +17,12 @@ mappings:
       - Fineen Davis
     mapping: RAPA_Deterministic.csv
     <<: *shared
-  - display_name: Unicode Normalization
+  - display_name: Unicode Equivalencies
     in_lang: git
-    out_lang: git-norm
+    out_lang: git-equiv
     authors:
       - Aidan Pine
-    mapping: norm.csv
+    mapping: equiv.csv
     <<: *shared
   - display_name: Gitksan IPA to English IPA
     in_lang: git-ipa
