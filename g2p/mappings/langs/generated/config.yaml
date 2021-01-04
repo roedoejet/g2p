@@ -161,3 +161,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2021-01-04 13:11:19.507484
+    case_sensitive: false
+    display_name: mic-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: mic-ipa
+    language_name: mic-ipa
+    mapping: mic-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
