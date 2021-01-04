@@ -1,20 +1,20 @@
 <<: &shared
   language_name: Tlingit
 mappings:
-  - display_name: Tlingit normalization
+  - display_name: Tlingit Equivalencies
     in_lang: tli
-    out_lang: tli-norm
+    out_lang: tli-equiv
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: tli_norm.csv
+    mapping: tli_equiv.csv
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
     norm_form: NFC
     <<: *shared
   - display_name: Tlingit to IPA
-    in_lang: tli-norm
+    in_lang: tli-equiv
     out_lang: tli-ipa
     authors:
       - Shankhalika Srikanth

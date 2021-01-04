@@ -25,24 +25,24 @@ mappings:
     authors:
       - Patrick Littell
     <<: *shared
-  - display_name: Kwak'wala (U'mista) Conversion
-    mapping: umista_trans.csv
+  - display_name: Kwak'wala (U'mista) Equivalencies
+    mapping: umista_equiv.csv
     in_lang: kwk-umista
     out_lang: kwk-umista-con
     rule_ordering: apply-longest-first
     authors:
       - Fineen Davis
     <<: *shared
-  - display_name: Kwak'wala (NAPA) Conversion
-    mapping: napa_trans_ubc.csv
+  - display_name: Kwak'wala (NAPA) Equivalencies
+    mapping: napa_equiv_ubc.csv
     in_lang: kwk-napa-ubc
     out_lang: kwk-napa-ubc-con
     rule_ordering: apply-longest-first
     authors:
       - Fineen Davis
     <<: *shared
-  - display_name: Kwak'wala (NAPA) Conversion
-    mapping: napa_trans_uvic.csv
+  - display_name: Kwak'wala (NAPA) Equivalencies
+    mapping: napa_equiv_uvic.csv
     in_lang: kwk-napa-uvic
     out_lang: kwk-napa-uvic-con
     rule_ordering: apply-longest-first
