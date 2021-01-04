@@ -72,6 +72,31 @@
       "context_after": "SONORANT"
    },
    {
+      "in": "k",
+      "out": "kə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "p",
+      "out": "pə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "x",
+      "out": "xə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "s",
+      "out": "sə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "t",
+      "out": "tə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
       "in": "^j",
       "out": "əj",
       "context_after": "CONSONANT"
@@ -102,8 +127,13 @@
       "context_after": "CONSONANT"
    },
    {
-      "in": "^q",
-      "out": "əq",
+      "in": "^tʃ",
+      "out": "ətʃ",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^x",
+      "out": "əx",
       "context_after": "CONSONANT"
    },
    {
@@ -125,30 +155,5 @@
       "in": "^y",
       "out": "əy",
       "context_after": "CONSONANT"
-   },
-   {
-      "in": "k",
-      "out": "kə",
-      "context_after": "(CONSONANT)$"
-   },
-   {
-      "in": "p",
-      "out": "pə",
-      "context_after": "(CONSONANT)$"
-   },
-   {
-      "in": "q",
-      "out": "qə",
-      "context_after": "(CONSONANT)$"
-   },
-   {
-      "in": "s",
-      "out": "sə",
-      "context_after": "(CONSONANT)$"
-   },
-   {
-      "in": "t",
-      "out": "tə",
-      "context_after": "(CONSONANT)$"
    }
 ]
