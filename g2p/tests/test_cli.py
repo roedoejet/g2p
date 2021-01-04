@@ -7,15 +7,15 @@ from glob import glob
 
 from g2p.app import APP
 from g2p.log import LOGGER
-from g2p.cli import convert, update, doctor
+from g2p.cli import convert, update, doctor, scan
 from g2p.tests.public.data import __file__ as data_dir
 
 class CliTest(TestCase):
     def setUp(self):
         self.runner = APP.test_cli_runner()
-        DATA_DIR = os.path.dirname(data_dir)
+        self.data_dir = os.path.dirname(data_dir)
         self.langs_to_test = []
-        for fn in glob(f'{DATA_DIR}/*.*sv'):
+        for fn in glob(f'{self.data_dir}/*.*sv'):
             if fn.endswith('csv'):
                 delimiter = ','
             elif fn.endswith('psv'):
@@ -75,6 +75,29 @@ class CliTest(TestCase):
         self.assertNotIn("eng-arpabet:", result.stdout)
         self.assertIn("eng-ipa:", result.stdout)
 
+    def not_test_scan_fra(self):
+        # TODO: fix fra g2p so fra_panagrams.txt passes
+        result = self.runner.invoke(scan, f'fra {self.data_dir}/fra_panagrams.txt')
+        self.assertEqual(result.exit_code, 0)
+        self.assertLogs(level='WARNING')
+        diacritics = 'àâéèêëîïôùûüç'
+        for d in diacritics:
+            self.assertNotIn(d, result.stdout)
+        unmapped_chars = ":/.,'-&()2"
+        for c in unmapped_chars:
+            self.assertIn(c, result.stdout)
+
+    def test_scan_fra_simple(self):
+        # For now, unit test g2p scan using a simpler piece of French
+        result = self.runner.invoke(scan, f'fra {self.data_dir}/fra_simple.txt')
+        self.assertEqual(result.exit_code, 0)
+        self.assertLogs(level='WARNING')
+        diacritics = 'àâéèêëîïôùûüç'
+        for d in diacritics:
+            self.assertNotIn(d, result.stdout)
+        unmapped_chars = ":,"
+        for c in unmapped_chars:
+            self.assertIn(c, result.stdout)
 
 if __name__ == '__main__':
     main()

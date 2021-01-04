@@ -1,6 +1,8 @@
 import os
 import click
 import yaml
+import re
+import codecs
 from pprint import PrettyPrinter as pp
 from flask.cli import FlaskGroup
 from collections import OrderedDict
@@ -11,7 +13,7 @@ from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, DUMMY_
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.create_ipa_mapping import create_mapping
-from g2p.mappings.utils import is_ipa, is_xsampa
+from g2p.mappings.utils import is_ipa, is_xsampa, normalize
 from g2p.mappings import Mapping
 from g2p._version import VERSION
 from g2p.app import APP, SOCKETIO, network_to_echart
@@ -163,7 +165,7 @@ def doctor(mapping, list_all, list_ipa):
             print(f"{m}: ", end="")
             print(
                 ("\n" + " " * len(m) + "  ").join(
-                    [x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]
+                    sorted([x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m])
                 )
             )
             print("")
@@ -195,3 +197,43 @@ def update():
     cache_langs()
     update_docs()
     network_to_echart(write_to_file=True)
+
+@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument('lang')
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Scan a document for non target language characters.")
+def scan(lang, path):
+    """ Returns the set of non-mapped characters in a document.
+        Accounts for case sensitivity in the configuration.
+    """
+    # Check input lang exists
+    if not lang in LANGS_NETWORK.nodes:
+        raise click.UsageError(
+            f"'{lang}' is not a valid value for 'LANG'")
+    
+    # Retrieve the mappings for lang
+    case_sensitive = True
+    mappings = []
+    for mapping in MAPPINGS_AVAILABLE:
+        if mapping['in_lang'].startswith(lang):
+            mappings.append(mapping)
+        case_sensitive = case_sensitive and mapping['case_sensitive']
+    
+    # Get input chars in mapping
+    mapped_chars = set()
+    for lang_mapping in mappings:
+        for x in lang_mapping['mapping_data']:
+            mapped_chars.add(normalize(x['in'],"NFD"))
+    # Find unmapped chars
+    filter_chars = ' \n'
+    mapped_string = ''.join(mapped_chars)
+    pattern = '[^' + mapped_string + filter_chars + '.]'
+    prog = re.compile(pattern)
+
+    with open(path, 'r') as file:
+        data = normalize(file.read(), "NFD")
+        if not case_sensitive:
+             data = data.lower()
+        unmapped = set(prog.findall(data))
+        if unmapped:
+            LOGGER.warning('The following characters are not mapped:')
+            print(unmapped)

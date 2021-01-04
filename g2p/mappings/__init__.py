@@ -87,12 +87,12 @@ class Mapping():
                 abbreviations)
         # Handle user-supplied list
         if isinstance(mapping, list):
-            self.mapping = validate(mapping)
+            self.mapping = validate(mapping, path="user-supplied mapping")
         elif isinstance(mapping, str) and (mapping.endswith('yaml') or mapping.endswith('yml')):
             loaded_config = load_mapping_from_path(mapping)
             self.process_loaded_config(loaded_config)
         elif isinstance(mapping, str):
-            self.mapping = validate(load_from_file(mapping))
+            self.mapping = validate(load_from_file(mapping), path=mapping)
         else:
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
                 loaded_config = find_mapping(
