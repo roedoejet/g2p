@@ -1,7 +1,7 @@
 <<: &shared
   language_name: Gwich'in
 mappings:
-  - display_name: Gwich'in Normalization
+  - display_name: Gwich'in Equivalencies
     in_lang: gwi
     out_lang: gwi-equiv
     authors:
