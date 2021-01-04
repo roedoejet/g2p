@@ -3,18 +3,18 @@
 mappings:
   - display_name: Gwich'in Normalization
     in_lang: gwi
-    out_lang: gwi-norm
+    out_lang: gwi-equiv
     authors:
       - Sabrina Yu
     type: mapping
-    mapping: gwi_norm.json
+    mapping: gwi_equiv.json
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
     norm_form: NFD
     <<: *shared
   - display_name: Gwich'in to IPA
-    in_lang: gwi-norm
+    in_lang: gwi-equiv
     out_lang: gwi-ipa
     authors:
       - Sabrina Yu
