@@ -230,6 +230,3 @@ This project exists thanks to all the people who contribute.
 ## License
 
 MIT. See [LICENSE](LICENSE) for the Copyright and license statements.
-
-When you contribute to this project, for example when you add a new mapping, you agree to license
-your contributions under the same license.
