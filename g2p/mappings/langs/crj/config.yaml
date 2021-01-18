@@ -16,7 +16,7 @@ mappings:
     out_lang: crj-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
     mapping: crj_to_ipa.json
     rule_ordering: as-written

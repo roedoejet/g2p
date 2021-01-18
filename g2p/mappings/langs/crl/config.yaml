@@ -15,7 +15,7 @@ mappings:
     out_lang: crl-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
       - Delasie Torkornoo
     mapping: crl_to_ipa.json
