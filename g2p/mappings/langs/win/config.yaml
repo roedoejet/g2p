@@ -7,7 +7,7 @@ mappings:
     out_lang: win-ipa
     case_sensitive: false
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
     <<: *shared
   - display_name: Hoocąk IPA to English IPA
     mapping: win_ipa_to_eng_ipa.json
@@ -15,5 +15,5 @@ mappings:
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
     <<: *shared

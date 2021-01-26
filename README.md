@@ -229,4 +229,4 @@ This project exists thanks to all the people who contribute.
 
 ## License
 
-[MIT](LICENSE) © Patrick Littell, Aidan Pine
+MIT. See [LICENSE](LICENSE) for the Copyright and license statements.

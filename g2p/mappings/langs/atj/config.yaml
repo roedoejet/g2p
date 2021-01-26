@@ -7,7 +7,7 @@ mappings:
     type: mapping
     case_sensitive: false
     authors:
-      - David Huggines Daines
+      - David Huggins-Daines
       - Patrick Littell
     mapping: atj_to_ipa.json
     <<: *shared

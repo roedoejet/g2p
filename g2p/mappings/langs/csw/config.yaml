@@ -16,7 +16,7 @@ mappings:
     out_lang: csw-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
       - Delasie Torkornoo
       - Bradley Ellert
