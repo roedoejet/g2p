@@ -23,13 +23,13 @@ if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
 def make_g2p(in_lang: str, out_lang: str):
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
-        LOGGER.error(f"No lang called {in_lang}. Please try again.")
-        raise(FileNotFoundError("No lang called {in_lang}."))
+        LOGGER.error(f"No lang called '{in_lang}'. Please try again.")
+        raise(FileNotFoundError(f"No lang called '{in_lang}'."))
 
     # Check out_lang is a node in network
     if out_lang not in LANGS_NETWORK.nodes:
-        LOGGER.error(f"No lang called {out_lang}. Please try again.")
-        raise(FileNotFoundError("No lang called {out_lang}."))
+        LOGGER.error(f"No lang called '{out_lang}'. Please try again.")
+        raise(FileNotFoundError(f"No lang called '{out_lang}'."))
 
     # Try to find the shortest path between the nodes
     try:
