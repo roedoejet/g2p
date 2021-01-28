@@ -318,3 +318,64 @@ class IndentDumper(yaml.Dumper):
 
     def ignore_aliases(self, *args):
         return True
+
+
+def merge_if_same_label(lst_of_dicts, text_key, label_key):
+    results = []
+    current_item = None
+    for dct in lst_of_dicts:
+        if label_key not in dct:
+            dct[label_key] = None
+        if not current_item:
+            current_item = deepcopy(dct)
+        elif dct[label_key] == current_item[label_key]:
+            current_item[text_key] += dct[text_key]
+        else:
+            results.append(current_item)
+            current_item = deepcopy(dct)
+    if current_item:
+        results.append(current_item)
+    return results
+
+
+CATEGORIES = {
+    "Cc": "other",  # Other, Control
+    "Cf": "other",  # Other, Format
+    "Cn": "other",  # Other, Not Assigned (no characters in the file have this property)
+    "Co": "letter",  # Other, Private Use
+    "Cs": "other",  # Other, Surrogate
+    "LC": "letter",  # Letter, Cased
+    "Ll": "letter",  # Letter, Lowercase
+    "Lm": "letter",  # Letter, Modifier
+    "Lo": "letter",  # Letter, Other
+    "Lt": "letter",  # Letter, Titlecase
+    "Lu": "letter",  # Letter, Uppercase
+    "Mc": "diacritic",  # Mark, Spacing Combining
+    "Me": "diacritic",  # Mark, Enclosing
+    "Mn": "diacritic",  # Mark, Nonspacing
+    "Nd": "number",  # Number, Decimal Digit
+    "Nl": "number",  # Number, Letter
+    "No": "number",  # Number, Other
+    "Pc": "punctuation",  # Punctuation, Connector
+    "Pd": "punctuation",  # Punctuation, Dash
+    "Pe": "punctuation",  # Punctuation, Close
+    "Pf": "punctuation",  # Punctuation, Final quote (may behave like Ps or Pe depending on usage)
+    "Pi": "punctuation",  # Punctuation, Initial quote (may behave like Ps or Pe depending on usage)
+    "Po": "punctuation",  # Punctuation, Other
+    "Ps": "punctuation",  # Punctuation, Open
+    "Sc": "symbol",  # Symbol, Currency
+    "Sk": "symbol",  # Symbol, Modifier
+    "Sm": "symbol",  # Symbol, Math
+    "So": "symbol",  # Symbol, Other
+    "Zl": "whitespace",  # Separator, Line
+    "Zp": "whitespace",  # Separator, Paragraph
+    "Zs": "whitespace",  # Separator, Space
+}
+
+
+def get_unicode_category(c):
+    """ Maps a character to one of [ "letter", "number", "diacritic", "punctuation",
+        "symbol", "whitespace", "other"] """
+    cat = ud.category(c)
+    assert cat in CATEGORIES
+    return CATEGORIES[cat]
