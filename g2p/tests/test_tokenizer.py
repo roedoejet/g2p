@@ -3,11 +3,11 @@
 
 from unittest import main, TestCase
 import os
-
 import g2p.mappings.tokenizer as tok
 
+
 class TokenizerTest(TestCase):
-    '''Test suite for tokenizing text in a language-specific way'''
+    """Test suite for tokenizing text in a language-specific way"""
 
     def setUp(self):
         pass
@@ -87,7 +87,9 @@ class TokenizerTest(TestCase):
         """ kwk is easier than tce: we just need to use kwk-umista -> kwk-ipa, but that's not
             implemented yet.
         """
-        self.assertEqual(len(tok.get_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1)
+        self.assertEqual(
+            len(tok.get_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1
+        )
 
 
 if __name__ == "__main__":

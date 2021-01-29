@@ -11,6 +11,7 @@ from networkx.exception import NetworkXNoPath
 
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
+import g2p.mappings.tokenizer as tok
 from g2p.transducer import CompositeTransducer, Transducer
 from g2p.log import LOGGER
 
@@ -54,4 +55,16 @@ def make_g2p(in_lang: str, out_lang: str):
     else:
         return CompositeTransducer([Transducer(x) for x in mappings_needed])
 
-    
+
+def get_tokenizer(in_lang=None):
+    return tok.get_tokenizer(in_lang)
+
+
+def tokenize_and_map(tokenizer, transducer, input: str):
+    result = ""
+    for token in tokenizer.tokenize_text(input):
+        if token["is_word"]:
+            result += transducer(token["text"]).output_string
+        else:
+            result += token["text"]
+    return result
