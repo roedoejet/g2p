@@ -12,7 +12,7 @@ from networkx.exception import NetworkXNoPath
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 import g2p.mappings.tokenizer as tok
-from g2p.transducer import CompositeTransducer, Transducer
+from g2p.transducer import CompositeTransducer, Transducer, TokenizingTransducer
 from g2p.log import LOGGER
 
 if sys.stdout.encoding != 'utf8' and hasattr(sys.stdout, 'buffer'):
@@ -21,7 +21,7 @@ if sys.stdout.encoding != 'utf8' and hasattr(sys.stdout, 'buffer'):
 if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
-def make_g2p(in_lang: str, out_lang: str):
+def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called {in_lang}. Please try again.")
@@ -49,11 +49,18 @@ def make_g2p(in_lang: str, out_lang: str):
         except IndexError:
             continue
 
-    # Either return Transducer or Composite Transducer
+    # Either construct a Transducer or Composite Transducer
     if len(mappings_needed) == 1:
-        return Transducer(mappings_needed[0])
+        transducer = Transducer(mappings_needed[0])
     else:
-        return CompositeTransducer([Transducer(x) for x in mappings_needed])
+        transducer = CompositeTransducer([Transducer(x) for x in mappings_needed])
+
+    # If tokenization was requested, return a TokenizingTransducer
+    if tok_lang:
+        tokenizer = tok.get_tokenizer(tok_lang)
+        transducer = TokenizingTransducer(transducer, tokenizer)
+
+    return transducer
 
 
 def get_tokenizer(in_lang=None):

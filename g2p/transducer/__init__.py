@@ -10,6 +10,7 @@ from typing import Dict, List, Pattern, Tuple, Union
 from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
+from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
@@ -505,3 +506,84 @@ class CompositeTransducer():
             self._tiers.append(tg)
             to_convert = tg.output_string
         return CompositeTransductionGraph(self._tiers)
+
+
+class TokenizedPseudoGraph(TransductionGraph):
+    """Unlike the real transduction graphs, the tokenized one only has the output_string
+    """
+
+    def __init__(self, input_string: str):
+        # Plain strings
+        self._input_string = input_string
+        self._output_string = input_string
+
+    @property
+    def input_string(self):
+        """str: The input string that initialized the TransductionGraph."""
+        return self._input_string
+
+    @input_string.setter
+    def input_string(self, value):
+        raise ValueError(
+            f"Sorry, you tried to change the input string to {value} but it cannot be changed")
+
+    @property
+    def output_string(self):
+        """str: The output string."""
+        return self._output_string
+
+    @output_string.setter
+    def output_string(self, value):
+        self._output_string = value
+
+    @property
+    def input_nodes(self):
+        raise ValueError(f"Sorry, input_nodes is not implemented yet for TokenizedPseudoGraph")
+
+    @property
+    def output_nodes(self):
+        raise ValueError(f"Sorry, output_nodes is not implemented yet for TokenizedPseudoGraph")
+
+    @property
+    def edges(self):
+        raise ValueError(f"Sorry, edges is not implemented yet for TokenizedPseudoGraph")
+
+    @edges.setter
+    def edges(self, value):
+        raise ValueError(f"Sorry, edges is not implemented yet for TokenizedPseudoGraph")
+
+    @property
+    def debugger(self):
+        raise ValueError(f"Sorry, debugger is not implemented yet for TokenizedPseudoGraph")
+
+    @debugger.setter
+    def debugger(self, value):
+        raise ValueError(f"Sorry, debugger is not implemented yet for TokenizedPseudoGraph")
+
+    @property
+    def tiers(self):
+        raise ValueError(f"Sorry, tiers is not implemented yet for TokenizedPseudoGraph")
+
+
+class TokenizingTransducer():
+    """This class combines tokenization and transduction.
+
+    Attributes:
+        transducer (Transducer): A Tranducer object for the mapping part
+        tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
+    """
+
+    def __init__(self, transducer: Transducer, tokenizer: DefaultTokenizer):
+        self._transducer = transducer
+        self._tokenizer = tokenizer
+
+    def __call__(self, to_convert: str):
+        result = ""
+        for token in self._tokenizer.tokenize_text(to_convert):
+            if token["is_word"]:
+                result += self._transducer(token["text"]).output_string
+            else:
+                result += token["text"]
+        tg = TokenizedPseudoGraph(to_convert)
+        tg.output_string = result
+        return tg
