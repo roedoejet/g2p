@@ -228,6 +228,12 @@
         "context_after": ""
     },
     {
+        "in": "\u0258\u02d0",
+        "out": "\u0259",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
         "in": "i\u02d0",
         "out": "e\u02d0",
         "context_before": "",
@@ -242,12 +248,6 @@
     {
         "in": "a\u02d0",
         "out": "e\u02d0",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0258\u02d0",
-        "out": "\u0259",
         "context_before": "",
         "context_after": ""
     },
@@ -282,6 +282,18 @@
         "context_after": ""
     },
     {
+        "in": "\u028c",
+        "out": "\u028c",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0258",
+        "out": "\u0259",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
         "in": "i",
         "out": "i",
         "context_before": "",
@@ -296,18 +308,6 @@
     {
         "in": "a",
         "out": "\u00e6",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u028c",
-        "out": "\u028c",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0258",
-        "out": "\u0259",
         "context_before": "",
         "context_after": ""
     },
