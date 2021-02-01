@@ -240,3 +240,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2021-01-31 19:56:52.169427
+    case_sensitive: false
+    display_name: tau-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: tau-ipa
+    language_name: tau-ipa
+    mapping: tau-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: as-written
