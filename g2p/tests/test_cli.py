@@ -99,5 +99,24 @@ class CliTest(TestCase):
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
 
+    def test_convert_option_e(self):
+        result = self.runner.invoke(convert, "-e est fra eng-arpabet")
+        for s in ["[['e', 'ɛ'], ['s', 'ɛ'], ['t', 'ɛ']]", "[['ɛ', 'ɛ']]", "[['ɛ', 'E'], ['ɛ', 'H']]"]:
+            self.assertIn(s, result.stdout)
+
+    def test_convert_option_d(self):
+        result = self.runner.invoke(convert, "-d est fra eng-arpabet")
+        for s in ["'input': 'est'", "'output': 'ɛ'", "'input': 'ɛ'", "'output': 'EH'"]:
+            self.assertIn(s, result.stdout)
+
+    def test_convert_option_t(self):
+        result = self.runner.invoke(convert, "-t e\\'i oji oji-ipa")
+        self.assertIn("e:ʔi", result.stdout)
+
+    def test_convert_option_tl(self):
+        result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
+        self.assertIn("e:'i", result.stdout)
+
+
 if __name__ == '__main__':
     main()

@@ -3,7 +3,7 @@ import click
 import yaml
 import re
 import codecs
-from pprint import PrettyPrinter as pp
+import pprint
 from flask.cli import FlaskGroup
 from collections import OrderedDict
 from networkx import draw, has_path
@@ -21,7 +21,7 @@ from g2p.api import update_docs
 from g2p.log import LOGGER
 from g2p import make_g2p
 
-PRINTER = pp(indent=4)
+PRINTER = pprint.PrettyPrinter(indent=4)
 
 
 def create_app():
@@ -86,8 +86,17 @@ def generate_mapping_network(path):
     plt.show()
 
 
+@click.option("--pretty-edges", "-e", default=False, is_flag=True,
+    help="Show the traduction graph in a pretty, plain-text format."
+)
 @click.option('--debugger/--no-debugger', '-d',
     default=False, help="Show all the conversion steps applied."
+)
+@click.option("--tok-lang", default=None,
+    help="Tokenize INPUT_TEXT before converting using the tokenizer for language TEXT."
+)
+@click.option("--tok", "-t", default=False, is_flag=True,
+    help="Tokenize INPUT_TEXT before converting using the tokenizer for IN_LANG."
 )
 @click.option('--path',
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
@@ -97,7 +106,7 @@ def generate_mapping_network(path):
 @click.argument('in_lang')
 @click.argument('input_text', type=click.STRING)
 @cli.command(context_settings=CONTEXT_SETTINGS, short_help="Convert text through a g2p mapping path.")
-def convert(in_lang, out_lang, input_text, path, debugger):
+def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, tok_lang):
     '''Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
        Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of languages.
@@ -126,17 +135,24 @@ def convert(in_lang, out_lang, input_text, path, debugger):
     if os.path.exists(input_text) and input_text.endswith('txt'):
         with open(input_text, encoding='utf8') as f:
             input_text = f.read()
+    # Determine which tokenizer to use, if any
+    if tok and tok_lang is None:
+        tok_lang = in_lang
+    # Transduce!!!
     if in_lang and out_lang:
-        transducer = make_g2p(in_lang, out_lang)
+        transducer = make_g2p(in_lang, out_lang, tok_lang=tok_lang)
     elif path:
         transducer = Transducer(Mapping(path))
     tg = transducer(input_text)
+    outputs = [tg.output_string]
+    if pretty_edges:
+        outputs += [tg.pretty_edges()]
     if debugger:
-        output = [tg.output_string, tg.edges, tg.debugger]
-        PRINTER.pprint(output)
+        outputs += [tg.edges, tg.debugger]
+    if len(outputs) > 1:
+        click.echo(pprint.pformat(outputs, indent=4))
     else:
-        output = tg.output_string
-        click.echo(output)
+        click.echo(tg.output_string)
 
 
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
