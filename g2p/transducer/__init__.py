@@ -133,8 +133,40 @@ class TransductionGraph():
                 edges[i] = [self._input_nodes[edge[0]][1], None]
         return edges
 
+    def as_dict(self):
+        return {
+            "edges": self._edges,
+            "input": self._input_string,
+            "output": self._output_string,
+            "input_nodes": self._input_nodes,
+            "output_nodes": self._output_nodes,
+        }
 
-class Transducer():
+    def clear_debugger(self):
+        self._debugger = []
+
+    def append(self, tg):
+        """ Append the nodes, edges, strings and debugger from tg to self,
+            shifting indices so tg nodes and edges are added after those of self.
+        """
+        in_offset = len(self._input_nodes)
+        out_offset = len(self._output_nodes)
+        # append input and output strings
+        self._input_string += tg._input_string
+        self._output_string += tg._output_string
+        # append nodes
+        self._input_nodes += [(i + in_offset, x) for (i, x) in tg._input_nodes]
+        self._output_nodes += [(i + out_offset, x) for (i, x) in tg._output_nodes]
+        # append edges
+        self._edges += [
+            (i + in_offset, None if j is None else j + out_offset)
+            for (i, j) in tg._edges
+        ]
+        # append debuggers
+        self._debugger += tg._debugger
+
+
+class Transducer:
     """This is the fundamental class for performing conversions in the g2p library.
 
     Each Transducer must be initialized with a Mapping object. The Transducer object can then be called to apply the rules from Mapping on a given input.
@@ -394,6 +426,7 @@ class Transducer():
         if self.norm_form:
             to_convert = normalize(to_convert, self.norm_form)
         tg = TransductionGraph(to_convert)
+        tg.debugger.append([])
         # initialize values
         intermediate_forms = False
         # iterate rules
@@ -423,7 +456,7 @@ class Transducer():
                     self.update_default_indices(
                         tg, match, intermediate_diff, out_string)
                 if io['in'] != io['out']:
-                    tg.debugger.append({'input': debug_string,
+                    tg.debugger[-1].append({'input': debug_string,
                                         'output': tg.output_string,
                                         'rule': {k: v for k, v in io.items() if k != 'match_pattern'},
                                         'start': start,
@@ -482,6 +515,30 @@ class CompositeTransductionGraph(TransductionGraph):
             pretty_edges.append(edges)
         return pretty_edges
 
+    def as_dict(self):
+        return {
+            "edges": self._edges,
+            "input": self._input_string,
+            "output": self._output_string,
+            "input_nodes": self._input_nodes,
+            "output_nodes": self._output_nodes,
+        }
+
+    def append(self, tg):
+        if isinstance(tg, CompositeTransductionGraph):
+            assert len(self._tiers) == len(tg._tiers)
+            for i in range(len(self._tiers)):
+                self._tiers[i].append(copy.deepcopy(tg.tiers[i]))
+        else:
+            for tier in self._tiers:
+                tier.append(copy.deepcopy(tg))
+        self.__init__(self.tiers)
+
+    def clear_debugger(self):
+        self._debugger = []
+        for tier in self._tiers:
+            tier.clear_debugger()
+
 
 class CompositeTransducer():
     """This class combines Transducer objects to form a CompositeTransducer object.
@@ -492,7 +549,6 @@ class CompositeTransducer():
 
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
-        self._tiers = []
 
     def __repr__(self):
         return f"{self.__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
@@ -501,68 +557,12 @@ class CompositeTransducer():
         return self.apply_rules(to_convert)
 
     def apply_rules(self, to_convert: str):
+        tg_list = []
         for transducer in self._transducers:
             tg = transducer(to_convert)
-            self._tiers.append(tg)
+            tg_list.append(tg)
             to_convert = tg.output_string
-        return CompositeTransductionGraph(self._tiers)
-
-
-class TokenizedPseudoGraph(TransductionGraph):
-    """Unlike the real transduction graphs, the tokenized one only has the output_string
-    """
-
-    def __init__(self, input_string: str):
-        # Plain strings
-        self._input_string = input_string
-        self._output_string = input_string
-
-    @property
-    def input_string(self):
-        """str: The input string that initialized the TransductionGraph."""
-        return self._input_string
-
-    @input_string.setter
-    def input_string(self, value):
-        raise ValueError(
-            f"Sorry, you tried to change the input string to {value} but it cannot be changed")
-
-    @property
-    def output_string(self):
-        """str: The output string."""
-        return self._output_string
-
-    @output_string.setter
-    def output_string(self, value):
-        self._output_string = value
-
-    @property
-    def input_nodes(self):
-        raise ValueError(f"Sorry, input_nodes is not implemented yet for TokenizedPseudoGraph")
-
-    @property
-    def output_nodes(self):
-        raise ValueError(f"Sorry, output_nodes is not implemented yet for TokenizedPseudoGraph")
-
-    @property
-    def edges(self):
-        raise ValueError(f"Sorry, edges is not implemented yet for TokenizedPseudoGraph")
-
-    @edges.setter
-    def edges(self, value):
-        raise ValueError(f"Sorry, edges is not implemented yet for TokenizedPseudoGraph")
-
-    @property
-    def debugger(self):
-        raise ValueError(f"Sorry, debugger is not implemented yet for TokenizedPseudoGraph")
-
-    @debugger.setter
-    def debugger(self, value):
-        raise ValueError(f"Sorry, debugger is not implemented yet for TokenizedPseudoGraph")
-
-    @property
-    def tiers(self):
-        raise ValueError(f"Sorry, tiers is not implemented yet for TokenizedPseudoGraph")
+        return CompositeTransductionGraph(tg_list)
 
 
 class TokenizingTransducer():
@@ -578,12 +578,13 @@ class TokenizingTransducer():
         self._tokenizer = tokenizer
 
     def __call__(self, to_convert: str):
-        result = ""
+        tg = self._transducer("")
+        tg.clear_debugger()  # clear the meaningless initial debugger
         for token in self._tokenizer.tokenize_text(to_convert):
             if token["is_word"]:
-                result += self._transducer(token["text"]).output_string
+                word_tg = self._transducer(token["text"])
+                tg.append(word_tg)
             else:
-                result += token["text"]
-        tg = TokenizedPseudoGraph(to_convert)
-        tg.output_string = result
+                non_word_tg = TransductionGraph(token["text"])
+                tg.append(non_word_tg)
         return tg
