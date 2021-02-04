@@ -51,17 +51,44 @@ class TokenizerTest(TestCase):
             transducer(self.contextualize("teste")).output_string,
         )
 
-    def test_tokenizing_transducer_not_implemented(self):
-        """ The tokenizing transducer returns a pseudo graph with several features not implemented
-        """
+    def test_tokenizing_transducer_debugger(self):
         transducer = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")
-        tg = transducer("teste")
-        with self.assertRaises(ValueError):
-            edges = tg.edges
-        with self.assertRaises(ValueError):
-            nodes = tg.output_nodes
-        with self.assertRaises(ValueError):
-            debugger = tg.debugger
+        debugger = transducer("ceci est un test.").debugger
+        self.assertEqual(len(debugger), 4)
+
+    def test_tokenizing_transducer_edges(self):
+        transducer = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")
+        edges = transducer("est est").edges
+        # est -> ɛ, so edges are (0, 0), (1, 0), (2, 0) for each "est", plus the
+        # space to the space, and the second set of edges being offset
+        ref_edges = [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)]
+        self.assertEqual(edges, ref_edges)
+
+    def test_tokenizing_transducer_edges2(self):
+        ref_edges = g2p.make_g2p("fra", "fra-ipa")("ça ça").edges
+        edges = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")("ça ça").edges
+        self.assertEqual(edges, ref_edges)
+
+    def test_tokenizing_transducer_edge_chain(self):
+        transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
+        edges = transducer("est est").edges
+        ref_edges = [
+            # "est est" -> "ɛ ɛ"
+            [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)],
+            [(0, 0), (1, 1), (2, 2)],  # "ɛ ɛ" -> "ɛ ɛ"
+            [(0, 0), (0, 1), (1, 2), (2, 3), (2, 4)],  # "ɛ ɛ" -> "EH EH"
+        ]
+        self.assertEqual(edges, ref_edges)
+
+    def test_tokenizing_transducer_edge_spaces(self):
+        transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
+        edges = transducer("  a, ").edges
+        ref_edges = [
+            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],  # "  a, " -> "  a, "
+            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],  # "  a, " -> "  ɑ, "
+            [(0, 0), (1, 1), (2, 2), (2, 3), (3, 4), (4, 5)],  # "  ɑ, " -> "  AA, "
+        ]
+        self.assertEqual(edges, ref_edges)
 
 
 if __name__ == "__main__":
