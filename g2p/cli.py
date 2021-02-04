@@ -9,7 +9,10 @@ from collections import OrderedDict
 from networkx import draw, has_path
 
 from g2p.transducer import CompositeTransducer, Transducer
-from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback, DUMMY_INVENTORY
+from g2p.mappings.create_fallback_mapping import (
+    align_to_dummy_fallback,
+    DUMMY_INVENTORY,
+)
 from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.create_ipa_mapping import create_mapping
@@ -28,24 +31,43 @@ def create_app():
     return APP
 
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 @click.version_option(version=VERSION, prog_name="g2p")
 @click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
 def cli():
-    '''Management script for G2P'''
+    """Management script for G2P"""
 
 
-@click.option('--out-dir', type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    help='Output results in DIRECTORY instead of the global "generated" directory.')
-@click.option('--list-dummy', default=False, is_flag=True, help="List the dummy phone inventory.")
-@click.option('--dummy/--no-dummy', default=False, help="Generate dummy fallback mapping to minimalist phone inventory.")
-@click.option('--ipa/--no-ipa', default=False, help="Generate mapping from LANG-ipa to eng-ipa.")
-@click.argument('in_lang', type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]))
-@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Generate English IPA or dummy mapping.")
+@click.option(
+    "--out-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Output results in DIRECTORY instead of the global "generated" directory.',
+)
+@click.option(
+    "--list-dummy", default=False, is_flag=True, help="List the dummy phone inventory."
+)
+@click.option(
+    "--dummy/--no-dummy",
+    default=False,
+    help="Generate dummy fallback mapping to minimalist phone inventory.",
+)
+@click.option(
+    "--ipa/--no-ipa", default=False, help="Generate mapping from LANG-ipa to eng-ipa."
+)
+@click.argument(
+    "in_lang",
+    type=click.Choice(
+        [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
+    ),
+)
+@cli.command(
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Generate English IPA or dummy mapping.",
+)
 def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
-    ''' For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
+    """ For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
         or from IN_LANG-ipa to a dummy minimalist phone inventory.
 
         If you just modified or wrote the IN_LANG to IN_LANG-ipa mapping, don't forget
@@ -53,87 +75,109 @@ def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
 
         Call "g2p update" again after calling "g2p generate-mapping" to make the new
         IN_LANG-ipa to eng-ipa mapping available.
-    '''
+    """
     if not ipa and not dummy and not list_dummy:
-        click.echo('You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information.')
-    if out_dir and (os.path.exists(os.path.join(out_dir, 'config.yaml')) or os.path.exists(os.path.join(out_dir, 'config.yaml'))):
         click.echo(
-            f'There is already a mapping config file in \'{out_dir}\' \nPlease choose another path.')
+            "You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information."
+        )
+    if out_dir and (
+        os.path.exists(os.path.join(out_dir, "config.yaml"))
+        or os.path.exists(os.path.join(out_dir, "config.yaml"))
+    ):
+        click.echo(
+            f"There is already a mapping config file in '{out_dir}' \nPlease choose another path."
+        )
         return
     if list_dummy:
         print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
     if ipa:
-        check_ipa_known_segs([f'{in_lang}-ipa'])
-        eng_ipa = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
-        new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
+        check_ipa_known_segs([f"{in_lang}-ipa"])
+        eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
+        new_mapping = Mapping(in_lang=in_lang, out_lang=f"{in_lang}-ipa")
         click.echo(f"Writing English IPA mapping for {in_lang} to file")
-        create_mapping(new_mapping, eng_ipa,
-                       write_to_file=True, out_dir=out_dir)
+        create_mapping(new_mapping, eng_ipa, write_to_file=True, out_dir=out_dir)
     if dummy:
-        new_mapping = Mapping(in_lang=in_lang, out_lang=f'{in_lang}-ipa')
+        new_mapping = Mapping(in_lang=in_lang, out_lang=f"{in_lang}-ipa")
         click.echo(f"Writing dummy fallback mapping for {in_lang} to file")
         dummy_config, dummy_mapping = align_to_dummy_fallback(
-            new_mapping, write_to_file=True, out_dir=out_dir)
+            new_mapping, write_to_file=True, out_dir=out_dir
+        )
 
 
-@click.argument('path', type=click.Path(exists=True, file_okay=False, dir_okay=True))
+@click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping_network(path):
-    ''' Generate a png of the network of mapping languages. Requires matplotlib.
-    '''
+    """ Generate a png of the network of mapping languages. Requires matplotlib.
+    """
     import matplotlib.pyplot as plt
+
     draw(LANGS_NETWORK, with_labels=True)
     plt.show()
 
 
-@click.option("--pretty-edges", "-e", default=False, is_flag=True,
-    help="Show the traduction graph in a pretty, plain-text format."
+@click.option(
+    "--pretty-edges",
+    "-e",
+    default=False,
+    is_flag=True,
+    help="Show the traduction graph in a pretty, plain-text format.",
 )
-@click.option('--debugger/--no-debugger', '-d',
-    default=False, help="Show all the conversion steps applied."
+@click.option(
+    "--debugger/--no-debugger",
+    "-d",
+    default=False,
+    help="Show all the conversion steps applied.",
 )
-@click.option("--tok-lang", default=None,
-    help="Tokenize INPUT_TEXT before converting using the tokenizer for language TEXT."
+@click.option(
+    "--tok-lang",
+    default=None,
+    help="Tokenize INPUT_TEXT before converting using the tokenizer for language TEXT.",
 )
-@click.option("--tok", "-t", default=False, is_flag=True,
-    help="Tokenize INPUT_TEXT before converting using the tokenizer for IN_LANG."
+@click.option(
+    "--tok",
+    "-t",
+    default=False,
+    is_flag=True,
+    help="Tokenize INPUT_TEXT before converting using the tokenizer for IN_LANG.",
 )
-@click.option('--path',
+@click.option(
+    "--path",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     help="Read text to convert from FILE.",
 )
-@click.argument('out_lang')
-@click.argument('in_lang')
-@click.argument('input_text', type=click.STRING)
-@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Convert text through a g2p mapping path.")
+@click.argument("out_lang")
+@click.argument("in_lang")
+@click.argument("input_text", type=click.STRING)
+@cli.command(
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Convert text through a g2p mapping path.",
+)
 def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, tok_lang):
-    '''Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
+    """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
        Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of languages.
 
        There must be a path from IN_LANG to OUT_LANG, possibly via some intermediates.
        For example, mapping from fra to eng-arpabet will successively apply
        fra->fra-ipa, fra-ipa->eng-ipa and eng-ipa->eng-arpabet.
-    '''
+    """
     # Check valid input
     # Check input != output
     if in_lang == out_lang:
-        raise click.UsageError(
-            "Values must be different for 'IN_LANG' and 'OUT_LANG'")
+        raise click.UsageError("Values must be different for 'IN_LANG' and 'OUT_LANG'")
     # Check input lang exists
     if not in_lang in LANGS_NETWORK.nodes:
-        raise click.UsageError(
-            f"'{in_lang}' is not a valid value for 'IN_LANG'")
+        raise click.UsageError(f"'{in_lang}' is not a valid value for 'IN_LANG'")
     # Check output lang exists
     if not out_lang in LANGS_NETWORK.nodes:
-        raise click.UsageError(
-            f"'{out_lang}' is not a valid value for 'OUT_LANG'")
+        raise click.UsageError(f"'{out_lang}' is not a valid value for 'OUT_LANG'")
     # Check if path exists
     if not has_path(LANGS_NETWORK, in_lang, out_lang):
         raise click.UsageError(
-            f"Path between '{in_lang}' and '{out_lang}' does not exist")
-    if os.path.exists(input_text) and input_text.endswith('txt'):
-        with open(input_text, encoding='utf8') as f:
+            f"Path between '{in_lang}' and '{out_lang}' does not exist"
+        )
+    if os.path.exists(input_text) and input_text.endswith("txt"):
+        with open(input_text, encoding="utf8") as f:
             input_text = f.read()
     # Determine which tokenizer to use, if any
     if tok and tok_lang is None:
@@ -156,11 +200,17 @@ def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, to
 
 
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
-@click.option("--list-all", is_flag=True, help="List all mappings that can be specified")
-@click.option("--list-ipa", is_flag=True, help="List IPA mappings that can be specified")
 @click.option(
-    "--mapping", "-m", multiple=True,
-    help="Check specified IPA mapping(s) (default: check all IPA mappings)."
+    "--list-all", is_flag=True, help="List all mappings that can be specified"
+)
+@click.option(
+    "--list-ipa", is_flag=True, help="List IPA mappings that can be specified"
+)
+@click.option(
+    "--mapping",
+    "-m",
+    multiple=True,
+    help="Check specified IPA mapping(s) (default: check all IPA mappings).",
 )
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def doctor(mapping, list_all, list_ipa):
@@ -176,12 +226,16 @@ def doctor(mapping, list_all, list_ipa):
         out_langs = sorted(set([x["out_lang"] for x in MAPPINGS_AVAILABLE]))
         if list_ipa:
             out_langs = [x for x in out_langs if is_ipa(x)]
-        LOGGER.info("Specifying an output language will check all mappings into that language:\n")
+        LOGGER.info(
+            "Specifying an output language will check all mappings into that language:\n"
+        )
         for m in out_langs:
             print(f"{m}: ", end="")
             print(
                 ("\n" + " " * len(m) + "  ").join(
-                    sorted([x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m])
+                    sorted(
+                        [x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]
+                    )
                 )
             )
             print("")
@@ -208,48 +262,51 @@ def doctor(mapping, list_all, list_ipa):
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update():
-    ''' Update cached language files
-    '''
+    """ Update cached language files
+    """
     cache_langs()
     update_docs()
     network_to_echart(write_to_file=True)
 
-@click.argument('path', type=click.Path(exists=True, file_okay=True, dir_okay=False))
-@click.argument('lang')
-@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Scan a document for non target language characters.")
+
+@click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
+@click.argument("lang")
+@cli.command(
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Scan a document for non target language characters.",
+)
 def scan(lang, path):
     """ Returns the set of non-mapped characters in a document.
         Accounts for case sensitivity in the configuration.
     """
     # Check input lang exists
     if not lang in LANGS_NETWORK.nodes:
-        raise click.UsageError(
-            f"'{lang}' is not a valid value for 'LANG'")
-    
+        raise click.UsageError(f"'{lang}' is not a valid value for 'LANG'")
+
     # Retrieve the mappings for lang
     case_sensitive = True
     mappings = []
     for mapping in MAPPINGS_AVAILABLE:
-        if mapping['in_lang'].startswith(lang):
+        if mapping["in_lang"].startswith(lang):
             mappings.append(mapping)
-        case_sensitive = case_sensitive and mapping['case_sensitive']
-    
+        case_sensitive = case_sensitive and mapping["case_sensitive"]
+
     # Get input chars in mapping
     mapped_chars = set()
     for lang_mapping in mappings:
-        for x in lang_mapping['mapping_data']:
-            mapped_chars.add(normalize(x['in'],"NFD"))
+        for x in lang_mapping["mapping_data"]:
+            mapped_chars.add(normalize(x["in"], "NFD"))
     # Find unmapped chars
-    filter_chars = ' \n'
-    mapped_string = ''.join(mapped_chars)
-    pattern = '[^' + mapped_string + filter_chars + '.]'
+    filter_chars = " \n"
+    mapped_string = "".join(mapped_chars)
+    pattern = "[^" + mapped_string + filter_chars + ".]"
     prog = re.compile(pattern)
 
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         data = normalize(file.read(), "NFD")
         if not case_sensitive:
-             data = data.lower()
+            data = data.lower()
         unmapped = set(prog.findall(data))
         if unmapped:
-            LOGGER.warning('The following characters are not mapped:')
+            LOGGER.warning("The following characters are not mapped:")
             print(unmapped)
