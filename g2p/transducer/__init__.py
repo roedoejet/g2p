@@ -17,7 +17,7 @@ from g2p.log import LOGGER
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
-copy._deepcopy_dispatch[type(re.compile(''))] = lambda r, _: r
+copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r
 
 # An Index is typed as follows:
 # {input_index: int, {'input_string': str, 'output': {output_index: int, str}}}
@@ -33,7 +33,7 @@ Index = Dict
 ChangeLog = List[List[int]]
 
 
-class TransductionGraph():
+class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
 
     Each TransductionGraph must be initialized with an input string.
@@ -62,7 +62,8 @@ class TransductionGraph():
     @input_string.setter
     def input_string(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the input string to {value} but it cannot be changed')
+            f"Sorry, you tried to change the input string to {value} but it cannot be changed"
+        )
 
     @property
     def output_string(self):
@@ -82,7 +83,8 @@ class TransductionGraph():
     @input_nodes.setter
     def input_nodes(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the input nodes to {value} but they cannot be changed.')
+            f"Sorry, you tried to change the input nodes to {value} but they cannot be changed."
+        )
 
     @property
     def output_nodes(self):
@@ -92,7 +94,8 @@ class TransductionGraph():
     @output_nodes.setter
     def output_nodes(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the output nodes to {value} but they cannot be changed directly. Change output_string instead.')
+            f"Sorry, you tried to change the output nodes to {value} but they cannot be changed directly. Change output_string instead."
+        )
 
     @property
     def edges(self):
@@ -105,7 +108,7 @@ class TransductionGraph():
 
     @property
     def debugger(self):
-        """List[dict]: A list of rules applied during the transformation. Useful for debugging."""
+        """List[dict]: A list of lists of rules applied during the transformation. Useful for debugging."""
         return self._debugger
 
     @debugger.setter
@@ -120,15 +123,18 @@ class TransductionGraph():
     @tiers.setter
     def tiers(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+            f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
+        )
 
     def pretty_edges(self):
         edges = copy.deepcopy(self._edges)
         edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(edges):
             if edge[1] != None:
-                edges[i] = [self._input_nodes[edge[0]]
-                            [1], self._output_nodes[edge[1]][1]]
+                edges[i] = [
+                    self._input_nodes[edge[0]][1],
+                    self._output_nodes[edge[1]][1],
+                ]
             else:
                 edges[i] = [self._input_nodes[edge[0]][1], None]
         return edges
@@ -177,11 +183,11 @@ class Transducer:
 
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
-        self.case_sensitive = mapping.kwargs['case_sensitive']
-        self.norm_form = mapping.kwargs.get('norm_form', 'none')
-        self.out_delimiter = mapping.kwargs.get('out_delimiter', '')
-        self._index_match_pattern = re.compile(r'(?<={)\d+(?=})')
-        self._char_match_pattern = re.compile(r'[^0-9\{\}]+(?={\d+})', re.U)
+        self.case_sensitive = mapping.kwargs["case_sensitive"]
+        self.norm_form = mapping.kwargs.get("norm_form", "none")
+        self.out_delimiter = mapping.kwargs.get("out_delimiter", "")
+        self._index_match_pattern = re.compile(r"(?<={)\d+(?=})")
+        self._char_match_pattern = re.compile(r"[^0-9\{\}]+(?={\d+})", re.U)
 
     def __repr__(self):
         return f"{self.__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
@@ -212,12 +218,12 @@ class Transducer:
             intermediate_ord = ord(string[0])
             return intermediate_ord - 983040
         else:
-            return - 1
+            return -1
 
     def resolve_intermediate_chars(self, output_string):
-        ''' Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
+        """ Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
             to their mapped equivalents.
-        '''
+        """
         indices_seen = defaultdict(int)
         for i, char in enumerate(output_string):
             intermediate_index = self._pua_to_index(char)
@@ -227,15 +233,19 @@ class Transducer:
             else:
                 output_char_index = indices_seen[intermediate_index]
                 try:
-                    output_string = output_string[:i] + \
-                        self.mapping[intermediate_index]['out'][output_char_index] + \
-                        output_string[i+1:]
+                    output_string = (
+                        output_string[:i]
+                        + self.mapping[intermediate_index]["out"][output_char_index]
+                        + output_string[i + 1 :]
+                    )
                 except IndexError:
                     indices_seen[intermediate_index] = 0
                     output_char_index = 0
-                    output_string = output_string[:i] + \
-                        self.mapping[intermediate_index]['out'][output_char_index] + \
-                        output_string[i+1:]
+                    output_string = (
+                        output_string[:i]
+                        + self.mapping[intermediate_index]["out"][output_char_index]
+                        + output_string[i + 1 :]
+                    )
                 indices_seen[intermediate_index] += 1
         return output_string
 
@@ -249,34 +259,38 @@ class Transducer:
                 For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
                 Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
         """
-        input_char_matches = [x.group()
-                              for x in self._char_match_pattern.finditer(io['in'])]
+        input_char_matches = [
+            x.group() for x in self._char_match_pattern.finditer(io["in"])
+        ]
         input_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(io['in'])]
+            x.group() for x in self._index_match_pattern.finditer(io["in"])
+        ]
         inputs = {}
         index = 0
         start = match.start() + intermediate_diff
         for i, m in enumerate(input_match_indices):
             for j, char in enumerate(input_char_matches[i]):
                 if m in inputs:
-                    inputs[m].append({'index': index + start, 'string': char})
+                    inputs[m].append({"index": index + start, "string": char})
                 else:
-                    inputs[m] = [{'index': index + start, 'string': char}]
+                    inputs[m] = [{"index": index + start, "string": char}]
                 index += 1
         output_char_matches = [
-            x.group() for x in self._char_match_pattern.finditer(out_string)]
+            x.group() for x in self._char_match_pattern.finditer(out_string)
+        ]
         output_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(out_string)]
+            x.group() for x in self._index_match_pattern.finditer(out_string)
+        ]
         outputs = {}
         index = 0
         for i, m in enumerate(output_match_indices):
             for j, char in enumerate(output_char_matches[i]):
                 if m in outputs:
-                    outputs[m].append({'index': index + start, 'string': char})
+                    outputs[m].append({"index": index + start, "string": char})
                 else:
-                    outputs[m] = [{'index': index + start, 'string': char}]
+                    outputs[m] = [{"index": index + start, "string": char}]
                 index += 1
-        out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
+        out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
         deleted = 0
         for match_index, input_matches in inputs.items():
             try:
@@ -286,52 +300,57 @@ class Transducer:
             if len(input_matches) == len(output_matches):
                 shortest = input_matches
                 longest = output_matches
-                process = 'basic'
+                process = "basic"
             elif len(input_matches) < len(output_matches):
                 shortest = input_matches
                 longest = output_matches
-                process = 'insert'
+                process = "insert"
             else:
                 shortest = output_matches
                 longest = input_matches
-                process = 'delete'
+                process = "delete"
             for i, char in enumerate(longest):
-                if process == 'basic' or i <= len(shortest) - 1:
-                    input_index = input_matches[i]['index'] - intermediate_diff
-                    output_index = output_matches[i]['index']
+                if process == "basic" or i <= len(shortest) - 1:
+                    input_index = input_matches[i]["index"] - intermediate_diff
+                    output_index = output_matches[i]["index"]
                     # don't allow insertion in basic process
                     if output_index >= len(match.group()) + start:
                         output_index = len(match.group()) + start - 1
-                    tg.output_string = tg.output_string[:output_index] + \
-                        char['string'] + tg.output_string[output_index+1:]
+                    tg.output_string = (
+                        tg.output_string[:output_index]
+                        + char["string"]
+                        + tg.output_string[output_index + 1 :]
+                    )
                     tg.edges = [x for x in tg.edges if x[1] != output_index]
                     tg.edges.append([input_index, output_index])
                 else:
-                    if process == 'insert':
-                        input_index = input_matches[-1]['index'] - \
-                            intermediate_diff
-                        output_index = output_matches[i]['index']
-                        tg.output_string = tg.output_string[:output_index] + \
-                            char['string'] + tg.output_string[output_index:]
+                    if process == "insert":
+                        input_index = input_matches[-1]["index"] - intermediate_diff
+                        output_index = output_matches[i]["index"]
+                        tg.output_string = (
+                            tg.output_string[:output_index]
+                            + char["string"]
+                            + tg.output_string[output_index:]
+                        )
                         for i, edge in enumerate(tg.edges):
                             if edge[1] != None and edge[1] >= output_index:
                                 tg.edges[i][1] += 1
                         tg.edges.append([input_index, output_index])
                     else:
-                        input_index = input_matches[i]['index'] - \
-                            intermediate_diff
+                        input_index = input_matches[i]["index"] - intermediate_diff
                         if output_matches:
-                            output_index = output_matches[-1]['index'] - deleted
+                            output_index = output_matches[-1]["index"] - deleted
                         else:
                             output_index = input_index + intermediate_diff - deleted
-                        tg.output_string = tg.output_string[:output_index] + \
-                            tg.output_string[output_index + 1:]
+                        tg.output_string = (
+                            tg.output_string[:output_index]
+                            + tg.output_string[output_index + 1 :]
+                        )
                         deleted += 1
                         if len(output_matches) > 0:
                             if [input_index, output_index] not in tg.edges:
                                 tg.edges.append([input_index, output_index])
-                            tg.edges = [
-                                x for x in tg.edges if x[1] != output_index]
+                            tg.edges = [x for x in tg.edges if x[1] != output_index]
                         else:
                             for i, edge in enumerate(tg.edges):
                                 if edge[1] != None and edge[1] == output_index:
@@ -347,19 +366,22 @@ class Transducer:
         out_length = len(out_string)
         if in_length == out_length:
             for i, char in enumerate(out_string):
-                tg.output_string = tg.output_string[:i +
-                                                    start] + char + tg.output_string[i+start+1:]
+                tg.output_string = (
+                    tg.output_string[: i + start]
+                    + char
+                    + tg.output_string[i + start + 1 :]
+                )
             return
         # default insertion(s)
         elif in_length < out_length:
             longest = out_string
             shortest = in_string
-            process = 'insert'
+            process = "insert"
         # default deletion(s)
         else:
             longest = in_string
             shortest = out_string
-            process = 'delete'
+            process = "delete"
         # iterate the longest string
         deleted = 0
         last_input_node = start
@@ -367,19 +389,25 @@ class Transducer:
         for i, char in enumerate(longest):
             # if the shorter string still has that output, keep that index
             if i <= len(shortest) - 1:
-                tg.output_string = tg.output_string[:i+start] + \
-                    out_string[i] + tg.output_string[i+start+1:]
+                tg.output_string = (
+                    tg.output_string[: i + start]
+                    + out_string[i]
+                    + tg.output_string[i + start + 1 :]
+                )
                 last_input_node = i + start
                 last_output_node = i + start
             # otherwise...
             else:
                 # add a new node and increment each following node
                 # log the change in order to update the edges.
-                if process == 'insert':
+                if process == "insert":
                     # Nodes
                     index_to_add = i + start
-                    tg.output_string = tg.output_string[:index_to_add] + \
-                        char + tg.output_string[index_to_add:]
+                    tg.output_string = (
+                        tg.output_string[:index_to_add]
+                        + char
+                        + tg.output_string[index_to_add:]
+                    )
                     # Edges
                     # Remove previously deleted and increment
                     for i, edge in enumerate(tg.edges):
@@ -387,7 +415,8 @@ class Transducer:
                             tg.edges[i][1] += 1
                     # add edge to index of last input character
                     last_input_node = max(
-                        [x[0] for x in tg.edges if x[1] == last_output_node])
+                        [x[0] for x in tg.edges if x[1] == last_output_node]
+                    )
                     last_output_node = index_to_add
                     tg.edges.append([last_input_node, index_to_add])
                 # delete the node and decrement each following node
@@ -395,21 +424,22 @@ class Transducer:
                 else:
                     # Nodes
                     index_to_delete = i + start - deleted
-                    tg.output_string = tg.output_string[:index_to_delete] + \
-                        tg.output_string[index_to_delete + 1:]
+                    tg.output_string = (
+                        tg.output_string[:index_to_delete]
+                        + tg.output_string[index_to_delete + 1 :]
+                    )
                     deleted += 1
                     # Edges
                     # delete
                     last_input_node = max(
-                        [x[0] for x in tg.edges if x[1] == index_to_delete])
+                        [x[0] for x in tg.edges if x[1] == index_to_delete]
+                    )
                     # if rule is not just a simple deletion,
                     # add an edge between the node and the last output node
                     if out_length > 0:
                         if [last_input_node, last_output_node] not in tg.edges:
-                            tg.edges.append(
-                                [last_input_node, last_output_node])
-                        tg.edges = [x for x in tg.edges if x[1]
-                                    != index_to_delete]
+                            tg.edges.append([last_input_node, last_output_node])
+                        tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
                     else:
                         for i, edge in enumerate(tg.edges):
                             if edge[1] != None and edge[1] == index_to_delete:
@@ -432,42 +462,52 @@ class Transducer:
         # iterate rules
         for io in self.mapping:
             # Do not allow empty rules
-            if not io['in'] and not io['out']:
+            if not io["in"] and not io["out"]:
                 continue
             io = copy.deepcopy(io)
             intermediate_diff = 0
-            for match in io['match_pattern'].finditer(tg.output_string):
+            for match in io["match_pattern"].finditer(tg.output_string):
                 debug_string = tg.output_string
                 start = match.start() + intermediate_diff
                 end = match.end() + intermediate_diff
-                if 'intermediate_form' in io:
-                    out_string = io['intermediate_form']
+                if "intermediate_form" in io:
+                    out_string = io["intermediate_form"]
                     intermediate_forms = True
                 else:
-                    out_string = io['out']
+                    out_string = io["out"]
                 if self.out_delimiter:
                     # if not end segment, add delimiter
                     if not end >= len(tg.output_string):
                         out_string += self.out_delimiter
-                if any(self._char_match_pattern.finditer(io['in'])) and any(self._char_match_pattern.finditer(out_string)):
+                if any(self._char_match_pattern.finditer(io["in"])) and any(
+                    self._char_match_pattern.finditer(out_string)
+                ):
                     self.update_explicit_indices(
-                        tg, match, io, intermediate_diff, out_string)
+                        tg, match, io, intermediate_diff, out_string
+                    )
                 else:
                     self.update_default_indices(
-                        tg, match, intermediate_diff, out_string)
-                if io['in'] != io['out']:
-                    tg.debugger[-1].append({'input': debug_string,
-                                        'output': tg.output_string,
-                                        'rule': {k: v for k, v in io.items() if k != 'match_pattern'},
-                                        'start': start,
-                                        'end': end})
-                out_string = re.sub(re.compile(r'{\d+}'), '', out_string)
+                        tg, match, intermediate_diff, out_string
+                    )
+                if io["in"] != io["out"]:
+                    tg.debugger[-1].append(
+                        {
+                            "input": debug_string,
+                            "output": tg.output_string,
+                            "rule": {
+                                k: v for k, v in io.items() if k != "match_pattern"
+                            },
+                            "start": start,
+                            "end": end,
+                        }
+                    )
+                out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
                 intermediate_diff += len(out_string) - len(match.group())
         if intermediate_forms:
-            tg.output_string = self.resolve_intermediate_chars(
-                tg.output_string)
-        tg.edges = list(dict.fromkeys(
-            [tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])]))
+            tg.output_string = self.resolve_intermediate_chars(tg.output_string)
+        tg.edges = list(
+            dict.fromkeys([tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])])
+        )
         return tg
 
 
@@ -499,7 +539,8 @@ class CompositeTransductionGraph(TransductionGraph):
     @tiers.setter
     def tiers(self, value):
         raise ValueError(
-            f'Sorry, you tried to change the tiers to {value} but they cannot be changed')
+            f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
+        )
 
     def pretty_edges(self):
         pretty_edges = []
@@ -508,8 +549,10 @@ class CompositeTransductionGraph(TransductionGraph):
             edges.sort(key=lambda x: x[0])
             for i, edge in enumerate(edges):
                 if edge[1] != None:
-                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]]
-                                [1], self.tiers[tier_i].output_nodes[edge[1]][1]]
+                    edges[i] = [
+                        self.tiers[tier_i].input_nodes[edge[0]][1],
+                        self.tiers[tier_i].output_nodes[edge[1]][1],
+                    ]
                 else:
                     edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
             pretty_edges.append(edges)
@@ -540,7 +583,7 @@ class CompositeTransductionGraph(TransductionGraph):
             tier.clear_debugger()
 
 
-class CompositeTransducer():
+class CompositeTransducer:
     """This class combines Transducer objects to form a CompositeTransducer object.
 
     Attributes:
@@ -565,7 +608,7 @@ class CompositeTransducer():
         return CompositeTransductionGraph(tg_list)
 
 
-class TokenizingTransducer():
+class TokenizingTransducer:
     """This class combines tokenization and transduction.
 
     Attributes:
