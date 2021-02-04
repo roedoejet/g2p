@@ -6,7 +6,7 @@ import os
 import g2p
 
 
-class TokenizerTest(TestCase):
+class TokenizeAndMapTest(TestCase):
     """ Test suite for chaining tokenization and transduction """
 
     def setUp(self):
