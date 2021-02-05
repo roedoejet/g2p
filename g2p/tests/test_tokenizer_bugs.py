@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from unittest import main, TestCase
+from g2p.log import LOGGER
 import os
 
 import g2p.mappings.tokenizer as tok
@@ -31,13 +32,15 @@ class TokenizerTestBugs(TestCase):
         tokenizer = tok.get_tokenizer("tce")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 1)
-        self.assertFalse(tokens[0]["is_word"])
+        self.assertTrue(tokens[0]["is_word"])
         self.assertEqual(tokens[0]["text"], "ts'nj")
 
     def test_tokenize_tce_equiv(self):
         input = "ts'e ts`e ts‘e ts’"
         self.assertEqual(len(tok.get_tokenizer("fra").tokenize_text(input)), 14)
-        self.assertEqual(len(tok.get_tokenizer("tce").tokenize_text(input)), 4)
+        tce_tokens = tok.get_tokenizer("tce").tokenize_text(input)
+        #LOGGER.warning([x["text"] for x in tce_tokens])
+        self.assertEqual(len(tok.get_tokenizer("tce").tokenize_text(input)), 7)
 
     def test_tokenizer_identity_tce(self):
         self.assertNotEqual(tok.get_tokenizer("eng"), tok.get_tokenizer("fra"))
