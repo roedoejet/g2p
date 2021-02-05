@@ -22,7 +22,6 @@ from g2p.tests.test_api_resources import ResourceIntegrationTest
 from g2p.tests.test_studio import StudioTest
 from g2p.tests.test_doctor import DoctorTest
 from g2p.tests.test_tokenizer import TokenizerTest
-from g2p.tests.test_tokenizer_bugs import TokenizerTestBugs
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 
 
@@ -45,7 +44,6 @@ MAPPINGS_TESTS = [
         NetworkTest,
         UtilsTest,
         TokenizerTest,
-        #TokenizerTestBugs, # left out because we know these tests fail
         TokenizeAndMapTest,
     ]
 ]

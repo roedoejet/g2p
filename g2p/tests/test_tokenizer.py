@@ -55,7 +55,7 @@ class TokenizerTest(TestCase):
         self.assertTrue(tokens[0]["is_word"])
         self.assertEqual(tokens[0]["text"], "p'ōį̄ą")
 
-    def not_test_tokenize_tce(self):
+    def test_tokenize_tce(self):
         """ tce is hard to tokenize correctly because we have tce -> tce-equiv -> tce-ipa, and ' is
             only mapped in the latter.
             Challenges:
@@ -63,6 +63,7 @@ class TokenizerTest(TestCase):
                tokenizer
              - we want to merge the input inventory of both tce->tce-equiv and tce-equiv->tce-ipa
                into just one joint inventory for the purpose of tokenization.
+            Now works - issue #46 fixed this.
         """
         input = "ts'nj"
         self.assertEqual(len(tok.get_tokenizer("fra").tokenize_text(input)), 3)
@@ -70,22 +71,25 @@ class TokenizerTest(TestCase):
         tokenizer = tok.get_tokenizer("tce")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 1)
-        self.assertFalse(tokens[0]["is_word"])
+        self.assertTrue(tokens[0]["is_word"])
         self.assertEqual(tokens[0]["text"], "ts'nj")
 
-    def not_test_tokenize_tce_equiv(self):
+    def test_tokenize_tce_equiv(self):
         input = "ts'e ts`e ts‘e ts’"
         self.assertEqual(len(tok.get_tokenizer("fra").tokenize_text(input)), 14)
-        self.assertEqual(len(tok.get_tokenizer("tce").tokenize_text(input)), 4)
+        tce_tokens = tok.get_tokenizer("tce").tokenize_text(input)
+        # LOGGER.warning([x["text"] for x in tce_tokens])
+        self.assertEqual(len(tok.get_tokenizer("tce").tokenize_text(input)), 7)
 
-    def not_test_tokenizer_identity_tce(self):
+    def test_tokenizer_identity_tce(self):
         self.assertNotEqual(tok.get_tokenizer("eng"), tok.get_tokenizer("fra"))
-        # the following assertion currently fails because both get the default tokenizer
         self.assertNotEqual(tok.get_tokenizer("eng"), tok.get_tokenizer("tce"))
+        self.assertEqual(tok.get_tokenizer("eng"), tok.get_tokenizer())
 
-    def not_test_tokenize_kwk(self):
+    def test_tokenize_kwk(self):
         """ kwk is easier than tce: we just need to use kwk-umista -> kwk-ipa, but that's not
             implemented yet.
+            Now works - issue #46 fixed this.
         """
         self.assertEqual(
             len(tok.get_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1
