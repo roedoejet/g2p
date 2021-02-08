@@ -131,12 +131,12 @@ def generate_mapping_network(path):
 @click.option(
     "--tok-lang",
     default=None,
-    help="Tokenize INPUT_TEXT before converting using the tokenizer for language TEXT.",
+    help="Override the tokenizing language. Implies --tok.",
 )
 @click.option(
-    "--tok",
+    "--tok/--no-tok",
     "-t",
-    default=False,
+    default=None,
     is_flag=True,
     help="Tokenize INPUT_TEXT before converting using the tokenizer for IN_LANG.",
 )
@@ -180,6 +180,8 @@ def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, to
         with open(input_text, encoding="utf8") as f:
             input_text = f.read()
     # Determine which tokenizer to use, if any
+    if tok is not None and not tok and tok_lang is not None:
+        raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
     if tok and tok_lang is None:
         tok_lang = in_lang
     # Transduce!!!

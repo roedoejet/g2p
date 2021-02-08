@@ -39,26 +39,36 @@ class CliTest(TestCase):
 
     def test_convert(self):
         error_count = 0
-        for test in self.langs_to_test:
-            output_string = self.runner.invoke(
-                convert, [test[2], test[0], test[1]]
-            ).stdout.strip()
-            if output_string != test[3]:
-                LOGGER.warning(
-                    "test_cli.py: mapping error: {} from {} to {} should be {}, got {}".format(
-                        test[2], test[0], test[1], test[3], output_string
+        for tok_option in ["--tok", "--no-tok"]:
+            for test in self.langs_to_test:
+                output_string = self.runner.invoke(
+                    convert, [tok_option, test[2], test[0], test[1]]
+                ).stdout.strip()
+                if output_string != test[3]:
+                    LOGGER.warning(
+                        f"test_cli.py: {test[0]}->{test[1]} mapping error: "
+                        f"{test[2]} should map to {test[3]}, got {output_string} (with {tok_option})."
                     )
-                )
-                if error_count == 0:
-                    first_failed_test = test
-                error_count += 1
+                    if error_count == 0:
+                        first_failed_test = test + [tok_option]
+                    error_count += 1
 
         if error_count > 0:
+            reference_string = first_failed_test[3]
             output_string = self.runner.invoke(
                 convert,
-                [first_failed_test[2], first_failed_test[0], first_failed_test[1]],
+                [
+                    first_failed_test[4],  # tok_option
+                    first_failed_test[2],  # word to convert
+                    first_failed_test[0],  # in_lang
+                    first_failed_test[1],  # out_lang
+                ],
             ).stdout.strip()
-            self.assertEqual(output_string, first_failed_test[3])
+            self.assertEqual(
+                output_string,
+                reference_string,
+                "Look for warnings in the log for any more mapping errors",
+            )
 
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")
