@@ -20,6 +20,7 @@ class DefaultTokenizer:
         self.inventory = []
         self.delim = ""
         self.case_sensitive = False
+        self.dot_is_letter = False # Hack for Tlingit where . is a letter when not word final
 
     def tokenize_aux(self, text):
         return text
@@ -39,6 +40,10 @@ class DefaultTokenizer:
     def tokenize_text(self, text):
         matches = self.tokenize_aux(text)
         units = [{"text": m, "is_word": self.is_word_character(m)} for m in matches]
+        if self.dot_is_letter:
+            for i, unit in enumerate(units):
+                if unit["text"] == "." and i+1 < len(units) and units[i+1]["is_word"]:
+                    unit["is_word"] = True
         units = merge_if_same_label(units, "text", "is_word")
         return units
 
@@ -49,6 +54,7 @@ class Tokenizer(DefaultTokenizer):
         self.lang = mapping.kwargs.get("language_name", "")
         self.delim = mapping.kwargs.get("in_delimiter", "")
         self.case_sensitive = mapping.kwargs.get("case_sensitive", True)
+        self.dot_is_letter = False
         # create regex
         self._build_regex()
 
@@ -76,9 +82,8 @@ class TwoHopTokenizer(Tokenizer):
         self.inventory = sum([m.inventory("in") for m in mappings], [])
         self.lang = mappings[0].kwargs.get("language_name", "")
         self.delim = mappings[0].kwargs.get("in_delimiter", "")
-        self.case_sensitive = any(
-            m.kwargs.get("case_sensitive", True) for m in mappings
-        )
+        self.case_sensitive = mappings[0].kwargs.get("case_sensitive", True)
+        self.dot_is_letter = False
         self._build_regex()
         # LOGGER.warning(pprint.pformat([self.lang, self.delim, self.case_sensitive, self.inventory]))
 
@@ -167,6 +172,10 @@ class TokenizerLibrary:
                     LOGGER.warning(
                         f"code above inspected the langs network, mapping from {in_lang} to {out_lang} should have been found!!!"
                     )
+
+            # Hack for Tlingit using dot as a letter when non word-final
+            if in_lang == "tli":
+                self.tokenizers[tokenizer_key].dot_is_letter = True
 
         return self.tokenizers.get(tokenizer_key)
 
