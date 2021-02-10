@@ -57,7 +57,10 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
 
     # If tokenization was requested, return a TokenizingTransducer
     if tok_lang:
-        tokenizer = tok.get_tokenizer(tok_lang)
+        if tok_lang == "path":
+            tokenizer = tok.get_tokenizer(in_lang=in_lang, tok_path=path)
+        else:
+            tokenizer = tok.get_tokenizer(in_lang=tok_lang)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
     return transducer

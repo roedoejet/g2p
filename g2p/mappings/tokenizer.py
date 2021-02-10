@@ -14,8 +14,6 @@ from g2p.log import LOGGER
 from networkx.exception import NetworkXError
 import pprint
 
-pp = pprint.PrettyPrinter()
-
 
 class DefaultTokenizer:
     def __init__(self):
@@ -95,27 +93,27 @@ class TokenizerLibrary:
     def __init__(self):
         self.tokenizers = {None: DefaultTokenizer()}
 
-    def get_tokenizer_key(self, in_lang, out_lang=None):
+    def get_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
         if not in_lang:
             return None
+        if tok_path:
+            return "-to-".join(tok_path)
         if not out_lang:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang
 
-    def get_tokenizer(self, in_lang, out_lang=None):
-        """ Get the tokenizer for input in language in_lang
-
-            Logic used:
-            - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
-              inventory of that mapping.
-            - elif in_lang -> X -> Y-ipa exists, e.g., tce -> tce-equiv -> tce-ipa, tokenize
-              using the input inventory of those two hops.
-            - otherwise, just use the default tokenizer, which accepts as part of words all
-              unicode letter, numbers and diacritics
-        """
-        tokenizer_key = self.get_tokenizer_key(in_lang, out_lang)
+    def get_tokenizer(self, in_lang, out_lang=None, tok_path=None):
+        tokenizer_key = self.get_tokenizer_key(in_lang, out_lang, tok_path)
         if not self.tokenizers.get(tokenizer_key):
             # This tokenizer was not created yet, initialize it now.
+            if tok_path:
+                #LOGGER.warning(f"in_lang={in_lang} tok_path={tok_path}")
+                if tok_path[0] != in_lang:
+                    raise ValueError("calling get_tokenizer() with tok_path requires that tok_path[0] == in_lang")
+                if len(tok_path) == 2 or tok_path[1].endswith("-ipa"):
+                    out_lang = tok_path[1]
+                else:
+                    out_lang = [tok_path[1], tok_path[2]]
             if not out_lang:
                 try:
                     successors = [x for x in LANGS_NETWORK.successors(in_lang)]
@@ -139,8 +137,9 @@ class TokenizerLibrary:
                             out_lang = [x, ipa_successors_two_hops[0]]
                         break
                     # There is no two-hop IPA successor, use the first direct successor
-                    if successors:
+                    if out_lang is None and successors:
                         out_lang = successors[0]
+            #LOGGER.warning(f"Tokenizer for {in_lang} is {out_lang}.")
             if out_lang is None:
                 # Default tokenizer:
                 self.tokenizers[tokenizer_key] = self.tokenizers[None]
@@ -175,5 +174,22 @@ class TokenizerLibrary:
 _TOKENIZER_LIBRARY = TokenizerLibrary()
 
 
-def get_tokenizer(in_lang=None):
-    return _TOKENIZER_LIBRARY.get_tokenizer(in_lang)
+def get_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+    """ Get the tokenizer for input in language in_lang
+
+        Logic used when only in_lang is provided:
+        - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
+          inventory of that mapping.
+        - elif in_lang -> X -> Y-ipa exists, e.g., tce -> tce-equiv -> tce-ipa, tokenize
+          using the input inventory of those two hops.
+        - otherwise, just use the default tokenizer, which accepts as part of words all
+          unicode letter, numbers and diacritics
+
+        Logic used when in_lang and out_lang are provided:
+        - if in_lang -> out_lang exists, tokenize using the input inventory of that mapping
+        - otherwise use the default tokenizer
+
+        Logic used when in_lang and tok_path are provided:
+        - use the first one or two hops in path, stopping at the first -ipa node
+    """
+    return _TOKENIZER_LIBRARY.get_tokenizer(in_lang, out_lang, tok_path)

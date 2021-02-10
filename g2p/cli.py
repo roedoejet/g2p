@@ -138,7 +138,7 @@ def generate_mapping_network(path):
     "-t",
     default=None,
     is_flag=True,
-    help="Tokenize INPUT_TEXT before converting using the tokenizer for IN_LANG.",
+    help="Tokenize INPUT_TEXT before converting.",
 )
 @click.option(
     "--path",
@@ -183,7 +183,7 @@ def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, to
     if tok is not None and not tok and tok_lang is not None:
         raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
     if tok and tok_lang is None:
-        tok_lang = in_lang
+        tok_lang = "path"
     # Transduce!!!
     if in_lang and out_lang:
         transducer = make_g2p(in_lang, out_lang, tok_lang=tok_lang)
