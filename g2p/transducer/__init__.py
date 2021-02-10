@@ -592,6 +592,7 @@ class CompositeTransducer:
 
     def __init__(self, transducers: List[Transducer]):
         self._transducers = transducers
+        self.norm_form = transducers[0].norm_form if transducers else "none"
 
     def __repr__(self):
         return f"{self.__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
@@ -621,8 +622,15 @@ class TokenizingTransducer:
         self._tokenizer = tokenizer
 
     def __call__(self, to_convert: str):
+        # perform normalization before tokenizing, since it can change tokenization
+        if self._transducer.norm_form:
+            to_convert = normalize(to_convert, self._transducer.norm_form)
+
+        # Initialize the transducer on an empty string so we can handle inputs
+        # that start with a non-token correctly.
         tg = self._transducer("")
         tg.clear_debugger()  # clear the meaningless initial debugger
+
         for token in self._tokenizer.tokenize_text(to_convert):
             if token["is_word"]:
                 word_tg = self._transducer(token["text"])

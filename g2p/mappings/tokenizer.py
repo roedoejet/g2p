@@ -55,12 +55,14 @@ class Tokenizer(DefaultTokenizer):
         self._build_regex()
 
     def _build_regex(self):
+        self.inventory = [re.sub(r"{[0-9]+}", "", x) for x in self.inventory]
         regex_pieces = sorted(self.inventory, key=lambda s: -len(s))
         regex_pieces = [re.escape(p) for p in regex_pieces]
         if self.delim:
             regex_pieces.append(self.delim)
         pattern = "|".join(regex_pieces + ["."])
         pattern = "(" + pattern + ")"
+        #LOGGER.warning(f"pattern for {self.lang}: {pattern}.")
         flags = re.DOTALL
         if not self.case_sensitive:
             flags |= re.I
@@ -127,7 +129,7 @@ class TokenizerLibrary:
                     # be future-proof we'll arbitrary take the first if there are more.
                     out_lang = ipa_successors[0]
                 else:
-                    # There is not direct IPA successor, look for a two-hop path to -ipa
+                    # There is no direct IPA successor, look for a two-hop path to -ipa
                     for x in successors:
                         ipa_successors_two_hops = [
                             y for y in LANGS_NETWORK.successors(x) if y.endswith("-ipa")
@@ -136,6 +138,9 @@ class TokenizerLibrary:
                         if ipa_successors_two_hops:
                             out_lang = [x, ipa_successors_two_hops[0]]
                         break
+                    # There is no two-hop IPA successor, use the first direct successor
+                    if successors:
+                        out_lang = successors[0]
             if out_lang is None:
                 # Default tokenizer:
                 self.tokenizers[tokenizer_key] = self.tokenizers[None]

@@ -28,7 +28,8 @@ class CliTest(TestCase):
                 for row in reader:
                     if len(row) != 4:
                         LOGGER.warning(
-                            f"Row in {fn} containing values {row} does not have the right values. Please check your data."
+                            f"Row in {fn} containing values {row} does not have the right values."
+                            f"Please check your data."
                         )
                     else:
                         self.langs_to_test.append(row)
@@ -46,8 +47,8 @@ class CliTest(TestCase):
                 ).stdout.strip()
                 if output_string != test[3]:
                     LOGGER.warning(
-                        f"test_cli.py: {test[0]}->{test[1]} mapping error: "
-                        f"{test[2]} should map to {test[3]}, got {output_string} (with {tok_option})."
+                        f"test_cli.py: {test[0]}->{test[1]} mapping error: '{test[2]}' "
+                        f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."
                     )
                     if error_count == 0:
                         first_failed_test = test + [tok_option]
@@ -67,6 +68,8 @@ class CliTest(TestCase):
             self.assertEqual(
                 output_string,
                 reference_string,
+                f"{first_failed_test[0]}->{first_failed_test[1]} mapping error "
+                "for '{first_failed_test[2]}'.\n"
                 "Look for warnings in the log for any more mapping errors",
             )
 
