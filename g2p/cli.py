@@ -215,8 +215,8 @@ def scan(lang, path):
     mappings = []
     for mapping in MAPPINGS_AVAILABLE:
         if mapping['in_lang'].startswith(lang):
+            case_sensitive = case_sensitive and mapping.get('case_sensitive', True)
             mappings.append(mapping)
-        case_sensitive = case_sensitive and mapping['case_sensitive']
     
     # Get input chars in mapping
     mapped_chars = set()
