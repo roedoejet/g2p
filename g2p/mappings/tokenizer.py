@@ -170,7 +170,7 @@ class TokenizerLibrary:
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]
                     LOGGER.warning(
-                        f"code above inspected the langs network, mapping from {in_lang} to {out_lang} should have been found!!!"
+                        f"Cannot find mapping from '{in_lang}' to '{out_lang}'. Using default tokenizer instead!!!"
                     )
 
             # Hack for Tlingit using dot as a letter when non word-final

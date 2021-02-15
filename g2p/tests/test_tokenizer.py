@@ -95,6 +95,18 @@ class TokenizerTest(TestCase):
             len(tok.get_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1
         )
 
+    def test_tokenize_not_ipa_explicit(self):
+        tokenizer = tok.get_tokenizer("fn-unicode-font", "fn-unicode")
+        self.assertNotEqual(tokenizer, tok.get_tokenizer())
+
+    def test_tokenize_not_ipa_implicit(self):
+        tokenizer = tok.get_tokenizer("fn-unicode-font")
+        self.assertNotEqual(tokenizer, tok.get_tokenizer())
+
+    def test_tokenize_lang_does_not_exit(self):
+        self.assertEqual(tok.get_tokenizer("not_a_language"), tok.get_tokenizer())
+        self.assertEqual(tok.get_tokenizer("fra", "not_a_language"), tok.get_tokenizer())
+
 
 if __name__ == "__main__":
     main()
