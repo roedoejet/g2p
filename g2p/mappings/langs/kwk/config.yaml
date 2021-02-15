@@ -10,12 +10,13 @@ mappings:
       - Patrick Littell
     <<: *shared
   - display_name: Kwak'wala (NAPA) to IPA
-    mapping: kwk_napa_to_ipa.json
+    mapping: kwk_napa_to_ipa.csv
     in_lang: kwk-napa
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
+      - Fineen Davis
     <<: *shared
   - display_name: Kwak'wala (U'mista) to IPA
     mapping: kwk_umista_to_ipa.json
