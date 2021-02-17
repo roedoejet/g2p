@@ -3,6 +3,7 @@
 from unittest import main, TestCase
 import os
 import csv
+import re
 from glob import glob
 
 from g2p.app import APP
@@ -123,6 +124,23 @@ class CliTest(TestCase):
         unmapped_chars = ":,"
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
+    
+    def test_scan_str_case(self):
+        result = self.runner.invoke(scan, f'str {self.data_dir}/str_un_human_rights.txt')
+        returned_set = re.search('{(.*)}', result.stdout).group(1)
+        self.assertEqual(result.exit_code, 0)
+        self.assertLogs(level='WARNING')
+        unmapped_upper = 'FGR'
+        for u in unmapped_upper:
+            self.assertIn(u, returned_set)
+        unmapped_lower = 'abcdefghijklqrtwxyz'
+        for low in unmapped_lower:
+            self.assertIn(low, returned_set)
+        mapped_upper = 'ABCDEHIJKLMNOPQSTUVWXYZ'
+        for u in mapped_upper:
+            self.assertNotIn(u, returned_set)
+        mapped_lower = 's'
+        self.assertNotIn(mapped_lower, returned_set)
 
     def test_convert_option_e(self):
         result = self.runner.invoke(convert, "-e est fra eng-arpabet")

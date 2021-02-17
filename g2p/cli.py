@@ -129,9 +129,7 @@ def generate_mapping_network(path):
     help="Show all the conversion steps applied.",
 )
 @click.option(
-    "--tok-lang",
-    default=None,
-    help="Override the tokenizing language. Implies --tok.",
+    "--tok-lang", default=None, help="Override the tokenizing language. Implies --tok.",
 )
 @click.option(
     "--tok/--no-tok",
@@ -289,9 +287,11 @@ def scan(lang, path):
     case_sensitive = True
     mappings = []
     for mapping in MAPPINGS_AVAILABLE:
-        if mapping["in_lang"].startswith(lang):
+        mapping_name = mapping["in_lang"]
+        # Exclude mappings for converting between IPAs
+        if mapping_name.startswith(lang) and "ipa" not in mapping_name:
+            case_sensitive = case_sensitive and mapping.get("case_sensitive", True)
             mappings.append(mapping)
-        case_sensitive = case_sensitive and mapping["case_sensitive"]
 
     # Get input chars in mapping
     mapped_chars = set()
