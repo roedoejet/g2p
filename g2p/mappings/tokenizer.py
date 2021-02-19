@@ -129,7 +129,7 @@ class TokenizerLibrary:
                 if ipa_successors:
                     # in_lang has an ipa successor, tokenize using it
                     # there currently are no langs with more than 1 IPA successor, but to
-                    # be future-proof we'll arbitrary take the first if there are more.
+                    # be future-proof we'll arbitrarily take the first if there are more.
                     out_lang = ipa_successors[0]
                 else:
                     # There is no direct IPA successor, look for a two-hop path to -ipa
