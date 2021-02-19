@@ -171,6 +171,10 @@ class TransductionGraph:
         # append debuggers
         self._debugger += tg._debugger
 
+    def __iadd__(self, tg):
+        self.append(tg)
+        return self
+
 
 class Transducer:
     """This is the fundamental class for performing conversions in the g2p library.
@@ -577,6 +581,10 @@ class CompositeTransductionGraph(TransductionGraph):
                 tier.append(copy.deepcopy(tg))
         self.__init__(self.tiers)
 
+    def __iadd__(self, tg):
+        self.append(tg)
+        return self
+
     def clear_debugger(self):
         self._debugger = []
         for tier in self._tiers:
@@ -634,8 +642,8 @@ class TokenizingTransducer:
         for token in self._tokenizer.tokenize_text(to_convert):
             if token["is_word"]:
                 word_tg = self._transducer(token["text"])
-                tg.append(word_tg)
+                tg += word_tg
             else:
                 non_word_tg = TransductionGraph(token["text"])
-                tg.append(non_word_tg)
+                tg += non_word_tg
         return tg
