@@ -86,7 +86,7 @@ class Text(Resource):
             'debugger', dest='debugger',
             type=bool, location='args',
             default=False, required=False,
-            help="The text in the input language",
+            help="Debugging information about the transduction process",
         )
 
     def get(self):

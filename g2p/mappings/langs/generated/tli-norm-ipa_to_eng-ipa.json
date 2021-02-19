@@ -36,12 +36,6 @@
         "context_after": ""
     },
     {
-        "in": "\u026c",
-        "out": "s",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
         "in": "\u0283",
         "out": "\u0283",
         "context_before": "",
@@ -314,6 +308,54 @@
     {
         "in": "l",
         "out": "l",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "k'",
+        "out": "k",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "w'",
+        "out": "w",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q'",
+        "out": "q",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "s'",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t'",
+        "out": "t",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "x'",
+        "out": "x",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "h'",
+        "out": "h",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ʃ'",
+        "out": "ʃ",
         "context_before": "",
         "context_after": ""
     }

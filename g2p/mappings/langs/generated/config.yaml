@@ -137,6 +137,7 @@ mappings:
     rule_ordering: as-written
   - authors:
       - Generated 2020-09-18 10:40:15.289530
+      - Updated by hand 2021-02-10 Eric Joanis to handle ejectives
     case_sensitive: false
     display_name: Tlingit IPA to English IPA
     escape_special: false

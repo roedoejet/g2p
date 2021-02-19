@@ -21,6 +21,8 @@ from g2p.tests.test_fallback import FallbackTest
 from g2p.tests.test_api_resources import ResourceIntegrationTest
 from g2p.tests.test_studio import StudioTest
 from g2p.tests.test_doctor import DoctorTest
+from g2p.tests.test_tokenizer import TokenizerTest
+from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 
 
 LOADER = TestLoader()
@@ -40,7 +42,9 @@ MAPPINGS_TESTS = [
         MappingCreationTest,
         MappingTest,
         NetworkTest,
-        UtilsTest
+        UtilsTest,
+        TokenizerTest,
+        TokenizeAndMapTest,
     ]
 ]
 

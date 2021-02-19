@@ -63,7 +63,7 @@
         ]
     ],
     "debugger": [
-        [
+        [[
             {
                 "input": "hej",
                 "output": "h\u025bj",
@@ -76,9 +76,9 @@
                 "start": 1,
                 "end": 2
             }
-        ],
-        [],
-        [
+        ]],
+        [[]],
+        [[
             {
                 "input": "h\u025bj",
                 "output": "hEH j",
@@ -115,6 +115,6 @@
                 "start": 6,
                 "end": 7
             }
-        ]
+        ]]
     ]
 }
