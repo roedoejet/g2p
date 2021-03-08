@@ -1,586 +1,630 @@
 [
    {
-      "in": "ai",
+      "in": "ᐁ",
       "out": "aj"
    },
    {
-      "in": "pai",
+      "in": "ᐯ",
       "out": "paj"
    },
    {
-      "in": "tai",
+      "in": "ᑌ",
       "out": "taj"
    },
    {
-      "in": "kai",
+      "in": "ᑫ",
       "out": "kaj"
    },
    {
-      "in": "ɣai",
+      "in": "ᒉ",
       "out": "ɡaj"
    },
    {
-      "in": "mai",
+      "in": "ᒣ",
       "out": "maj"
    },
    {
-      "in": "nai",
+      "in": "ᓀ",
       "out": "naj"
    },
    {
-      "in": "sai",
+      "in": "ᓭ",
       "out": "saj"
    },
    {
-      "in": "lai",
+      "in": "ᓓ",
       "out": "laj"
    },
    {
-      "in": "jai",
+      "in": "ᔦ",
       "out": "jaj"
    },
    {
-      "in": "vai",
+      "in": "ᕓ",
       "out": "vaj"
    },
    {
-      "in": "rai",
+      "in": "ᕃ",
       "out": "ʁaj"
    },
    {
-      "in": "qai",
+      "in": "ᙯ",
       "out": "qaj"
    },
    {
-      "in": "ngai",
+      "in": "ᖅᑫ",
+      "out": "qːaj"
+   },
+   {
+      "in": "ᙰ",
       "out": "ŋaj"
    },
    {
-      "in": "ai",
+      "in": "ᐊᐃ",
       "out": "aj"
    },
    {
-      "in": "pai",
+      "in": "ᐸᐃ",
       "out": "paj"
    },
    {
-      "in": "tai",
+      "in": "ᑕᐃ",
       "out": "taj"
    },
    {
-      "in": "kai",
+      "in": "ᑲᐃ",
       "out": "kaj"
    },
    {
-      "in": "gai",
+      "in": "ᒐᐃ",
       "out": "ɡaj"
    },
    {
-      "in": "mai",
+      "in": "ᒪᐃ",
       "out": "maj"
    },
    {
-      "in": "nai",
+      "in": "ᓇᐃ",
       "out": "naj"
    },
    {
-      "in": "sai",
+      "in": "ᓴᐃ",
       "out": "saj"
    },
    {
-      "in": "lai",
+      "in": "ᓚᐃ",
       "out": "laj"
    },
    {
-      "in": "jai",
+      "in": "ᔭᐃ",
       "out": "jaj"
    },
    {
-      "in": "vai",
+      "in": "ᕙᐃ",
       "out": "vaj"
    },
    {
-      "in": "rai",
+      "in": "ᕋᐃ",
       "out": "ʁaj"
    },
    {
-      "in": "qai",
+      "in": "ᖃᐃ",
       "out": "qaj"
    },
    {
-      "in": "ngai",
+      "in": "ᖅᑲᐃ",
+      "out": "qːaj"
+   },
+   {
+      "in": "ᖓᐃ",
       "out": "ŋaj"
    },
    {
-      "in": "i",
+      "in": "ᐃ",
       "out": "i"
    },
    {
-      "in": "pi",
+      "in": "ᐱ",
       "out": "pi"
    },
    {
-      "in": "ti",
+      "in": "ᑎ",
       "out": "ti"
    },
    {
-      "in": "ki",
+      "in": "ᑭ",
       "out": "ki"
    },
    {
-      "in": "gi",
+      "in": "ᒋ",
       "out": "ɡi"
    },
    {
-      "in": "mi",
+      "in": "ᒥ",
       "out": "mi"
    },
    {
-      "in": "ni",
+      "in": "ᓂ",
       "out": "ni"
    },
    {
-      "in": "si",
+      "in": "ᓯ",
       "out": "si"
    },
    {
-      "in": "li",
+      "in": "ᓕ",
       "out": "li"
    },
    {
-      "in": "ji",
+      "in": "ᔨ",
       "out": "ji"
    },
    {
-      "in": "vi",
+      "in": "ᕕ",
       "out": "vi"
    },
    {
-      "in": "ri",
+      "in": "ᕆ",
       "out": "ʁi"
    },
    {
-      "in": "qi",
+      "in": "ᕿ",
       "out": "qi"
    },
    {
-      "in": "ngi",
+      "in": "ᖅᑭ",
+      "out": "qːi"
+   },
+   {
+      "in": "ᖏ",
       "out": "ŋi"
    },
    {
-      "in": "nngi",
+      "in": "ᙱ",
       "out": "ŋːi"
    },
    {
-      "in": "łi",
+      "in": "ᖠ",
       "out": "ɬi"
    },
    {
-      "in": "ii",
+      "in": "ᐄ",
       "out": "iː"
    },
    {
-      "in": "pii",
+      "in": "ᐲ",
       "out": "piː"
    },
    {
-      "in": "tii",
+      "in": "ᑏ",
       "out": "tiː"
    },
    {
-      "in": "kii",
+      "in": "ᑮ",
       "out": "kiː"
    },
    {
-      "in": "gii",
+      "in": "ᒌ",
       "out": "ɡiː"
    },
    {
-      "in": "mii",
+      "in": "ᒦ",
       "out": "miː"
    },
    {
-      "in": "nii",
+      "in": "ᓃ",
       "out": "niː"
    },
    {
-      "in": "sii",
+      "in": "ᓰ",
       "out": "siː"
    },
    {
-      "in": "lii",
+      "in": "ᓖ",
       "out": "liː"
    },
    {
-      "in": "jii",
+      "in": "ᔩ",
       "out": "jiː"
    },
    {
-      "in": "vii",
+      "in": "ᕖ",
       "out": "viː"
    },
    {
-      "in": "rii",
+      "in": "ᕇ",
       "out": "ʁiː"
    },
    {
-      "in": "qii",
+      "in": "ᖀ",
       "out": "qiː"
    },
    {
-      "in": "ngii",
+      "in": "ᖅᑮ",
+      "out": "qːiː"
+   },
+   {
+      "in": "ᖐ",
       "out": "ŋiː"
    },
    {
-      "in": "nngii",
+      "in": "ᙲ",
       "out": "ŋːiː"
    },
    {
-      "in": "łii",
+      "in": "ᖡ",
       "out": "ɬiː"
    },
    {
-      "in": "u",
+      "in": "ᐅ",
       "out": "u"
    },
    {
-      "in": "pu",
+      "in": "ᐳ",
       "out": "pu"
    },
    {
-      "in": "tu",
+      "in": "ᑐ",
       "out": "tu"
    },
    {
-      "in": "ku",
+      "in": "ᑯ",
       "out": "ku"
    },
    {
-      "in": "gu",
+      "in": "ᒍ",
       "out": "ɡu"
    },
    {
-      "in": "mu",
+      "in": "ᒧ",
       "out": "mu"
    },
    {
-      "in": "nu",
+      "in": "ᓄ",
       "out": "nu"
    },
    {
-      "in": "su",
+      "in": "ᓱ",
       "out": "su"
    },
    {
-      "in": "lu",
+      "in": "ᓗ",
       "out": "lu"
    },
    {
-      "in": "ju",
+      "in": "ᔪ",
       "out": "ju"
    },
    {
-      "in": "vu",
+      "in": "ᕗ",
       "out": "vu"
    },
    {
-      "in": "ru",
+      "in": "ᕈ",
       "out": "ʁu"
    },
    {
-      "in": "qu",
+      "in": "ᖁ",
       "out": "qu"
    },
    {
-      "in": "ngu",
+      "in": "ᖅᑯ",
+      "out": "qːu"
+   },
+   {
+      "in": "ᖑ",
       "out": "ŋu"
    },
    {
-      "in": "nngu",
-      "out": "ŋŋu"
+      "in": "ᙳ",
+      "out": "ŋːu"
    },
    {
-      "in": "łu",
+      "in": "ᖢ",
       "out": "ɬu"
    },
    {
-      "in": "uu",
+      "in": "ᐆ",
       "out": "uː"
    },
    {
-      "in": "puu",
+      "in": "ᐴ",
       "out": "puː"
    },
    {
-      "in": "tuu",
+      "in": "ᑑ",
       "out": "tuː"
    },
    {
-      "in": "kuu",
+      "in": "ᑰ",
       "out": "kuː"
    },
    {
-      "in": "guu",
+      "in": "ᒎ",
       "out": "ɡuː"
    },
    {
-      "in": "muu",
+      "in": "ᒨ",
       "out": "muː"
    },
    {
-      "in": "nuu",
+      "in": "ᓅ",
       "out": "nuː"
    },
    {
-      "in": "suu",
+      "in": "ᓲ",
       "out": "suː"
    },
    {
-      "in": "luu",
+      "in": "ᓘ",
       "out": "luː"
    },
    {
-      "in": "juu",
+      "in": "ᔫ",
       "out": "juː"
    },
    {
-      "in": "vuu",
+      "in": "ᕘ",
       "out": "vuː"
    },
    {
-      "in": "ruu",
+      "in": "ᕉ",
       "out": "ʁuː"
    },
    {
-      "in": "quu",
+      "in": "ᖂ",
       "out": "quː"
    },
    {
-      "in": "nguu",
+      "in": "ᖅᑰ",
+      "out": "qːuː"
+   },
+   {
+      "in": "ᖒ",
       "out": "ŋuː"
    },
    {
-      "in": "nnguu",
-      "out": "ŋŋuː"
+      "in": "ᙴ",
+      "out": "ŋːuː"
    },
    {
-      "in": "łuu",
+      "in": "ᖣ",
       "out": "ɬuː"
    },
    {
-      "in": "a",
+      "in": "ᐊ",
       "out": "a"
    },
    {
-      "in": "pa",
+      "in": "ᐸ",
       "out": "pa"
    },
    {
-      "in": "ta",
+      "in": "ᑕ",
       "out": "ta"
    },
    {
-      "in": "ka",
+      "in": "ᑲ",
       "out": "ka"
    },
    {
-      "in": "ga",
+      "in": "ᒐ",
       "out": "ɡa"
    },
    {
-      "in": "ma",
+      "in": "ᒪ",
       "out": "ma"
    },
    {
-      "in": "na",
+      "in": "ᓇ",
       "out": "na"
    },
    {
-      "in": "sa",
+      "in": "ᓴ",
       "out": "sa"
    },
    {
-      "in": "la",
+      "in": "ᓚ",
       "out": "la"
    },
    {
-      "in": "ja",
+      "in": "ᔭ",
       "out": "ja"
    },
    {
-      "in": "va",
+      "in": "ᕙ",
       "out": "va"
    },
    {
-      "in": "ra",
+      "in": "ᕋ",
       "out": "ʁa"
    },
    {
-      "in": "qa",
+      "in": "ᖃ",
       "out": "qa"
    },
    {
-      "in": "nga",
+      "in": "ᖅᑲ",
+      "out": "qːa"
+   },
+   {
+      "in": "ᖓ",
       "out": "ŋa"
    },
    {
-      "in": "nnga",
+      "in": "ᙵ",
       "out": "ŋːa"
    },
    {
-      "in": "ła",
+      "in": "ᖤ",
       "out": "ɬa"
    },
    {
-      "in": "aa",
+      "in": "ᐋ",
       "out": "aː"
    },
    {
-      "in": "paa",
+      "in": "ᐹ",
       "out": "paː"
    },
    {
-      "in": "taa",
+      "in": "ᑖ",
       "out": "taː"
    },
    {
-      "in": "kaa",
+      "in": "ᑳ",
       "out": "kaː"
    },
    {
-      "in": "gaa",
+      "in": "ᒑ",
       "out": "ɡaː"
    },
    {
-      "in": "maa",
+      "in": "ᒫ",
       "out": "maː"
    },
    {
-      "in": "naa",
+      "in": "ᓈ",
       "out": "naː"
    },
    {
-      "in": "saa",
+      "in": "ᓵ",
       "out": "saː"
    },
    {
-      "in": "laa",
+      "in": "ᓛ",
       "out": "laː"
    },
    {
-      "in": "jaa",
+      "in": "ᔮ",
       "out": "jaː"
    },
    {
-      "in": "vaa",
+      "in": "ᕚ",
       "out": "vaː"
    },
    {
-      "in": "raa",
+      "in": "ᕌ",
       "out": "ʁaː"
    },
    {
-      "in": "qaa",
+      "in": "ᖄ",
       "out": "qaː"
    },
    {
-      "in": "ngaa",
+      "in": "ᖅᑳ",
+      "out": "qːaː"
+   },
+   {
+      "in": "ᖔ",
       "out": "ŋaː"
    },
    {
-      "in": "nngaa",
+      "in": "ᙶ",
       "out": "ŋːaː"
    },
    {
-      "in": "łaa",
+      "in": "ᖥ",
       "out": "ɬaː"
    },
    {
-      "in": "h",
+      "in": "ᐦ",
       "out": "h"
    },
    {
-      "in": "p",
+      "in": "ᑉ",
       "out": "p"
    },
    {
-      "in": "t",
+      "in": "ᑦ",
       "out": "t"
    },
    {
-      "in": "k",
+      "in": "ᒃ",
       "out": "k"
    },
    {
-      "in": "g",
+      "in": "ᒡ",
       "out": "ɡ"
    },
    {
-      "in": "m",
+      "in": "ᒻ",
       "out": "m"
    },
    {
-      "in": "n",
+      "in": "ᓐ",
       "out": "n"
    },
    {
-      "in": "s",
+      "in": "ᔅ",
       "out": "s"
    },
    {
-      "in": "l",
+      "in": "ᓪ",
       "out": "l"
    },
    {
-      "in": "j",
+      "in": "ᔾ",
       "out": "j"
    },
    {
-      "in": "v",
+      "in": "ᕝ",
       "out": "v"
    },
    {
-      "in": "r",
+      "in": "ᕐ",
       "out": "ʁ"
    },
    {
-      "in": "q",
+      "in": "ᖅ",
       "out": "q"
    },
    {
-      "in": "ng",
+      "in": "ᖅᒃ",
+      "out": "qː"
+   },
+   {
+      "in": "ᖕ",
       "out": "ŋ"
    },
    {
-      "in": "nng",
+      "in": "ᖖ",
       "out": "ŋː"
    },
    {
-      "in": "ł",
+      "in": "ᖦ",
       "out": "ɬ"
-   },   
+   },
    {
-      "in": "řa",
+      "in": "ᖬ",
       "out": "ɻa"
    },
    {
-      "in": "ři",
+      "in": "ᖨ",
       "out": "ɻi"
    },
    {
-      "in": "řu",
+      "in": "ᖪ",
       "out": "ɻu"
    },
    {
-      "in": "řaa",
+      "in": "ᖭ",
       "out": "ɻaː"
    },
    {
-      "in": "řii",
+      "in": "ᖩ",
       "out": "ɻiː"
    },
    {
-      "in": "řuu",
+      "in": "ᖫ",
       "out": "ɻuː"
+   },
+   {
+      "in": "H",
+      "out": "h"
+   },
+   {
+      "in": "ᕼ",
+      "out": "h"
    }
 ]
