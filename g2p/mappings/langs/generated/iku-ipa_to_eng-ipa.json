@@ -1,0 +1,944 @@
+[
+    {
+        "in": "aj",
+        "out": "\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "paj",
+        "out": "p\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "taj",
+        "out": "t\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "kaj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261aj",
+        "out": "\u0261\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "maj",
+        "out": "m\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "naj",
+        "out": "n\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "saj",
+        "out": "s\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "laj",
+        "out": "l\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "jaj",
+        "out": "j\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vaj",
+        "out": "v\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281aj",
+        "out": "\u0292\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qaj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0aj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014baj",
+        "out": "\u014b\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "aj",
+        "out": "\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "paj",
+        "out": "p\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "taj",
+        "out": "t\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "kaj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261aj",
+        "out": "\u0261\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "maj",
+        "out": "m\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "naj",
+        "out": "n\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "saj",
+        "out": "s\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "laj",
+        "out": "l\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "jaj",
+        "out": "j\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vaj",
+        "out": "v\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281aj",
+        "out": "\u0292\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qaj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0aj",
+        "out": "k\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014baj",
+        "out": "\u014b\u0251j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "i",
+        "out": "i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pi",
+        "out": "pi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ti",
+        "out": "ti",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ki",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261i",
+        "out": "\u0261i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "mi",
+        "out": "mi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ni",
+        "out": "ni",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "si",
+        "out": "si",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "li",
+        "out": "li",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ji",
+        "out": "ji",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vi",
+        "out": "vi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281i",
+        "out": "\u0292i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qi",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0i",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014bi",
+        "out": "\u014bi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0i",
+        "out": "\u014bi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026ci",
+        "out": "si",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "i\u02d0",
+        "out": "i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pi\u02d0",
+        "out": "pi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ti\u02d0",
+        "out": "ti",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ki\u02d0",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261i\u02d0",
+        "out": "\u0261i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "mi\u02d0",
+        "out": "mi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ni\u02d0",
+        "out": "ni",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "si\u02d0",
+        "out": "si",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "li\u02d0",
+        "out": "li",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ji\u02d0",
+        "out": "ji",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vi\u02d0",
+        "out": "vi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281i\u02d0",
+        "out": "\u0292i",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qi\u02d0",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0i\u02d0",
+        "out": "ki",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014bi\u02d0",
+        "out": "\u014bi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0i\u02d0",
+        "out": "\u014bi",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026ci\u02d0",
+        "out": "si",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "u",
+        "out": "u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pu",
+        "out": "pu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "tu",
+        "out": "tu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ku",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261u",
+        "out": "\u0261u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "mu",
+        "out": "mu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "nu",
+        "out": "nu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "su",
+        "out": "su",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "lu",
+        "out": "lu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ju",
+        "out": "ju",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vu",
+        "out": "vu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281u",
+        "out": "\u0292u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qu",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0u",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014bu",
+        "out": "\u014bu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0u",
+        "out": "\u014bu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026cu",
+        "out": "su",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "u\u02d0",
+        "out": "u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pu\u02d0",
+        "out": "pu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "tu\u02d0",
+        "out": "tu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ku\u02d0",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261u\u02d0",
+        "out": "\u0261u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "mu\u02d0",
+        "out": "mu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "nu\u02d0",
+        "out": "nu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "su\u02d0",
+        "out": "su",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "lu\u02d0",
+        "out": "lu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ju\u02d0",
+        "out": "ju",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "vu\u02d0",
+        "out": "vu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281u\u02d0",
+        "out": "\u0292u",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qu\u02d0",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0u\u02d0",
+        "out": "ku",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014bu\u02d0",
+        "out": "\u014bu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0u\u02d0",
+        "out": "\u014bu",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026cu\u02d0",
+        "out": "su",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "a",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pa",
+        "out": "p\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ta",
+        "out": "t\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ka",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261a",
+        "out": "\u0261\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ma",
+        "out": "m\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "na",
+        "out": "n\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "sa",
+        "out": "s\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "la",
+        "out": "l\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ja",
+        "out": "j\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "va",
+        "out": "v\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281a",
+        "out": "\u0292\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qa",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0a",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014ba",
+        "out": "\u014b\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0a",
+        "out": "\u014b\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026ca",
+        "out": "s\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "a\u02d0",
+        "out": "\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "pa\u02d0",
+        "out": "p\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ta\u02d0",
+        "out": "t\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ka\u02d0",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261a\u02d0",
+        "out": "\u0261\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ma\u02d0",
+        "out": "m\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "na\u02d0",
+        "out": "n\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "sa\u02d0",
+        "out": "s\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "la\u02d0",
+        "out": "l\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ja\u02d0",
+        "out": "j\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "va\u02d0",
+        "out": "v\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281a\u02d0",
+        "out": "\u0292\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "qa\u02d0",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0a\u02d0",
+        "out": "k\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014ba\u02d0",
+        "out": "\u014b\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0a\u02d0",
+        "out": "\u014b\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026ca\u02d0",
+        "out": "s\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "h",
+        "out": "h",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "p",
+        "out": "p",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t",
+        "out": "t",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "k",
+        "out": "k",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0261",
+        "out": "\u0261",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "m",
+        "out": "m",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "n",
+        "out": "n",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "s",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "l",
+        "out": "l",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "j",
+        "out": "j",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "v",
+        "out": "v",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0281",
+        "out": "\u0292",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q",
+        "out": "k",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "q\u02d0",
+        "out": "k",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u014b\u02d0",
+        "out": "\u014b",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u026c",
+        "out": "s",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027ba",
+        "out": "j\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027bi",
+        "out": "ji",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027bu",
+        "out": "ju",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027ba\u02d0",
+        "out": "j\u0251",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027bi\u02d0",
+        "out": "ji",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u027bu\u02d0",
+        "out": "ju",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "h",
+        "out": "h",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "h",
+        "out": "h",
+        "context_before": "",
+        "context_after": ""
+    }
+]
