@@ -1,181 +1,181 @@
 [
     {
         "in": "aj",
-        "out": "\u0251j",
+        "out": "ɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "paj",
-        "out": "p\u0251j",
+        "out": "pɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "taj",
-        "out": "t\u0251j",
+        "out": "tɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "kaj",
-        "out": "k\u0251j",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261aj",
-        "out": "\u0261\u0251j",
+        "in": "ɡaj",
+        "out": "ɡɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "maj",
-        "out": "m\u0251j",
+        "out": "mɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "naj",
-        "out": "n\u0251j",
+        "out": "nɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "saj",
-        "out": "s\u0251j",
+        "out": "sɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "laj",
-        "out": "l\u0251j",
+        "out": "lɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "jaj",
-        "out": "j\u0251j",
+        "out": "jɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "vaj",
-        "out": "v\u0251j",
+        "out": "vɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281aj",
-        "out": "\u0292\u0251j",
+        "in": "ʁaj",
+        "out": "ʒɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "qaj",
-        "out": "k\u0251j",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0aj",
-        "out": "k\u0251j",
+        "in": "qːaj",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014baj",
-        "out": "\u014b\u0251j",
+        "in": "ŋaj",
+        "out": "ŋɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "aj",
-        "out": "\u0251j",
+        "out": "ɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "paj",
-        "out": "p\u0251j",
+        "out": "pɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "taj",
-        "out": "t\u0251j",
+        "out": "tɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "kaj",
-        "out": "k\u0251j",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261aj",
-        "out": "\u0261\u0251j",
+        "in": "ɡaj",
+        "out": "ɡɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "maj",
-        "out": "m\u0251j",
+        "out": "mɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "naj",
-        "out": "n\u0251j",
+        "out": "nɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "saj",
-        "out": "s\u0251j",
+        "out": "sɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "laj",
-        "out": "l\u0251j",
+        "out": "lɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "jaj",
-        "out": "j\u0251j",
+        "out": "jɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "vaj",
-        "out": "v\u0251j",
+        "out": "vɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281aj",
-        "out": "\u0292\u0251j",
+        "in": "ʁaj",
+        "out": "ʒɑj",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "qaj",
-        "out": "k\u0251j",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0aj",
-        "out": "k\u0251j",
+        "in": "qːaj",
+        "out": "kɑj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014baj",
-        "out": "\u014b\u0251j",
+        "in": "ŋaj",
+        "out": "ŋɑj",
         "context_before": "",
         "context_after": ""
     },
@@ -204,8 +204,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0261i",
-        "out": "\u0261i",
+        "in": "ɡi",
+        "out": "ɡi",
         "context_before": "",
         "context_after": ""
     },
@@ -246,8 +246,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0281i",
-        "out": "\u0292i",
+        "in": "ʁi",
+        "out": "ʒi",
         "context_before": "",
         "context_after": ""
     },
@@ -258,127 +258,127 @@
         "context_after": ""
     },
     {
-        "in": "q\u02d0i",
+        "in": "qːi",
         "out": "ki",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014bi",
-        "out": "\u014bi",
+        "in": "ŋi",
+        "out": "ŋi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0i",
-        "out": "\u014bi",
+        "in": "ŋːi",
+        "out": "ŋi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026ci",
+        "in": "ɬi",
         "out": "si",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "i\u02d0",
+        "in": "iː",
         "out": "i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "pi\u02d0",
+        "in": "piː",
         "out": "pi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ti\u02d0",
+        "in": "tiː",
         "out": "ti",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ki\u02d0",
+        "in": "kiː",
         "out": "ki",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261i\u02d0",
-        "out": "\u0261i",
+        "in": "ɡiː",
+        "out": "ɡi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "mi\u02d0",
+        "in": "miː",
         "out": "mi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ni\u02d0",
+        "in": "niː",
         "out": "ni",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "si\u02d0",
+        "in": "siː",
         "out": "si",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "li\u02d0",
+        "in": "liː",
         "out": "li",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ji\u02d0",
+        "in": "jiː",
         "out": "ji",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "vi\u02d0",
+        "in": "viː",
         "out": "vi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281i\u02d0",
-        "out": "\u0292i",
+        "in": "ʁiː",
+        "out": "ʒi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "qi\u02d0",
+        "in": "qiː",
         "out": "ki",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0i\u02d0",
+        "in": "qːiː",
         "out": "ki",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014bi\u02d0",
-        "out": "\u014bi",
+        "in": "ŋiː",
+        "out": "ŋi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0i\u02d0",
-        "out": "\u014bi",
+        "in": "ŋːiː",
+        "out": "ŋi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026ci\u02d0",
+        "in": "ɬiː",
         "out": "si",
         "context_before": "",
         "context_after": ""
@@ -408,8 +408,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0261u",
-        "out": "\u0261u",
+        "in": "ɡu",
+        "out": "ɡu",
         "context_before": "",
         "context_after": ""
     },
@@ -450,8 +450,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0281u",
-        "out": "\u0292u",
+        "in": "ʁu",
+        "out": "ʒu",
         "context_before": "",
         "context_after": ""
     },
@@ -462,332 +462,332 @@
         "context_after": ""
     },
     {
-        "in": "q\u02d0u",
+        "in": "qːu",
         "out": "ku",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014bu",
-        "out": "\u014bu",
+        "in": "ŋu",
+        "out": "ŋu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0u",
-        "out": "\u014bu",
+        "in": "ŋːu",
+        "out": "ŋu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026cu",
+        "in": "ɬu",
         "out": "su",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "u\u02d0",
+        "in": "uː",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "pu\u02d0",
+        "in": "puː",
         "out": "pu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "tu\u02d0",
+        "in": "tuː",
         "out": "tu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ku\u02d0",
+        "in": "kuː",
         "out": "ku",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261u\u02d0",
-        "out": "\u0261u",
+        "in": "ɡuː",
+        "out": "ɡu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "mu\u02d0",
+        "in": "muː",
         "out": "mu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "nu\u02d0",
+        "in": "nuː",
         "out": "nu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "su\u02d0",
+        "in": "suː",
         "out": "su",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "lu\u02d0",
+        "in": "luː",
         "out": "lu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ju\u02d0",
+        "in": "juː",
         "out": "ju",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "vu\u02d0",
+        "in": "vuː",
         "out": "vu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281u\u02d0",
-        "out": "\u0292u",
+        "in": "ʁuː",
+        "out": "ʒu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "qu\u02d0",
+        "in": "quː",
         "out": "ku",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0u\u02d0",
+        "in": "qːuː",
         "out": "ku",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014bu\u02d0",
-        "out": "\u014bu",
+        "in": "ŋuː",
+        "out": "ŋu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0u\u02d0",
-        "out": "\u014bu",
+        "in": "ŋːuː",
+        "out": "ŋu",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026cu\u02d0",
+        "in": "ɬuː",
         "out": "su",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "a",
-        "out": "\u0251",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "pa",
-        "out": "p\u0251",
+        "out": "pɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ta",
-        "out": "t\u0251",
+        "out": "tɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ka",
-        "out": "k\u0251",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261a",
-        "out": "\u0261\u0251",
+        "in": "ɡa",
+        "out": "ɡɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ma",
-        "out": "m\u0251",
+        "out": "mɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "na",
-        "out": "n\u0251",
+        "out": "nɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "sa",
-        "out": "s\u0251",
+        "out": "sɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "la",
-        "out": "l\u0251",
+        "out": "lɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ja",
-        "out": "j\u0251",
+        "out": "jɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "va",
-        "out": "v\u0251",
+        "out": "vɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281a",
-        "out": "\u0292\u0251",
+        "in": "ʁa",
+        "out": "ʒɑ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "qa",
-        "out": "k\u0251",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0a",
-        "out": "k\u0251",
+        "in": "qːa",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014ba",
-        "out": "\u014b\u0251",
+        "in": "ŋa",
+        "out": "ŋɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0a",
-        "out": "\u014b\u0251",
+        "in": "ŋːa",
+        "out": "ŋɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026ca",
-        "out": "s\u0251",
+        "in": "ɬa",
+        "out": "sɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "a\u02d0",
-        "out": "\u0251",
+        "in": "aː",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "pa\u02d0",
-        "out": "p\u0251",
+        "in": "paː",
+        "out": "pɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ta\u02d0",
-        "out": "t\u0251",
+        "in": "taː",
+        "out": "tɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ka\u02d0",
-        "out": "k\u0251",
+        "in": "kaː",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261a\u02d0",
-        "out": "\u0261\u0251",
+        "in": "ɡaː",
+        "out": "ɡɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ma\u02d0",
-        "out": "m\u0251",
+        "in": "maː",
+        "out": "mɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "na\u02d0",
-        "out": "n\u0251",
+        "in": "naː",
+        "out": "nɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "sa\u02d0",
-        "out": "s\u0251",
+        "in": "saː",
+        "out": "sɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "la\u02d0",
-        "out": "l\u0251",
+        "in": "laː",
+        "out": "lɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "ja\u02d0",
-        "out": "j\u0251",
+        "in": "jaː",
+        "out": "jɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "va\u02d0",
-        "out": "v\u0251",
+        "in": "vaː",
+        "out": "vɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0281a\u02d0",
-        "out": "\u0292\u0251",
+        "in": "ʁaː",
+        "out": "ʒɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "qa\u02d0",
-        "out": "k\u0251",
+        "in": "qaː",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "q\u02d0a\u02d0",
-        "out": "k\u0251",
+        "in": "qːaː",
+        "out": "kɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014ba\u02d0",
-        "out": "\u014b\u0251",
+        "in": "ŋaː",
+        "out": "ŋɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0a\u02d0",
-        "out": "\u014b\u0251",
+        "in": "ŋːaː",
+        "out": "ŋɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026ca\u02d0",
-        "out": "s\u0251",
+        "in": "ɬaː",
+        "out": "sɑ",
         "context_before": "",
         "context_after": ""
     },
@@ -816,8 +816,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0261",
-        "out": "\u0261",
+        "in": "ɡ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
@@ -858,8 +858,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0281",
-        "out": "\u0292",
+        "in": "ʁ",
+        "out": "ʒ",
         "context_before": "",
         "context_after": ""
     },
@@ -870,61 +870,61 @@
         "context_after": ""
     },
     {
-        "in": "q\u02d0",
+        "in": "qː",
         "out": "k",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b",
-        "out": "\u014b",
+        "in": "ŋ",
+        "out": "ŋ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014b\u02d0",
-        "out": "\u014b",
+        "in": "ŋː",
+        "out": "ŋ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026c",
+        "in": "ɬ",
         "out": "s",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027ba",
-        "out": "j\u0251",
+        "in": "ɻa",
+        "out": "jɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027bi",
+        "in": "ɻi",
         "out": "ji",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027bu",
+        "in": "ɻu",
         "out": "ju",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027ba\u02d0",
-        "out": "j\u0251",
+        "in": "ɻaː",
+        "out": "jɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027bi\u02d0",
+        "in": "ɻiː",
         "out": "ji",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u027bu\u02d0",
+        "in": "ɻuː",
         "out": "ju",
         "context_before": "",
         "context_after": ""
