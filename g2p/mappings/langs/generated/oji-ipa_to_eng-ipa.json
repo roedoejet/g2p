@@ -1,13 +1,13 @@
 [
     {
-        "in": "\u014b",
-        "out": "\u014b",
+        "in": "ŋ",
+        "out": "ŋ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251:",
-        "out": "\u0251",
+        "in": "ɑ:",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
@@ -19,19 +19,19 @@
     },
     {
         "in": "o:",
-        "out": "o\u02d0",
+        "out": "oː",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "e:",
-        "out": "e\u02d0",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
@@ -43,7 +43,7 @@
     },
     {
         "in": "o",
-        "out": "o\u02d0",
+        "out": "oː",
         "context_before": "",
         "context_after": ""
     },
@@ -54,8 +54,8 @@
         "context_after": ""
     },
     {
-        "in": "t\u0283",
-        "out": "t\u0361\u0283",
+        "in": "tʃ",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
@@ -66,8 +66,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0261",
-        "out": "\u0261",
+        "in": "ɡ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
@@ -78,20 +78,20 @@
         "context_after": ""
     },
     {
-        "in": "\u0294",
-        "out": "\u0294",
+        "in": "ʔ",
+        "out": "ʔ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0294",
-        "out": "\u0294",
+        "in": "ʔ",
+        "out": "ʔ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "d\u0292",
-        "out": "d\u0292",
+        "in": "dʒ",
+        "out": "dʒ",
         "context_before": "",
         "context_after": ""
     },
@@ -120,8 +120,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0283",
-        "out": "\u0283",
+        "in": "ʃ",
+        "out": "ʃ",
         "context_before": "",
         "context_after": ""
     },
@@ -150,8 +150,8 @@
         "context_after": ""
     },
     {
-        "in": "\u0292",
-        "out": "\u0292",
+        "in": "ʒ",
+        "out": "ʒ",
         "context_before": "",
         "context_after": ""
     },

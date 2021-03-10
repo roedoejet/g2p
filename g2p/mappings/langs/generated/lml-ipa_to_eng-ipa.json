@@ -1,37 +1,37 @@
 [
     {
-        "in": "\u014b",
-        "out": "\u014b",
+        "in": "ŋ",
+        "out": "ŋ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u014bg",
-        "out": "\u014b",
+        "in": "ŋg",
+        "out": "ŋ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0261",
-        "out": "\u0261",
+        "in": "ɡ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0263",
-        "out": "\u0261",
+        "in": "ɣ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0279",
-        "out": "\u0279",
+        "in": "ɹ",
+        "out": "ɹ",
         "context_before": "",
         "context_after": ""
     }
