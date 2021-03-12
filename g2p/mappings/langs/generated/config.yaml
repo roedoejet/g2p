@@ -175,3 +175,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2021-03-08 17:26:16.371203
+    case_sensitive: true
+    display_name: iku-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: iku-ipa
+    language_name: iku-ipa
+    mapping: iku-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
