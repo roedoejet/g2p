@@ -1,22 +1,22 @@
 <<: &shared
   language_name: Moose Cree
 mappings:
-  - display_name: Moose Cree Normalization
+  - display_name: Moose Cree Equivalencies
     in_lang: crm
-    out_lang: crm-norm
+    out_lang: crm-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
       - Bradley Ellert
       - Aidan Pine
-    mapping: crm_norm.json
+    mapping: crm_equiv.json
     <<: *shared
   - display_name: Moose Cree to IPA
-    in_lang: crm-norm
+    in_lang: crm-equiv
     out_lang: crm-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
       - Delasie Torkornoo
       - Bradley Ellert

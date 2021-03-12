@@ -1,22 +1,22 @@
 <<: &shared
   language_name: Southern East Cree
 mappings:
-  - display_name: Northern East Cree Normalization
+  - display_name: Northern East Cree Equivalencies
     in_lang: crj
-    out_lang: crj-norm
+    out_lang: crj-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
       - Aidan Pine
-    mapping: crj_norm.json
+    mapping: crj_equiv.json
     rule_ordering: as-written
     <<: *shared
   - display_name: Southern East Cree to IPA
-    in_lang: crj-norm
+    in_lang: crj-equiv
     out_lang: crj-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
     mapping: crj_to_ipa.json
     rule_ordering: as-written

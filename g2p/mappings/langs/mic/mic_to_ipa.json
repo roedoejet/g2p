@@ -1,0 +1,163 @@
+[
+   {
+      "in": "\uA78C",
+      "out": "'"
+   },
+   {
+      "in": "í|i'",
+      "out": "iː"
+   },
+   {
+      "in": "á|a'",
+      "out": "\u0251ː"
+   },
+   {
+      "in": "é|e'|e",
+      "out": "eː"
+   },
+   {
+      "in": "ó|o'",
+      "out": "oː"
+   },
+   {
+      "in": "ú|u'",
+      "out": "uː"
+   },
+   {
+      "in": "a",
+      "out": "\u0251"
+   },
+   {
+      "in": "j",
+      "out": "tʃ"
+   },
+   {
+      "in": "q",
+      "out": "x"
+   },
+   {
+      "in": "y",
+      "out": "j"
+   },
+   {
+      "in": "p",
+      "out": "b",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "t",
+      "out": "d",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "k",
+      "out": "ɡ",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "tʃ",
+      "out": "dʒ",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "s",
+      "out": "z",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "x",
+      "out": "ɣ",
+      "context_before": "SONORANT",
+      "context_after": "SONORANT"
+   },
+   {
+      "in": "k",
+      "out": "kə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "p",
+      "out": "pə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "x",
+      "out": "xə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "s",
+      "out": "sə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "t",
+      "out": "tə",
+      "context_after": "(CONSONANT)$"
+   },
+   {
+      "in": "^j",
+      "out": "əj",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^k",
+      "out": "ək",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^l",
+      "out": "əl",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^m",
+      "out": "əm",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^n",
+      "out": "ən",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^p",
+      "out": "əp",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^tʃ",
+      "out": "ətʃ",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^x",
+      "out": "əx",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^s",
+      "out": "əs",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^t",
+      "out": "ət",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^w",
+      "out": "əw",
+      "context_after": "CONSONANT"
+   },
+   {
+      "in": "^y",
+      "out": "əy",
+      "context_after": "CONSONANT"
+   }
+]

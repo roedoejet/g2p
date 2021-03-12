@@ -1,0 +1,28 @@
+<<: &shared
+  language_name: Gwich'in
+mappings:
+  - display_name: Gwich'in Equivalencies
+    in_lang: gwi
+    out_lang: gwi-equiv
+    authors:
+      - Sabrina Yu
+    type: mapping
+    mapping: gwi_equiv.json
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Gwich'in to IPA
+    in_lang: gwi-equiv
+    out_lang: gwi-ipa
+    authors:
+      - Sabrina Yu
+    type: mapping
+    mapping: gwi_to_ipa.json
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+    

@@ -1,21 +1,21 @@
 <<: &shared
   language_name: Northern East Cree
 mappings:
-  - display_name: Northern East Cree Normalization
+  - display_name: Northern East Cree Equivalencies
     in_lang: crl
-    out_lang: crl-norm
+    out_lang: crl-equiv
     type: mapping
     authors:
       - Delasie Torkornoo
       - Aidan Pine
-    mapping: crl_norm.json
+    mapping: crl_equiv.json
     <<: *shared
   - display_name: Northern East Cree to IPA
-    in_lang: crl-norm
+    in_lang: crl-equiv
     out_lang: crl-ipa
     type: mapping
     authors:
-      - David Huggins Daines
+      - David Huggins-Daines
       - Patrick Littell
       - Delasie Torkornoo
     mapping: crl_to_ipa.json
