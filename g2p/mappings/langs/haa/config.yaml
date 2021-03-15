@@ -1,0 +1,28 @@
+<<: &shared
+  language_name: Hän
+mappings:
+  - display_name: Hän equivalencies
+    in_lang: haa
+    out_lang: haa-equiv
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: haa_equiv.csv
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Hän to IPA
+    in_lang: haa-equiv
+    out_lang: haa-ipa
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: haa_to_ipa.csv
+    abbreviations: haa_abbs.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
