@@ -6,31 +6,31 @@
         "context_after": ""
     },
     {
-        "in": "t\u03b8'",
-        "out": "t\u03b8",
+        "in": "tθ'",
+        "out": "tθ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u03b8\u02b0",
-        "out": "t\u03b8",
+        "in": "tθʰ",
+        "out": "tθ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u03b8",
-        "out": "\u03b8",
+        "in": "θ",
+        "out": "θ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u026c'",
+        "in": "tɬ'",
         "out": "ts",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u026c\u02b0",
+        "in": "tɬʰ",
         "out": "ts",
         "context_before": "",
         "context_after": ""
@@ -42,7 +42,7 @@
         "context_after": ""
     },
     {
-        "in": "ts\u02b0",
+        "in": "tsʰ",
         "out": "ts",
         "context_before": "",
         "context_after": ""
@@ -54,20 +54,20 @@
         "context_after": ""
     },
     {
-        "in": "t\u02b0",
+        "in": "tʰ",
         "out": "t",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u03b8",
-        "out": "t\u03b8",
+        "in": "tθ",
+        "out": "tθ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f0",
-        "out": "\u00f0",
+        "in": "ð",
+        "out": "ð",
         "context_before": "",
         "context_after": ""
     },
@@ -78,7 +78,7 @@
         "context_after": ""
     },
     {
-        "in": "t\u026c",
+        "in": "tɬ",
         "out": "ts",
         "context_before": "",
         "context_after": ""
@@ -90,61 +90,61 @@
         "context_after": ""
     },
     {
-        "in": "\u0283",
-        "out": "\u0283",
+        "in": "ʃ",
+        "out": "ʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0292",
-        "out": "\u0292",
+        "in": "ʒ",
+        "out": "ʒ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u0283'",
-        "out": "t\u0361\u0283",
+        "in": "tʃ'",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u0283\u02b0",
-        "out": "t\u0283",
+        "in": "tʃʰ",
+        "out": "tʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u0283",
-        "out": "t\u0361\u0283",
+        "in": "tʃ",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0263\u02b7",
-        "out": "\u0261w",
+        "in": "ɣʷ",
+        "out": "ɡw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0263",
-        "out": "\u0261",
+        "in": "ɣ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "k\u02b7",
+        "in": "kʷ",
         "out": "kw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "x\u02b7",
+        "in": "xʷ",
         "out": "kw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "k'\u02b7",
+        "in": "k'ʷ",
         "out": "kw",
         "context_before": "",
         "context_after": ""
@@ -156,7 +156,7 @@
         "context_after": ""
     },
     {
-        "in": "k\u02b0\u02b7",
+        "in": "kʰʷ",
         "out": "kw",
         "context_before": "",
         "context_after": ""
@@ -168,584 +168,584 @@
         "context_after": ""
     },
     {
-        "in": "k\u02b0",
+        "in": "kʰ",
         "out": "k",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0279",
-        "out": "\u0279",
+        "in": "ɹ",
+        "out": "ɹ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0294",
-        "out": "\u0294",
+        "in": "ʔ",
+        "out": "ʔ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026c",
+        "in": "ɬ",
         "out": "s",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u1d50p",
+        "in": "ᵐp",
         "out": "p",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u207ft",
+        "in": "ⁿt",
         "out": "t",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u207ft\u0283",
-        "out": "t\u0361\u0283",
+        "in": "ⁿtʃ",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɛ",
+        "out": "ɛ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɛ",
+        "out": "ɛ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɛ",
+        "out": "ɛ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɛ",
+        "out": "ɛ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɛ",
+        "out": "ɛ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ai",
-        "out": "\u00e6i",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ai",
-        "out": "\u00e6i",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ai",
-        "out": "\u00e6i",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ai",
-        "out": "\u00e6i",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ai",
-        "out": "\u00e6i",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ai",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b\u0303",
-        "out": "\u025b\u0303",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289\u0303",
-        "out": "\u0169",
+        "in": "ɛ̃",
+        "out": "ɛ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259\u0303w",
-        "out": "\u028c\u0303w",
+        "in": "ʉ̃",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00e3i",
-        "out": "\u00e6\u0303i",
+        "in": "ə̃w",
+        "out": "ʌ̃w",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c\u0303",
-        "out": "\u028c\u0303",
+        "in": "ãi",
+        "out": "æ̃i",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u0303",
-        "out": "\u0251\u0303",
+        "in": "ʌ̃",
+        "out": "ʌ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u025b",
-        "out": "\u025b",
+        "in": "ɑ̃",
+        "out": "ɑ̃",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0289",
+        "in": "ɛ",
+        "out": "ɛ",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "ʉ",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "ai",
-        "out": "\u00e6i",
+        "out": "æi",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0129",
-        "out": "\u0129",
+        "in": "ĩ",
+        "out": "ĩ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u00f5",
-        "out": "\u00f5",
+        "in": "õ",
+        "out": "õ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0169",
-        "out": "\u0169",
+        "in": "ũ",
+        "out": "ũ",
         "context_before": "",
         "context_after": ""
     },
@@ -781,31 +781,31 @@
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },

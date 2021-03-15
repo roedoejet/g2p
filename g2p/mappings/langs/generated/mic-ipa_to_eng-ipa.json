@@ -6,44 +6,44 @@
         "context_after": ""
     },
     {
-        "in": "i\u02d0",
-        "out": "e\u02d0",
+        "in": "iː",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251\u02d0",
-        "out": "\u0251",
+        "in": "ɑː",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "e\u02d0",
-        "out": "e\u02d0",
+        "in": "eː",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "o\u02d0",
-        "out": "o\u02d0",
+        "in": "oː",
+        "out": "oː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "u\u02d0",
+        "in": "uː",
         "out": "u",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0251",
-        "out": "\u0251",
+        "in": "ɑ",
+        "out": "ɑ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u0283",
-        "out": "t\u0361\u0283",
+        "in": "tʃ",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
@@ -72,14 +72,14 @@
         "context_after": ""
     },
     {
-        "in": "\u0261",
-        "out": "\u0261",
+        "in": "ɡ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "d\u0292",
-        "out": "d\u0292",
+        "in": "dʒ",
+        "out": "dʒ",
         "context_before": "",
         "context_after": ""
     },
@@ -90,110 +90,110 @@
         "context_after": ""
     },
     {
-        "in": "\u0263",
-        "out": "\u0261",
+        "in": "ɣ",
+        "out": "ɡ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "k\u0259",
-        "out": "k\u0259",
+        "in": "kə",
+        "out": "kə",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "p\u0259",
-        "out": "p\u0259",
+        "in": "pə",
+        "out": "pə",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "x\u0259",
-        "out": "k\u0259",
+        "in": "xə",
+        "out": "kə",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "s\u0259",
-        "out": "s\u0259",
+        "in": "sə",
+        "out": "sə",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "t\u0259",
-        "out": "t\u0259",
+        "in": "tə",
+        "out": "tə",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259j",
-        "out": "\u0259j",
+        "in": "əj",
+        "out": "əj",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259k",
-        "out": "\u0259k",
+        "in": "ək",
+        "out": "ək",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259l",
-        "out": "\u0259l",
+        "in": "əl",
+        "out": "əl",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259m",
-        "out": "\u0259m",
+        "in": "əm",
+        "out": "əm",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259n",
-        "out": "\u0259n",
+        "in": "ən",
+        "out": "ən",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259p",
-        "out": "\u0259p",
+        "in": "əp",
+        "out": "əp",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259t\u0283",
-        "out": "\u0259t\u0361\u0283",
+        "in": "ətʃ",
+        "out": "ət͡ʃ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259x",
-        "out": "\u0259k",
+        "in": "əx",
+        "out": "ək",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259s",
-        "out": "\u0259s",
+        "in": "əs",
+        "out": "əs",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259t",
-        "out": "\u0259t",
+        "in": "ət",
+        "out": "ət",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259w",
-        "out": "\u0259w",
+        "in": "əw",
+        "out": "əw",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u0259y",
-        "out": "\u0259u",
+        "in": "əy",
+        "out": "əu",
         "context_before": "",
         "context_after": ""
     }
