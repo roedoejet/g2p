@@ -7,10 +7,6 @@ on:
     types: [created]
   push:
     branches: [ release ]
-    tags: 
-      - release
-      - build
-      - v*.*.*
 jobs:
   deploy:
     runs-on: ubuntu-latest
