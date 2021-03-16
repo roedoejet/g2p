@@ -6,7 +6,7 @@ on:
   release:
     types: [created]
   push:
-    branches: [ release ]
+    branches: [ dev.workflow_auto_tag ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,15 +26,19 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
-        twine upload dist/*
-    - name: trigger convertextract build
+        #twine upload dist/*
+    - name: Tag the repo
       run: |
-        curl --location --request POST 'https://api.github.com/repos/roedoejet/convertextract/dispatches' \
-        --header 'Accept: application/vnd.github.everest-preview+json' \
-        --header 'Content-Type: application/json' \
-        --header 'Authorization: Bearer ${{ secrets.G2P_PAT }}' \
-        --header 'Content-Type: text/plain' \
-        --data-raw '{
-          "event_type": "g2p-published",
-          "client_payload": {}
-        }'
+        VERSION=`ls dist/g2p-*.tar.gz | sed -e 's/.*g2p-//' -e 's/.tar.gz.*//'`
+        echo git tag -a -m"Release version $VERSION" v$VERSION
+    #- name: trigger convertextract build
+    #  run: |
+    #    curl --location --request POST 'https://api.github.com/repos/roedoejet/convertextract/dispatches' \
+    #    --header 'Accept: application/vnd.github.everest-preview+json' \
+    #    --header 'Content-Type: application/json' \
+    #    --header 'Authorization: Bearer ${{ secrets.G2P_PAT }}' \
+    #    --header 'Content-Type: text/plain' \
+    #    --data-raw '{
+    #      "event_type": "g2p-published",
+    #      "client_payload": {}
+    #    }'
