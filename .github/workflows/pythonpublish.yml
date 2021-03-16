@@ -27,13 +27,6 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
-    - name: Tag the repo
-      run: |
-        VERSION=`ls dist/g2p-*.tar.gz | sed -e 's/.*g2p-//' -e 's/.tar.gz.*//'`
-        git config --global user.email hello@aidanpine.ca
-        git config --global user.name "Aidan Pine via GitHub Actions"
-        git tag -a -m"Release version $VERSION" v$VERSION
-        git push origin v$VERSION
     - name: trigger convertextract build
       run: |
         curl --location --request POST 'https://api.github.com/repos/roedoejet/convertextract/dispatches' \
@@ -45,3 +38,10 @@ jobs:
           "event_type": "g2p-published",
           "client_payload": {}
         }'
+    - name: Tag the repo
+      run: |
+        VERSION=`ls dist/g2p-*.tar.gz | sed -e 's/.*g2p-//' -e 's/.tar.gz.*//'`
+        git config --global user.email hello@aidanpine.ca
+        git config --global user.name "Aidan Pine via GitHub Actions"
+        git tag -a -m"Release version $VERSION" v$VERSION
+        git push origin v$VERSION
