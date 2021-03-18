@@ -5,6 +5,7 @@ mappings:
     in_lang: iku
     out_lang: iku-equiv
     type: mapping
+    rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
     mapping: iku_to_iku_equiv.json
@@ -13,6 +14,7 @@ mappings:
     in_lang: iku-equiv
     out_lang: iku-ipa
     type: mapping
+    rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
     mapping: iku_equiv_to_ipa.json
@@ -21,6 +23,9 @@ mappings:
     in_lang: iku-sro
     out_lang: iku-sro-ipa
     type: mapping
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
     mapping: iku_sro_to_ipa.json
