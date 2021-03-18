@@ -512,6 +512,10 @@
       "out": "ɬ"
    },
    {
+      "in": "ř",
+      "out": "ɟ"
+   },
+   {
       "in": "řa",
       "out": "ɟa"
    },
@@ -538,5 +542,25 @@
    {
       "in": "řuu",
       "out": "ɟuː"
+   },
+   {
+      "comment": "ikt character",
+      "in": "y",
+      "out": "j"
+   },
+   {
+      "comment": "ikt character",
+      "in": "š",
+      "out": "ʂ"
+   },
+   {
+      "comment": "ikt character",
+      "in": "ȓ",
+      "out": "ɟ"
+   },
+   {
+      "comment": "ikt character",
+      "in": "ñ",
+      "out": "ɲ"
    }
 ]

@@ -24,6 +24,7 @@ mappings:
     out_lang: iku-sro-ipa
     type: mapping
     case_sensitive: false
+    norm_form: NFD
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
