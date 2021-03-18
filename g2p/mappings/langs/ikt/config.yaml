@@ -1,0 +1,12 @@
+<<: &shared
+  language_name: Inuinnaqtun
+mappings:
+  - display_name: Inuinnaqtun to IPA
+    in_lang: ikt
+    out_lang: ikt-ipa
+    type: mapping
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    mapping: ikt_to_ipa.json
+    <<: *shared
