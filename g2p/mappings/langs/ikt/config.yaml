@@ -1,10 +1,11 @@
 <<: &shared
-  language_name: Inuinnaqtun
+  language_name: Western Inuktut
 mappings:
-  - display_name: Inuinnaqtun to IPA
+  - display_name: Western Inuktut to IPA
     in_lang: ikt
     out_lang: ikt-ipa
     type: mapping
+    case_sensitive: false
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
