@@ -188,3 +188,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2021-03-18 14:51:53.222666
+    case_sensitive: false
+    display_name: ikt-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: ikt-ipa
+    language_name: ikt-ipa
+    mapping: ikt-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
