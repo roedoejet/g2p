@@ -16,62 +16,6 @@
       "out": "kaj"
    },
    {
-      "in": "ɣai",
-      "out": "ɡaj"
-   },
-   {
-      "in": "mai",
-      "out": "maj"
-   },
-   {
-      "in": "nai",
-      "out": "naj"
-   },
-   {
-      "in": "sai",
-      "out": "saj"
-   },
-   {
-      "in": "lai",
-      "out": "laj"
-   },
-   {
-      "in": "jai",
-      "out": "jaj"
-   },
-   {
-      "in": "vai",
-      "out": "vaj"
-   },
-   {
-      "in": "rai",
-      "out": "ʁaj"
-   },
-   {
-      "in": "qai",
-      "out": "qaj"
-   },
-   {
-      "in": "ngai",
-      "out": "ŋaj"
-   },
-   {
-      "in": "ai",
-      "out": "aj"
-   },
-   {
-      "in": "pai",
-      "out": "paj"
-   },
-   {
-      "in": "tai",
-      "out": "taj"
-   },
-   {
-      "in": "kai",
-      "out": "kaj"
-   },
-   {
       "in": "gai",
       "out": "ɡaj"
    },
@@ -92,6 +36,10 @@
       "out": "laj"
    },
    {
+      "in": "łai",
+      "out": "ɬaj"
+   },
+   {
       "in": "jai",
       "out": "jaj"
    },
@@ -110,6 +58,10 @@
    {
       "in": "ngai",
       "out": "ŋaj"
+   },
+   {
+      "in": "nngi",
+      "out": "ŋːaj"
    },
    {
       "in": "i",
@@ -297,7 +249,7 @@
    },
    {
       "in": "nngu",
-      "out": "ŋŋu"
+      "out": "ŋːu"
    },
    {
       "in": "łu",
@@ -361,7 +313,7 @@
    },
    {
       "in": "nnguu",
-      "out": "ŋŋuː"
+      "out": "ŋːuː"
    },
    {
       "in": "łuu",
@@ -558,5 +510,57 @@
    {
       "in": "ł",
       "out": "ɬ"
+   },
+   {
+      "in": "ř",
+      "out": "ɟ"
+   },
+   {
+      "in": "řa",
+      "out": "ɟa"
+   },
+   {
+      "in": "řai",
+      "out": "ɟaj"
+   },
+   {
+      "in": "ři",
+      "out": "ɟi"
+   },
+   {
+      "in": "řu",
+      "out": "ɟu"
+   },
+   {
+      "in": "řaa",
+      "out": "ɟaː"
+   },
+   {
+      "in": "řii",
+      "out": "ɟiː"
+   },
+   {
+      "in": "řuu",
+      "out": "ɟuː"
+   },
+   {
+      "comment": "ikt character",
+      "in": "y",
+      "out": "j"
+   },
+   {
+      "comment": "ikt character",
+      "in": "š",
+      "out": "ʂ"
+   },
+   {
+      "comment": "ikt character",
+      "in": "ȓ",
+      "out": "ɟ"
+   },
+   {
+      "comment": "ikt character",
+      "in": "ñ",
+      "out": "ɲ"
    }
 ]
