@@ -1,44 +1,44 @@
 [
     {
-        "in": "e\u02d0",
-        "out": "e\u02d0",
+        "in": "eː",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "i\u02d0",
-        "out": "e\u02d0",
+        "in": "iː",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "o\u02d0",
-        "out": "o\u02d0",
+        "in": "oː",
+        "out": "oː",
         "context_before": "",
         "context_after": "",
         "prevent_feeding": true
     },
     {
-        "in": "a\u02d0",
-        "out": "e\u02d0",
+        "in": "aː",
+        "out": "eː",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u026a",
-        "out": "\u026a",
+        "in": "ɪ",
+        "out": "ɪ",
         "context_before": "",
         "context_after": ""
     },
     {
         "in": "o",
-        "out": "\u0254",
+        "out": "ɔ",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "\u028c",
-        "out": "\u028c",
+        "in": "ʌ",
+        "out": "ʌ",
         "context_before": "",
         "context_after": ""
     },
@@ -73,7 +73,7 @@
         "context_after": ""
     },
     {
-        "in": "t\u0361s",
+        "in": "t͡s",
         "out": "ts",
         "context_before": "",
         "context_after": ""

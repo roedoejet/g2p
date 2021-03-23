@@ -361,7 +361,7 @@ class Mapping():
                     for io in self.mapping]
         if file_type == 'json':
             with open(fn, 'w', encoding='utf8') as f:
-                json.dump(filtered, f, indent=4)
+                json.dump(filtered, f, indent=4, ensure_ascii=False)
         elif file_type == 'csv':
             with open(fn, 'w', encoding='utf8') as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)

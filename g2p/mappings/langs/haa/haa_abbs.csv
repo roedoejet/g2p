@@ -1,0 +1,11 @@
+PLAIN_VOWEL,i,u,äw,aw,ay,ä,a,ew,ey,ë,oy,iw,o,e
+GRAVE_VOWEL,ì,ù,ä̀w,àw,ày,ä̀,à,èw,èy,ë̀,òy,ìw,ò,è
+HAT_VOWEL,î,û,ä̂w,âw,ây,ä̂,â,êw,êy,ë̂,ôy,îw,ô,ê
+VEE_VOWEL,ǐ,ǔ,ä̌w,ǎw,ǎy,ä̌,ǎ,ěw,ěy,ë̌,ǒy,ǐw,ǒ,ě
+NASAL_VOWEL,į,ų,ą̈w,ąw,ąy,ą̈,ą,ęw,ęy,ę̈,ǫy,įw,ǫ,ę
+NASAL_GRAVE_VOWEL,į̀,ų̀,ą̈̀w,ą̀w,ą̀y,ą̈̀,ą̀,ę̀w,ę̀y,ę̈̀,ǫ̀y,į̀w,ǫ̀,ę̀
+NASAL_HAT_VOWEL,į̂,ų̂,ą̈̂w,ą̂w,ą̂y,ą̈̂,ą̂,ę̂w,ę̂y,ę̈̂,ǫ̂y,į̂w,ǫ̂,ę̂
+NASAL_VEE_VOWEL,į̌,ų̌,ą̈̌w,ą̌w,ą̌y,ą̈̌,ą̌,ę̌w,ę̌y,ę̈̌,ǫ̌y,į̌w,ǫ̌,ę̌
+VOWELS,PLAIN_VOWEL,GRAVE_VOWEL,HAT_VOWEL,VEE_VOWEL,NASAL_VOWEL,NASAL_GRAVE_VOWEL,NASAL_HAT_VOWEL,NASAL_VEE_VOWEL
+VELAR,kh,k',k,gh,g,nj
+CONSONANTS,p,m,b,w,t,d,ḏ,n,r,z,s,ł,c,j̱,j,y,k,g,',l,h
