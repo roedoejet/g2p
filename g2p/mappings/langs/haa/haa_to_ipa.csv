@@ -1,3 +1,4 @@
+nj,ⁿk,,CONSONANTS
 p,pʰ
 mb,ᵐp
 b,p
@@ -23,7 +24,6 @@ d,t
 nh,n̥
 nd,ⁿt
 nj,ⁿk,,VELAR
-nj,ⁿk,[VOWELS],[^VOWELS]
 nj,ŋ
 rh,ɻ̊
 zr,ʐ
@@ -39,20 +39,14 @@ sh,ʃ
 yh,j̊
 kh,x
 k',k'
-k,kʁ,,VOWELS
+k,kʁ,,[VOWELS]
 k,kʰ
 gh,ɣ
-g,gʁ,,VOWELS
+g,gʁ,,[VOWELS]
 g,k
 ',ʔ
-l,ɬɮ,VOWELS,VOWELS
-\u0300\u0328,\u0303
-\u030C\u0328,\u0303
-\u0302\u0328,\u0303
-\u0300,
-\u030C,
-\u0302,
-̈ä\u0328w,ão
+l,ɬɮ,[VOWELS],[VOWELS]
+a\u0328\u0308w,ão
 a\u0328w,æ̃o
 a\u0328y,æ̃i
 ä\u0328,ɑ̃
