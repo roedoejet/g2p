@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Northern Tutchone
+mappings:
+  - display_name: Northern Tutchone equivalencies
+    in_lang: ttm
+    out_lang: ttm-equiv
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: ttm_equiv.csv
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Northern Tutchone to IPA
+    in_lang: ttm-equiv
+    out_lang: ttm-ipa
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    mapping: ttm_to_ipa.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
