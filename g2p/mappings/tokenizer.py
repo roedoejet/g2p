@@ -76,7 +76,7 @@ class Tokenizer(DefaultTokenizer):
         return self.regex.findall(text)
 
 
-class TwoHopTokenizer(Tokenizer):
+class MultiHopTokenizer(Tokenizer):
     def __init__(self, mappings: list):
         assert mappings
         self.inventory = sum([m.inventory("in") for m in mappings], [])
@@ -115,10 +115,15 @@ class TokenizerLibrary:
                 #LOGGER.warning(f"in_lang={in_lang} tok_path={tok_path}")
                 if tok_path[0] != in_lang:
                     raise ValueError("calling get_tokenizer() with tok_path requires that tok_path[0] == in_lang")
+                assert len(tok_path) >= 2
                 if len(tok_path) == 2 or tok_path[1].endswith("-ipa"):
                     out_lang = tok_path[1]
+                elif len(tok_path) == 3 or tok_path[2].endswith("-ipa"):
+                    out_lang = tok_path[1:3]
+                elif len(tok_path) > 3 and tok_path[3].endswith("-ipa"):
+                    out_lang = tok_path[1:4]
                 else:
-                    out_lang = [tok_path[1], tok_path[2]]
+                    out_lang = tok_path[1:3]
             if not out_lang:
                 try:
                     successors = [x for x in LANGS_NETWORK.successors(in_lang)]
@@ -149,14 +154,13 @@ class TokenizerLibrary:
                 # Default tokenizer:
                 self.tokenizers[tokenizer_key] = self.tokenizers[None]
             elif isinstance(out_lang, list):
-                # Build a two-hop tokenizer
-                assert len(out_lang) == 2
+                # Build a multi-hop tokenizer
+                assert len(out_lang) > 1
                 try:
-                    mapping1 = Mapping(in_lang=in_lang, out_lang=out_lang[0])
-                    mapping2 = Mapping(in_lang=out_lang[0], out_lang=out_lang[1])
-                    self.tokenizers[tokenizer_key] = TwoHopTokenizer(
-                        (mapping1, mapping2)
-                    )
+                    mappings = [Mapping(in_lang=in_lang, out_lang=out_lang[0])]
+                    for i in range(1, len(out_lang)):
+                        mappings.append(Mapping(in_lang=out_lang[i - 1], out_lang=out_lang[i]))
+                    self.tokenizers[tokenizer_key] = MultiHopTokenizer(mappings)
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]
                     LOGGER.warning(
