@@ -110,16 +110,16 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2020-10-05 17:07:26.834691
+      - Generated 2021-03-07 22:23:34.538427
     case_sensitive: false
     display_name: tce-ipa IPA to eng-ipa IPA
     escape_special: false
     in_lang: tce-ipa
     language_name: tce-ipa
-    mapping: tce-norm-ipa_to_eng-ipa.json
-    norm_form: NFC
+    mapping: tce-ipa_to_eng-ipa.json
+    norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: true
+    prevent_feeding: false
     reverse: false
     rule_ordering: as-written
   - authors:
