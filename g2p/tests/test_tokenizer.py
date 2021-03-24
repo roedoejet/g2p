@@ -95,6 +95,12 @@ class TokenizerTest(TestCase):
             len(tok.get_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1
         )
 
+    def test_three_hop_tokenizer(self):
+        """ test the three hop tokenizer with haa -> haa-ipa via haa-equiv and haa-simp """
+        tokenizer = tok.get_tokenizer("haa", tok_path=["haa", "haa-equiv", "haa-simp", "haa-ipa"])
+        tokens = tokenizer.tokenize_text("ch'ch")
+        self.assertEqual(len(tokens), 1)
+
     def test_tokenize_not_ipa_explicit(self):
         tokenizer = tok.get_tokenizer("fn-unicode-font", "fn-unicode")
         self.assertNotEqual(tokenizer, tok.get_tokenizer())
