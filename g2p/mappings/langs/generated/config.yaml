@@ -209,6 +209,12 @@ mappings:
     in_lang: iku-sro-ipa
     language_name: iku-sro-ipa
     mapping: iku-sro-ipa_to_eng-ipa.json
+    norm_form: NFD
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
       - Generated 2021-03-23 11:55:07.200851
     case_sensitive: false
     display_name: haa-ipa IPA to eng-ipa IPA
