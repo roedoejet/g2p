@@ -1,7 +1,7 @@
 <<: &shared
   language_name: Upper Tanana
 mappings:
-  - display_name: Upper Tanana normalization
+  - display_name: Upper Tanana Equivalencies
     in_lang: tau
     out_lang: tau-equiv
     authors:

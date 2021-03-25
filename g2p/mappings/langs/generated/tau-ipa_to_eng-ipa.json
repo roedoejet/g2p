@@ -1,19 +1,19 @@
 [
     {
-        "in": "m",
-        "out": "m",
+        "in": "t\u03b8\u02bc",
+        "out": "t\u03b8",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "m",
-        "out": "m",
+        "in": "t\u03b8",
+        "out": "t\u03b8",
         "context_before": "",
         "context_after": ""
     },
     {
-        "in": "m",
-        "out": "m",
+        "in": "t\u03b8",
+        "out": "t\u03b8",
         "context_before": "",
         "context_after": ""
     },
@@ -36,8 +36,14 @@
         "context_after": ""
     },
     {
-        "in": "t\u0283'",
-        "out": "t\u0361\u0283",
+        "in": "t\u0283\u02bc",
+        "out": "t\u0283",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t\u026c\u02bc",
+        "out": "ts",
         "context_before": "",
         "context_after": ""
     },
@@ -72,8 +78,14 @@
         "context_after": ""
     },
     {
-        "in": "t\u026b",
-        "out": "tl",
+        "in": "ts",
+        "out": "ts",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "t\u026c",
+        "out": "ts",
         "context_before": "",
         "context_after": ""
     },
@@ -108,7 +120,7 @@
         "context_after": ""
     },
     {
-        "in": "j",
+        "in": "j\u030a",
         "out": "j",
         "context_before": "",
         "context_after": ""
@@ -152,6 +164,12 @@
     {
         "in": "w",
         "out": "w",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "k",
+        "out": "k",
         "context_before": "",
         "context_after": ""
     },
@@ -234,6 +252,18 @@
         "context_after": ""
     },
     {
+        "in": "\u028c",
+        "out": "\u028c",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0258",
+        "out": "\u0259",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
         "in": "i\u02d0",
         "out": "e\u02d0",
         "context_before": "",
@@ -278,18 +308,6 @@
     {
         "in": "ea",
         "out": "\u025b\u00e6",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u028c",
-        "out": "\u028c",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0258",
-        "out": "\u0259",
         "context_before": "",
         "context_after": ""
     },

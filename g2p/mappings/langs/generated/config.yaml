@@ -241,7 +241,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-01-31 19:56:52.169427
+      - Generated 2021-03-24 21:42:30.002668
     case_sensitive: false
     display_name: tau-ipa IPA to eng-ipa IPA
     escape_special: false
