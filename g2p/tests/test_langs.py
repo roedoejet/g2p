@@ -49,8 +49,8 @@ class LangTest(TestCase):
         error_count = 0
         for test in self.langs_to_test:
             transducer = make_g2p(test[0], test[1])
-            output_string = transducer(test[2]).output_string
-            if output_string != test[3]:
+            output_string = transducer(test[2]).output_string.strip()
+            if output_string != test[3].strip():
                 LOGGER.warning("test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(test[2], test[0], test[1], test[3], output_string))
                 if error_count == 0:
                     first_failed_test = test
@@ -58,7 +58,7 @@ class LangTest(TestCase):
 
         if error_count > 0:
             transducer = make_g2p(first_failed_test[0], first_failed_test[1])
-            self.assertEqual(transducer(first_failed_test[2]).output_string, first_failed_test[3])
+            self.assertEqual(transducer(first_failed_test[2]).output_string.strip(), first_failed_test[3].strip())
 
         #for test in self.langs_to_test:
         #    transducer = make_g2p(test[0], test[1])
