@@ -127,22 +127,6 @@ JSON files are written as an array of objects where each object corresponds to a
 
 ## CLI
 
-![](/Volumes/Data/github_repos/g2p/docs/assets/g2p_update.jpeg)
-
-Text Data Base (DB): the files with the conversion rules created by the user
-* mappings/langs/*.csv
-* mappings/langs/*.json
-* mappings/langs/*.yaml
-
-Compiled Data Base (DB): the files that result from running the `update` command
-* mappings/langs/langs.pkl
-* mappings/langs/network.pkl
-* mappings/langs/static/languages-network.json
-* mappings/langs/static/swagger.json
-
-Gen Data Base (DB): the file that is created when running the `generate-mapping` command
-* mappings/generated/*
-
 ### `update`
 
 If you edit or add new mappings to the `g2p.mappings.langs` folder, you need to update `g2p`. You do this by running `g2p update`
@@ -156,6 +140,32 @@ Ex. `g2p convert hej dan eng-arpabet` would produce `HH EH Y`
 If your language has a mapping to IPA and you want to generate a mapping between that and the English IPA mapping, you can use `g2p generate-mapping <in_lang> --ipa`.  Remember to run `g2p update` before so that it has the latest mappings for your language.
   
 Ex. `g2p generate-mapping dan --ipa` will produce a mapping from `dan-ipa` to `eng-ipa`. You must also run `g2p update` afterwards to update `g2p`. The resulting mapping will be added to the folder in `g2p.mappings.langs.generated`
+
+### g2p workflow diagram
+
+The interactions between `g2p update` and `g2p generate-mapping` are not fully intuitive, so this diagram should help understand what's going on:
+
+<img src="docs/assets/g2p_update.jpeg"  width="600"/>
+
+Text DB: this is the textual database of g2p conversion rules created by contributors. It consists of these files:
+* g2p/mappings/langs/\*/\*.csv
+* g2p/mappings/langs/\*/\*.json
+* g2p/mappings/langs/\*/\*.yaml
+
+Gen DB: this is the part of the textual database that is generated when running the `g2p generate-mapping` command:
+* g2p/mappings/generated/*
+
+Compiled DB: this contains the same info as Text DB + Gen DB, but in a format optimized for fast reading by the machine. This is what any program using `g2p` reads: `g2p convert`, `readalongs align`, `convertextract`, and also `g2p generate-mapping`. It consists of these files:
+* g2p/mappings/langs/langs.pkl
+* g2p/mappings/langs/network.pkl
+* g2p/mappings/langs/static/languages-network.json
+* g2p/mappings/langs/static/swagger.json
+
+So, when you write a new g2p mapping for a language, say `lll`, and you want to be able to convert text from `lll` to `eng-ipa` or `eng-arpabet`, you need to do the following:
+1. Write the mapping from `lll` to `lll-ipa` in g2p/mappings/langs/lll/. You've just updated Text DB.
+2. Run `g2p update` to regenerate Compiled DB from the current Text DB and Gen DB, i.e., to incorporate your new mapping rules.
+3. Run `g2p generate-mapping --ipa lll` to generate g2p/mappings/langs/generated/lll-ipa_to_eng-ipa.json. This is not based on what you wrote directly, but rather on what's in Generated DB.
+4. Run `g2p udpate` again. `g2p generate-mapping` updates Gen DB only, so what gets written there will only be reflected in Compiled DB when you run `g2p update` once more.
 
 ## Studio
 
