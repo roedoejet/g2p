@@ -127,6 +127,22 @@ JSON files are written as an array of objects where each object corresponds to a
 
 ## CLI
 
+![](/Volumes/Data/github_repos/g2p/docs/assets/g2p_update.jpeg)
+
+Text Data Base (DB): the files with the conversion rules created by the user
+* mappings/langs/*.csv
+* mappings/langs/*.json
+* mappings/langs/*.yaml
+
+Compiled Data Base (DB): the files that result from running the `update` command
+* mappings/langs/langs.pkl
+* mappings/langs/network.pkl
+* mappings/langs/static/languages-network.json
+* mappings/langs/static/swagger.json
+
+Gen Data Base (DB): the file that is created when running the `generate-mapping` command
+* mappings/generated/*
+
 ### `update`
 
 If you edit or add new mappings to the `g2p.mappings.langs` folder, you need to update `g2p`. You do this by running `g2p update`
@@ -215,17 +231,6 @@ Then, you can generate the mapping between `dan-ipa` and `eng-ipa` by running `g
 #### Footnotes
 
 <b id="f1">1</b> If this notation is unfamiliar, have a look at [phonological rewrite rules](https://en.wikipedia.org/wiki/Phonological_rule#:~:text=Phonological%20rules%20are%20commonly%20used,or%20distinctive%20features%20or%20both.) [↩](#a1)
-
-
-### Contributors
-
-This project exists thanks to all the people who contribute. 
-
-[@littell](https://github.com/littell).
-[@finguist](https://github.com/finguist).
-[@joanise](https://github.com/joanise).
-[@eddieantonio](https://github.com/eddieantonio).
-[@dhdaines](https://github.com/dhdaines).
 
 
 ## License
