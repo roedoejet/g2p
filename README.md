@@ -243,6 +243,12 @@ Then, you can generate the mapping between `dan-ipa` and `eng-ipa` by running `g
 <b id="f1">1</b> If this notation is unfamiliar, have a look at [phonological rewrite rules](https://en.wikipedia.org/wiki/Phonological_rule#:~:text=Phonological%20rules%20are%20commonly%20used,or%20distinctive%20features%20or%20both.) [↩](#a1)
 
 
+### Contributors
+
+This project exists thanks to all the
+[people who contribute](https://github.com/roedoejet/g2p/graphs/contributors).
+
+
 ## License
 
 MIT. See [LICENSE](LICENSE) for the Copyright and license statements.
