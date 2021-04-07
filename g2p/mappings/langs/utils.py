@@ -11,8 +11,28 @@ from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
 
 
+# panphon.distance.Distance() takes a long time to initialize, so...
+# a) we don't want to load it if we don't need it, i.e., don't use a constant
+# b) we don't want to load it more than once, i.e., don't use a local variable.
+# Conclusion: use a singleton with lazy initialization
+# Profiling results: calling is_panphon() the first time still costs 400ms, but subsequent
+# calls cost .2ms each. With dst=distance.Distance() instead of
+# dst=PanphonDistanceSingleton.Distance, the first call costs 400ms and subsequent calls
+# cost 180ms each.
+class PanphonDistanceSingletonMetaClass(type):
+    @property
+    def Distance(cls):
+        if getattr(cls, "_DISTANCE", None) is None:
+            cls._DISTANCE = distance.Distance()
+        return cls._DISTANCE
+
+
+class PanphonDistanceSingleton(metaclass=PanphonDistanceSingletonMetaClass):
+    pass
+
+
 def check_ipa_known_segs(mappings_to_check=False):
-    dst = distance.Distance()
+    dst = PanphonDistanceSingleton.Distance
     if not mappings_to_check:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
@@ -34,7 +54,7 @@ def check_ipa_known_segs(mappings_to_check=False):
 
 
 def is_panphon(string):
-    dst = distance.Distance()
+    dst = PanphonDistanceSingleton.Distance
     for word in string.split():
         if not word == "".join(dst.fm.ipa_segs(word)):
             return False
