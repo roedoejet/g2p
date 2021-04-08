@@ -167,6 +167,8 @@ So, when you write a new g2p mapping for a language, say `lll`, and you want to 
 3. Run `g2p generate-mapping --ipa lll` to generate g2p/mappings/langs/generated/lll-ipa_to_eng-ipa.json. This is not based on what you wrote directly, but rather on what's in Generated DB.
 4. Run `g2p udpate` again. `g2p generate-mapping` updates Gen DB only, so what gets written there will only be reflected in Compiled DB when you run `g2p update` once more.
 
+Once you have the Compiled DB, it is then possible to use the `g2p convert` command, create time-aligned audiobooks with [readalongs align](https://github.com/ReadAlongs/Studio), or convert files with the [convertextract](https://github.com/roedoejet/convertextract) library.
+
 ## Studio
 
 You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally using `python run_studio.py`. 
