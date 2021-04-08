@@ -126,7 +126,15 @@ def generate_mapping_network(path):
     "--debugger/--no-debugger",
     "-d",
     default=False,
+    is_flag=True,
     help="Show all the conversion steps applied.",
+)
+@click.option(
+    "--check/--no-check",
+    "-c",
+    default=False,
+    is_flag=True,
+    help="Check IPA outputs against panphon and/or eng-arpabet output against ARPABET",
 )
 @click.option(
     "--tok-lang", default=None, help="Override the tokenizing language. Implies --tok.",
@@ -134,7 +142,7 @@ def generate_mapping_network(path):
 @click.option(
     "--tok/--no-tok",
     "-t",
-    default=None,
+    default=None,  # three-way var: None=not set, True/False=set to True/False
     is_flag=True,
     help="Tokenize INPUT_TEXT before converting.",
 )
@@ -150,7 +158,9 @@ def generate_mapping_network(path):
     context_settings=CONTEXT_SETTINGS,
     short_help="Convert text through a g2p mapping path.",
 )
-def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, tok_lang):
+def convert(
+    in_lang, out_lang, input_text, path, tok, check, debugger, pretty_edges, tok_lang
+):
     """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
        Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of languages.
@@ -188,6 +198,8 @@ def convert(in_lang, out_lang, input_text, path, tok, debugger, pretty_edges, to
     elif path:
         transducer = Transducer(Mapping(path))
     tg = transducer(input_text)
+    if check:
+        transducer.check(tg)
     outputs = [tg.output_string]
     if pretty_edges:
         outputs += [tg.pretty_edges()]

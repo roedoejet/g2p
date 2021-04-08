@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-""" Test Mapping langs utility functions
-"""
+""" Test Mapping langs utility functions """
 
 from unittest import TestCase, main
 
+from g2p import make_g2p
 from g2p.mappings.langs import utils
 
 
@@ -28,6 +28,27 @@ class LangsUtilsTest(TestCase):
         non_arpabet_string = "sometext"
         self.assertTrue(utils.is_arpabet(arpabet_string))
         self.assertFalse(utils.is_arpabet(non_arpabet_string))
+
+    def test_check_arpabet(self):
+        transducer = make_g2p("eng-ipa", "eng-arpabet")
+        self.assertTrue(transducer.check(transducer("jŋeːi")))
+        self.assertFalse(transducer.check(transducer("gaŋi")))
+        self.assertTrue(transducer.check(transducer("ɡɑŋi")))
+        self.assertFalse(transducer.check(transducer("ñ")))
+
+    def test_check_ipa(self):
+        transducer = make_g2p("fra", "fra-ipa")
+        self.assertTrue(transducer.check(transducer("ceci")))
+        self.assertFalse(transducer.check(transducer("ñ")))
+        self.assertTrue(transducer.check(transducer("ceci est un test été à")))
+
+        transducer = make_g2p("fra-ipa", "eng-ipa")
+        self.assertFalse(transducer.check(transducer("ñ")))
+
+    def test_check_composite_transducer(self):
+        transducer = make_g2p("fra", "eng-arpabet")
+        self.assertTrue(transducer.check(transducer("ceci est un test été à")))
+        self.assertFalse(transducer.check(transducer("ñ")))
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ from collections.abc import Iterable
 from g2p.mappings import Mapping
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
+from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 
@@ -512,6 +513,25 @@ class Transducer:
         )
         return tg
 
+    def check(self, tg: TransductionGraph):
+        out_lang = self.mapping.kwargs["out_lang"]
+        if out_lang == "eng-arpabet":
+            if not is_arpabet(tg.output_string):
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" is not all valid {out_lang}.'
+                )
+                return False
+            else:
+                return True
+        elif out_lang.endswith("-ipa"):
+            if not is_panphon(tg.output_string):
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" is not all valid {out_lang}.'
+                )
+                return False
+            else:
+                return True
+
 
 class CompositeTransductionGraph(TransductionGraph):
     """This is the object returned after performing a transduction using a CompositeTransducer.
@@ -613,6 +633,16 @@ class CompositeTransducer:
             tg_list.append(tg)
             to_convert = tg.output_string
         return CompositeTransductionGraph(tg_list)
+
+    def check(self, tg: CompositeTransductionGraph):
+        assert len(self._transducers) == len(tg._tiers)
+        result = True
+        for i, transducer in enumerate(self._transducers):
+            # Don't replace by result = results and check(): we want the warnings printed
+            # at each tier!
+            if not transducer.check(tg._tiers[i]):
+                result = False
+        return result
 
 
 class TokenizingTransducer:

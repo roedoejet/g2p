@@ -59,12 +59,12 @@ def is_panphon(string):
     return True
 
 
-ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
+_ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
 
 
 def is_arpabet(string):
-    # print(f"arpabet_set={ARPABET_SET}")
+    # print(f"arpabet_set={_ARPABET_SET}")
     for sound in string.split():
-        if sound not in ARPABET_SET:
+        if sound not in _ARPABET_SET:
             return False
     return True
