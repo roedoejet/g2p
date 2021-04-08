@@ -6,7 +6,12 @@
 
 from linetimer import CodeTimer
 from panphon import distance
-from g2p.mappings.langs.utils import is_panphon
+from g2p.mappings.langs.utils import is_panphon, getPanphonDistanceSingleton
+
+for iters in (1, 1, 10, 100, 1000, 10000):
+    with CodeTimer(f"getPanphonDistanceSingleton() {iters} times"):
+        for i in range(iters):
+            dst = getPanphonDistanceSingleton()
 
 for words in (1, 10):
     with CodeTimer(f"is_panphon() {words} words"):

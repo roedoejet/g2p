@@ -4,8 +4,7 @@ Utilities used by other classes
 
 """
 
-from panphon import distance
-
+import panphon.distance
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
@@ -16,12 +15,12 @@ from g2p.mappings.langs import MAPPINGS_AVAILABLE
 # b) we don't want to load it more than once, i.e., don't use a local variable.
 # Conclusion: use a singleton with lazy initialization
 # Profiling results: calling is_panphon() the first time still costs 400ms, but subsequent
-# calls cost .2ms each. With dst=distance.Distance() instead of
-# dst=PanphonDistanceSingleton.Distance, the first call costs 400ms and subsequent calls
+# calls cost .02ms each. With dst=panphone.distance.Distance() instead of
+# dst=getPanphonDistanceSingleton(), the first call costs 400ms and subsequent calls
 # cost 180ms each.
 def getPanphonDistanceSingleton():
     if not hasattr(getPanphonDistanceSingleton, "value"):
-        setattr(getPanphonDistanceSingleton, "value", distance.Distance())
+        setattr(getPanphonDistanceSingleton, "value", panphon.distance.Distance())
     return getPanphonDistanceSingleton.value
 
 
