@@ -19,20 +19,18 @@ from g2p.mappings.langs import MAPPINGS_AVAILABLE
 # calls cost .2ms each. With dst=distance.Distance() instead of
 # dst=PanphonDistanceSingleton.Distance, the first call costs 400ms and subsequent calls
 # cost 180ms each.
-class PanphonDistanceSingletonMetaClass(type):
-    @property
-    def Distance(cls):
-        if getattr(cls, "_DISTANCE", None) is None:
-            cls._DISTANCE = distance.Distance()
-        return cls._DISTANCE
 
+_PANPHON_DISTANCE_SINGLETON = None
 
-class PanphonDistanceSingleton(metaclass=PanphonDistanceSingletonMetaClass):
-    pass
+def getPanphonDistanceSingleton():
+    global _PANPHON_DISTANCE_SINGLETON
+    if _PANPHON_DISTANCE_SINGLETON is None:
+        _PANPHON_DISTANCE_SINGLETON = distance.Distance()
+    return _PANPHON_DISTANCE_SINGLETON
 
 
 def check_ipa_known_segs(mappings_to_check=False):
-    dst = PanphonDistanceSingleton.Distance
+    dst = getPanphonDistanceSingleton()
     if not mappings_to_check:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
@@ -54,7 +52,7 @@ def check_ipa_known_segs(mappings_to_check=False):
 
 
 def is_panphon(string):
-    dst = PanphonDistanceSingleton.Distance
+    dst = getPanphonDistanceSingleton()
     for word in string.split():
         if not word == "".join(dst.fm.ipa_segs(word)):
             return False
