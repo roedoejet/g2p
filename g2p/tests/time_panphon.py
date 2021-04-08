@@ -1,17 +1,43 @@
-""" Time how long it takes to initialize panphon.distance.Distance() repeatedly,
-    and how fast is_panphon() is when using various singleton or non-singleton solutions.
-    (To benchmark the different solutions, I changed mappings.langs.utils.is_panphon and
-    reran this timing script.)
+"""
+
+Time how long it takes to initialize panphon.distance.Distance() repeatedly,
+and how fast is_panphon() is when using various singleton or non-singleton solutions.
+
+Conclusion:
+dst = panphon.distance.Distance() costs about 400ms the first time, about 180ms each
+subsequent times.
+
+Using a global constant singleton costs about 0.00015ms per call after the initial 400ms
+initialization cost was incurred.
+
+Using hasattr() costs about 0.00022ms per call after the initial 400ms initialization cost
+was incurred.
+
 """
 
 from linetimer import CodeTimer
-from panphon import distance
-from g2p.mappings.langs.utils import is_panphon, getPanphonDistanceSingleton
+import panphon.distance
+from g2p.mappings.langs.utils import is_panphon
+
+_PANPHON_DISTANCE_SINGLETON = None
+def getPanphonDistanceSingleton1():
+    global _PANPHON_DISTANCE_SINGLETON
+    if _PANPHON_DISTANCE_SINGLETON is None:
+        _PANPHON_DISTANCE_SINGLETON = panphon.distance.Distance()
+    return _PANPHON_DISTANCE_SINGLETON
+
+def getPanphonDistanceSingleton2():
+    if not hasattr(getPanphonDistanceSingleton2, "value"):
+        setattr(getPanphonDistanceSingleton2, "value", panphon.distance.Distance())
+    return getPanphonDistanceSingleton2.value
 
 for iters in (1, 1, 10, 100, 1000, 10000):
-    with CodeTimer(f"getPanphonDistanceSingleton() {iters} times"):
+    with CodeTimer(f"getPanphonDistanceSingleton1() {iters} times"):
         for i in range(iters):
-            dst = getPanphonDistanceSingleton()
+            dst = getPanphonDistanceSingleton1()
+    with CodeTimer(f"getPanphonDistanceSingleton2() {iters} times"):
+        for i in range(iters):
+            dst = getPanphonDistanceSingleton2()
 
 for words in (1, 10):
     with CodeTimer(f"is_panphon() {words} words"):
@@ -26,4 +52,4 @@ for words in (1, 10):
 for iters in (1, 10):
     with CodeTimer(f"dst init {iters} times"):
         for i in range(iters):
-            dst = distance.Distance()
+            dst = panphon.distance.Distance()
