@@ -55,6 +55,7 @@ def is_panphon(string):
     dst = getPanphonDistanceSingleton()
     for word in string.split():
         if not word == "".join(dst.fm.ipa_segs(word)):
+            LOGGER.warning(f"word={word} IPA segs={dst.fm.ipa_segs(word)}")
             return False
     return True
 
