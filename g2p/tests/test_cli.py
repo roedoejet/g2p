@@ -41,10 +41,10 @@ class CliTest(TestCase):
 
     def test_convert(self):
         error_count = 0
-        for tok_option in ["--tok", "--no-tok"]:
+        for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for test in self.langs_to_test:
                 output_string = self.runner.invoke(
-                    convert, [tok_option, test[2], test[0], test[1]]
+                    convert, [*tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
                 if output_string != test[3].strip():
                     LOGGER.warning(
