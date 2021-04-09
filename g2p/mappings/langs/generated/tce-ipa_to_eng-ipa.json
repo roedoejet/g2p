@@ -6,7 +6,7 @@
         "context_after": ""
     },
     {
-        "in": "t\u03b8'",
+        "in": "t\u03b8ʼ",
         "out": "t\u03b8",
         "context_before": "",
         "context_after": ""
@@ -24,7 +24,7 @@
         "context_after": ""
     },
     {
-        "in": "t\u026c'",
+        "in": "t\u026cʼ",
         "out": "ts",
         "context_before": "",
         "context_after": ""
@@ -36,7 +36,7 @@
         "context_after": ""
     },
     {
-        "in": "ts'",
+        "in": "tsʼ",
         "out": "ts",
         "context_before": "",
         "context_after": ""
@@ -48,7 +48,7 @@
         "context_after": ""
     },
     {
-        "in": "t'",
+        "in": "tʼ",
         "out": "t",
         "context_before": "",
         "context_after": ""
@@ -96,7 +96,7 @@
         "context_after": ""
     },
     {
-        "in": "t\u0283'",
+        "in": "t\u0283ʼ",
         "out": "t\u0361\u0283",
         "context_before": "",
         "context_after": ""
@@ -144,7 +144,7 @@
         "context_after": ""
     },
     {
-        "in": "k'\u02b7",
+        "in": "kʼ\u02b7",
         "out": "kw",
         "context_before": "",
         "context_after": ""
@@ -162,7 +162,7 @@
         "context_after": ""
     },
     {
-        "in": "k'",
+        "in": "kʼ",
         "out": "k",
         "context_before": "",
         "context_after": ""
