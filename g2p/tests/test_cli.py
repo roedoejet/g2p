@@ -158,11 +158,11 @@ class CliTest(TestCase):
 
     def test_convert_option_t(self):
         result = self.runner.invoke(convert, "-t e\\'i oji oji-ipa")
-        self.assertIn("e:ʔi", result.stdout)
+        self.assertIn("eːʔi", result.stdout)
 
     def test_convert_option_tl(self):
         result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
-        self.assertIn("e:'i", result.stdout)
+        self.assertIn("eː'i", result.stdout)
 
 
 if __name__ == "__main__":
