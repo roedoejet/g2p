@@ -531,6 +531,9 @@ class Transducer:
                 return False
             else:
                 return True
+        else:
+            # No check implemented at this tier, just return True
+            return True
 
 
 class CompositeTransductionGraph(TransductionGraph):
@@ -641,8 +644,7 @@ class CompositeTransducer:
         else:
             result = True
             for i, transducer in enumerate(self._transducers):
-                # Don't replace by result = results and check(): we want the warnings printed
-                # at each tier!
+                # Don't short circuit: we want the warnings printed at each tier!
                 if not transducer.check(tg._tiers[i]):
                     result = False
             return result
