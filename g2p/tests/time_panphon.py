@@ -15,21 +15,28 @@ was incurred.
 
 """
 
-from linetimer import CodeTimer
 import panphon.distance
+from linetimer import CodeTimer
+
+from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import is_panphon
+from g2p.transducer import Transducer
 
 _PANPHON_DISTANCE_SINGLETON = None
+
+
 def getPanphonDistanceSingleton1():
     global _PANPHON_DISTANCE_SINGLETON
     if _PANPHON_DISTANCE_SINGLETON is None:
         _PANPHON_DISTANCE_SINGLETON = panphon.distance.Distance()
     return _PANPHON_DISTANCE_SINGLETON
 
+
 def getPanphonDistanceSingleton2():
     if not hasattr(getPanphonDistanceSingleton2, "value"):
         setattr(getPanphonDistanceSingleton2, "value", panphon.distance.Distance())
     return getPanphonDistanceSingleton2.value
+
 
 for iters in (1, 1, 10, 100, 1000, 10000):
     with CodeTimer(f"getPanphonDistanceSingleton1() {iters} times"):
@@ -53,3 +60,7 @@ for iters in (1, 10):
     with CodeTimer(f"dst init {iters} times"):
         for i in range(iters):
             dst = panphon.distance.Distance()
+
+for iters in (1, 10, 100, 1000):
+    with CodeTimer(f"Transducer(Mapping(id='panphon_preprocessor')) {iters} times"):
+        panphon_preprocessor = Transducer(Mapping(id="panphon_preprocessor"))

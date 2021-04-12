@@ -5,6 +5,7 @@
 from unittest import TestCase, main
 
 from g2p import make_g2p
+from g2p.log import LOGGER
 from g2p.mappings.langs import utils
 
 
@@ -13,7 +14,7 @@ class LangsUtilsTest(TestCase):
         self.assertTrue(utils.is_panphon("ijŋeːʒoːɡd͡ʒ"))  # All panphon chars
         self.assertTrue(utils.is_panphon("ij ij"))  # tokenizes on spaces
         # ASCII g is not ipa/panphon use ɡ (\u0261)
-        self.assertFalse(utils.is_panphon("ga"))
+        # self.assertFalse(utils.is_panphon("ga"))  - tolerated because of panphon preprocessor!
         # ASCII : is not ipa/panphon, use ː (\u02D0)
         self.assertFalse(utils.is_panphon("e:"))
 
@@ -38,6 +39,11 @@ class LangsUtilsTest(TestCase):
 
         transducer = make_g2p("fra-ipa", "eng-ipa")
         self.assertFalse(transducer.check(transducer("ñ")))
+
+    def test_is_ipa_with_panphon_preprocessor(self):
+        # panphon doesn't like these directly, but our panphon proprocessor "patches" them
+        # because they are valid IPA phonetic constructs that panphon is a bit too picky about.
+        self.assertTrue(utils.is_panphon("ɻ̊j̊ oⁿk oᵐp"))
 
     def test_check_composite_transducer(self):
         transducer = make_g2p("fra", "eng-arpabet")
@@ -68,14 +74,24 @@ class LangsUtilsTest(TestCase):
 
     def test_shallow_check(self):
         transducer = make_g2p("win", "eng-arpabet", tok_lang="win")
-        # This is False, but should be True! It's Flase because the mapping outputs :
+        # This is False, but should be True! It's False because the mapping outputs :
         # instead of ː
-        # self.assertFalse(transducer.check(transducer("uu")))
+        self.assertFalse(transducer.check(transducer("uu")))
         self.assertTrue(transducer.check(transducer("uu"), shallow=True))
 
     def test_check_with_equiv(self):
         transducer = make_g2p("tau", "eng-arpabet", tok_lang="tau")
-        self.assertTrue(transducer.check(transducer("sh'oo Jign maasee' do'eent'aa shyyyh")))
+        tau_ipa = make_g2p("tau", "tau-ipa", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        self.assertTrue(utils.is_panphon(tau_ipa))
+        eng_ipa = make_g2p("tau", "eng-ipa", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        self.assertTrue(utils.is_panphon(eng_ipa))
+        eng_arpabet = make_g2p("tau", "eng-arpabet", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        self.assertTrue(utils.is_arpabet(eng_arpabet))
+        LOGGER.warning(f"tau-ipa {tau_ipa}\neng-ipa {eng_ipa}\n eng-arpabet {eng_arpabet}")
+        self.assertTrue(
+            transducer.check(transducer("sh'oo Jign maasee' do'eent'aa shyyyh"))
+        )
+
 
 if __name__ == "__main__":
     main()
