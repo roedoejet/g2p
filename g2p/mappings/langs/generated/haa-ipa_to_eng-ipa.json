@@ -162,7 +162,7 @@
         "context_after": ""
     },
     {
-        "in": "\u027b\u0325",
+        "in": "\u027b\u030a",
         "out": "j",
         "context_before": "",
         "context_after": ""
@@ -228,7 +228,7 @@
         "context_after": ""
     },
     {
-        "in": "j\u0325",
+        "in": "j\u030a",
         "out": "j",
         "context_before": "",
         "context_after": ""
