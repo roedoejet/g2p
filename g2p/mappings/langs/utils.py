@@ -5,10 +5,10 @@ Utilities used by other classes
 """
 
 import panphon.distance
+
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
-
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -52,12 +52,21 @@ def check_ipa_known_segs(mappings_to_check=False):
 
 
 def is_panphon(string):
+    # Deferred importing required here, because g2p.transducer also imports this file.
+    # Such circular dependency is probably bad design, maybe a reviewer of this code will
+    # have a better solution to recommend?
+    import g2p.transducer
     dst = getPanphonDistanceSingleton()
-    for word in string.split():
+    panphon_preprocessor = g2p.transducer.Transducer(Mapping(id="panphon_preprocessor"))
+    preprocessed_string = panphon_preprocessor(string).output_string
+    # Use a loop that prints the warning on all strings that are not panphon, even though
+    # logically this should not be necessary to calculate the answer.
+    result = True
+    for word in preprocessed_string.split():
         if not word == "".join(dst.fm.ipa_segs(word)):
             LOGGER.warning(f"word={word} IPA segs={dst.fm.ipa_segs(word)}")
-            return False
-    return True
+            result = False
+    return result
 
 
 _ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
