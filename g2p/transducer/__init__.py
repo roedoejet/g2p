@@ -480,9 +480,7 @@ class Transducer:
                 else:
                     out_string = io["out"]
                 if self.out_delimiter:
-                    # if not end segment, add delimiter
-                    if not end >= len(tg.output_string):
-                        out_string += self.out_delimiter
+                    out_string += self.out_delimiter
                 if any(self._char_match_pattern.finditer(io["in"])) and any(
                     self._char_match_pattern.finditer(out_string)
                 ):

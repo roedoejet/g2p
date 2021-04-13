@@ -46,7 +46,7 @@ class CliTest(TestCase):
                 output_string = self.runner.invoke(
                     convert, [tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
-                if output_string != test[3]:
+                if output_string != test[3].strip():
                     LOGGER.warning(
                         f"test_cli.py: {test[0]}->{test[1]} mapping error: '{test[2]}' "
                         f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."
@@ -68,7 +68,7 @@ class CliTest(TestCase):
             ).stdout.strip()
             self.assertEqual(
                 output_string,
-                reference_string,
+                reference_string.strip(),
                 f"{first_failed_test[0]}->{first_failed_test[1]} mapping error "
                 "for '{first_failed_test[2]}'.\n"
                 "Look for warnings in the log for any more mapping errors",
@@ -147,13 +147,13 @@ class CliTest(TestCase):
         for s in [
             "[['e', 'ɛ'], ['s', 'ɛ'], ['t', 'ɛ']]",
             "[['ɛ', 'ɛ']]",
-            "[['ɛ', 'E'], ['ɛ', 'H']]",
+            "[['ɛ', 'E'], ['ɛ', 'H'], ['ɛ', ' ']]",
         ]:
             self.assertIn(s, result.stdout)
 
     def test_convert_option_d(self):
         result = self.runner.invoke(convert, "-d est fra eng-arpabet")
-        for s in ["'input': 'est'", "'output': 'ɛ'", "'input': 'ɛ'", "'output': 'EH'"]:
+        for s in ["'input': 'est'", "'output': 'ɛ'", "'input': 'ɛ'", "'output': 'EH '"]:
             self.assertIn(s, result.stdout)
 
     def test_convert_option_t(self):
