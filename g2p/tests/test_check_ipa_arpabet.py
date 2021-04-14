@@ -9,7 +9,7 @@ from g2p.log import LOGGER
 from g2p.mappings.langs import utils
 
 
-class LangsUtilsTest(TestCase):
+class CheckIpaArpabetTest(TestCase):
     def test_is_IPA(self):
         self.assertTrue(utils.is_panphon("ijŋeːʒoːɡd͡ʒ"))  # All panphon chars
         self.assertTrue(utils.is_panphon("ij ij"))  # tokenizes on spaces
