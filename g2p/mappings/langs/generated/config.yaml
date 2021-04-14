@@ -16,6 +16,9 @@ mappings:
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2020-02-06 11:01:41.458466
+    authors:
+      - Generated 2021-04-14 16:34:39.868437
+      - Tidied up 2021-04-14 by Eric Joanis
     display_name: French IPA to English IPA
     in_lang: fra-ipa
     language_name: French
