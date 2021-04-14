@@ -16,7 +16,7 @@ class CheckIpaArpabetTest(TestCase):
         # ASCII g is not ipa/panphon use ɡ (\u0261)
         # self.assertFalse(utils.is_panphon("ga"))  - tolerated because of panphon preprocessor!
         # ASCII : is not ipa/panphon, use ː (\u02D0)
-        self.assertFalse(utils.is_panphon("e:"))
+        self.assertFalse(utils.is_panphon("ge:"))
 
     def test_is_arpabet(self):
         arpabet_string = "S AH S IY  EH  AO N  T EH"

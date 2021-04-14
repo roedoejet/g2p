@@ -518,7 +518,7 @@ class Transducer:
         if out_lang == "eng-arpabet":
             if not is_arpabet(tg.output_string):
                 LOGGER.warning(
-                    f'Transducer output "{tg.output_string}" is not fully valid {out_lang}.'
+                    f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
                 )
                 return False
             else:
