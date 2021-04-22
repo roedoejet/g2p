@@ -9,6 +9,7 @@ mappings:
       - Delasie Torkornoo
       - Aidan Pine
     mapping: crl_equiv.json
+    rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Northern East Cree to IPA
     in_lang: crl-equiv
@@ -19,6 +20,7 @@ mappings:
       - Patrick Littell
       - Delasie Torkornoo
     mapping: crl_to_ipa.json
+    rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Northern East Cree IPA to English IPA
     in_lang: crl-ipa
