@@ -9,7 +9,7 @@ mappings:
       - Delasie Torkornoo
       - Aidan Pine
     mapping: crj_equiv.json
-    rule_ordering: as-written
+    rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Southern East Cree to IPA
     in_lang: crj-equiv
@@ -19,12 +19,12 @@ mappings:
       - David Huggins-Daines
       - Patrick Littell
     mapping: crj_to_ipa.json
-    rule_ordering: as-written
+    rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Southern East Cree IPA to English IPA
     in_lang: crj-ipa
     out_lang: eng-ipa
     type: mapping
     mapping: crj_ipa_to_eng_ipa.json
-    rule_ordering: as-written
+    rule_ordering: apply-longest-first
     <<: *shared
