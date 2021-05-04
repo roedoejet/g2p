@@ -1,2 +1,4 @@
 [report]
-precision = 2
+    precision = 2
+[run]
+    source = g2p
