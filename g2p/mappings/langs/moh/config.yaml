@@ -23,12 +23,12 @@ mappings:
     authors:
       - Aidan Pine
     <<: *shared
-  - display_name: Mohawk to Mohawk ASCII
-    mapping: moh_to_ascii.json
-    in_lang: moh
-    out_lang: moh-ascii
+  - display_name: Mohawk IPA to Mohawk Festival ASCII
+    mapping: moh_to_festival.csv
+    in_lang: moh-ipa
+    out_lang: moh-festival
     abbreviations: abbreviations.csv
     authors:
       - Aidan Pine
-    notes: This is for TTS. Scrubs all special and non-ascii characters.
+    notes: This is for use in Festival which requires only ASCII characters. I tried to write something that is still readable but doesn't have ambiguous sequences (like my previous attempt).
     <<: *shared
