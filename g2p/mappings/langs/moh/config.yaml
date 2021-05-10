@@ -3,10 +3,21 @@
 mappings:
   - display_name: Mohawk to IPA
     mapping: moh_to_ipa.json
-    in_lang: moh
+    in_lang: moh-equiv
     out_lang: moh-ipa
     case_sensitive: false
-    norm_form: NFD
+    norm_form: NFC
+    rule_ordering: as-written
+    abbreviations: abbreviations.csv
+    authors:
+      - Aidan Pine
+    <<: *shared
+  - display_name: Mohawk Equivalencies
+    mapping: moh_equiv.json
+    in_lang: moh
+    out_lang: moh-equiv
+    case_sensitive: false
+    norm_form: NFC
     rule_ordering: as-written
     abbreviations: abbreviations.csv
     authors:

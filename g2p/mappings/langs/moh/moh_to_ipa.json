@@ -1,23 +1,19 @@
 [
   {
     "in": "á:",
-    "out": "aː"
+    "out": "áː"
   },
   {
     "in": "à:",
-    "out": "a"
+    "out": "àː"
   },
   {
     "in": "a:",
     "out": "aː"
   },
   {
-    "in": "à",
-    "out": "a"
-  },
-  {
     "in": "á",
-    "out": "a"
+    "out": "ˈa"
   },
   {
     "in": "a",
@@ -25,41 +21,38 @@
   },
   {
     "in": "én:",
-    "out": "ẽː"
+    "out": "ʌ̃́ː"
+  },
+  {
+    "in": "en",
+    "out": "ʌ̃",
+    "context_after": "CONSONANT|\\s|$"
+  },
+  {
+    "in": "en:",
+    "out": "ʌ̃ː",
+    "context_after": "CONSONANT|\\s|$"
+  },
+  {
+    "in": "è:",
+    "out": "èː"
+  },
+  {
+    "in": "é:",
+    "out": "éː",
+    "prevent_feeding": true
+  },
+  {
+    "in": "é",
+    "out": "ˈe"
+  },
+  {
+    "in": "èn:",
+    "out": "ẽ̀ː"
   },
   {
     "in": "e",
     "out": "e"
-  },
-  {
-    "in": "en",
-    "out": "ẽ",
-    "context_after": "CONSONANT"
-  },
-  {
-    "in": "en:",
-    "out": "ẽː",
-    "context_after": "CONSONANT"
-  },
-  {
-    "in": "è:",
-    "out": "e:"
-  },
-  {
-    "in": "é",
-    "out": "e"
-  },
-  {
-    "in": "é:",
-    "out": "eː"
-  },
-  {
-    "in": "èn",
-    "out": "ẽː"
-  },
-  {
-    "in": "i",
-    "out": "i"
   },
   {
     "in": "i:",
@@ -67,19 +60,43 @@
   },
   {
     "in": "í:",
-    "out": "iː"
+    "out": "íː",
+    "prevent_feeding": true
   },
   {
     "in": "í",
-    "out": "i"
+    "out": "ˈi"
   },
   {
     "in": "ì:",
-    "out": "iː"
+    "out": "ìː"
+  },
+  {
+    "in": "i",
+    "out": "i"
   },
   {
     "in": "k",
     "out": "k"
+  },
+  {
+    "in": "k",
+    "out": "ɡ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "kw",
+    "out": "ɡʷ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "kw",
+    "out": "kʷ"
+  },
+  {
+    "in": "kw",
+    "out": "kʰʷ",
+    "context_after": "\\s|$"
   },
   {
     "in": "n",
@@ -87,42 +104,33 @@
   },
   {
     "in": "ón:",
-    "out": "õː"
+    "out": "ṹː"
   },
   {
     "in": "òn:",
-    "out": "õː"
-  },
-  {
-    "in": "on:",
-    "out": "õː",
-    "context_after": "CONSONANT"
-  },
-  {
-    "in": "o:",
-    "out": "oː"
+    "out": "ũ̀ː"
   },
   {
     "in": "on",
-    "out": "õ",
-    "context_after": "CONSONANT"
+    "out": "ũ",
+    "context_after": "CONSONANT|\\s|$"
   },
   {
     "in": "ón",
-    "out": "õ"
+    "out": "ˈũ"
   },
   {
     "in": "ó:",
-    "out": "oː"
+    "out": "óː",
+    "prevent_feeding": true
   },
-
   {
     "in": "ò:",
-    "out": "oː"
+    "out": "òː"
   },
   {
     "in": "ó",
-    "out": "o"
+    "out": "ˈo"
   },
   {
     "in": "o",
@@ -137,6 +145,26 @@
     "out": "t"
   },
   {
+    "in": "t",
+    "out": "d",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "ti",
+    "out": "d͡ʒ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "tshi",
+    "out": "t͡ʃ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "hsi",
+    "out": "ʃ",
+    "context_after": "VOWEL"
+  },
+  {
     "in": "s",
     "out": "s"
   },
@@ -149,15 +177,15 @@
     "out": "w"
   },
   {
+    "in": "wh",
+    "out": "f"
+  },
+  {
     "in": "y",
     "out": "j"
   },
   {
     "in": "'",
-    "out": "ʔ"
-  },
-  {
-    "in": "’",
     "out": "ʔ"
   }
 ]
