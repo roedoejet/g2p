@@ -16,7 +16,7 @@ class CheckIpaArpabetTest(TestCase):
         # ASCII g is not ipa/panphon use ɡ (\u0261)
         # self.assertFalse(utils.is_panphon("ga"))  - tolerated because of panphon preprocessor!
         # ASCII : is not ipa/panphon, use ː (\u02D0)
-        self.assertFalse(utils.is_panphon("ge:"))
+        self.assertFalse(utils.is_panphon("ge:", display_warnings=True))
 
     def test_is_arpabet(self):
         arpabet_string = "S AH S IY  EH  AO N  T EH"
@@ -35,6 +35,7 @@ class CheckIpaArpabetTest(TestCase):
         transducer = make_g2p("fra", "fra-ipa")
         self.assertTrue(transducer.check(transducer("ceci")))
         self.assertFalse(transducer.check(transducer("ñ")))
+        self.assertFalse(transducer.check(transducer("ñ"), display_warnings=True))
         self.assertTrue(transducer.check(transducer("ceci est un test été à")))
 
         transducer = make_g2p("fra-ipa", "eng-ipa")
@@ -71,6 +72,12 @@ class CheckIpaArpabetTest(TestCase):
         self.assertFalse(
             transducer.check(transducer("mais... c'est ñoñ, si du texte ne passe pas!"))
         )
+        self.assertFalse(
+            transducer.check(
+                transducer("mais... c'est ñoñ, si du texte ne passe pas!"),
+                display_warnings=True,
+            )
+        )
 
     def test_shallow_check(self):
         transducer = make_g2p("win", "eng-arpabet", tok_lang="win")
@@ -81,13 +88,21 @@ class CheckIpaArpabetTest(TestCase):
 
     def test_check_with_equiv(self):
         transducer = make_g2p("tau", "eng-arpabet", tok_lang="tau")
-        tau_ipa = make_g2p("tau", "tau-ipa", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        tau_ipa = make_g2p("tau", "tau-ipa", tok_lang="tau")(
+            "sh'oo Jign maasee' do'eent'aa shyyyh"
+        ).output_string
         self.assertTrue(utils.is_panphon(tau_ipa))
-        eng_ipa = make_g2p("tau", "eng-ipa", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        eng_ipa = make_g2p("tau", "eng-ipa", tok_lang="tau")(
+            "sh'oo Jign maasee' do'eent'aa shyyyh"
+        ).output_string
         self.assertTrue(utils.is_panphon(eng_ipa))
-        eng_arpabet = make_g2p("tau", "eng-arpabet", tok_lang="tau")("sh'oo Jign maasee' do'eent'aa shyyyh").output_string
+        eng_arpabet = make_g2p("tau", "eng-arpabet", tok_lang="tau")(
+            "sh'oo Jign maasee' do'eent'aa shyyyh"
+        ).output_string
         self.assertTrue(utils.is_arpabet(eng_arpabet))
-        LOGGER.warning(f"tau-ipa {tau_ipa}\neng-ipa {eng_ipa}\n eng-arpabet {eng_arpabet}")
+        LOGGER.warning(
+            f"tau-ipa {tau_ipa}\neng-ipa {eng_ipa}\n eng-arpabet {eng_arpabet}"
+        )
         self.assertTrue(
             transducer.check(transducer("sh'oo Jign maasee' do'eent'aa shyyyh"))
         )
