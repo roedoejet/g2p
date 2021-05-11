@@ -1,7 +1,8 @@
 [
   {
     "in": "á:",
-    "out": "áː"
+    "out": "áː",
+    "prevent_feeding": true
   },
   {
     "in": "à:",
@@ -31,6 +32,11 @@
   {
     "in": "en:",
     "out": "ʌ̃ː",
+    "context_after": "CONSONANT|\\s|$"
+  },
+  {
+    "in": "en",
+    "out": "ʌ̃",
     "context_after": "CONSONANT|\\s|$"
   },
   {

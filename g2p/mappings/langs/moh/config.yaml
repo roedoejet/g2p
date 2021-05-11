@@ -28,6 +28,7 @@ mappings:
     in_lang: moh-ipa
     out_lang: moh-festival
     abbreviations: abbreviations.csv
+    rule_ordering: apply-longest-first
     authors:
       - Aidan Pine
     notes: This is for use in Festival which requires only ASCII characters. I tried to write something that is still readable but doesn't have ambiguous sequences (like my previous attempt).

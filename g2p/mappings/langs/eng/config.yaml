@@ -6,6 +6,7 @@ mappings:
     out_lang: eng-arpabet
     out_delimiter: " "
     type: mapping
+    norm_form: "NFD"
     authors:
       - Patrick Littell
     mapping: eng_ipa_to_arpabet.json
