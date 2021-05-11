@@ -199,7 +199,7 @@ def convert(
         transducer = Transducer(Mapping(path))
     tg = transducer(input_text)
     if check:
-        transducer.check(tg)
+        transducer.check(tg, display_warnings=True)
     outputs = [tg.output_string]
     if pretty_edges:
         outputs += [tg.pretty_edges()]

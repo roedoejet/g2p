@@ -513,21 +513,23 @@ class Transducer:
         )
         return tg
 
-    def check(self, tg: TransductionGraph, shallow=False):
+    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         out_lang = self.mapping.kwargs["out_lang"]
         if out_lang == "eng-arpabet":
             if not is_arpabet(tg.output_string):
-                LOGGER.warning(
-                    f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
-                )
+                if display_warnings:
+                    LOGGER.warning(
+                        f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                    )
                 return False
             else:
                 return True
         elif out_lang.endswith("-ipa"):
-            if not is_panphon(tg.output_string):
-                LOGGER.warning(
-                    f'Transducer output "{tg.output_string}" is not fully valid {out_lang}.'
-                )
+            if not is_panphon(tg.output_string, display_warnings=display_warnings):
+                if display_warnings:
+                    LOGGER.warning(
+                        f'Transducer output "{tg.output_string}" is not fully valid {out_lang}.'
+                    )
                 return False
             else:
                 return True
@@ -637,16 +639,25 @@ class CompositeTransducer:
             to_convert = tg.output_string
         return CompositeTransductionGraph(tg_list)
 
-    def check(self, tg: CompositeTransductionGraph, shallow=False):
+    def check(
+        self, tg: CompositeTransductionGraph, shallow=False, display_warnings=False
+    ):
         assert len(self._transducers) == len(tg._tiers)
         if shallow:
-            return self._transducers[-1].check(tg._tiers[-1])
+            return self._transducers[-1].check(
+                tg._tiers[-1], display_warnings=display_warnings
+            )
         else:
             result = True
             for i, transducer in enumerate(self._transducers):
-                # Don't short circuit: we want the warnings printed at each tier!
-                if not transducer.check(tg._tiers[i]):
-                    result = False
+                if not transducer.check(
+                    tg._tiers[i], display_warnings=display_warnings
+                ):
+                    # Don't short circuit if warnings are required
+                    if display_warnings:
+                        result = False
+                    else:
+                        return False
             return result
 
 
@@ -681,16 +692,24 @@ class TokenizingTransducer:
                 tg += non_word_tg
         return tg
 
-    def check(self, tg: TransductionGraph, shallow=False):
+    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         # The obvious implementation fails, because we need to check only the words, not
         # the text between the words!
-        # return self._transducer.check(tg)
+        # return self._transducer.check(tg) # <- complains about characters between words
 
         # So, sadly, we redo the work of transduction so we can check the words only, step
         # by step. I don't like this solution, but I don't see how to get around it.
         result = True
         for token in self._tokenizer.tokenize_text(tg.input_string):
             if token["is_word"]:
-                if not self._transducer.check(self._transducer(token["text"]), shallow):
-                    result = False
+                if not self._transducer.check(
+                    self._transducer(token["text"]),
+                    shallow,
+                    display_warnings=display_warnings,
+                ):
+                    # Don't short circuit if warnings are required
+                    if display_warnings:
+                        result = False
+                    else:
+                        return False
         return result
