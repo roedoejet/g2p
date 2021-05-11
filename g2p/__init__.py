@@ -21,7 +21,13 @@ if sys.stdout.encoding != 'utf8' and hasattr(sys.stdout, 'buffer'):
 if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
+
+_g2p_cache = {}
+
 def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
+    if (in_lang, out_lang, tok_lang) in _g2p_cache:
+        return _g2p_cache[(in_lang, out_lang, tok_lang)]
+
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called '{in_lang}'. Please try again.")
@@ -63,6 +69,7 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
             tokenizer = tok.get_tokenizer(in_lang=tok_lang)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
+    _g2p_cache[(in_lang, out_lang, tok_lang)] = transducer
     return transducer
 
 
