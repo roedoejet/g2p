@@ -7,7 +7,7 @@ language's input mapping or that are unicode letters, numbers and diacritics.
 """
 import re
 from g2p.mappings import Mapping
-from g2p.mappings.utils import merge_if_same_label, get_unicode_category
+from g2p.mappings.utils import merge_if_same_label, get_unicode_category, is_ipa
 from g2p.exceptions import MappingMissing
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.log import LOGGER
@@ -116,11 +116,11 @@ class TokenizerLibrary:
                 if tok_path[0] != in_lang:
                     raise ValueError("calling get_tokenizer() with tok_path requires that tok_path[0] == in_lang")
                 assert len(tok_path) >= 2
-                if len(tok_path) == 2 or tok_path[1].endswith("-ipa"):
+                if len(tok_path) == 2 or is_ipa(tok_path[1]):
                     out_lang = tok_path[1]
-                elif len(tok_path) == 3 or tok_path[2].endswith("-ipa"):
+                elif len(tok_path) == 3 or is_ipa(tok_path[2]):
                     out_lang = tok_path[1:3]
-                elif len(tok_path) > 3 and tok_path[3].endswith("-ipa"):
+                elif len(tok_path) > 3 and is_ipa(tok_path[3]):
                     out_lang = tok_path[1:4]
                 else:
                     out_lang = tok_path[1:3]
@@ -129,7 +129,7 @@ class TokenizerLibrary:
                     successors = [x for x in LANGS_NETWORK.successors(in_lang)]
                 except NetworkXError:
                     successors = []
-                ipa_successors = [x for x in successors if x.endswith("-ipa")]
+                ipa_successors = [x for x in successors if is_ipa(x)]
                 # LOGGER.warning(pprint.pformat([in_lang, "->", successors, ipa_successors]))
                 if ipa_successors:
                     # in_lang has an ipa successor, tokenize using it
@@ -140,7 +140,7 @@ class TokenizerLibrary:
                     # There is no direct IPA successor, look for a two-hop path to -ipa
                     for x in successors:
                         ipa_successors_two_hops = [
-                            y for y in LANGS_NETWORK.successors(x) if y.endswith("-ipa")
+                            y for y in LANGS_NETWORK.successors(x) if is_ipa(y)
                         ]
                         # LOGGER.warning(pprint.pformat([in_lang, x, "->", [ipa_successors_two_hops]]))
                         if ipa_successors_two_hops:

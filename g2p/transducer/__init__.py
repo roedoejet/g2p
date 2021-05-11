@@ -11,7 +11,7 @@ from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
 from g2p.mappings.tokenizer import DefaultTokenizer
-from g2p.mappings.utils import create_fixed_width_lookbehind, normalize
+from g2p.mappings.utils import create_fixed_width_lookbehind, normalize, is_ipa
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
@@ -524,7 +524,7 @@ class Transducer:
                 return False
             else:
                 return True
-        elif out_lang.endswith("-ipa"):
+        elif is_ipa(out_lang):
             if not is_panphon(tg.output_string, display_warnings=display_warnings):
                 if display_warnings:
                     LOGGER.warning(
