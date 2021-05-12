@@ -332,6 +332,8 @@ class Mapping():
         '''
         for io in mapping:
             io['in'], io['out'] = io['out'], io['in']
+            del io['context_before']
+            del io['context_after']
         return mapping
 
     def add_abbreviations(self, abbs, mappings):
