@@ -1,5 +1,39 @@
 [
   {
+    "in": "ti",
+    "out": "d͡ʒ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "tshi",
+    "out": "t͡ʃ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "hsi",
+    "out": "ʃ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "tsy",
+    "out": "d͡ʒ"
+  },
+  {
+    "in": "t",
+    "out": "d",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "k",
+    "out": "ɡ",
+    "context_after": "VOWEL"
+  },
+  {
+    "in": "kw",
+    "out": "ɡʷ",
+    "context_after": "VOWEL"
+  },
+  {
     "in": "á:",
     "out": "áː",
     "prevent_feeding": true
@@ -86,16 +120,6 @@
     "out": "k"
   },
   {
-    "in": "k",
-    "out": "ɡ",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "kw",
-    "out": "ɡʷ",
-    "context_after": "VOWEL"
-  },
-  {
     "in": "kw",
     "out": "kʷ"
   },
@@ -151,32 +175,8 @@
     "out": "t"
   },
   {
-    "in": "t",
-    "out": "d",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "ti",
-    "out": "d͡ʒ",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "tshi",
-    "out": "t͡ʃ",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "hsi",
-    "out": "ʃ",
-    "context_after": "VOWEL"
-  },
-  {
     "in": "s",
     "out": "s"
-  },
-  {
-    "in": "tsy",
-    "out": "d͡ʒ"
   },
   {
     "in": "w",
