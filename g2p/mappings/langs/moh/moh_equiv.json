@@ -20,6 +20,24 @@
         "out": "'"
     },
     {
+        "in": "òn",
+        "out": "òn:",
+        "context_after": "(CONSONANT)"
+    },
+    {
+        "in": "èn",
+        "out": "èn:",
+        "context_after": "(CONSONANT)"
+    },
+    {
+        "in": "on:",
+        "out": "ón:"
+    },
+    {
+        "in": "en:",
+        "out": "én:"
+    },
+    {
         "in": "à",
         "out": "à:",
         "context_after": "[^:]"
@@ -27,7 +45,7 @@
     {
         "in": "è",
         "out": "è:",
-        "context_after": "[^:]"
+        "context_after": "[^:](VOWEL)"
     },
     {
         "in": "ì",
@@ -37,17 +55,7 @@
     {
         "in": "ò",
         "out": "ò:",
-        "context_after": "[^:]"
-    },
-    {
-        "in": "òn",
-        "out": "òn:",
-        "context_after": "[^:]"
-    },
-    {
-        "in": "èn",
-        "out": "èn:",
-        "context_after": "[^:]"
+        "context_after": "[^:n](VOWEL)"
     },
     {
         "in": "i:",
@@ -64,13 +72,5 @@
     {
         "in": "o:",
         "out": "ó:"
-    },
-    {
-        "in": "on:",
-        "out": "ón:"
-    },
-    {
-        "in": "en:",
-        "out": "én:"
     }
 ]
