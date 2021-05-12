@@ -68,7 +68,7 @@ def is_panphon(string, display_warnings=False):
         if not word == word_ipa:
             if display_warnings:
                 LOGGER.warning(
-                    f'String "{word}" is missing characters in its IPA segmentation {word_ipa_segs}'
+                    f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
                 )
                 if "g" in word and not is_panphon.g_warning_printed:
                     LOGGER.warning(
@@ -81,7 +81,7 @@ def is_panphon(string, display_warnings=False):
                     )
                     is_panphon.colon_warning_printed = True
                 for c in word:
-                    if c not in word_ipa_segs:
+                    if c not in word_ipa:
                         LOGGER.warning(
                             f"Character '{c}' (\\u{format(ord(c), '04x')}) in word '{word}' was not recognized as IPA by panphon."
                         )
