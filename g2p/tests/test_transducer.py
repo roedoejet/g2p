@@ -12,7 +12,7 @@ class TransducerTest(TestCase):
     '''
     @classmethod
     def setUpClass(cls):
-        cls.test_mapping_moh = Mapping(in_lang="moh", out_lang='moh-ipa')
+        cls.test_mapping_moh = Mapping(in_lang="moh-equiv", out_lang='moh-ipa')
         cls.test_mapping = Mapping([{'in': 'a', "out": 'b'}])
         cls.test_mapping_rev = Mapping(
             [{"in": 'a', "out": 'b'}], reverse=True)
@@ -76,7 +76,7 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_rev("a").output_string, 'a')
 
     def test_lang_import(self):
-        self.assertEqual(self.test_trans_moh('kawennón:nis').output_string, 'kawẽnõːnis')
+        self.assertEqual(self.test_trans_moh('kawenón:nis').output_string, 'ɡawenṹːnis')
 
     def test_composite(self):
         self.assertEqual(self.test_trans_composite('aba').output_string, 'aaa')
