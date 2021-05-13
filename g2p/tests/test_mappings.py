@@ -155,7 +155,7 @@ class MappingTest(TestCase):
     def test_minimal(self):
         mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'minimal_config.yaml'))
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('abb').output_string, 'aab')
+        self.assertEqual(transducer('abb').output_string, 'aaa')
         self.assertEqual(transducer('a').output_string, 'a')
         self.assertFalse(mapping.wants_rules_sorted())
         self.assertFalse(mapping.kwargs['case_sensitive'])
@@ -169,7 +169,7 @@ class MappingTest(TestCase):
         """
         mapping = Mapping(os.path.join(os.path.dirname(public_data), 'mappings', 'rule-ordering.yaml'))
         transducer = Transducer(mapping)
-        self.assertEqual(transducer('abb').output_string, 'aab')
+        self.assertEqual(transducer('abb').output_string, 'aaa')
         self.assertEqual(transducer('a').output_string, 'a')
         self.assertTrue(mapping.wants_rules_sorted())
         self.assertEqual(mapping.kwargs['rule_ordering'], 'apply-longest-first')
