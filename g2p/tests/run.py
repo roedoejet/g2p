@@ -23,6 +23,7 @@ from g2p.tests.test_studio import StudioTest
 from g2p.tests.test_doctor import DoctorTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
+from g2p.tests.test_check_ipa_arpabet import CheckIpaArpabetTest
 
 
 LOADER = TestLoader()
@@ -45,6 +46,7 @@ MAPPINGS_TESTS = [
         UtilsTest,
         TokenizerTest,
         TokenizeAndMapTest,
+        CheckIpaArpabetTest,
     ]
 ]
 

@@ -41,10 +41,10 @@ class CliTest(TestCase):
 
     def test_convert(self):
         error_count = 0
-        for tok_option in ["--tok", "--no-tok"]:
+        for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for test in self.langs_to_test:
                 output_string = self.runner.invoke(
-                    convert, [tok_option, test[2], test[0], test[1]]
+                    convert, [*tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
                 if output_string != test[3].strip():
                     LOGGER.warning(
@@ -158,11 +158,11 @@ class CliTest(TestCase):
 
     def test_convert_option_t(self):
         result = self.runner.invoke(convert, "-t e\\'i oji oji-ipa")
-        self.assertIn("e:ʔi", result.stdout)
+        self.assertIn("eːʔi", result.stdout)
 
     def test_convert_option_tl(self):
         result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
-        self.assertIn("e:'i", result.stdout)
+        self.assertIn("eː'i", result.stdout)
 
 
 if __name__ == "__main__":
