@@ -515,13 +515,14 @@ class Transducer:
     def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         out_lang = self.mapping.kwargs["out_lang"]
         if out_lang == "eng-arpabet":
-            if is_arpabet(tg.output_string):
+            if not is_arpabet(tg.output_string):
+                if display_warnings:
+                    LOGGER.warning(
+                        f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                    )
+                return False
+            else:
                 return True
-            if display_warnings:
-                LOGGER.warning(
-                    f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
-                )
-            return False
         elif is_ipa(out_lang):
             if not is_panphon(tg.output_string, display_warnings=display_warnings):
                 if display_warnings:
@@ -645,17 +646,18 @@ class CompositeTransducer:
             return self._transducers[-1].check(
                 tg._tiers[-1], display_warnings=display_warnings
             )
-        result = True
-        for i, transducer in enumerate(self._transducers):
-            if not transducer.check(
-                tg._tiers[i], display_warnings=display_warnings
-            ):
-                # Don't short circuit if warnings are required
-                if display_warnings:
-                    result = False
-                else:
-                    return False
-        return result
+        else:
+            result = True
+            for i, transducer in enumerate(self._transducers):
+                if not transducer.check(
+                    tg._tiers[i], display_warnings=display_warnings
+                ):
+                    # Don't short circuit if warnings are required
+                    if display_warnings:
+                        result = False
+                    else:
+                        return False
+            return result
 
 
 class TokenizingTransducer:
