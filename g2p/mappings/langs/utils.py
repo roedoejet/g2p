@@ -65,29 +65,28 @@ def is_panphon(string, display_warnings=False):
     for word in preprocessed_string.split():
         word_ipa_segs = dst.fm.ipa_segs(word)
         word_ipa = "".join(word_ipa_segs)
-        if not word == word_ipa:
-            if display_warnings:
-                LOGGER.warning(
-                    f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
-                )
-                if "g" in word and not is_panphon.g_warning_printed:
-                    LOGGER.warning(
-                        f"Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
-                    )
-                    is_panphon.g_warning_printed = True
-                if ":" in word and not is_panphon.colon_warning_printed:
-                    LOGGER.warning(
-                        f"Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
-                    )
-                    is_panphon.colon_warning_printed = True
-                for c in word:
-                    if c not in word_ipa:
-                        LOGGER.warning(
-                            f"Character '{c}' (\\u{format(ord(c), '04x')}) in word '{word}' was not recognized as IPA by panphon."
-                        )
-                result = False
-            else:
+        if word != word_ipa:
+            if not display_warnings:
                 return False
+            LOGGER.warning(
+                f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
+            )
+            if "g" in word and not is_panphon.g_warning_printed:
+                LOGGER.warning(
+                    f"Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
+                )
+                is_panphon.g_warning_printed = True
+            if ":" in word and not is_panphon.colon_warning_printed:
+                LOGGER.warning(
+                    f"Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
+                )
+                is_panphon.colon_warning_printed = True
+            for c in word:
+                if c not in word_ipa:
+                    LOGGER.warning(
+                        f"Character '{c}' (\\u{format(ord(c), '04x')}) in word '{word}' was not recognized as IPA by panphon."
+                    )
+            result = False
     return result
 
 
