@@ -131,13 +131,13 @@ class TransductionGraph:
         edges = copy.deepcopy(self._edges)
         edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(edges):
-            if edge[1] != None:
+            if edge[1] is None:
+                edges[i] = [self._input_nodes[edge[0]][1], None]
+            else:
                 edges[i] = [
                     self._input_nodes[edge[0]][1],
                     self._output_nodes[edge[1]][1],
                 ]
-            else:
-                edges[i] = [self._input_nodes[edge[0]][1], None]
         return edges
 
     def as_dict(self):
@@ -235,23 +235,22 @@ class Transducer:
             # if not Private Supplementary Use character
             if intermediate_index < 0:
                 continue
-            else:
-                output_char_index = indices_seen[intermediate_index]
-                try:
-                    output_string = (
-                        output_string[:i]
-                        + self.mapping[intermediate_index]["out"][output_char_index]
-                        + output_string[i + 1 :]
-                    )
-                except IndexError:
-                    indices_seen[intermediate_index] = 0
-                    output_char_index = 0
-                    output_string = (
-                        output_string[:i]
-                        + self.mapping[intermediate_index]["out"][output_char_index]
-                        + output_string[i + 1 :]
-                    )
-                indices_seen[intermediate_index] += 1
+            output_char_index = indices_seen[intermediate_index]
+            try:
+                output_string = (
+                    output_string[:i]
+                    + self.mapping[intermediate_index]["out"][output_char_index]
+                    + output_string[i + 1 :]
+                )
+            except IndexError:
+                indices_seen[intermediate_index] = 0
+                output_char_index = 0
+                output_string = (
+                    output_string[:i]
+                    + self.mapping[intermediate_index]["out"][output_char_index]
+                    + output_string[i + 1 :]
+                )
+            indices_seen[intermediate_index] += 1
         return output_string
 
     def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string):
@@ -516,14 +515,13 @@ class Transducer:
     def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         out_lang = self.mapping.kwargs["out_lang"]
         if out_lang == "eng-arpabet":
-            if not is_arpabet(tg.output_string):
-                if display_warnings:
-                    LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
-                    )
-                return False
-            else:
+            if is_arpabet(tg.output_string):
                 return True
+            if display_warnings:
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                )
+            return False
         elif is_ipa(out_lang):
             if not is_panphon(tg.output_string, display_warnings=display_warnings):
                 if display_warnings:
@@ -575,13 +573,13 @@ class CompositeTransductionGraph(TransductionGraph):
             edges = copy.deepcopy(edges)
             edges.sort(key=lambda x: x[0])
             for i, edge in enumerate(edges):
-                if edge[1] != None:
+                if edge[1] is None:
+                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
+                else:
                     edges[i] = [
                         self.tiers[tier_i].input_nodes[edge[0]][1],
                         self.tiers[tier_i].output_nodes[edge[1]][1],
                     ]
-                else:
-                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
             pretty_edges.append(edges)
         return pretty_edges
 
@@ -647,18 +645,17 @@ class CompositeTransducer:
             return self._transducers[-1].check(
                 tg._tiers[-1], display_warnings=display_warnings
             )
-        else:
-            result = True
-            for i, transducer in enumerate(self._transducers):
-                if not transducer.check(
-                    tg._tiers[i], display_warnings=display_warnings
-                ):
-                    # Don't short circuit if warnings are required
-                    if display_warnings:
-                        result = False
-                    else:
-                        return False
-            return result
+        result = True
+        for i, transducer in enumerate(self._transducers):
+            if not transducer.check(
+                tg._tiers[i], display_warnings=display_warnings
+            ):
+                # Don't short circuit if warnings are required
+                if display_warnings:
+                    result = False
+                else:
+                    return False
+        return result
 
 
 class TokenizingTransducer:
@@ -701,15 +698,14 @@ class TokenizingTransducer:
         # by step. I don't like this solution, but I don't see how to get around it.
         result = True
         for token in self._tokenizer.tokenize_text(tg.input_string):
-            if token["is_word"]:
-                if not self._transducer.check(
-                    self._transducer(token["text"]),
-                    shallow,
-                    display_warnings=display_warnings,
-                ):
-                    # Don't short circuit if warnings are required
-                    if display_warnings:
-                        result = False
-                    else:
-                        return False
+            if token["is_word"] and not self._transducer.check(
+                self._transducer(token["text"]),
+                shallow,
+                display_warnings=display_warnings,
+            ):
+                # Don't short circuit if warnings are required
+                if display_warnings:
+                    result = False
+                else:
+                    return False
         return result
