@@ -8,8 +8,9 @@ mappings:
     authors:
       - Delasie Torkornoo
       - Aidan Pine
+      - Eric Joanis
     mapping: crl_equiv.json
-    rule_ordering: apply-longest-first
+    rule_ordering: as-written
     <<: *shared
   - display_name: Northern East Cree to IPA
     in_lang: crl-equiv

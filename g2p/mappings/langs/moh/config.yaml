@@ -3,21 +3,57 @@
 mappings:
   - display_name: Mohawk to IPA
     mapping: moh_to_ipa.json
-    in_lang: moh
+    in_lang: moh-equiv
     out_lang: moh-ipa
     case_sensitive: false
-    norm_form: NFD
+    norm_form: NFC
     rule_ordering: as-written
     abbreviations: abbreviations.csv
     authors:
       - Aidan Pine
     <<: *shared
-  - display_name: Mohawk to Mohawk ASCII
-    mapping: moh_to_ascii.json
-    in_lang: moh
-    out_lang: moh-ascii
+  - display_name: IPA to Mohawk
+    mapping: moh_to_ipa.json
+    in_lang: moh-ipa
+    reverse: true
+    out_lang: moh
+    case_sensitive: false
+    norm_form: NFC
+    rule_ordering: as-written
     abbreviations: abbreviations.csv
     authors:
       - Aidan Pine
-    notes: This is for TTS. Scrubs all special and non-ascii characters.
+    <<: *shared
+  - display_name: Mohawk Equivalencies
+    mapping: moh_equiv.json
+    in_lang: moh
+    out_lang: moh-equiv
+    case_sensitive: false
+    norm_form: NFC
+    rule_ordering: as-written
+    abbreviations: abbreviations.csv
+    authors:
+      - Aidan Pine
+    <<: *shared
+  - display_name: Mohawk IPA to Mohawk Festival ASCII
+    mapping: moh_to_festival.csv
+    in_lang: moh-ipa
+    out_lang: moh-festival
+    abbreviations: abbreviations.csv
+    rule_ordering: apply-longest-first
+    authors:
+      - Aidan Pine
+    notes: This is for use in Festival which requires only ASCII characters. I tried to write something that is still readable but doesn't have ambiguous sequences (like my previous attempt).
+    <<: *shared
+  - display_name: Mohawk Festival ASCII to Mohawk IPA
+    mapping: moh_to_festival.csv
+    in_lang: moh-festival
+    out_lang: moh-ipa
+    abbreviations: abbreviations.csv
+    rule_ordering: apply-longest-first
+    reverse: true
+    norm_form: NFC
+    authors:
+      - Aidan Pine
+    notes: This is for use in Festival which requires only ASCII characters. I tried to write something that is still readable but doesn't have ambiguous sequences (like my previous attempt).
     <<: *shared

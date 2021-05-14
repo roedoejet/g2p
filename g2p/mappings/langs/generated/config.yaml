@@ -40,15 +40,6 @@ mappings:
     mapping: alq-ipa_to_eng-ipa.json
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
-  - author: Generated 2019-12-06 15:24:08.036823
-    display_name: Mohawk IPA to English IPA
-    in_lang: moh-ipa
-    language_name: Mohawk
-    mapping: moh-ipa_to_eng-ipa.json
-    norm_form: NFD
-    out_lang: eng-ipa
-    prevent_feeding: true
-    rule_ordering: apply-longest-first
   - authors:
       - Generated 2020-03-06 00:15:29.676518
     case_sensitive: true
@@ -256,3 +247,16 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2021-05-11 08:47:29.486775
+    case_sensitive: false
+    display_name: Mohawk IPA to English IPA
+    escape_special: false
+    in_lang: moh-ipa
+    language_name: moh-ipa
+    mapping: moh-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
