@@ -1,0 +1,78 @@
+Notes on tone bars by Eric Joanis, reflecting research done with Pat Littell.
+
+The following is a list of all the tone accents and their equivalent tone bars.
+
+Note: this mapping might not be a good idea for our panphon proprocessor, because the
+correct placement of the tone bars is not always right after the vowel that had the tone
+accent, and panphon does not like the result of applying the panphon processor that simply
+applies to mapping without reordering taking into account the rest of the syllable.
+
+The mapping is partially based based on the IPA picker: https://r12a.github.io/pickers/ipa/
+but that site is missing \u1dc6 and \u1dc7. I have mapped them by parallel with the other
+similar accents.
+
+Tone accents shown by themselves, usually easy to see, but not always rendered correctly:
+
+\u0300 =  ̀ -> ˨
+\u0301 =  ́ -> ˦
+\u0302 =  ̂ -> ˥˩
+\u0304 =  ̄ -> ˧
+\u030b =  ̋ -> ˥
+\u030c =  ̌ -> ˩˥
+\u030f =  ̏ -> ˩
+\u1dc4 =  ᷄ -> ˦˥
+\u1dc5 =  ᷅ -> ˩˨
+\u1dc6 =  ᷆ -> ˨˩
+\u1dc7 =  ᷇ -> ˥˦
+\u1dc8 =  ᷈ -> ˧˦˧
+
+Tone accents shown on a letter to make them render correctly:
+
+\u0300 = à -> ˨
+\u0301 = á -> ˦
+\u0302 = â -> ˥˩
+\u0304 = ā -> ˧
+\u030b = a̋ -> ˥
+\u030c = ǎ -> ˩˥
+\u030f = ȁ -> ˩
+\u1dc4 = a᷄ -> ˦˥
+\u1dc5 = a᷅ -> ˩˨
+\u1dc6 = a᷆ -> ˨˩
+\u1dc7 = a᷇ -> ˥˦
+\u1dc8 = a᷈ -> ˧˦˧
+
+Question: Chris Cox suggests that \u1dc4 to \u1dc5 could use, e.g., mid-to-veryhigh, instead
+of high-to-veryhigh, interpreting the accent shape more strictly. However, the IPA picker
+uses high-to-veryhigh.
+
+IPA picker option:
+\u1dc4 =  ᷄ -> ˦˥
+\u1dc5 =  ᷅ -> ˩˨
+\u1dc6 =  ᷆ -> ˨˩
+\u1dc7 =  ᷇ -> ˥˦
+
+Alternative option with stricter correspondance to tone accents:
+\u1dc4 =  ᷄ -> ˧˥
+\u1dc5 =  ᷅ -> ˩˧
+\u1dc6 =  ᷆ -> ˧˩
+\u1dc7 =  ᷇ -> ˥˧
+
+Is there an official standard to these?
+
+If we want to activate replacing by tone accents by tone bars, right after the character
+where the accent was, we can use this set of rules in panphon_preprocessor.csv:
+\u0300,˨
+\u0301,˦
+\u0302,˥˩
+\u0304,˧
+\u030b,˥
+\u030c,˩˥
+\u030f,˩
+\u1dc4,˦˥
+\u1dc5,˩˨
+\u1dc6,˨˩
+\u1dc7,˥˦
+\u1dc8,˧˦˧
+but I'm not activating this yet, since it doesn't place the tone bars where Panphon 0.19
+likes them.
+
