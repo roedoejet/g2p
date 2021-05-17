@@ -45,7 +45,7 @@
     {
         "in": "è",
         "out": "è:",
-        "context_after": "[^:](VOWEL)"
+        "context_after": "([^:n]|n(VOWEL))"
     },
     {
         "in": "ì",
@@ -55,7 +55,7 @@
     {
         "in": "ò",
         "out": "ò:",
-        "context_after": "[^:n](VOWEL)"
+        "context_after": "([^:n]|n(VOWEL))"
     },
     {
         "in": "i:",
