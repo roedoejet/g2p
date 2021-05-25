@@ -138,7 +138,7 @@ mappings:
     in_lang: tli-ipa
     language_name: Tlingit IPA
     mapping: tli-norm-ipa_to_eng-ipa.json
-    norm_form: NFC
+    norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
     reverse: false
