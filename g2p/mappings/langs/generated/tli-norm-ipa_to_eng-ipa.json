@@ -54,8 +54,8 @@
         "context_after": ""
     },
     {
-        "in": "tʃ",
-        "out": "t͡ʃ",
+        "in": "tʃʰ",
+        "out": "tʃ",
         "context_before": "",
         "context_after": ""
     },
@@ -72,8 +72,8 @@
         "context_after": ""
     },
     {
-        "in": "tʃʰ",
-        "out": "tʃ",
+        "in": "tʃ",
+        "out": "t͡ʃ",
         "context_before": "",
         "context_after": ""
     },
