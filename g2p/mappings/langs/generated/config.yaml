@@ -141,7 +141,7 @@ mappings:
     mapping: tli-norm-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: false
+    prevent_feeding: true
     reverse: false
     rule_ordering: as-written
   - authors:
