@@ -512,13 +512,14 @@ class Transducer:
         )
         return tg
 
-    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
+    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False, original_input=None):
         out_lang = self.mapping.kwargs["out_lang"]
         if out_lang == "eng-arpabet":
             if not is_arpabet(tg.output_string):
                 if display_warnings:
+                    display_input = original_input if original_input else tg.input_string
                     LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
                     )
                 return False
             else:
@@ -526,8 +527,9 @@ class Transducer:
         elif is_ipa(out_lang):
             if not is_panphon(tg.output_string, display_warnings=display_warnings):
                 if display_warnings:
+                    display_input = original_input if original_input else tg.input_string
                     LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" is not fully valid {out_lang}.'
+                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
                     )
                 return False
             else:
@@ -644,13 +646,17 @@ class CompositeTransducer:
         assert len(self._transducers) == len(tg._tiers)
         if shallow:
             return self._transducers[-1].check(
-                tg._tiers[-1], display_warnings=display_warnings
+                tg._tiers[-1],
+                display_warnings=display_warnings,
+                original_input=tg.input_string
             )
         else:
             result = True
             for i, transducer in enumerate(self._transducers):
                 if not transducer.check(
-                    tg._tiers[i], display_warnings=display_warnings
+                    tg._tiers[i],
+                    display_warnings=display_warnings,
+                    original_input=tg.input_string
                 ):
                     # Don't short circuit if warnings are required
                     if display_warnings:
