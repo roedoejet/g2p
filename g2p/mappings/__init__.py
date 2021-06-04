@@ -94,6 +94,8 @@ class Mapping():
         elif isinstance(mapping, str):
             self.mapping = validate(load_from_file(mapping), path=mapping)
         else:
+            if self.kwargs.get("type", "") == "unidecode":
+                self.mapping = UnidecodeMapping()
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
                 loaded_config = find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
@@ -182,10 +184,13 @@ class Mapping():
         ''' For a mapping loaded from a file, take the keyword arguments and supply them to the
             Mapping, and get any abbreviations data.
         '''
-        self.mapping = config['mapping_data']
+        if config.get("type", "") == "unidecode":
+            self.mapping = UnidecodeMapping()
+        else:
+            self.mapping = config['mapping_data']
+            self.abbreviations = config.get('abbreviations_data', None)
         mapping_kwargs = OrderedDict(
             {k: v for k, v in config.items() if k in self.allowable_kwargs})
-        self.abbreviations = config.get('abbreviations_data', None)
         # Merge kwargs, but prioritize kwargs that initialized the Mapping
         self.kwargs = {**mapping_kwargs, **self.kwargs}
 
@@ -418,6 +423,12 @@ class Mapping():
         with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,
                       default_flow_style=False)
+
+
+class UnidecodeMapping():
+    def __iter__(self):
+        # Hack to return an empty iterator
+        return (x for x in [])
 
 
 if __name__ == '__main__':

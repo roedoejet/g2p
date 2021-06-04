@@ -24,6 +24,7 @@ from g2p.tests.test_doctor import DoctorTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 from g2p.tests.test_check_ipa_arpabet import CheckIpaArpabetTest
+from g2p.tests.test_unidecode_transducer import UnidecodeTransducerTest
 
 
 LOADER = TestLoader()
@@ -32,7 +33,8 @@ TRANSDUCER_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
         IndicesTest,
-        TransducerTest
+        TransducerTest,
+        UnidecodeTransducerTest,
     ]
 ]
 

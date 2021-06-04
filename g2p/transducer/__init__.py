@@ -6,10 +6,11 @@ which are responsible for performing transductions in the g2p library.
 
 import re
 import copy
+import text_unidecode
 from typing import Dict, List, Pattern, Tuple, Union
 from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, UnidecodeMapping
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize, is_ipa
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
@@ -453,7 +454,42 @@ class Transducer:
                         if edge[1] != None and edge[1] > index_to_delete:
                             tg.edges[i][1] -= 1
 
+    def apply_unidecode(self, to_convert: str):
+        if self.norm_form:
+            to_convert = normalize(to_convert, self.norm_form)
+        tg = TransductionGraph(to_convert)
+
+        # Conversion is done character by character using unidecode
+        converted = [
+            text_unidecode.unidecode(c)
+            for c in to_convert
+        ]
+        tg.output_string = "".join(converted)
+
+        # Edges are calculated to follow the conversion step by step
+        if tg.output_string == "":
+            # Some inputs get completely deleted by unidecode, in which case there are no
+            # valid edges to output.
+            tg.edges = []
+        else:
+            edges = []
+            x_len, y_len = 0, 0
+            for tgt in converted:
+                if tgt:
+                    for c in tgt:
+                        edges.append((x_len, y_len))
+                        y_len += 1
+                else:
+                    edges.append((x_len, max(y_len-1, 0)))
+                x_len += 1
+            tg.edges = edges
+
+        return tg
+
     def apply_rules(self, to_convert: str):
+        if isinstance(self.mapping.mapping, UnidecodeMapping):
+            return self.apply_unidecode(to_convert)
+
         # perform any normalization
         if not self.case_sensitive:
             to_convert = to_convert.lower()
