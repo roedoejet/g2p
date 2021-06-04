@@ -84,6 +84,8 @@ class CliTest(TestCase):
 
         # Disable this test: it's very slow (8s, just by itself) and does not assert
         # anything useful.
+        # Migrated to test_doctor_expensive.py so we can still run it, manually or via
+        # ./run.py all.
         # result = self.runner.invoke(doctor)
         # self.assertEqual(result.exit_code, 0)
         # self.assertGreaterEqual(len(result.stdout), 10000)
