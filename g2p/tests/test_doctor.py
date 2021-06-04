@@ -15,7 +15,12 @@ class DoctorTest(TestCase):
         self.assertIn("panphon", "".join(cm.output))
         self.assertGreaterEqual(len(cm.output), 2)
 
-    def test_ipa_known_segs_all(self):
+    # this test takes 8 seconds and doesn't do anything useful: it trivially increases
+    # code coverage but does not have enough assertions to catch a future code-breaking
+    # change.
+    # Migrated to test_doctor_expensive.py so we can still run it, manually or via
+    # ./run.py all.
+    def not_test_ipa_known_segs_all(self):
         with self.assertLogs(LOGGER, level='WARNING') as cm:
             check_ipa_known_segs()
         self.assertGreaterEqual(len(cm.output), 20)
