@@ -94,8 +94,6 @@ class Mapping():
         elif isinstance(mapping, str):
             self.mapping = validate(load_from_file(mapping), path=mapping)
         else:
-            if self.kwargs.get("type", "") == "unidecode":
-                self.mapping = []
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
                 loaded_config = find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
@@ -103,6 +101,8 @@ class Mapping():
             elif 'id' in self.kwargs:
                 loaded_config = self.find_mapping_by_id(self.kwargs['id'])
                 self.process_loaded_config(loaded_config)
+            elif self.kwargs.get("type", "") == "unidecode":
+                self.mapping = []
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
