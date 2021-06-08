@@ -10,7 +10,7 @@ import text_unidecode
 from typing import Dict, List, Pattern, Tuple, Union
 from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
-from g2p.mappings import Mapping, UnidecodeMapping
+from g2p.mappings import Mapping
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import create_fixed_width_lookbehind, normalize, is_ipa
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
@@ -487,7 +487,7 @@ class Transducer:
         return tg
 
     def apply_rules(self, to_convert: str):
-        if isinstance(self.mapping.mapping, UnidecodeMapping):
+        if self.mapping.kwargs.get("type", "") == "unidecode":
             return self.apply_unidecode(to_convert)
 
         # perform any normalization

@@ -77,7 +77,7 @@ class Mapping():
         # yes, they should
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
                                  'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'rule_ordering',
-                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
+                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse', 'type']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
@@ -95,7 +95,7 @@ class Mapping():
             self.mapping = validate(load_from_file(mapping), path=mapping)
         else:
             if self.kwargs.get("type", "") == "unidecode":
-                self.mapping = UnidecodeMapping()
+                self.mapping = []
             if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
                 loaded_config = find_mapping(
                     self.kwargs['in_lang'], self.kwargs['out_lang'])
@@ -185,7 +185,7 @@ class Mapping():
             Mapping, and get any abbreviations data.
         '''
         if config.get("type", "") == "unidecode":
-            self.mapping = UnidecodeMapping()
+            self.mapping = []
         else:
             self.mapping = config['mapping_data']
             self.abbreviations = config.get('abbreviations_data', None)
@@ -423,12 +423,6 @@ class Mapping():
         with open(fn, 'w', encoding='utf8') as f:
             yaml.dump(template, f, Dumper=IndentDumper,
                       default_flow_style=False)
-
-
-class UnidecodeMapping():
-    def __iter__(self):
-        # Hack to return an empty iterator
-        return (x for x in [])
 
 
 if __name__ == '__main__':
