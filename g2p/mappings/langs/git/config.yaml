@@ -2,13 +2,15 @@
   language_name: Gitksan
 mappings:
   - display_name: Orthography
-    in_lang: git
+    in_lang: git-equiv
     out_lang: git-ipa
     rule_ordering: as-written
     case_sensitive: false
     authors:
       - Fineen Davis
+      - Aidan Pine
     mapping: git_to_ipa.json
+    abbreviations: Ortho_variables.csv
     <<: *shared
   - display_name: Rigsby APA
     in_lang: git
