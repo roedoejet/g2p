@@ -8,12 +8,6 @@
         "out": "æ"
     },
     {
-        "in": "ts",
-        "out": "ts",
-        "context_after": "VOWEL",
-        "prevent_feeding": true
-    },
-    {
         "in": "ee",
         "out": "eː",
         "prevent_feeding": true
@@ -122,7 +116,8 @@
     },
     {
         "in": "ts",
-        "out": "t͡s"
+        "out": "t͡s",
+        "context_after": "CONSONANT|$"
     },
     {
         "in": "g\u0332",
