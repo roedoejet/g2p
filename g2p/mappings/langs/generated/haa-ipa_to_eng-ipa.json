@@ -1,5 +1,41 @@
 [
     {
+        "in": "\u0303\u0300",
+        "out": "\u0303",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0303\u030C",
+        "out": "\u0303",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0303\u0302",
+        "out": "\u0303",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0300",
+        "out": "",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u030C",
+        "out": "",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
+        "in": "\u0302",
+        "out": "",
+        "context_before": "",
+        "context_after": ""
+    },
+    {
         "in": "\u207fk",
         "out": "nk",
         "context_before": "",
@@ -344,12 +380,6 @@
     {
         "in": "i\u0303u",
         "out": "i\u0303u",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "\u0303",
-        "out": "",
         "context_before": "",
         "context_after": ""
     },
