@@ -1,10 +1,17 @@
 [{
         "in": "aa",
-        "out": "aː"
+        "out": "æː",
+        "prevent_feeding": true
     },
     {
         "in": "a",
         "out": "æ"
+    },
+    {
+        "in": "ts",
+        "out": "ts",
+        "context_after": "VOWEL",
+        "prevent_feeding": true
     },
     {
         "in": "ee",
@@ -44,32 +51,20 @@
         "out": "qʼ"
     },
     {
+        "in": "k\u0332",
+        "out": "q"
+    },
+    {
         "in": "ts'",
         "out": "t͡sʼ"
     },
     {
-        "in": "p",
-        "out": "b",
-        "context_after": "VOWEL"
-    },
-    {
-        "in": "t",
-        "out": "d",
-        "context_after": "VOWEL"
+        "in": "kw",
+        "out": "cʷ"
     },
     {
         "in": "k",
-        "out": "ɟ",
-        "context_after": "VOWEL"
-    },
-    {
-        "in": "kw",
-        "out": "ɡʷ",
-        "context_after": "VOWEL"
-    },
-    {
-        "in": "kw",
-        "out": "kʷ"
+        "out": "c"
     },
     {
         "in": "gy",
@@ -124,10 +119,6 @@
     {
         "in": "y",
         "out": "j"
-    },
-    {
-        "in": "k\u0332",
-        "out": "q"
     },
     {
         "in": "ts",
@@ -208,5 +199,9 @@
     {
         "in": "i",
         "out": "ɪ"
+    },
+    {
+        "in": "p",
+        "out": "p"
     }
 ]
