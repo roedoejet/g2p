@@ -1,10 +1,11 @@
 <<: &shared
   language_name: Undetermined
 mappings:
-  - display_name: Undetermined to IPA
+  - display_name: Undetermined ASCII to IPA
     mapping: und_to_ipa.json
-    in_lang: und
+    in_lang: und-ascii
     out_lang: und-ipa
+    norm: NFD
     case_sensitive: false
     escape_special: true
     authors:
@@ -17,4 +18,12 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
+    <<: *shared
+  - display_name: Undertermined Unicode to ASCII
+    type: unidecode
+    norm: NFD
+    in_lang: und
+    out_lang: und-ascii
+    authors:
+      - Eric Joanis
     <<: *shared

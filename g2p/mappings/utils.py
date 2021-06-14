@@ -229,6 +229,9 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         if 'mapping' in mapping:
             mapping['mapping_data'] = load_from_file(
                 os.path.join(path.parent, mapping['mapping']))
+        elif mapping.get("type", "") == "unidecode":
+            # This mapping is not implemented as a regular mapping, but as custom software
+            pass
         else:
             # Is "mapping" key missing?
             raise exceptions.MalformedMapping('Key "mapping:" missing from a mapping in {}.'.format(path))
