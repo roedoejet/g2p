@@ -14,4 +14,4 @@ pyyaml
 regex
 requests
 tqdm
-unidecode
+text_unidecode
