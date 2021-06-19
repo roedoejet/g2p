@@ -6,8 +6,8 @@ mappings:
     in_lang: str
     out_lang: str-equiv
     rule_ordering: as-written
-    norm_form: NFD
-    case_sensitive: true
+    norm_form: NFC
+    case_sensitive: false
     authors:
       - Shankhalika Srikanth
     <<: *shared
@@ -16,8 +16,9 @@ mappings:
     in_lang: str-equiv
     out_lang: str-ipa
     rule_ordering: as-written
-    norm_form: NFD
-    case_sensitive: true
+    norm_form: NFC
+    case_sensitive: false
+    prevent_feeding: true
     authors:
       - Aidan Pine
     <<: *shared
