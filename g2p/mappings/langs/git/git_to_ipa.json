@@ -154,6 +154,10 @@
         "context_after": "VOWEL"
     },
     {
+        "in": "x",
+        "out": "x"
+    },
+    {
         "in": "xw",
         "out": "xʷ"
     },
