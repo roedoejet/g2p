@@ -236,7 +236,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-03-24 21:42:30.002668
+      - Generated 2021-08-01 19:37:38.316339
     case_sensitive: false
     display_name: tau-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -245,7 +245,7 @@ mappings:
     mapping: tau-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: true
+    prevent_feeding: false
     reverse: false
     rule_ordering: as-written
   - authors:
