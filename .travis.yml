@@ -19,7 +19,7 @@ install:
   - cd /home/travis/build/roedoejet/g2p && pip3 install -e .
   # Legal check: make sure we don't introduce GPL dependencies
   - pip3 install pip-licenses
-  - if pip-licenses | grep -v 'Artistic License,' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
+  - if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
   # Install testing requirements
   - pip3 install coverage
   - pip3 install coveralls
