@@ -316,7 +316,7 @@ def scan(lang, path):
     pattern = "[^" + mapped_string + filter_chars + ".]"
     prog = re.compile(pattern)
 
-    with open(path, "r") as file:
+    with open(path, "r", encoding="utf8") as file:
         data = normalize(file.read(), "NFD")
         if not case_sensitive:
             data = data.lower()
