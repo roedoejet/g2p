@@ -40,6 +40,11 @@
       "out": "h"
    },
    {
+      "in": "ᕼ",
+      "out": "h",
+      "comment": "sometimes syllabics 'ᕼ' is used instead of ASCII 'H', e.g., 'ᕼii' was found in real data"
+   },
+   {
       "in": "p",
       "out": "p"
    },

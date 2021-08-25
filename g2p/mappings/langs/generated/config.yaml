@@ -132,15 +132,16 @@ mappings:
   - authors:
       - Generated 2020-09-18 10:40:15.289530
       - Updated by hand 2021-02-10 Eric Joanis to handle ejectives
+      - Update by hand 2021-05-21 Shankhalika Srikanth reorder rules with aspiration
     case_sensitive: false
     display_name: Tlingit IPA to English IPA
     escape_special: false
     in_lang: tli-ipa
     language_name: Tlingit IPA
-    mapping: tli-norm-ipa_to_eng-ipa.json
-    norm_form: NFC
+    mapping: tli-ipa_to_eng-ipa.json
+    norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: false
+    prevent_feeding: true
     reverse: false
     rule_ordering: as-written
   - authors:
@@ -235,7 +236,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-03-24 21:42:30.002668
+      - Generated 2021-08-01 19:37:38.316339
     case_sensitive: false
     display_name: tau-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -244,7 +245,7 @@ mappings:
     mapping: tau-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: true
+    prevent_feeding: false
     reverse: false
     rule_ordering: as-written
   - authors:

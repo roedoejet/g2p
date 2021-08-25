@@ -6,6 +6,7 @@ which are responsible for performing transductions in the g2p library.
 
 import re
 import copy
+import text_unidecode
 from typing import Dict, List, Pattern, Tuple, Union
 from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
@@ -453,7 +454,42 @@ class Transducer:
                         if edge[1] != None and edge[1] > index_to_delete:
                             tg.edges[i][1] -= 1
 
+    def apply_unidecode(self, to_convert: str):
+        if self.norm_form:
+            to_convert = normalize(to_convert, self.norm_form)
+        tg = TransductionGraph(to_convert)
+
+        # Conversion is done character by character using unidecode
+        converted = [
+            text_unidecode.unidecode(c)
+            for c in to_convert
+        ]
+        tg.output_string = "".join(converted)
+
+        # Edges are calculated to follow the conversion step by step
+        if tg.output_string == "":
+            # Some inputs get completely deleted by unidecode, in which case there are no
+            # valid edges to output.
+            tg.edges = []
+        else:
+            edges = []
+            x_len, y_len = 0, 0
+            for tgt in converted:
+                if tgt:
+                    for c in tgt:
+                        edges.append((x_len, y_len))
+                        y_len += 1
+                else:
+                    edges.append((x_len, max(y_len-1, 0)))
+                x_len += 1
+            tg.edges = edges
+
+        return tg
+
     def apply_rules(self, to_convert: str):
+        if self.mapping.kwargs.get("type", "") == "unidecode":
+            return self.apply_unidecode(to_convert)
+
         # perform any normalization
         if not self.case_sensitive:
             to_convert = to_convert.lower()
@@ -512,13 +548,14 @@ class Transducer:
         )
         return tg
 
-    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
+    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False, original_input=None):
         out_lang = self.mapping.kwargs["out_lang"]
         if out_lang == "eng-arpabet":
             if not is_arpabet(tg.output_string):
                 if display_warnings:
+                    display_input = original_input if original_input else tg.input_string
                     LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
                     )
                 return False
             else:
@@ -526,8 +563,9 @@ class Transducer:
         elif is_ipa(out_lang):
             if not is_panphon(tg.output_string, display_warnings=display_warnings):
                 if display_warnings:
+                    display_input = original_input if original_input else tg.input_string
                     LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" is not fully valid {out_lang}.'
+                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
                     )
                 return False
             else:
@@ -644,13 +682,17 @@ class CompositeTransducer:
         assert len(self._transducers) == len(tg._tiers)
         if shallow:
             return self._transducers[-1].check(
-                tg._tiers[-1], display_warnings=display_warnings
+                tg._tiers[-1],
+                display_warnings=display_warnings,
+                original_input=tg.input_string
             )
         else:
             result = True
             for i, transducer in enumerate(self._transducers):
                 if not transducer.check(
-                    tg._tiers[i], display_warnings=display_warnings
+                    tg._tiers[i],
+                    display_warnings=display_warnings,
+                    original_input=tg.input_string
                 ):
                     # Don't short circuit if warnings are required
                     if display_warnings:

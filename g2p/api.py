@@ -125,7 +125,7 @@ def update_docs():
     LOGGER.info('Updated API documentation')
 
 
-g2p_api = Blueprint('resources.g2p', __name__)
+g2p_api = Blueprint('resources-g2p', __name__)
 
 CORS(g2p_api)
 

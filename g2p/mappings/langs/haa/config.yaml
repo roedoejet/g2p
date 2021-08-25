@@ -13,20 +13,8 @@ mappings:
     case_sensitive: false
     norm_form: NFD
     <<: *shared
-  - display_name: Hän to Simplified
-    in_lang: haa-equiv
-    out_lang: haa-simp
-    authors:
-      - Shankhalika Srikanth
-    type: mapping
-    mapping: haa_simplify.csv
-    prevent_feeding: true
-    rule_ordering: as-written
-    case_sensitive: false
-    norm_form: NFD
-    <<: *shared
   - display_name: Hän to IPA
-    in_lang: haa-simp
+    in_lang: haa-equiv
     out_lang: haa-ipa
     authors:
       - Shankhalika Srikanth

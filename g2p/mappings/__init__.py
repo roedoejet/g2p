@@ -77,7 +77,7 @@ class Mapping():
         # yes, they should
         self.allowable_kwargs = ['language_name', 'display_name', 'mapping', 'in_lang',
                                  'out_lang', 'out_delimiter', 'as_is', 'case_sensitive', 'rule_ordering',
-                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse']
+                                 'escape_special', 'norm_form', 'prevent_feeding', 'reverse', 'type']
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
@@ -101,6 +101,8 @@ class Mapping():
             elif 'id' in self.kwargs:
                 loaded_config = self.find_mapping_by_id(self.kwargs['id'])
                 self.process_loaded_config(loaded_config)
+            elif self.kwargs.get("type", "") == "unidecode":
+                self.mapping = []
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
@@ -182,10 +184,13 @@ class Mapping():
         ''' For a mapping loaded from a file, take the keyword arguments and supply them to the
             Mapping, and get any abbreviations data.
         '''
-        self.mapping = config['mapping_data']
+        if config.get("type", "") == "unidecode":
+            self.mapping = []
+        else:
+            self.mapping = config['mapping_data']
+            self.abbreviations = config.get('abbreviations_data', None)
         mapping_kwargs = OrderedDict(
             {k: v for k, v in config.items() if k in self.allowable_kwargs})
-        self.abbreviations = config.get('abbreviations_data', None)
         # Merge kwargs, but prioritize kwargs that initialized the Mapping
         self.kwargs = {**mapping_kwargs, **self.kwargs}
 

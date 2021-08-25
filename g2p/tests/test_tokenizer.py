@@ -96,8 +96,10 @@ class TokenizerTest(TestCase):
         )
 
     def test_three_hop_tokenizer(self):
-        """ test the three hop tokenizer with haa -> haa-ipa via haa-equiv and haa-simp """
-        tokenizer = tok.get_tokenizer("haa", tok_path=["haa", "haa-equiv", "haa-simp", "haa-ipa"])
+        # This used to test the three hop tokenizer with haa -> haa-ipa via haa-equiv and haa-simp
+        # tokenizer = tok.get_tokenizer("haa", tok_path=["haa", "haa-equiv", "haa-simp", "haa-ipa"])
+        # But now haa has been redesigned to not use haa-simp, so downgrade the test to two hops
+        tokenizer = tok.get_tokenizer("haa", tok_path=["haa", "haa-equiv", "haa-ipa"])
         tokens = tokenizer.tokenize_text("ch'ch")
         self.assertEqual(len(tokens), 1)
 
