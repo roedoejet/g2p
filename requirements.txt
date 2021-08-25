@@ -1,7 +1,7 @@
 openpyxl
 click
 coloredlogs<=14.0
-eventlet==0.30.2
+eventlet==0.31.0
 flask-cors>=3.0.9
 Flask>=2.0.0
 flask_socketio==4.3.2
