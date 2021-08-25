@@ -17,7 +17,7 @@ class CliTest(TestCase):
         self.runner = APP.test_cli_runner()
         self.data_dir = os.path.dirname(data_dir)
         self.langs_to_test = []
-        for fn in glob(f"{self.data_dir}/*.*sv"):
+        for fn in glob(os.path.join(self.data_dir, "*.*sv")):
             if fn.endswith("csv"):
                 delimiter = ","
             elif fn.endswith("psv"):
@@ -40,6 +40,7 @@ class CliTest(TestCase):
         self.assertEqual(result.exit_code, 0)
 
     def test_convert(self):
+        LOGGER.info(f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data")
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for test in self.langs_to_test:
@@ -107,7 +108,7 @@ class CliTest(TestCase):
 
     def not_test_scan_fra(self):
         # TODO: fix fra g2p so fra_panagrams.txt passes
-        result = self.runner.invoke(scan, f"fra {self.data_dir}/fra_panagrams.txt")
+        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")])
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -119,7 +120,7 @@ class CliTest(TestCase):
 
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
-        result = self.runner.invoke(scan, f"fra {self.data_dir}/fra_simple.txt")
+        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")])
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -130,7 +131,7 @@ class CliTest(TestCase):
             self.assertIn(c, result.stdout)
     
     def test_scan_str_case(self):
-        result = self.runner.invoke(scan, f'str {self.data_dir}/str_un_human_rights.txt')
+        result = self.runner.invoke(scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")])
         returned_set = re.search('{(.*)}', result.stdout).group(1)
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level='WARNING')
