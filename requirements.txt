@@ -9,8 +9,8 @@ flask-talisman>=0.7.0
 flask-restful>=0.3.9
 gunicorn
 networkx
-panphon
-pyyaml
+panphon>=0.19
+pyyaml>=5.2
 regex
 requests
 tqdm
