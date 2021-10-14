@@ -141,6 +141,8 @@ If your language has a mapping to IPA and you want to generate a mapping between
   
 Ex. `g2p generate-mapping dan --ipa` will produce a mapping from `dan-ipa` to `eng-ipa`. You must also run `g2p update` afterwards to update `g2p`. The resulting mapping will be added to the folder in `g2p.mappings.langs.generated`
 
+Note: if your language goes through an intermediate representation, e.g., lang -> lang-equiv -> lang-ipa, specify both the `<in_lang>` and `<out_lang>` of your final IPA mapping to `g2p generate-mapping`. E.g., to generate `crl-ipa -> eng-ipa`, you would run `g2p generate-mapping --ipa crl-equiv crl-ipa`.
+
 ### g2p workflow diagram
 
 The interactions between `g2p update` and `g2p generate-mapping` are not fully intuitive, so this diagram should help understand what's going on:
