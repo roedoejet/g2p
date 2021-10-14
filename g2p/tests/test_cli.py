@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
-import os
 import csv
+import os
 import re
 from glob import glob
+from unittest import TestCase, main
 
 from g2p.app import APP
+from g2p.cli import convert, doctor, generate_mapping, scan, update
 from g2p.log import LOGGER
-from g2p.cli import convert, update, doctor, scan, generate_mapping
 from g2p.tests.public.data import __file__ as data_dir
 
 
 class CliTest(TestCase):
+    """Test suite for the g2p Command Line Interface"""
+
     def setUp(self):
         self.runner = APP.test_cli_runner()
         self.data_dir = os.path.dirname(data_dir)
@@ -40,7 +42,9 @@ class CliTest(TestCase):
         self.assertEqual(result.exit_code, 0)
 
     def test_convert(self):
-        LOGGER.info(f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data")
+        LOGGER.info(
+            f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data"
+        )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for test in self.langs_to_test:
@@ -108,7 +112,9 @@ class CliTest(TestCase):
 
     def not_test_scan_fra(self):
         # TODO: fix fra g2p so fra_panagrams.txt passes
-        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")])
+        result = self.runner.invoke(
+            scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")]
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -120,7 +126,9 @@ class CliTest(TestCase):
 
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
-        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")])
+        result = self.runner.invoke(
+            scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")],
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -129,22 +137,24 @@ class CliTest(TestCase):
         unmapped_chars = ":,"
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
-    
+
     def test_scan_str_case(self):
-        result = self.runner.invoke(scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")])
-        returned_set = re.search('{(.*)}', result.stdout).group(1)
+        result = self.runner.invoke(
+            scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")],
+        )
+        returned_set = re.search("{(.*)}", result.stdout).group(1)
         self.assertEqual(result.exit_code, 0)
-        self.assertLogs(level='WARNING')
-        unmapped_upper = 'FGR'
+        self.assertLogs(level="WARNING")
+        unmapped_upper = "FGR"
         for u in unmapped_upper:
             self.assertIn(u, returned_set)
-        unmapped_lower = 'abcdefghijklqrtwxyz'
+        unmapped_lower = "abcdefghijklqrtwxyz"
         for low in unmapped_lower:
             self.assertIn(low, returned_set)
-        mapped_upper = 'ABCDEHIJKLMNOPQSTUVWXYZ'
+        mapped_upper = "ABCDEHIJKLMNOPQSTUVWXYZ"
         for u in mapped_upper:
             self.assertNotIn(u, returned_set)
-        mapped_lower = 's'
+        mapped_lower = "s"
         self.assertNotIn(mapped_lower, returned_set)
 
     def test_convert_option_e(self):

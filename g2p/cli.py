@@ -1,29 +1,29 @@
+import codecs
 import os
+import pprint
+import re
+from collections import OrderedDict
+
 import click
 import yaml
-import re
-import codecs
-import pprint
 from flask.cli import FlaskGroup
-from collections import OrderedDict
-from networkx import draw, has_path
-
-from g2p.exceptions import MappingMissing
-from g2p.transducer import CompositeTransducer, Transducer
-from g2p.mappings.create_fallback_mapping import (
-    align_to_dummy_fallback,
-    DUMMY_INVENTORY,
-)
-from g2p.mappings.langs import cache_langs, LANGS_NETWORK, MAPPINGS_AVAILABLE
-from g2p.mappings.langs.utils import check_ipa_known_segs
-from g2p.mappings.create_ipa_mapping import create_mapping
-from g2p.mappings.utils import is_ipa, is_xsampa, normalize
-from g2p.mappings import Mapping
-from g2p._version import VERSION
-from g2p.app import APP, SOCKETIO, network_to_echart
-from g2p.api import update_docs
-from g2p.log import LOGGER
 from g2p import make_g2p
+from g2p._version import VERSION
+from g2p.api import update_docs
+from g2p.app import APP, SOCKETIO, network_to_echart
+from g2p.exceptions import MappingMissing
+from g2p.log import LOGGER
+from g2p.mappings import Mapping
+from g2p.mappings.create_fallback_mapping import (
+    DUMMY_INVENTORY,
+    align_to_dummy_fallback,
+)
+from g2p.mappings.create_ipa_mapping import create_mapping
+from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
+from g2p.mappings.langs.utils import check_ipa_known_segs
+from g2p.mappings.utils import is_ipa, is_xsampa, normalize
+from g2p.transducer import CompositeTransducer, Transducer
+from networkx import draw, has_path
 
 PRINTER = pprint.PrettyPrinter(indent=4)
 
@@ -61,12 +61,10 @@ def cli():
     "out_lang",
     required=False,
     default=None,
-    #type=click.Choice([x for x in LANGS_NETWORK.nodes if is_ipa(x)]),
     type=str,
 )
 @click.argument(
     "in_lang",
-    #type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]),
     type=str,
 )
 @cli.command(
@@ -96,7 +94,9 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
         http://g2p-studio.herokuapp.com/api/v1/langs .
     """
 
-    in_lang_choices = [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
+    in_lang_choices = [
+        x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)
+    ]
     if in_lang not in in_lang_choices:
         raise click.BadParameter(
             f'Invalid value for IN_LANG: "{in_lang}".\n'
@@ -115,7 +115,9 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
         )
 
     if not ipa and not dummy and not list_dummy:
-        click.echo("Nothing to do! Please specify at least one of --ipa, --dummy or --list-dummy.")
+        click.echo(
+            "Nothing to do! Please specify at least one of --ipa, --dummy or --list-dummy."
+        )
 
     if out_dir and (
         os.path.exists(os.path.join(out_dir, "config.yaml"))
@@ -136,7 +138,6 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
             raise click.BadParameter(f'Cannot find IPA mapping for "{in_lang}": {e}')
 
     if ipa:
-        #print(f"in_lang={in_lang} out_lang={out_lang}")
         check_ipa_known_segs([f"{in_lang}-ipa"])
         eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
         click.echo(f"Writing English IPA mapping for {out_lang} to file")
