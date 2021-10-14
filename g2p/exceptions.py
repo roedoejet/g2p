@@ -19,8 +19,8 @@ class MappingMissing(CommandLineError):
     def __str__(self):
         return self.render((
             '\n'
-            'There is no mapping between the languages "%(in_lang)s" and "%(out_lang)s", please\n'
-            'make sure you spelled the name correctly or go to\n'
+            'There is no mapping between the languages "%(in_lang)s" and "%(out_lang)s", \n'
+            'please make sure you spelled the name correctly or go to\n'
             'https://g2p-studio.herokuapp.com/api/v1/langs for a list of mappings'
         ))
 

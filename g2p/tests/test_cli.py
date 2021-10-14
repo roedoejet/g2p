@@ -8,7 +8,7 @@ from glob import glob
 
 from g2p.app import APP
 from g2p.log import LOGGER
-from g2p.cli import convert, update, doctor, scan
+from g2p.cli import convert, update, doctor, scan, generate_mapping
 from g2p.tests.public.data import __file__ as data_dir
 
 
@@ -168,6 +168,35 @@ class CliTest(TestCase):
     def test_convert_option_tl(self):
         result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
         self.assertIn("eː'i", result.stdout)
+
+    def test_generate_mapping_errors(self):
+        """Exercise various error situations with the g2p generate-mapping CLI command"""
+
+        # We don't exercise valid calls to generate_mapping here. The underlying
+        # create_mapping() function is tested in test_create_mapping.py, and
+        # align_to_dummy_fallback() in test_fallback.py, with less expensive
+        # inputs than our real g2p mappings, and with predictable results.
+
+        results = self.runner.invoke(generate_mapping)
+        self.assertIn("Missing argument", results.output)
+
+        results = self.runner.invoke(generate_mapping, "fra")
+        self.assertIn("Nothing to do", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa foo")
+        self.assertIn("Invalid value for IN_LANG", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--dummy fra foo")
+        self.assertIn("Invalid value for OUT_LANG", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa crl")
+        self.assertIn("Cannot find IPA mapping", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa fra dan-ipa")
+        self.assertIn("Cannot find IPA mapping", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--list-dummy fra")
+        self.assertIn("Dummy phone inventory", results.output)
 
 
 if __name__ == "__main__":

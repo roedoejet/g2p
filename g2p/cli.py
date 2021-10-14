@@ -8,6 +8,7 @@ from flask.cli import FlaskGroup
 from collections import OrderedDict
 from networkx import draw, has_path
 
+from g2p.exceptions import MappingMissing
 from g2p.transducer import CompositeTransducer, Transducer
 from g2p.mappings.create_fallback_mapping import (
     align_to_dummy_fallback,
@@ -57,50 +58,94 @@ def cli():
     "--ipa/--no-ipa", default=False, help="Generate mapping from LANG-ipa to eng-ipa."
 )
 @click.argument(
+    "out_lang",
+    required=False,
+    default=None,
+    #type=click.Choice([x for x in LANGS_NETWORK.nodes if is_ipa(x)]),
+    type=str,
+)
+@click.argument(
     "in_lang",
-    type=click.Choice(
-        [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
-    ),
+    #type=click.Choice([x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]),
+    type=str,
 )
 @cli.command(
     context_settings=CONTEXT_SETTINGS,
     short_help="Generate English IPA or dummy mapping.",
 )
-def generate_mapping(in_lang, dummy, ipa, list_dummy, out_dir):
+def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
     """ For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
         or from IN_LANG-ipa to a dummy minimalist phone inventory.
+        This assumes the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping
+        from the its output inventory.
 
-        If you just modified or wrote the IN_LANG to IN_LANG-ipa mapping, don't forget
-        to call "g2p update" first so "g2p generate-mapping" sees the latest version.
+        To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping following a
+        different patterns, e.g., from crl-equiv -> crl-ipa, specify both IN_LANG
+        (crl-equiv in this example) and OUT_LANG (crl-ipa in this example).
+
+        If you just modified or created the IN_LANG to IN_LANG-ipa/OUT_LANG mapping,
+        don't forget to call "g2p update" first so "g2p generate-mapping" sees the
+        latest version.
 
         Call "g2p update" again after calling "g2p generate-mapping" to make the new
-        IN_LANG-ipa to eng-ipa mapping available.
+        IN_LANG-ipa/OUT_LANG to eng-ipa mapping available.
+
+        Note: at least one of --ipa, --dummy or --list-dummy is required.
+
+        You can list available mappings with "g2p doctor --list-ipa", or by visiting
+        http://g2p-studio.herokuapp.com/api/v1/langs .
     """
-    if not ipa and not dummy and not list_dummy:
-        click.echo(
-            "You have to choose to generate either an IPA-based mapping or a dummy fallback mapping. Check the docs for more information."
+
+    in_lang_choices = [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
+    if in_lang not in in_lang_choices:
+        raise click.BadParameter(
+            f'Invalid value for IN_LANG: "{in_lang}".\n'
+            "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
+            f"i.e., one of:\n{', '.join(in_lang_choices)}."
         )
+
+    out_lang_choices = [x for x in LANGS_NETWORK.nodes if is_ipa(x)]
+    if out_lang is None:
+        out_lang = f"{in_lang}-ipa"
+    elif out_lang not in out_lang_choices:
+        raise click.BadParameter(
+            f'Invalid value for OUT_LANG: "{out_lang}".\n'
+            "OUT_LANG must be an IPA language code with an existing mapping from IN_LANG, "
+            f"i.e., one of:\n{', '.join(out_lang_choices)}"
+        )
+
+    if not ipa and not dummy and not list_dummy:
+        click.echo("Nothing to do! Please specify at least one of --ipa, --dummy or --list-dummy.")
+
     if out_dir and (
         os.path.exists(os.path.join(out_dir, "config.yaml"))
         or os.path.exists(os.path.join(out_dir, "config.yaml"))
     ):
         click.echo(
-            f"There is already a mapping config file in '{out_dir}' \nPlease choose another path."
+            f'There is already a mapping config file in "{out_dir}".\nPlease choose another path.'
         )
         return
+
     if list_dummy:
         print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
+
+    if ipa or dummy:
+        try:
+            source_mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
+        except MappingMissing as e:
+            raise click.BadParameter(f'Cannot find IPA mapping for "{in_lang}": {e}')
+
     if ipa:
+        #print(f"in_lang={in_lang} out_lang={out_lang}")
         check_ipa_known_segs([f"{in_lang}-ipa"])
         eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
-        new_mapping = Mapping(in_lang=in_lang, out_lang=f"{in_lang}-ipa")
-        click.echo(f"Writing English IPA mapping for {in_lang} to file")
-        create_mapping(new_mapping, eng_ipa, write_to_file=True, out_dir=out_dir)
+        click.echo(f"Writing English IPA mapping for {out_lang} to file")
+        create_mapping(source_mapping, eng_ipa, write_to_file=True, out_dir=out_dir)
+
     if dummy:
-        new_mapping = Mapping(in_lang=in_lang, out_lang=f"{in_lang}-ipa")
-        click.echo(f"Writing dummy fallback mapping for {in_lang} to file")
-        dummy_config, dummy_mapping = align_to_dummy_fallback(
-            new_mapping, write_to_file=True, out_dir=out_dir
+        click.echo(f"Writing dummy fallback mapping for {out_lang} to file")
+        dummy_mapping = align_to_dummy_fallback(
+            source_mapping, write_to_file=True, out_dir=out_dir
         )
 
 
