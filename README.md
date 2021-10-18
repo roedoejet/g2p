@@ -2,7 +2,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/roedoejet/g2p/badge.svg?branch=master)](https://coveralls.io/github/roedoejet/g2p?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/g2p/badge/?version=latest)](https://g2p.readthedocs.io/en/latest/?badge=latest)
-[![Build Status](https://travis-ci.com/roedoejet/g2p.svg?branch=master)](https://travis-ci.com/roedoejet/g2p)
+[![Build Status](https://travis-ci.com/roedoejet/g2p.svg?branch=master)](https://travis-ci.com/github/roedoejet/g2p)
 [![PyPI package](https://img.shields.io/pypi/v/g2p.svg)](https://pypi.org/project/g2p/)
 [![license](https://img.shields.io/badge/Licence-MIT-green)](LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/g2p)
@@ -140,6 +140,8 @@ Ex. `g2p convert hej dan eng-arpabet` would produce `HH EH Y`
 If your language has a mapping to IPA and you want to generate a mapping between that and the English IPA mapping, you can use `g2p generate-mapping <in_lang> --ipa`.  Remember to run `g2p update` before so that it has the latest mappings for your language.
   
 Ex. `g2p generate-mapping dan --ipa` will produce a mapping from `dan-ipa` to `eng-ipa`. You must also run `g2p update` afterwards to update `g2p`. The resulting mapping will be added to the folder in `g2p.mappings.langs.generated`
+
+Note: if your language goes through an intermediate representation, e.g., lang -> lang-equiv -> lang-ipa, specify both the `<in_lang>` and `<out_lang>` of your final IPA mapping to `g2p generate-mapping`. E.g., to generate `crl-ipa -> eng-ipa`, you would run `g2p generate-mapping --ipa crl-equiv crl-ipa`.
 
 ### g2p workflow diagram
 

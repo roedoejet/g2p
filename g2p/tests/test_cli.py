@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
-import os
 import csv
+import os
 import re
 from glob import glob
+from unittest import TestCase, main
 
 from g2p.app import APP
+from g2p.cli import convert, doctor, generate_mapping, scan, update
 from g2p.log import LOGGER
-from g2p.cli import convert, update, doctor, scan
 from g2p.tests.public.data import __file__ as data_dir
 
 
 class CliTest(TestCase):
+    """Test suite for the g2p Command Line Interface"""
+
     def setUp(self):
         self.runner = APP.test_cli_runner()
         self.data_dir = os.path.dirname(data_dir)
@@ -40,7 +42,9 @@ class CliTest(TestCase):
         self.assertEqual(result.exit_code, 0)
 
     def test_convert(self):
-        LOGGER.info(f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data")
+        LOGGER.info(
+            f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data"
+        )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for test in self.langs_to_test:
@@ -108,7 +112,9 @@ class CliTest(TestCase):
 
     def not_test_scan_fra(self):
         # TODO: fix fra g2p so fra_panagrams.txt passes
-        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")])
+        result = self.runner.invoke(
+            scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")]
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -120,7 +126,9 @@ class CliTest(TestCase):
 
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
-        result = self.runner.invoke(scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")])
+        result = self.runner.invoke(
+            scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")],
+        )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         diacritics = "àâéèêëîïôùûüç"
@@ -129,22 +137,24 @@ class CliTest(TestCase):
         unmapped_chars = ":,"
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
-    
+
     def test_scan_str_case(self):
-        result = self.runner.invoke(scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")])
-        returned_set = re.search('{(.*)}', result.stdout).group(1)
+        result = self.runner.invoke(
+            scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")],
+        )
+        returned_set = re.search("{(.*)}", result.stdout).group(1)
         self.assertEqual(result.exit_code, 0)
-        self.assertLogs(level='WARNING')
-        unmapped_upper = 'FGR'
+        self.assertLogs(level="WARNING")
+        unmapped_upper = "FGR"
         for u in unmapped_upper:
             self.assertIn(u, returned_set)
-        unmapped_lower = 'abcdefghijklqrtwxyz'
+        unmapped_lower = "abcdefghijklqrtwxyz"
         for low in unmapped_lower:
             self.assertIn(low, returned_set)
-        mapped_upper = 'ABCDEHIJKLMNOPQSTUVWXYZ'
+        mapped_upper = "ABCDEHIJKLMNOPQSTUVWXYZ"
         for u in mapped_upper:
             self.assertNotIn(u, returned_set)
-        mapped_lower = 's'
+        mapped_lower = "s"
         self.assertNotIn(mapped_lower, returned_set)
 
     def test_convert_option_e(self):
@@ -168,6 +178,35 @@ class CliTest(TestCase):
     def test_convert_option_tl(self):
         result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
         self.assertIn("eː'i", result.stdout)
+
+    def test_generate_mapping_errors(self):
+        """Exercise various error situations with the g2p generate-mapping CLI command"""
+
+        # We don't exercise valid calls to generate_mapping here. The underlying
+        # create_mapping() function is tested in test_create_mapping.py, and
+        # align_to_dummy_fallback() in test_fallback.py, with less expensive
+        # inputs than our real g2p mappings, and with predictable results.
+
+        results = self.runner.invoke(generate_mapping)
+        self.assertIn("Missing argument", results.output)
+
+        results = self.runner.invoke(generate_mapping, "fra")
+        self.assertIn("Nothing to do", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa foo")
+        self.assertIn("Invalid value for IN_LANG", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--dummy fra foo")
+        self.assertIn("Invalid value for OUT_LANG", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa crl")
+        self.assertIn("Cannot find IPA mapping", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa fra dan-ipa")
+        self.assertIn("Cannot find IPA mapping", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--list-dummy fra")
+        self.assertIn("Dummy phone inventory", results.output)
 
 
 if __name__ == "__main__":
