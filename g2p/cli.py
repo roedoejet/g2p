@@ -3,6 +3,7 @@ import pprint
 import re
 
 import click
+import yaml
 from flask.cli import FlaskGroup
 from networkx import draw, has_path
 
@@ -20,7 +21,7 @@ from g2p.mappings.create_fallback_mapping import (
 from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
-from g2p.mappings.utils import is_ipa, is_xsampa, normalize
+from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
 from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
@@ -220,6 +221,11 @@ def generate_mapping_network(path):
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     help="Read text to convert from FILE.",
 )
+@click.option(
+    "--config",
+    type=click.Path(exists=True, file_okay=True, dir_okay=False),
+    help="A path to a mapping configuration file to use",
+)
 @click.argument("out_lang")
 @click.argument("in_lang")
 @click.argument("input_text", type=click.STRING)
@@ -228,7 +234,16 @@ def generate_mapping_network(path):
     short_help="Convert text through a g2p mapping path.",
 )
 def convert(
-    in_lang, out_lang, input_text, path, tok, check, debugger, pretty_edges, tok_lang
+    in_lang,
+    out_lang,
+    input_text,
+    path,
+    tok,
+    check,
+    debugger,
+    pretty_edges,
+    tok_lang,
+    config,
 ):
     """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
@@ -242,11 +257,34 @@ def convert(
     # Check input != output
     if in_lang == out_lang:
         raise click.UsageError("Values must be different for 'IN_LANG' and 'OUT_LANG'")
+    if config:
+        # This isn't that DRY - copied from g2p/mappings/langs/__init__.py
+        mappings_legal_pairs = []
+        with open(config, encoding="utf8") as f:
+            data = yaml.safe_load(f)
+        if "mappings" in data:
+            for index, mapping in enumerate(data["mappings"]):
+                mappings_legal_pairs.append(
+                    (
+                        data["mappings"][index]["in_lang"],
+                        data["mappings"][index]["out_lang"],
+                    )
+                )
+                data["mappings"][index] = load_mapping_from_path(config, index)
+        else:
+            data = load_mapping_from_path(config)
+        for pair in mappings_legal_pairs:
+            if pair[0] in LANGS_NETWORK.nodes:
+                LOGGER.warn(
+                    f"A mapping with the name '{pair[0]}' is already defined in g2p. Your local mapping with the same name might not function properly."
+                )
+        LANGS_NETWORK.add_edges_from(mappings_legal_pairs)
+        MAPPINGS_AVAILABLE.extend(data["mappings"])
     # Check input lang exists
-    if not in_lang in LANGS_NETWORK.nodes:
+    if in_lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{in_lang}' is not a valid value for 'IN_LANG'")
     # Check output lang exists
-    if not out_lang in LANGS_NETWORK.nodes:
+    if out_lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{out_lang}' is not a valid value for 'OUT_LANG'")
     # Check if path exists
     if not has_path(LANGS_NETWORK, in_lang, out_lang):
