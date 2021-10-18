@@ -136,6 +136,8 @@ If you want to convert a string on the command line, you can use `g2p convert <i
   
 Ex. `g2p convert hej dan eng-arpabet` would produce `HH EH Y`
 
+If you have written your own mapping that is not included in the standard `g2p` library, you can point to its configuration file using the `--config` flag, as in `g2p convert <input_text> <in_lang> <out_lang> --config path/to/config.yml`. This will add the mappings defined in your configuration to the existing `g2p` network, so be careful to avoid namespace errors.
+
 ### `generate-mapping`
 If your language has a mapping to IPA and you want to generate a mapping between that and the English IPA mapping, you can use `g2p generate-mapping <in_lang> --ipa`.  Remember to run `g2p update` before so that it has the latest mappings for your language.
   

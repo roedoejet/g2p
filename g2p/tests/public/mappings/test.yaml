@@ -1,0 +1,17 @@
+mappings:
+  - language_name: Local Config
+    display_name: Local Config
+    in_lang: local-config-in
+    out_lang: local-config-out
+    type: mapping
+    authors:
+      - Aidan Pine
+    mapping: test_to_ipa.csv
+  - language_name: Local Config
+    display_name: Local Config to IPA
+    in_lang: local-config-in
+    out_lang: dan-ipa
+    type: mapping
+    authors:
+      - Aidan Pine
+    mapping: test_to_ipa.csv

@@ -9,6 +9,7 @@ from unittest import TestCase, main
 from g2p.app import APP
 from g2p.cli import convert, doctor, generate_mapping, scan, update
 from g2p.log import LOGGER
+from g2p.tests.public import PUBLIC_DIR
 from g2p.tests.public.data import __file__ as data_dir
 
 
@@ -125,7 +126,7 @@ class CliTest(TestCase):
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
         result = self.runner.invoke(
-            scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")],
+            scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")]
         )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
@@ -138,7 +139,7 @@ class CliTest(TestCase):
 
     def test_scan_str_case(self):
         result = self.runner.invoke(
-            scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")],
+            scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")]
         )
         returned_set = re.search("{(.*)}", result.stdout).group(1)
         self.assertEqual(result.exit_code, 0)
@@ -223,6 +224,18 @@ class CliTest(TestCase):
             results.output,
             "Non-existent out-dir must be reported as error",
         )
+
+    def test_local_config(self):
+        config_path = os.path.join(PUBLIC_DIR, "mappings", "test.yaml")
+        result = self.runner.invoke(
+            convert,
+            ["bbbb", "local-config-in", "local-config-out", "--config", config_path,],
+        )
+        self.assertIn("aaaa", result.stdout)
+        result = self.runner.invoke(
+            convert, ["b", "local-config-in", "eng-ipa", "--config", config_path,],
+        )
+        self.assertIn("ɑ", result.stdout)
 
 
 if __name__ == "__main__":
