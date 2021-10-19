@@ -111,17 +111,37 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
 
     return mapping
 
+# cached panphon.distance.Distance() instance
+panphon_dst = None
+# cached p2_pseqs, since they're expensive but usually the same
+find_good_match_cache = (None, None, None)
+
 def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
     """Find a good sequence in inventory_l2 matching p1."""
 
-    dst = panphon.distance.Distance()
     # The proper way to do this would be with some kind of beam search
     # through a determinized/minimized FST, but in the absence of that
     # we can do a kind of heurstic greedy search.  (we don't want any
     # dependencies outside of PyPI otherwise we'd just use OpenFST)
-    p1_pseq = dst.fm.ipa_segs(p1)
-    p2_pseqs = [dst.fm.ipa_segs(p)
-                for p in process_characters(inventory_l2, l2_is_xsampa)]
+
+    # Initializing panphon.distance.Distance() is expensive, so do it just
+    # once, and only if needed.
+    global panphon_dst
+    if panphon_dst is None:
+        panphon_dst = panphon.distance.Distance()
+
+    p1_pseq = panphon_dst.fm.ipa_segs(p1)
+
+    # Cache ps_pseqs since it's expensive to build and it's the same value
+    # repeatedly in a given call to align_inventories()
+    global find_good_match_cache
+    if inventory_l2 is not find_good_match_cache[0] or l2_is_xsampa != find_good_match_cache[1]:
+        p2_pseqs = [panphon_dst.fm.ipa_segs(p)
+                    for p in process_characters(inventory_l2, l2_is_xsampa)]
+        find_good_match_cache = (inventory_l2, l2_is_xsampa, p2_pseqs)
+    else:
+        p2_pseqs = find_good_match_cache[2]
+
     i = 0
     good_match = []
     while i < len(p1_pseq):
@@ -138,7 +158,7 @@ def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
                 continue
             e = min(i + len(p2_pseq), len(p1_pseq))
             input_seg = p1_pseq[i:e]
-            score = dst.weighted_feature_edit_distance(''.join(input_seg),
+            score = panphon_dst.weighted_feature_edit_distance(''.join(input_seg),
                                                        ''.join(p2_pseq))
             # Be very greedy and take the longest match
             if (score < best_score
