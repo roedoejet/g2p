@@ -31,6 +31,7 @@ import yaml
 from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
 from g2p.transducer import Transducer
 from g2p.mappings import Mapping
+from g2p.mappings.langs.utils import getPanphonDistanceSingleton
 from g2p.log import LOGGER
 
 #################################
@@ -111,71 +112,64 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
 
     return mapping
 
-# cached panphon.distance.Distance() instance
-panphon_dst = None
-# cached p2_pseqs, since they're expensive but usually the same
-find_good_match_cache = (None, None, None)
-
-def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
-    """Find a good sequence in inventory_l2 matching p1."""
-
-    # The proper way to do this would be with some kind of beam search
-    # through a determinized/minimized FST, but in the absence of that
-    # we can do a kind of heurstic greedy search.  (we don't want any
-    # dependencies outside of PyPI otherwise we'd just use OpenFST)
-
-    # Initializing panphon.distance.Distance() is expensive, so do it just
-    # once, and only if needed.
-    global panphon_dst
-    if panphon_dst is None:
-        panphon_dst = panphon.distance.Distance()
-
-    p1_pseq = panphon_dst.fm.ipa_segs(p1)
-
-    # Cache ps_pseqs since it's expensive to build and it's the same value
-    # repeatedly in a given call to align_inventories()
-    global find_good_match_cache
-    if inventory_l2 is not find_good_match_cache[0] or l2_is_xsampa != find_good_match_cache[1]:
-        p2_pseqs = [panphon_dst.fm.ipa_segs(p)
-                    for p in process_characters(inventory_l2, l2_is_xsampa)]
-        find_good_match_cache = (inventory_l2, l2_is_xsampa, p2_pseqs)
-    else:
-        p2_pseqs = find_good_match_cache[2]
-
-    i = 0
-    good_match = []
-    while i < len(p1_pseq):
-        best_input = ""
-        best_output = -1
-        best_score = 0xdeadbeef
-        for j, p2_pseq in enumerate(p2_pseqs):
-            # FIXME: Should also consider the (weighted) possibility
-            # of deleting input or inserting any segment (but that
-            # can't be done with a greedy search)
-            if len(p2_pseq) == 0:
-                LOGGER.warning('No panphon mapping for %s - skipping',
-                               inventory_l2[j])
-                continue
-            e = min(i + len(p2_pseq), len(p1_pseq))
-            input_seg = p1_pseq[i:e]
-            score = panphon_dst.weighted_feature_edit_distance(''.join(input_seg),
-                                                       ''.join(p2_pseq))
-            # Be very greedy and take the longest match
-            if (score < best_score
-                or score == best_score
-                    and len(input_seg) > len(best_input)):
-                best_input = input_seg
-                best_output = j
-                best_score = score
-        LOGGER.debug('Best match at position %d: %s => %s',
-                     i, best_input, inventory_l2[best_output])
-        good_match.append(inventory_l2[best_output])
-        i += len(best_input)  # greedy!
-    return ''.join(good_match)
 
 
 def align_inventories(inventory_l1, inventory_l2,
                       l1_is_xsampa=False, l2_is_xsampa=False):
+    """Align inventories by finding a good sequence in inventory_l2 for each
+    character in inventory_l1"""
+
+    # find_good_match() is a function inside align_inventories() because it
+    # lets us initialize dst and ps_pseqs globally once, yielding a roughly 8x
+    # speed inprovements over the previous version of the code.
+
+    # Initializing panphon.distance.Distance() is expensive, so do it just once
+    dst = getPanphonDistanceSingleton()
+    # Initializing p2_pseqs is expensive, so do it only once per call to align_inventories()
+    p2_pseqs = [dst.fm.ipa_segs(p)
+                for p in process_characters(inventory_l2, l2_is_xsampa)]
+
+    def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
+        """Find a good sequence in inventory_l2 matching p1."""
+
+        # The proper way to do this would be with some kind of beam search
+        # through a determinized/minimized FST, but in the absence of that
+        # we can do a kind of heurstic greedy search.  (we don't want any
+        # dependencies outside of PyPI otherwise we'd just use OpenFST)
+
+        p1_pseq = dst.fm.ipa_segs(p1)
+
+        i = 0
+        good_match = []
+        while i < len(p1_pseq):
+            best_input = ""
+            best_output = -1
+            best_score = 0xdeadbeef
+            for j, p2_pseq in enumerate(p2_pseqs):
+                # FIXME: Should also consider the (weighted) possibility
+                # of deleting input or inserting any segment (but that
+                # can't be done with a greedy search)
+                if len(p2_pseq) == 0:
+                    LOGGER.warning('No panphon mapping for %s - skipping',
+                                   inventory_l2[j])
+                    continue
+                e = min(i + len(p2_pseq), len(p1_pseq))
+                input_seg = p1_pseq[i:e]
+                score = dst.weighted_feature_edit_distance(''.join(input_seg),
+                                                           ''.join(p2_pseq))
+                # Be very greedy and take the longest match
+                if (score < best_score
+                    or score == best_score
+                        and len(input_seg) > len(best_input)):
+                    best_input = input_seg
+                    best_output = j
+                    best_score = score
+            LOGGER.debug('Best match at position %d: %s => %s',
+                         i, best_input, inventory_l2[best_output])
+            good_match.append(inventory_l2[best_output])
+            i += len(best_input)  # greedy!
+        return ''.join(good_match)
+
     mapping = []
     pbar = tqdm(total=100)
     step = 1/len(inventory_l1)*100
