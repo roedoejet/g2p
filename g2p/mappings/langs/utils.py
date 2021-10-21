@@ -28,7 +28,6 @@ def getPanphonDistanceSingleton():
 
 
 def check_ipa_known_segs(mappings_to_check=False):
-    dst = getPanphonDistanceSingleton()
     if not mappings_to_check:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
@@ -39,7 +38,8 @@ def check_ipa_known_segs(mappings_to_check=False):
             for rule in mapping["mapping_data"]:
                 if not is_panphon(rule["out"]):
                     LOGGER.warning(
-                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} and {mapping['out_lang']} is not recognized as valid IPA by panphon."
+                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} "
+                        f"and {mapping['out_lang']} is not recognized as valid IPA by panphon."
                     )
                     found_error = True
     if found_error:
@@ -82,7 +82,8 @@ def is_panphon(string, display_warnings=False):
             for c in word:
                 if c not in word_ipa:
                     LOGGER.warning(
-                        f"Character '{c}' (\\u{format(ord(c), '04x')}) in word '{word}' was not recognized as IPA by panphon."
+                        f"Character '{c}' (\\u{format(ord(c), '04x')}) in word '{word}' "
+                        "was not recognized as IPA by panphon."
                     )
             result = False
     return result

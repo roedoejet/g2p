@@ -4,7 +4,7 @@
 Test all Mappings
 """
 
-from unittest import main, TestCase
+from unittest import TestCase, main
 
 from g2p.mappings import Mapping
 from g2p.mappings.create_ipa_mapping import create_mapping

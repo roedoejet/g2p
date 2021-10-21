@@ -1,12 +1,11 @@
-import codecs
 import os
 import pprint
 import re
-from collections import OrderedDict
 
 import click
-import yaml
 from flask.cli import FlaskGroup
+from networkx import draw, has_path
+
 from g2p import make_g2p
 from g2p._version import VERSION
 from g2p.api import update_docs
@@ -22,8 +21,7 @@ from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, normalize
-from g2p.transducer import CompositeTransducer, Transducer
-from networkx import draw, has_path
+from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
 
@@ -133,11 +131,6 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
     if ipa and dummy:
         raise click.BadParameter(
             "Cannot do both --ipa and --dummy at the same time, please choose one or the other."
-        )
-
-    if False and out_dir and os.path.exists(os.path.join(out_dir, "config.yaml")):
-        raise click.BadParameter(
-            f'There is already a mapping config file in "{out_dir}".\nPlease choose another path.'
         )
 
     if out_dir and not os.path.isdir(out_dir):

@@ -13,21 +13,13 @@
 # AP Note: Taken from ReadAlongs-Studio and implemented with G2P formatting
 ######################################################################
 
-from __future__ import print_function, unicode_literals
-from __future__ import division, absolute_import
-
-from copy import deepcopy
-import json
-import os
-
 from tqdm import tqdm
-import yaml
 
-from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
-from g2p.transducer import Transducer
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import getPanphonDistanceSingleton
-from g2p.log import LOGGER
+from g2p.mappings.utils import is_ipa, is_xsampa
+from g2p.transducer import Transducer
 
 #################################
 #
@@ -48,7 +40,8 @@ _xsampa_converter = None  # Cache this but create it only of needed
 def process_character(p, is_xsampa=False):
     if is_xsampa:
         if _xsampa_converter is None:
-            from panphon.xsampa import XSampa  # Expensive import, do it only when needed
+            # Expensive import, do it only when needed:
+            from panphon.xsampa import XSampa
             _xsampa_converter = XSampa()
         p = _xsampa_converter.convert(p)
     panphon_preprocessor = Transducer(Mapping(id='panphon_preprocessor'))
@@ -116,7 +109,7 @@ def align_inventories(inventory_l1, inventory_l2,
     p2_pseqs = [dst.fm.ipa_segs(p)
                 for p in process_characters(inventory_l2, l2_is_xsampa)]
 
-    def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
+    def find_good_match(p1, inventory_l2):
         """Find a good sequence in inventory_l2 matching p1."""
 
         # The proper way to do this would be with some kind of beam search
@@ -164,7 +157,7 @@ def align_inventories(inventory_l1, inventory_l2,
                                                l1_is_xsampa)):
         # we enumerate the strings because we want to save the original string
         # (e.g., 'kʷ') to the mapping, not the processed one (e.g. 'kw')
-        good_match = find_good_match(p1, inventory_l2, l2_is_xsampa)
+        good_match = find_good_match(p1, inventory_l2)
         mapping.append({"in": inventory_l1[i1], "out": good_match})
         pbar.update(step)
     pbar.close()

@@ -5,26 +5,39 @@ Module for all things related to lookup tables
 """
 
 import csv
+import datetime as dt
+import json
 import os
 import re
-import json
-from typing import DefaultDict, List, Pattern, Union
-from collections import defaultdict, OrderedDict
-from itertools import chain
-from pathlib import Path
-from operator import methodcaller
+from collections import OrderedDict, defaultdict
 from copy import deepcopy
+from itertools import chain
+from operator import methodcaller
+from pathlib import Path
+from typing import DefaultDict, List, Pattern, Union
 
 import yaml
-import datetime as dt
 
 from g2p import exceptions
-from g2p.mappings.langs import __file__ as LANGS_FILE, LANGS, MAPPINGS_AVAILABLE
-from g2p.mappings.utils import create_fixed_width_lookbehind, escape_special_characters, normalize
-from g2p.mappings.utils import find_mapping, flatten_abbreviations, IndentDumper, load_abbreviations_from_file
-from g2p.mappings.utils import load_from_file, load_mapping_from_path, unicode_escape, validate
-from g2p.mappings.utils import is_dummy, is_ipa, is_xsampa
 from g2p.log import LOGGER
+from g2p.mappings.langs import LANGS, MAPPINGS_AVAILABLE
+from g2p.mappings.langs import __file__ as LANGS_FILE
+from g2p.mappings.utils import (
+    IndentDumper,
+    create_fixed_width_lookbehind,
+    escape_special_characters,
+    find_mapping,
+    flatten_abbreviations,
+    is_dummy,
+    is_ipa,
+    is_xsampa,
+    load_abbreviations_from_file,
+    load_from_file,
+    load_mapping_from_path,
+    normalize,
+    unicode_escape,
+    validate,
+)
 
 GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), 'generated')
 
@@ -145,6 +158,7 @@ class Mapping():
         for mapping in MAPPINGS_AVAILABLE:
             if mapping.get('id', '') == map_id:
                 return deepcopy(mapping)
+
     @staticmethod
     def mapping_type(name):
         if is_ipa(name):

@@ -3,19 +3,17 @@
 Utilities used by other classes
 
 """
-import os
 import csv
-from collections import defaultdict
-from typing import List
-import regex as re
 import json
+import os
+import unicodedata as ud
+from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-import datetime as dt
-import yaml
-import unicodedata as ud
-
 from typing import Dict
+
+import regex as re
+import yaml
 
 from g2p import exceptions
 from g2p.log import LOGGER
@@ -60,7 +58,8 @@ def normalize(inp: str, norm_form: str):
         normalized = ud.normalize(norm_form, unicode_escape(inp))
         if normalized != inp:
             LOGGER.debug(
-                'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. Note that this is not necessarily the final stage of normalization.',
+                'The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. '
+                'Note that this is not necessarily the final stage of normalization.',
                 inp, normalized, norm_form)
         return normalized
 
@@ -178,7 +177,7 @@ def load_from_csv(language, delimiter=','):
         except IndexError:
             new_io['context_after'] = ''
         for k in new_io:
-            if isinstance(new_io[k], float) or isinstance(new_io[k], int):
+            if isinstance(new_io[k], (float, int)):
                 new_io[k] = str(new_io[k])
         mapping.append(new_io)
 
@@ -215,16 +214,29 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         # If more than one mapping in the mapping config
         if 'mappings' in mapping:
             try:
-                LOGGER.debug('Loading mapping from %s between "%s" and "%s" at index %s', path_to_mapping_config,
-                            mapping['mappings'][index].get('in_lang', 'und'), mapping['mappings'][index].get('out_lang', 'und'), index)
+                LOGGER.debug(
+                    'Loading mapping from %s between "%s" and "%s" at index %s',
+                    path_to_mapping_config,
+                    mapping['mappings'][index].get('in_lang', 'und'),
+                    mapping['mappings'][index].get('out_lang', 'und'),
+                    index
+                )
                 mapping = mapping['mappings'][index]
             except KeyError:
                 LOGGER.warning(
-                    'An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
+                    'An index of %s was provided for the mapping %s but that index does not exist in the mapping. '
+                    'Please check your mapping.',
+                    index,
+                    path_to_mapping_config
+                )
         # Log the warning if an Index other than 0 was provided for a mapping config with a single mapping.
         elif index != 0:
             LOGGER.warning(
-                'An index of %s was provided for the mapping %s but that index does not exist in the mapping. Please check your mapping.', index, path_to_mapping_config)
+                'An index of %s was provided for the mapping %s but that index does not exist in the mapping. '
+                'Please check your mapping.',
+                index,
+                path_to_mapping_config
+            )
         # try to load the data from the mapping data file
         if 'mapping' in mapping:
             mapping['mapping_data'] = load_from_file(
@@ -265,9 +277,10 @@ def validate(mapping, path):
         if not valid:
             raise exceptions.MalformedMapping('Missing "in" or "out" in an entry in {}.'.format(path))
         return mapping
-    except TypeError:
-        # The JSON probably is not just a list (ie could be legacy readalongs format) TODO: proper exception handling
-        raise exceptions.MalformedMapping('Formatting error in mapping in {}.'.format(path))
+    except TypeError as e:
+        # The JSON probably is not just a list (ie could be legacy readalongs format)
+        # TODO: proper exception handling
+        raise exceptions.MalformedMapping('Formatting error in mapping in {}.'.format(path)) from e
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
     for k, v in to_escape.items():
@@ -277,7 +290,9 @@ def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
             escaped = v
         if escaped != v:
             LOGGER.debug(
-                f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' to False in your Mapping configuration to disable this.")
+                f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' "
+                "to False in your Mapping configuration to disable this."
+            )
         to_escape[k] = escaped
     return to_escape
 
@@ -317,7 +332,7 @@ def is_dummy(lang: str) -> bool:
 
 class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):
-        return super(IndentDumper, self).increase_indent(flow, False)
+        return super().increase_indent(flow, False)
 
     def ignore_aliases(self, *args):
         return True

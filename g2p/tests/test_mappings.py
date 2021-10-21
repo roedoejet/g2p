@@ -28,7 +28,10 @@ class MappingTest(TestCase):
     '''
 
     def setUp(self):
-        self.test_mapping_no_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}, {'in': '\u0061\u0301', 'out': '\u0061\u0301'}], norm_form='none')
+        self.test_mapping_no_norm = Mapping(
+            [{'in': '\u00e1', 'out': '\u00e1'}, {'in': '\u0061\u0301', 'out': '\u0061\u0301'}],
+            norm_form='none'
+        )
         self.test_mapping_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}])
         with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json'), encoding='utf8') as f:
             self.json_map = json.load(f)
@@ -58,7 +61,11 @@ class MappingTest(TestCase):
             mapping_sorted = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
         self.assertTrue(mapping_sorted.wants_rules_sorted())
         self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
-        self.assertIn("apply-longest-first", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+        self.assertIn(
+            "apply-longest-first",
+            log_output.getvalue(),
+            "it should show the equivalent rule_ordering setting"
+        )
 
         # explicitly set as_is=True
         log_output = io.StringIO()
@@ -89,7 +96,6 @@ class MappingTest(TestCase):
         rule-ordering: 'apply-shortest-first'
         """
         rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
-        mapping_default = Mapping(rules)
 
         transducer_longest_first = Transducer(Mapping(rules, rule_ordering='apply-longest-first'))
         self.assertEqual(transducer_longest_first('aa').output_string, 'c')
@@ -128,14 +134,14 @@ class MappingTest(TestCase):
         self.assertEqual(transducer('A').output_string, 'b')
 
     def test_escape_special(self):
-        mapping = Mapping([{'in': '\d', "out": 'digit'}])
-        mapping_escaped = Mapping([{'in': '\d', "out": 'b'}], escape_special=True)
+        mapping = Mapping([{'in': r'\d', "out": 'digit'}])
+        mapping_escaped = Mapping([{'in': r'\d', "out": 'b'}], escape_special=True)
         transducer = Transducer(mapping)
         transducer_escaped = Transducer(mapping_escaped)
         self.assertEqual(transducer('1').output_string, 'digit')
-        self.assertEqual(transducer('\d').output_string, '\d')
+        self.assertEqual(transducer(r'\d').output_string, r'\d')
         self.assertEqual(transducer_escaped('1').output_string, '1')
-        self.assertEqual(transducer_escaped('\d').output_string, 'b')
+        self.assertEqual(transducer_escaped(r'\d').output_string, 'b')
 
     def test_norm_form(self):
         mapping_nfc = Mapping([{'in': 'a\u0301', "out": 'a'}]) # Defaults to NFC
