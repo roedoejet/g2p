@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ######################################################################
-# © Patrick Littell
+# Patrick Littell
 #
 # create_ipa_mapping.py
 #
@@ -23,8 +20,6 @@ from copy import deepcopy
 import json
 import os
 
-from panphon.xsampa import XSampa
-import panphon.distance
 from tqdm import tqdm
 import yaml
 
@@ -48,12 +43,14 @@ from g2p.log import LOGGER
 # treated as two characters rather than one.
 #
 #################################
-xsampa_converter = XSampa()
-
+_xsampa_converter = None  # Cache this but create it only of needed
 
 def process_character(p, is_xsampa=False):
     if is_xsampa:
-        p = xsampa_converter.convert(p)
+        if _xsampa_converter is None:
+            from panphon.xsampa import XSampa  # Expensive import, do it only when needed
+            _xsampa_converter = XSampa()
+        p = _xsampa_converter.convert(p)
     panphon_preprocessor = Transducer(Mapping(id='panphon_preprocessor'))
     return panphon_preprocessor(p).output_string
 
@@ -182,8 +179,3 @@ def align_inventories(inventory_l1, inventory_l2,
         pbar.update(step)
     pbar.close()
     return mapping
-
-if __name__ == '__main__':
-    test_1 = Mapping(in_lang='atj', out_lang='atj-ipa')
-    test_2 = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
-    create_mapping(test_1, test_2, write_to_file=True)

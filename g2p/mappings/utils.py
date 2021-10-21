@@ -15,7 +15,6 @@ import datetime as dt
 import yaml
 import unicodedata as ud
 
-from openpyxl import load_workbook
 from typing import Dict
 
 from g2p import exceptions
@@ -109,6 +108,7 @@ def pattern_to_fixed_width_lookbehinds(match):
 def load_from_workbook(language):
     ''' Parse mapping from Excel workbook
     '''
+    from openpyxl import load_workbook  # Expensive import, do it only when needed
     work_book = load_workbook(language)
     work_sheet = work_book.active
     # Create wordlist

@@ -4,8 +4,6 @@ Utilities used by other classes
 
 """
 
-import panphon.distance
-
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
@@ -21,10 +19,10 @@ from g2p.mappings.langs import MAPPINGS_AVAILABLE
 
 _PANPHON_DISTANCE_SINGLETON = None
 
-
 def getPanphonDistanceSingleton():
     global _PANPHON_DISTANCE_SINGLETON
     if _PANPHON_DISTANCE_SINGLETON is None:
+        import panphon.distance  # Expensive import, only do it when actually needed
         _PANPHON_DISTANCE_SINGLETON = panphon.distance.Distance()
     return _PANPHON_DISTANCE_SINGLETON
 
@@ -94,10 +92,12 @@ is_panphon.g_warning_printed = False
 is_panphon.colon_warning_printed = False
 
 
-_ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
-
+_ARPABET_SET = None
 
 def is_arpabet(string):
+    global _ARPABET_SET
+    if _ARPABET_SET is None:
+        _ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
     # print(f"arpabet_set={_ARPABET_SET}")
     for sound in string.split():
         if sound not in _ARPABET_SET:

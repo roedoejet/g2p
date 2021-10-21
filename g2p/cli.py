@@ -10,7 +10,7 @@ from flask.cli import FlaskGroup
 from g2p import make_g2p
 from g2p._version import VERSION
 from g2p.api import update_docs
-from g2p.app import APP, SOCKETIO, network_to_echart
+from g2p.app import APP, network_to_echart
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
