@@ -191,7 +191,11 @@ class CliTest(TestCase):
         self.assertIn("Missing argument", results.output)
 
         results = self.runner.invoke(generate_mapping, "fra")
-        self.assertIn("Nothing to do", results.output)
+        self.assertIn(
+            "Nothing to do",
+            results.output,
+            '"g2p generate-mapping fra" should say need --ipa or --dummy or --list-dummy',
+        )
 
         results = self.runner.invoke(generate_mapping, "--ipa foo")
         self.assertIn("Invalid value for IN_LANG", results.output)
@@ -207,6 +211,20 @@ class CliTest(TestCase):
 
         results = self.runner.invoke(generate_mapping, "--list-dummy fra")
         self.assertIn("Dummy phone inventory", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa --dummy fra")
+        self.assertIn(
+            "Cannot do both --ipa and --dummy at the same time", results.output
+        )
+
+        results = self.runner.invoke(
+            generate_mapping, "--out-dir does-not-exist --ipa fra"
+        )
+        self.assertIn(
+            "does not exist",
+            results.output,
+            "Non-existent out-dir must be reported as error",
+        )
 
 
 if __name__ == "__main__":

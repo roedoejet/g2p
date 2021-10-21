@@ -67,7 +67,9 @@ def process_characters(inv, is_xsampa=False):
 ###################################
 
 
-def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in', write_to_file: bool = False, out_dir: str = '') -> Mapping:
+def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in') -> Mapping:
+    """Create a mapping from mapping_1's output inventory to mapping_2's input inventory"""
+
     map_1_name = mapping_1.kwargs[f'{mapping_1_io}_lang']
     map_2_name = mapping_2.kwargs[f'{mapping_2_io}_lang']
     if not is_ipa(map_1_name) and not is_xsampa(map_1_name):
@@ -96,19 +98,7 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     config['out_lang'] = map_2_name
     config['mapping'] = mapping
     mapping = Mapping(**config)
-    if write_to_file:
-        if out_dir:
-            if os.path.isdir(out_dir):
-                mapping.config_to_file(out_dir)
-                mapping.mapping_to_file(out_dir)
-            else:
-                LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
-        else:
-            mapping.config_to_file()
-            mapping.mapping_to_file()
-
     return mapping
-
 
 
 def align_inventories(inventory_l1, inventory_l2,

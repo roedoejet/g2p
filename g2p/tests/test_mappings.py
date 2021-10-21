@@ -1,16 +1,27 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
 import io
-import os
 import json
-from contextlib import redirect_stderr
-from g2p.mappings import Mapping
-from g2p.transducer import Transducer
-from g2p.tests.public import __file__ as public_data
-from g2p import exceptions
-from tempfile import NamedTemporaryFile
+import os
 import unicodedata as ud
+from contextlib import redirect_stderr
+from tempfile import NamedTemporaryFile
+from typing import List
+from unittest import TestCase, main
+
+from g2p import exceptions
+from g2p.mappings import Mapping
+from g2p.tests.public import __file__ as public_data
+from g2p.transducer import Transducer
+
+
+def rules_from_strings(*mapping: List[str]) -> List[dict]:
+    """Quick pseudo constructor for unit testing of mappings"""
+    rules = []
+    for rule in mapping:
+        key, value = rule.split(":")
+        rules.append({"in": key, "out": value})
+    return rules
 
 class MappingTest(TestCase):
     ''' Basic Mapping Test
@@ -204,6 +215,16 @@ class MappingTest(TestCase):
         tf.close()
         self.assertRaises(TypeError, Mapping, tf.name)
         os.unlink(tf.name)
+
+    def test_extend_and_deduplicate(self):
+        mapping1 = Mapping(rules_from_strings("a:b", "c:d", "g:h"))
+        mapping2 = Mapping(rules_from_strings("a:x", "c:d", "e:f"))
+        extend_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "c:d", "e:f"))
+        mapping1.extend(mapping2)
+        self.assertEquals(mapping1.mapping, extend_ref.mapping)
+        dedup_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
+        mapping1.deduplicate()
+        self.assertEquals(mapping1.mapping, dedup_ref.mapping)
 
 
 if __name__ == "__main__":

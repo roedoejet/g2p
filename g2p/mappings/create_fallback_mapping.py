@@ -10,7 +10,8 @@ from g2p.mappings.utils import is_ipa, unicode_escape
 
 DUMMY_INVENTORY = ["ɑ", "i", "u", "t", "s", "n"]
 
-def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: bool = False, out_dir: str = ''):
+def align_to_dummy_fallback(mapping: Mapping, io: str = 'in'):
+    """Create a mapping from mapping's output inventory to a minimalist dummy inventory"""
     display_name = mapping.kwargs.get('language_name', 'No Language display name in Config')
     config = {'in_lang': mapping.kwargs[f'{io}_lang'], 'out_lang': 'dummy'}
     default_char = 't'
@@ -34,18 +35,4 @@ def align_to_dummy_fallback(mapping: Mapping, io: str = 'in', write_to_file: boo
 
     config['mapping'] = mapping
     mapping = Mapping(**config)
-    if write_to_file:
-        if out_dir:
-            if os.path.isdir(out_dir):
-                mapping.config_to_file(out_dir)
-                mapping.mapping_to_file(out_dir)
-            else:
-                LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
-        else:
-            mapping.config_to_file()
-            mapping.mapping_to_file()
     return mapping
-
-if __name__ == "__main__":
-    test = Mapping(in_lang='git', out_lang='git-ipa')
-    dummy_config, dummy_mapping = align_to_dummy_fallback(test, write_to_file=True)

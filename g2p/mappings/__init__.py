@@ -341,6 +341,20 @@ class Mapping():
             del io['context_after']
         return mapping
 
+    def extend(self, mapping):
+        """Add all the rules from mapping into self, effectively merging two mappings
+
+        Caveat: if self and mapping have contradictory rules, which one will
+        "win" is unspecified, and may depend on mapping configuration options.
+        """
+        self.mapping.extend(mapping.mapping)
+
+    def deduplicate(self):
+        """Remove duplicate rules found in self, keeping the first copy found."""
+        # Since Python 3.6, dict keeps its element in insertion order (while
+        # set does not), so deduplicating the rules is a one-liner:
+        self.mapping = list({repr(rule): rule for rule in self.mapping}.values())
+
     def add_abbreviations(self, abbs, mappings):
         ''' Return abbreviated forms, given a list of abbreviations.
 
@@ -381,12 +395,12 @@ class Mapping():
         ''' Write config to file
         '''
         add_config = False
+        if os.path.isdir(output_path):
+            output_path = os.path.join(output_path, 'config.yaml')
         if os.path.exists(output_path) and os.path.isfile(output_path):
             LOGGER.warning(f'Adding mapping config to file at {output_path}')
             fn = output_path
             add_config = True
-        elif os.path.isdir(output_path):
-            fn = os.path.join(output_path, 'config.yaml')
         else:
             LOGGER.warning(f'writing mapping config to file at {output_path}')
             fn = output_path
