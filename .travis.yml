@@ -31,6 +31,7 @@ before_script:
 # commands to run the testing suite. if any of these fail, travis lets us know
 script: 
   - cd /home/travis/build/roedoejet/g2p && coverage run --source g2p run_tests.py dev
+  - if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
 
 # commands to run after the tests successfully complete
 after_success:
