@@ -85,7 +85,6 @@ class CliTest(TestCase):
 
         result = self.runner.invoke(doctor, "-m fra-ipa")
         self.assertEqual(result.exit_code, 0)
-        self.assertIn("vagon", result.stdout)
 
         # Disable this test: it's very slow (8s, just by itself) and does not assert
         # anything useful.

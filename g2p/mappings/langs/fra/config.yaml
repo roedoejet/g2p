@@ -11,5 +11,5 @@ mappings:
     abbreviations: fra_abbs.csv
     rule_ordering: as-written
     case_sensitive: false
-    norm_form: 'NFD'
+    norm_form: 'NFC'
     <<: *shared
