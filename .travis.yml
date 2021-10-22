@@ -35,3 +35,4 @@ script:
 # commands to run after the tests successfully complete
 after_success:
   - coveralls
+  - if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
