@@ -85,7 +85,6 @@ class CliTest(TestCase):
 
         result = self.runner.invoke(doctor, "-m fra-ipa")
         self.assertEqual(result.exit_code, 0)
-        self.assertIn("vagon", result.stdout)
 
         # Disable this test: it's very slow (8s, just by itself) and does not assert
         # anything useful.
@@ -110,8 +109,7 @@ class CliTest(TestCase):
         self.assertNotIn("eng-arpabet:", result.stdout)
         self.assertIn("eng-ipa:", result.stdout)
 
-    def not_test_scan_fra(self):
-        # TODO: fix fra g2p so fra_panagrams.txt passes
+    def test_scan_fra(self):
         result = self.runner.invoke(
             scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")]
         )
@@ -120,7 +118,7 @@ class CliTest(TestCase):
         diacritics = "àâéèêëîïôùûüç"
         for d in diacritics:
             self.assertNotIn(d, result.stdout)
-        unmapped_chars = ":/.,'-&()2"
+        unmapped_chars = ":/,'-()2"
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
 

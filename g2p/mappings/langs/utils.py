@@ -27,8 +27,12 @@ def getPanphonDistanceSingleton():
     return _PANPHON_DISTANCE_SINGLETON
 
 
-def check_ipa_known_segs(mappings_to_check=False):
-    if not mappings_to_check:
+def check_ipa_known_segs(mappings_to_check=None) -> bool:
+    """Check the given mappings, or all IPA mappings, for invalid IPA in the "out" fields
+
+    Returns True iff not errors were found.
+    """
+    if mappings_to_check is None:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
     for mapping in [
@@ -46,6 +50,7 @@ def check_ipa_known_segs(mappings_to_check=False):
         LOGGER.warning(
             "Please refer to https://github.com/dmort27/panphon for information about panphon."
         )
+    return not found_error
 
 
 def is_panphon(string, display_warnings=False):
