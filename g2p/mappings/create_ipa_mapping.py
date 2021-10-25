@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 ######################################################################
-# © Patrick Littell
+# Patrick Littell
 #
 # create_ipa_mapping.py
 #
@@ -16,22 +13,13 @@
 # AP Note: Taken from ReadAlongs-Studio and implemented with G2P formatting
 ######################################################################
 
-from __future__ import print_function, unicode_literals
-from __future__ import division, absolute_import
-
-from copy import deepcopy
-import json
-import os
-
-from panphon.xsampa import XSampa
-import panphon.distance
 from tqdm import tqdm
-import yaml
 
-from g2p.mappings.utils import is_ipa, is_xsampa, IndentDumper
-from g2p.transducer import Transducer
-from g2p.mappings import Mapping
 from g2p.log import LOGGER
+from g2p.mappings import Mapping
+from g2p.mappings.langs.utils import getPanphonDistanceSingleton
+from g2p.mappings.utils import is_ipa, is_xsampa
+from g2p.transducer import Transducer
 
 #################################
 #
@@ -47,12 +35,15 @@ from g2p.log import LOGGER
 # treated as two characters rather than one.
 #
 #################################
-xsampa_converter = XSampa()
-
+_xsampa_converter = None  # Cache this but create it only of needed
 
 def process_character(p, is_xsampa=False):
     if is_xsampa:
-        p = xsampa_converter.convert(p)
+        if _xsampa_converter is None:
+            # Expensive import, do it only when needed:
+            from panphon.xsampa import XSampa
+            _xsampa_converter = XSampa()
+        p = _xsampa_converter.convert(p)
     panphon_preprocessor = Transducer(Mapping(id='panphon_preprocessor'))
     return panphon_preprocessor(p).output_string
 
@@ -69,7 +60,9 @@ def process_characters(inv, is_xsampa=False):
 ###################################
 
 
-def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in', write_to_file: bool = False, out_dir: str = '') -> Mapping:
+def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in') -> Mapping:
+    """Create a mapping from mapping_1's output inventory to mapping_2's input inventory"""
+
     map_1_name = mapping_1.kwargs[f'{mapping_1_io}_lang']
     map_2_name = mapping_2.kwargs[f'{mapping_2_io}_lang']
     if not is_ipa(map_1_name) and not is_xsampa(map_1_name):
@@ -98,64 +91,65 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
     config['out_lang'] = map_2_name
     config['mapping'] = mapping
     mapping = Mapping(**config)
-    if write_to_file:
-        if out_dir:
-            if os.path.isdir(out_dir):
-                mapping.config_to_file(out_dir)
-                mapping.mapping_to_file(out_dir)
-            else:
-                LOGGER.warning(f'{out_dir} is not a directory. Writing to default instead.')
-        else:
-            mapping.config_to_file()
-            mapping.mapping_to_file()
-
     return mapping
-
-def find_good_match(p1, inventory_l2, l2_is_xsampa=False):
-    """Find a good sequence in inventory_l2 matching p1."""
-
-    dst = panphon.distance.Distance()
-    # The proper way to do this would be with some kind of beam search
-    # through a determinized/minimized FST, but in the absence of that
-    # we can do a kind of heurstic greedy search.  (we don't want any
-    # dependencies outside of PyPI otherwise we'd just use OpenFST)
-    p1_pseq = dst.fm.ipa_segs(p1)
-    p2_pseqs = [dst.fm.ipa_segs(p)
-                for p in process_characters(inventory_l2, l2_is_xsampa)]
-    i = 0
-    good_match = []
-    while i < len(p1_pseq):
-        best_input = ""
-        best_output = -1
-        best_score = 0xdeadbeef
-        for j, p2_pseq in enumerate(p2_pseqs):
-            # FIXME: Should also consider the (weighted) possibility
-            # of deleting input or inserting any segment (but that
-            # can't be done with a greedy search)
-            if len(p2_pseq) == 0:
-                LOGGER.warning('No panphon mapping for %s - skipping',
-                               inventory_l2[j])
-                continue
-            e = min(i + len(p2_pseq), len(p1_pseq))
-            input_seg = p1_pseq[i:e]
-            score = dst.weighted_feature_edit_distance(''.join(input_seg),
-                                                       ''.join(p2_pseq))
-            # Be very greedy and take the longest match
-            if (score < best_score
-                or score == best_score
-                    and len(input_seg) > len(best_input)):
-                best_input = input_seg
-                best_output = j
-                best_score = score
-        LOGGER.debug('Best match at position %d: %s => %s',
-                     i, best_input, inventory_l2[best_output])
-        good_match.append(inventory_l2[best_output])
-        i += len(best_input)  # greedy!
-    return ''.join(good_match)
 
 
 def align_inventories(inventory_l1, inventory_l2,
                       l1_is_xsampa=False, l2_is_xsampa=False):
+    """Align inventories by finding a good sequence in inventory_l2 for each
+    character in inventory_l1"""
+
+    # find_good_match() is a function inside align_inventories() because it
+    # lets us initialize dst and ps_pseqs globally once, yielding a roughly 8x
+    # speed inprovements over the previous version of the code.
+
+    # Initializing panphon.distance.Distance() is expensive, so do it just once
+    dst = getPanphonDistanceSingleton()
+    # Initializing p2_pseqs is expensive, so do it only once per call to align_inventories()
+    p2_pseqs = [dst.fm.ipa_segs(p)
+                for p in process_characters(inventory_l2, l2_is_xsampa)]
+
+    def find_good_match(p1, inventory_l2):
+        """Find a good sequence in inventory_l2 matching p1."""
+
+        # The proper way to do this would be with some kind of beam search
+        # through a determinized/minimized FST, but in the absence of that
+        # we can do a kind of heurstic greedy search.  (we don't want any
+        # dependencies outside of PyPI otherwise we'd just use OpenFST)
+
+        p1_pseq = dst.fm.ipa_segs(p1)
+
+        i = 0
+        good_match = []
+        while i < len(p1_pseq):
+            best_input = ""
+            best_output = -1
+            best_score = 0xdeadbeef
+            for j, p2_pseq in enumerate(p2_pseqs):
+                # FIXME: Should also consider the (weighted) possibility
+                # of deleting input or inserting any segment (but that
+                # can't be done with a greedy search)
+                if len(p2_pseq) == 0:
+                    LOGGER.warning('No panphon mapping for %s - skipping',
+                                   inventory_l2[j])
+                    continue
+                e = min(i + len(p2_pseq), len(p1_pseq))
+                input_seg = p1_pseq[i:e]
+                score = dst.weighted_feature_edit_distance(''.join(input_seg),
+                                                           ''.join(p2_pseq))
+                # Be very greedy and take the longest match
+                if (score < best_score
+                    or score == best_score
+                        and len(input_seg) > len(best_input)):
+                    best_input = input_seg
+                    best_output = j
+                    best_score = score
+            LOGGER.debug('Best match at position %d: %s => %s',
+                         i, best_input, inventory_l2[best_output])
+            good_match.append(inventory_l2[best_output])
+            i += len(best_input)  # greedy!
+        return ''.join(good_match)
+
     mapping = []
     pbar = tqdm(total=100)
     step = 1/len(inventory_l1)*100
@@ -163,13 +157,8 @@ def align_inventories(inventory_l1, inventory_l2,
                                                l1_is_xsampa)):
         # we enumerate the strings because we want to save the original string
         # (e.g., 'kʷ') to the mapping, not the processed one (e.g. 'kw')
-        good_match = find_good_match(p1, inventory_l2, l2_is_xsampa)
+        good_match = find_good_match(p1, inventory_l2)
         mapping.append({"in": inventory_l1[i1], "out": good_match})
         pbar.update(step)
     pbar.close()
     return mapping
-
-if __name__ == '__main__':
-    test_1 = Mapping(in_lang='atj', out_lang='atj-ipa')
-    test_2 = Mapping(in_lang='eng-ipa', out_lang='eng-arpabet')
-    create_mapping(test_1, test_2, write_to_file=True)

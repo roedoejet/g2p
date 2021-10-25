@@ -1,23 +1,37 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
 import io
-import os
 import json
-from contextlib import redirect_stderr
-from g2p.mappings import Mapping
-from g2p.transducer import Transducer
-from g2p.tests.public import __file__ as public_data
-from g2p import exceptions
-from tempfile import NamedTemporaryFile
+import os
 import unicodedata as ud
+from contextlib import redirect_stderr
+from tempfile import NamedTemporaryFile
+from typing import List
+from unittest import TestCase, main
+
+from g2p import exceptions
+from g2p.mappings import Mapping
+from g2p.tests.public import __file__ as public_data
+from g2p.transducer import Transducer
+
+
+def rules_from_strings(*mapping: List[str]) -> List[dict]:
+    """Quick pseudo constructor for unit testing of mappings"""
+    rules = []
+    for rule in mapping:
+        key, value = rule.split(":")
+        rules.append({"in": key, "out": value})
+    return rules
 
 class MappingTest(TestCase):
     ''' Basic Mapping Test
     '''
 
     def setUp(self):
-        self.test_mapping_no_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}, {'in': '\u0061\u0301', 'out': '\u0061\u0301'}], norm_form='none')
+        self.test_mapping_no_norm = Mapping(
+            [{'in': '\u00e1', 'out': '\u00e1'}, {'in': '\u0061\u0301', 'out': '\u0061\u0301'}],
+            norm_form='none'
+        )
         self.test_mapping_norm = Mapping([{'in': '\u00e1', 'out': '\u00e1'}])
         with open(os.path.join(os.path.dirname(public_data), 'git_to_ipa.json'), encoding='utf8') as f:
             self.json_map = json.load(f)
@@ -47,7 +61,11 @@ class MappingTest(TestCase):
             mapping_sorted = Mapping([{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}], as_is=False)
         self.assertTrue(mapping_sorted.wants_rules_sorted())
         self.assertIn("deprecated", log_output.getvalue(), "it should warn that the feature is deprecated")
-        self.assertIn("apply-longest-first", log_output.getvalue(), "it should show the equivalent rule_ordering setting")
+        self.assertIn(
+            "apply-longest-first",
+            log_output.getvalue(),
+            "it should show the equivalent rule_ordering setting"
+        )
 
         # explicitly set as_is=True
         log_output = io.StringIO()
@@ -78,7 +96,6 @@ class MappingTest(TestCase):
         rule-ordering: 'apply-shortest-first'
         """
         rules = [{'in': 'a', "out": 'b'}, {'in': 'aa', 'out': 'c'}]
-        mapping_default = Mapping(rules)
 
         transducer_longest_first = Transducer(Mapping(rules, rule_ordering='apply-longest-first'))
         self.assertEqual(transducer_longest_first('aa').output_string, 'c')
@@ -117,14 +134,14 @@ class MappingTest(TestCase):
         self.assertEqual(transducer('A').output_string, 'b')
 
     def test_escape_special(self):
-        mapping = Mapping([{'in': '\d', "out": 'digit'}])
-        mapping_escaped = Mapping([{'in': '\d', "out": 'b'}], escape_special=True)
+        mapping = Mapping([{'in': r'\d', "out": 'digit'}])
+        mapping_escaped = Mapping([{'in': r'\d', "out": 'b'}], escape_special=True)
         transducer = Transducer(mapping)
         transducer_escaped = Transducer(mapping_escaped)
         self.assertEqual(transducer('1').output_string, 'digit')
-        self.assertEqual(transducer('\d').output_string, '\d')
+        self.assertEqual(transducer(r'\d').output_string, r'\d')
         self.assertEqual(transducer_escaped('1').output_string, '1')
-        self.assertEqual(transducer_escaped('\d').output_string, 'b')
+        self.assertEqual(transducer_escaped(r'\d').output_string, 'b')
 
     def test_norm_form(self):
         mapping_nfc = Mapping([{'in': 'a\u0301', "out": 'a'}]) # Defaults to NFC
@@ -204,6 +221,16 @@ class MappingTest(TestCase):
         tf.close()
         self.assertRaises(TypeError, Mapping, tf.name)
         os.unlink(tf.name)
+
+    def test_extend_and_deduplicate(self):
+        mapping1 = Mapping(rules_from_strings("a:b", "c:d", "g:h"))
+        mapping2 = Mapping(rules_from_strings("a:x", "c:d", "e:f"))
+        extend_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "c:d", "e:f"))
+        mapping1.extend(mapping2)
+        self.assertEquals(mapping1.mapping, extend_ref.mapping)
+        dedup_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
+        mapping1.deduplicate()
+        self.assertEquals(mapping1.mapping, dedup_ref.mapping)
 
 
 if __name__ == "__main__":

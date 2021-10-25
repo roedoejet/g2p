@@ -1,16 +1,15 @@
-import codecs
 import os
 import pprint
 import re
-from collections import OrderedDict
 
 import click
-import yaml
 from flask.cli import FlaskGroup
+from networkx import draw, has_path
+
 from g2p import make_g2p
 from g2p._version import VERSION
 from g2p.api import update_docs
-from g2p.app import APP, SOCKETIO, network_to_echart
+from g2p.app import APP, network_to_echart
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
@@ -22,8 +21,7 @@ from g2p.mappings.create_ipa_mapping import create_mapping
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, normalize
-from g2p.transducer import CompositeTransducer, Transducer
-from networkx import draw, has_path
+from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
 
@@ -57,6 +55,11 @@ def cli():
 @click.option(
     "--ipa/--no-ipa", default=False, help="Generate mapping from LANG-ipa to eng-ipa."
 )
+@click.option(
+    "--merge/--no-merge",
+    default=False,
+    help="Merge multiple mappings together, in which case IN_LANG is a colon-seperated list and OUT_LANG is required.",
+)
 @click.argument(
     "out_lang",
     required=False,
@@ -71,7 +74,7 @@ def cli():
     context_settings=CONTEXT_SETTINGS,
     short_help="Generate English IPA or dummy mapping.",
 )
-def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
+def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
     """ For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
         or from IN_LANG-ipa to a dummy minimalist phone inventory.
         This assumes the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping
@@ -94,15 +97,21 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
         http://g2p-studio.herokuapp.com/api/v1/langs .
     """
 
-    in_lang_choices = [
-        x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)
-    ]
-    if in_lang not in in_lang_choices:
-        raise click.BadParameter(
-            f'Invalid value for IN_LANG: "{in_lang}".\n'
-            "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
-            f"i.e., one of:\n{', '.join(in_lang_choices)}."
-        )
+    if merge:
+        if out_lang is None:
+            raise click.BadParameter("OUT_LANG is required with --merge.")
+        in_langs = in_lang.split(":")
+    else:
+        in_langs = [in_lang]
+
+    in_lang_choices = [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
+    for l in in_langs:
+        if l not in in_lang_choices:
+            raise click.BadParameter(
+                f'Invalid value for IN_LANG: "{l}".\n'
+                "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
+                f"i.e., one of:\n{', '.join(in_lang_choices)}."
+            )
 
     out_lang_choices = [x for x in LANGS_NETWORK.nodes if is_ipa(x)]
     if out_lang is None:
@@ -115,39 +124,53 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir):
         )
 
     if not ipa and not dummy and not list_dummy:
-        click.echo(
+        raise click.BadParameter(
             "Nothing to do! Please specify at least one of --ipa, --dummy or --list-dummy."
         )
 
-    if out_dir and (
-        os.path.exists(os.path.join(out_dir, "config.yaml"))
-        or os.path.exists(os.path.join(out_dir, "config.yaml"))
-    ):
-        click.echo(
-            f'There is already a mapping config file in "{out_dir}".\nPlease choose another path.'
+    if ipa and dummy:
+        raise click.BadParameter(
+            "Cannot do both --ipa and --dummy at the same time, please choose one or the other."
         )
-        return
+
+    if out_dir and not os.path.isdir(out_dir):
+        raise click.BadParameter(
+            f'Output directory "{out_dir}" does not exist. Cannot write mapping.'
+        )
 
     if list_dummy:
         print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
 
     if ipa or dummy:
-        try:
-            source_mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
-        except MappingMissing as e:
-            raise click.BadParameter(f'Cannot find IPA mapping for "{in_lang}": {e}')
+        source_mappings = []
+        for l in in_langs:
+            try:
+                source_mapping = Mapping(in_lang=l, out_lang=out_lang)
+            except MappingMissing as e:
+                raise click.BadParameter(f'Cannot find IPA mapping for "{l}": {e}')
+            source_mappings.append(source_mapping)
 
-    if ipa:
-        check_ipa_known_segs([f"{in_lang}-ipa"])
-        eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
-        click.echo(f"Writing English IPA mapping for {out_lang} to file")
-        create_mapping(source_mapping, eng_ipa, write_to_file=True, out_dir=out_dir)
+        if ipa:
+            check_ipa_known_segs([f"{in_lang}-ipa"])
+            eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
+            click.echo(f"Writing English IPA mapping for {out_lang} to file")
+            new_mapping = create_mapping(source_mappings[0], eng_ipa)
+            for m in source_mappings[1:]:
+                new_mapping.extend(create_mapping(m, eng_ipa))
+        else:  # dummy
+            click.echo(f"Writing dummy fallback mapping for {out_lang} to file")
+            new_mapping = align_to_dummy_fallback(source_mappings[0])
+            for m in source_mappings[1:]:
+                new_mapping.extend(align_to_dummy_fallback(m))
 
-    if dummy:
-        click.echo(f"Writing dummy fallback mapping for {out_lang} to file")
-        dummy_mapping = align_to_dummy_fallback(
-            source_mapping, write_to_file=True, out_dir=out_dir
-        )
+        new_mapping.deduplicate()
+
+        if out_dir:
+            new_mapping.config_to_file(out_dir)
+            new_mapping.mapping_to_file(out_dir)
+        else:
+            new_mapping.config_to_file()
+            new_mapping.mapping_to_file()
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))
