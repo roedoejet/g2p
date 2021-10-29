@@ -9,7 +9,6 @@ from unittest import TestCase, main
 from g2p.app import APP
 from g2p.cli import convert, doctor, generate_mapping, scan, update
 from g2p.log import LOGGER
-from g2p.tests.public import PUBLIC_DIR
 from g2p.tests.public.data import __file__ as data_dir
 
 
@@ -224,18 +223,6 @@ class CliTest(TestCase):
             results.output,
             "Non-existent out-dir must be reported as error",
         )
-
-    def test_local_config(self):
-        config_path = os.path.join(PUBLIC_DIR, "mappings", "test.yaml")
-        result = self.runner.invoke(
-            convert,
-            ["bbbb", "local-config-in", "local-config-out", "--config", config_path,],
-        )
-        self.assertIn("aaaa", result.stdout)
-        result = self.runner.invoke(
-            convert, ["b", "local-config-in", "eng-ipa", "--config", config_path,],
-        )
-        self.assertIn("ɑ", result.stdout)
 
 
 if __name__ == "__main__":

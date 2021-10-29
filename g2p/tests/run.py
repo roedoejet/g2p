@@ -25,6 +25,7 @@ from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_transducer import TransducerTest
 from g2p.tests.test_unidecode_transducer import UnidecodeTransducerTest
 from g2p.tests.test_utils import UtilsTest
+from g2p.tests.test_z_local_config import LocalConfigTest
 
 # Deliberately left out:
 # from g2p.tests.test_doctor_expensive import ExpensiveDoctorTest
@@ -66,7 +67,15 @@ INTEGRATION_TESTS = [
     ]
 ]
 
-DEV_TESTS = TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS
+# LocalConfigTest has to get run last, to avoid interactions with other test
+# cases, since it has side effects on the global database
+LAST_DEV_TEST = [
+    LOADER.loadTestsFromTestCase(test) for test in [
+        LocalConfigTest,
+    ]
+]
+
+DEV_TESTS = TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS + LAST_DEV_TEST
 
 
 def run_tests(suite):
@@ -74,13 +83,13 @@ def run_tests(suite):
     '''
     if suite == 'all':
         suite = LOADER.discover(os.path.dirname(__file__))
-    if suite == 'trans':
+    elif suite == 'trans':
         suite = TestSuite(TRANSDUCER_TESTS)
-    if suite == 'langs':
+    elif suite == 'langs':
         suite = TestSuite(LANGS_TESTS)
-    if suite == 'mappings':
+    elif suite == 'mappings':
         suite = TestSuite(MAPPINGS_TESTS)
-    if suite == 'integ':
+    elif suite == 'integ':
         suite = TestSuite(INTEGRATION_TESTS)
     elif suite == 'dev':
         suite = TestSuite(DEV_TESTS)
@@ -89,7 +98,7 @@ def run_tests(suite):
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
     else:
         return runner.run(suite)
-    
+
 
 
 if __name__ == "__main__":
