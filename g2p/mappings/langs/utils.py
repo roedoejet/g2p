@@ -7,6 +7,7 @@ Utilities used by other classes
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
+from g2p.mappings.utils import is_ipa
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -38,7 +39,7 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     for mapping in [
         x for x in MAPPINGS_AVAILABLE if x["out_lang"] in mappings_to_check
     ]:
-        if mapping["out_lang"].endswith("-ipa"):
+        if is_ipa(mapping["out_lang"]):
             for rule in mapping["mapping_data"]:
                 if not is_panphon(rule["out"]):
                     LOGGER.warning(
