@@ -11,41 +11,39 @@ var option = {
     tooltip: {},
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
-    series: [
-        {
-            type: 'graph',
-            layout: 'none',
-            symbolSize: 70,
-            roam: true,
-            label: {
-                normal: {
-                    show: true
-                }
-            },
-            edgeSymbol: ['none', 'arrow'],
-            edgeSymbolSize: [0, 10],
-            edgeLabel: {
-                normal: {
-                    textStyle: {
-                        fontSize: 36
-                    }
-                }
-            },
-            data: [{ "name": "a (in-0)", "x": 300, "y": 300 }, { "name": "a (out-0)", "x": 500, "y": 300 }],
-            links: [{ "source": 0, "target": 1 }],
-            lineStyle: {
-                normal: {
-                    color: '#333',
-                    opacity: 0.8,
-                    width: 2,
-                    curveness: 0
+    series: [{
+        type: 'graph',
+        layout: 'none',
+        symbolSize: 70,
+        roam: true,
+        label: {
+            normal: {
+                show: true
+            }
+        },
+        edgeSymbol: ['none', 'arrow'],
+        edgeSymbolSize: [0, 10],
+        edgeLabel: {
+            normal: {
+                textStyle: {
+                    fontSize: 36
                 }
             }
+        },
+        data: [{ "name": "a (in-0)", "x": 300, "y": 300 }, { "name": "a (out-0)", "x": 500, "y": 300 }],
+        links: [{ "source": 0, "target": 1 }],
+        lineStyle: {
+            normal: {
+                color: '#333',
+                opacity: 0.8,
+                width: 2,
+                curveness: 0
+            }
         }
-    ]
+    }]
 };
 
-$(window).on('resize', function () {
+$(window).on('resize', function() {
     if (myChart != null && myChart != undefined) {
         myChart.resize();
     }
@@ -67,7 +65,7 @@ function createSettings(index, data) {
     if ('include' in data && data['include']) {
         include = 'checked'
     }
-    if (data['as_is']) {
+    if (data['rule_ordering'] === 'as-written') {
         as_is = 'checked'
     }
     if (data['case_sensitive']) {
@@ -98,11 +96,11 @@ function createSettings(index, data) {
                         <label for='include'>Include rules in output</label>
                 </div>
                 <div>
-                    <input ${as_is} checked id='as_is-${index}' type='checkbox' name='as_is' value='as_is'>
+                    <input ${as_is} id='as_is-${index}' type='checkbox' name='as_is' value='as_is'>
                         <label for='as_is'>Leave order as is</label>
                 </div>
                 <div>
-                    <input  ${case_sensitive} checked id='case_sensitive-${index}' type='checkbox' name='case_sensitive'
+                    <input  ${case_sensitive} id='case_sensitive-${index}' type='checkbox' name='case_sensitive'
                         value='case_sensitive'>
                         <label for='case_sensitive'>Rules are case sensitive</label>
                 </div>
@@ -130,32 +128,36 @@ function createSettings(index, data) {
     </form>
 </div>`
     $('#settings-container').append(settings_template)
-    document.getElementById(`include-${index}`).addEventListener('click', function (event) {
+    document.getElementById(`include-${index}`).addEventListener('click', function(event) {
         const include = event.target.checked
-        setKwargs(index, { as_is })
+        setKwargs(index, { include })
     })
 
-    document.getElementById(`as_is-${index}`).addEventListener('click', function (event) {
+    document.getElementById(`as_is-${index}`).addEventListener('click', function(event) {
         const as_is = event.target.checked
-        setKwargs(index, { as_is })
+        if (as_is) {
+            setKwargs(index, { rule_ordering: 'as-written' })
+        } else {
+            setKwargs(index, { rule_ordering: 'apply-longest-first' })
+        }
     })
 
-    document.getElementById(`case_sensitive-${index}`).addEventListener('click', function (event) {
+    document.getElementById(`case_sensitive-${index}`).addEventListener('click', function(event) {
         const case_sensitive = event.target.checked
         setKwargs(index, { case_sensitive })
     })
 
-    document.getElementById(`escape_special-${index}`).addEventListener('click', function (event) {
+    document.getElementById(`escape_special-${index}`).addEventListener('click', function(event) {
         const escape_special = event.target.checked
         setKwargs(index, { escape_special })
     })
 
-    document.getElementById(`reverse-${index}`).addEventListener('click', function (event) {
+    document.getElementById(`reverse-${index}`).addEventListener('click', function(event) {
         const reverse = event.target.checked
         setKwargs(index, { reverse })
     })
 
-    document.getElementById(`out_delimiter-${index}`).addEventListener('change', function (event) {
+    document.getElementById(`out_delimiter-${index}`).addEventListener('change', function(event) {
         const out_delimiter = event.target.value
         setKwargs(index, { out_delimiter })
     })
@@ -203,6 +205,7 @@ function createAbbs(index, data) {
     ABBS.push(hotVar)
     return hotVar
 }
+
 function createTable(index, data) {
     let id = 'hot-' + index
     let el = '<div class="hot-container" id="' + id + '-container"><div id="' + id + '"></div></div>';
@@ -247,7 +250,7 @@ function createTable(index, data) {
     const config = { attributes: true };
     observer.observe(targetNode, config);
     TABLES.push(hot)
-    $(id).on('change', function (event) {
+    $(id).on('change', function(event) {
         convert()
         return false;
     })
@@ -256,7 +259,7 @@ function createTable(index, data) {
 var size = 10;
 var dataObject = []
 var varsObject = []
-var settingsObject = { 'include': true, 'as_is': true, 'case_sensitive': true, 'escape_special': false, 'reverse': false }
+var settingsObject = { 'include': true, 'rule_ordering': "as-written", 'case_sensitive': true, 'escape_special': false, 'reverse': false }
 for (var j = 0; j < size; j++) {
     dataObject.push({
         "in": '',
@@ -274,13 +277,13 @@ createTable(0, dataObject)
 createAbbs(0, varsObject)
 createSettings(0, settingsObject)
 
-document.getElementById("export-abbs").addEventListener("click", function (event) {
+document.getElementById("export-abbs").addEventListener("click", function(event) {
     varhot.getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
 })
 
 // Kwargs
 
-document.getElementById('standard-radio').addEventListener('click', function (event) {
+document.getElementById('standard-radio').addEventListener('click', function(event) {
     if ($('#standard').is(":hidden")) {
         $('#input').val($('#indexInput').val())
         convert()
@@ -289,7 +292,7 @@ document.getElementById('standard-radio').addEventListener('click', function (ev
     }
 })
 
-getIncludedIndices = function () {
+getIncludedIndices = function() {
     indices = []
     let mappings = $(".include")
     for (var j = 0; j < mappings.length; j++) {
@@ -300,7 +303,7 @@ getIncludedIndices = function () {
     return indices
 }
 
-getIncludedMappings = function () {
+getIncludedMappings = function() {
     let indices = getIncludedIndices()
     let mappings = []
     if (TABLES.length === indices.length && ABBS.length === indices.length) {
@@ -315,7 +318,7 @@ getIncludedMappings = function () {
     return mappings
 }
 
-var getKwargs = function (index) {
+var getKwargs = function(index) {
     const as_is = document.getElementById(`as_is-${index}`).checked
     const case_sensitive = document.getElementById(`case_sensitive-${index}`).checked
     const escape_special = document.getElementById(`escape_special-${index}`).checked
@@ -327,7 +330,7 @@ var getKwargs = function (index) {
     return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding }
 }
 
-var setKwargs = function (index, kwargs) {
+var setKwargs = function(index, kwargs) {
     if ('as_is' in kwargs) {
         document.getElementById(`as_is-${index}`).checked = kwargs['as_is']
     }
@@ -359,11 +362,11 @@ var conversionSocket = io.connect('//' + document.domain + ':' + location.port +
 var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
 var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
 
-var trackIndex = function () {
+var trackIndex = function() {
     return $('#animated-radio').is(":checked")
 }
 
-var convert = function () {
+var convert = function() {
     // prevent conversion from happening before TABLES, ABBS, and SETTINGS are populated.
     if (TABLES.length > 0 && ABBS.length > 0) {
         let index = trackIndex()
@@ -384,7 +387,7 @@ var convert = function () {
     }
 }
 
-document.getElementById('animated-radio').addEventListener('click', function (event) {
+document.getElementById('animated-radio').addEventListener('click', function(event) {
     if ($('#animated').is(":hidden")) {
         $('#indexInput').val($('#input').val())
         convert()
@@ -396,7 +399,7 @@ document.getElementById('animated-radio').addEventListener('click', function (ev
 
 // Convert after any changes to tables
 Handsontable.hooks.add('afterChange', convert)
-conversionSocket.on('conversion response', function (msg) {
+conversionSocket.on('conversion response', function(msg) {
     let index = trackIndex()
     if (index) {
         // Convert after any changes to tables
@@ -409,11 +412,11 @@ conversionSocket.on('conversion response', function (msg) {
     }
 });
 
-connectionSocket.on('connection response', function (msg) {
+connectionSocket.on('connection response', function(msg) {
     $('#log').text('(' + msg.data + ')')
 })
 
-connectionSocket.on('disconnect', function () {
+connectionSocket.on('disconnect', function() {
     $('#log').text('(Disconnected)')
 })
 
@@ -456,7 +459,7 @@ function showSettings(index) {
     convert()
 }
 
-tableSocket.on('table response', function (msg) {
+tableSocket.on('table response', function(msg) {
     // msg arg is list of {
     //  mappings: io pairs to be applied to hot table 
     //  abbs: abbreviations to be included in abbreviations table
@@ -464,11 +467,11 @@ tableSocket.on('table response', function (msg) {
     // }
     TABLES = []
     ABBS = []
-    // Clear navs
+        // Clear navs
     $("#table-nav").empty()
     $("#settings-nav").empty()
     $('#abbs-nav').empty()
-    // Clear others
+        // Clear others
     $("#table-container").empty()
     $('#abbs-table-container').empty()
     $('#settings-container').empty()
@@ -487,7 +490,7 @@ tableSocket.on('table response', function (msg) {
         $("#table-nav").append(table_nav_li)
         $('#settings-nav').append(settings_nav_li.replace('showTable', 'showSettings'))
         $('#abbs-nav').append(abbs_nav_li.replace('showTable', 'showAbbs'))
-        // update other elements
+            // update other elements
         createAbbs(j, msg[j]['abbs'])
         createSettings(j, msg[j]['kwargs'])
         createTable(j, msg[j]['mappings'])
@@ -496,43 +499,43 @@ tableSocket.on('table response', function (msg) {
     convert()
 })
 
-$('#input').on('keyup', function (event) {
+$('#input').on('keyup', function(event) {
     convert()
     return false;
 })
-$('#indexInput').on('keyup', function (event) {
+$('#indexInput').on('keyup', function(event) {
     convert(index = true)
     return false;
 })
-$('#hot-add').click(function (event) {
+$('#hot-add').click(function(event) {
     let active = $('li.title.rules.active')
     let index = $('li.title.rules').index(active)
     rows = TABLES[index].countRows()
     TABLES[index].alter('insert_row', rows)
 })
-$('#varhot-add-col').click(function (event) {
+$('#varhot-add-col').click(function(event) {
     let active = $('li.title.abbs.active')
     let index = $('li.title.abbs').index(active)
     cols = ABBS[index].countCols()
     ABBS[index].alter('insert_col', cols)
 })
-$('#varhot-add-row').click(function (event) {
+$('#varhot-add-row').click(function(event) {
     let active = $('li.title.abbs.active')
     let index = $('li.title.abbs').index(active)
     rows = ABBS[index].countRows()
     ABBS[index].alter('insert_row', rows)
 })
-$('#export-abbs').click(function (event) {
+$('#export-abbs').click(function(event) {
     let active = $('li.title.abbs.active')
     let index = $('li.title.abbs').index(active)
     ABBS[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
-$('#export-rules').click(function (event) {
+$('#export-rules').click(function(event) {
     let active = $('li.title.rules.active')
     let index = $('li.title.rules').index(active)
     TABLES[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
-$('#langselect').change(function () {
+$('#langselect').change(function() {
     var selected = $("#langselect option:selected").val();
     var in_lang = selected;
     var out_lang = selected;
@@ -544,30 +547,30 @@ $('#langselect').change(function () {
     tableSocket.emit('table event', { in_lang: in_lang, out_lang: out_lang })
 })
 
-$(document).ready(function () {
+$(document).ready(function() {
     $.ajax({
         url: "/api/v1/langs",
         dataType: "json",
-        success: function (response) {
-            $.each(response, function (index, value) {
+        success: function(response) {
+            $.each(response, function(index, value) {
                 $("#input-langselect").append("<option value=" + value + ">" + value + "</option>")
             })
         }
     });
 
-    $("#input-langselect").on('change', function (event) {
+    $("#input-langselect").on('change', function(event) {
         let in_lang = $("#input-langselect option:selected").val()
         $.ajax({
             url: "/api/v1/descendants/" + in_lang,
             dataType: "json",
-            success: function (response) {
+            success: function(response) {
                 $("#output-langselect").empty()
-                $.each(response, function (index, value) {
+                $.each(response, function(index, value) {
                     $("#output-langselect").append("<option value=" + value + ">" + value + "</option>")
                 })
                 changeTable()
             },
-            error: function (xhr, ajaxOptions, thrownError) {
+            error: function(xhr, ajaxOptions, thrownError) {
                 if (xhr.status == 404) {
                     $('#input-langselect option[value=custom]').attr('selected', 'selected');
                     $("#output-langselect").empty();
@@ -584,7 +587,7 @@ $(document).ready(function () {
         tableSocket.emit('table event', { in_lang, out_lang })
     }
 
-    $("#output-langselect").on('change', function (event) {
+    $("#output-langselect").on('change', function(event) {
         changeTable()
     })
 
