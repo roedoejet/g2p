@@ -27,12 +27,12 @@ def getPanphonDistanceSingleton():
     return _PANPHON_DISTANCE_SINGLETON
 
 
-def check_ipa_known_segs(mappings_to_check=None) -> bool:
+def check_ipa_known_segs(mappings_to_check=False) -> bool:
     """Check the given mappings, or all IPA mappings, for invalid IPA in the "out" fields
 
     Returns True iff not errors were found.
     """
-    if mappings_to_check is None:
+    if not mappings_to_check:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
     for mapping in [
