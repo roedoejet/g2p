@@ -96,6 +96,16 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
 
         You can list available mappings with "g2p doctor --list-ipa", or by visiting
         http://g2p-studio.herokuapp.com/api/v1/langs .
+
+        \b
+        Sample usage:
+            Generate Algonquin IPA to English IPA from alq -> alq-ipa
+                g2p generate-mapping --ipa alq
+            Generate Mohawk IPA to English IPA from moh-equiv -> moh-ipa
+                g2p generate-mapping --ipa moh-equiv moh-ipa
+            Generate Michif IPA to English IPA from the union of crg-dv ->
+            crg-ipa and crg-tmd -> crg-ipa
+                g2p generate-mapping --ipa --merge crg-dv:crg-tmd crg-ipa
     """
 
     if merge:
