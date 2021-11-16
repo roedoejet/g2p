@@ -1,6 +1,9 @@
-from g2p.tests.run import run_tests
+#!/usr/bin/env python3
+
 import sys
 import unittest
+
+from g2p.tests.run import run_tests
 
 try:
     result = run_tests(sys.argv[1])

@@ -9,6 +9,7 @@ import io
 from networkx import shortest_path
 from networkx.exception import NetworkXNoPath
 
+from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 import g2p.mappings.tokenizer as tok
@@ -25,25 +26,39 @@ if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
 _g2p_cache = {}
 
 def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
+    """Make a g2p Transducer for mapping text from in_lang to out_lang via the
+    shortest path between them.
+
+    Args:
+        in_lang (str): input language code
+        out_lang (str): output language code
+
+    Returns:
+        Transducer from in_lang to out_lang
+
+    Raises:
+        InvalidLanguageCode: if in_lang or out_lang don't exist
+        NoPath: if there is path between in_lang and out_lang
+    """
     if (in_lang, out_lang, tok_lang) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tok_lang)]
 
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called '{in_lang}'. Please try again.")
-        raise(FileNotFoundError(f"No lang called '{in_lang}'."))
+        raise InvalidLanguageCode(in_lang)
 
     # Check out_lang is a node in network
     if out_lang not in LANGS_NETWORK.nodes:
         LOGGER.error(f"No lang called '{out_lang}'. Please try again.")
-        raise(FileNotFoundError(f"No lang called '{out_lang}'."))
+        raise InvalidLanguageCode(out_lang)
 
     # Try to find the shortest path between the nodes
     try:
         path = shortest_path(LANGS_NETWORK, in_lang, out_lang)
-    except NetworkXNoPath:
+    except NetworkXNoPath as e:
         LOGGER.error(f"Sorry, we couldn't find a way to convert {in_lang} to {out_lang}. Please update your langs by running `g2p update` and try again.")
-        raise(NetworkXNoPath)
+        raise NoPath(in_lang, out_lang) from e
 
     # Find all mappings needed
     mappings_needed = []
