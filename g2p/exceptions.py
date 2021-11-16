@@ -30,6 +30,23 @@ class MappingMissing(CommandLineError):
         )
 
 
+class NoPath(CommandLineError):
+    def __init__(self, in_lang, out_lang):
+        super().__init__(self)
+        self.in_lang = in_lang
+        self.out_lang = out_lang
+
+    def __str__(self):
+        return self.render(
+            (
+                "\n"
+                'There is no g2p path between the languages "%(in_lang)s" and "%(out_lang)s", \n'
+                "please make sure you spelled the name correctly or go to\n"
+                "https://g2p-studio.herokuapp.com/api/v1/langs for a list of mappings"
+            )
+        )
+
+
 class InvalidNormalization(CommandLineError):
     def __init__(self, norm):
         super().__init__(self)
@@ -87,3 +104,12 @@ class IncorrectFileType(CommandLineError):
 
     def __str__(self):
         return self.render(self.msg)
+
+
+class InvalidLanguageCode(CommandLineError):
+    def __init__(self, lang):
+        super().__init__(self)
+        self.lang = lang
+
+    def __str__(self):
+        return self.render('No language called: "%(lang)s".')

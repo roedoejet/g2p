@@ -7,10 +7,10 @@ from flask import Blueprint, abort
 from flask_restful import (Resource, Api, reqparse)
 from flask_cors import CORS
 
-from networkx.exception import NetworkXError, NetworkXNoPath
+from networkx.exception import NetworkXError
 from networkx.algorithms.dag import ancestors, descendants
+from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.static import __file__ as static_file
-from g2p.transducer import Transducer
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
 from g2p.log import LOGGER
 from g2p import make_g2p
@@ -19,7 +19,7 @@ from g2p import make_g2p
 class Ancestors(Resource):
     def get(self, node):
         try:
-            return sorted([x for x in ancestors(LANGS_NETWORK, node)])
+            return sorted(ancestors(LANGS_NETWORK, node))
         except NetworkXError:
             abort(404)
 
@@ -27,7 +27,7 @@ class Ancestors(Resource):
 class Descendants(Resource):
     def get(self, node):
         try:
-            return sorted([x for x in descendants(LANGS_NETWORK, node)])
+            return sorted(descendants(LANGS_NETWORK, node))
         except NetworkXError:
             abort(404)
 
@@ -55,7 +55,7 @@ class Langs(Resource):
         if verbose:
             return self.AVAILABLE_MAPPINGS
         else:
-            return sorted([x for x in LANGS_NETWORK.nodes])
+            return sorted(LANGS_NETWORK.nodes)
 
 
 class Text(Resource):
@@ -106,9 +106,9 @@ class Text(Resource):
             if index:
                 index = tg.edges
             return {'input-text': input_text, 'output-text': text, 'index': index, 'debugger': debugger}
-        except NetworkXNoPath:
+        except NoPath:
             abort(400)
-        except FileNotFoundError:
+        except InvalidLanguageCode:
             abort(404)
 
 
@@ -118,8 +118,7 @@ def update_docs():
     swagger_path = os.path.join(os.path.dirname(static_file), 'swagger.json')
     with open(swagger_path) as f:
         data = json.load(f)
-    data['components']['schemas']['Langs']['enum'] = sorted(
-        [x for x in LANGS_NETWORK.nodes])
+    data['components']['schemas']['Langs']['enum'] = sorted(LANGS_NETWORK.nodes)
     with open(swagger_path, 'w') as f:
         f.write(json.dumps(data))
     LOGGER.info('Updated API documentation')
