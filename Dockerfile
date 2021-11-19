@@ -10,6 +10,7 @@ RUN apt-get install -y libffi-dev openssl libssl-dev python3 python3-pip python3
 RUN mkdir /g2p
 RUN mkdir /g2p/g2p
 COPY g2p /g2p/g2p
+COPY requirements /g2p/requirements
 COPY requirements.txt /g2p
 COPY setup.py /g2p
 COPY README.md /g2p
