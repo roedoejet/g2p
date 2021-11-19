@@ -1,0 +1,1 @@
+All development and normal use requirements are in requirements.txt - we use a specific version of gunicorn to run the g2p studio in production, and don't want to introduce git as a dependency, so we separate these requirements here.
