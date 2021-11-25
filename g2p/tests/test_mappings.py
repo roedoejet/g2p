@@ -10,6 +10,7 @@ from typing import List
 from unittest import TestCase, main
 
 from g2p import exceptions
+from g2p import transducer
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
@@ -213,6 +214,18 @@ class MappingTest(TestCase):
         self.assertTrue(mapping.kwargs["escape_special"])
         self.assertEqual(mapping.kwargs["norm_form"], "NFD")
         self.assertTrue(mapping.kwargs["reverse"])
+
+    def test_abbreviations(self):
+        mapping = Mapping(
+            os.path.join(
+                os.path.dirname(public_data), "mappings", "abbreviation_config.yaml"
+            )
+        )
+        self.assertEqual(mapping.mapping[0]["in"], "i|u")
+        self.assertEqual(mapping.mapping[1]["in"], "a|e|i|o|u")
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer("i").output_string, "1")
+        self.assertEqual(transducer("e").output_string, "2")
 
     def test_rule_ordering_from_config(self):
         """
