@@ -114,7 +114,7 @@ class Mapping:
         self.processed = False
         if isinstance(abbreviations, defaultdict) or not abbreviations:
             self.abbreviations = abbreviations
-        elif abbreviations:
+        else:
             self.abbreviations = load_abbreviations_from_file(abbreviations)
         # Handle user-supplied list
         if isinstance(mapping, list):
@@ -140,7 +140,9 @@ class Mapping:
             else:
                 raise exceptions.MalformedLookup()
         if self.abbreviations:
-            for abb, stands_for in self.abbreviations.items():
+            for abb, stands_for in sorted(
+                self.abbreviations.items(), key=lambda x: len(x[0]), reverse=True
+            ):
                 abb_match = re.compile(abb)
                 abb_repl = "|".join(stands_for)
                 if self.mapping and "match_pattern" not in self.mapping[0]:
