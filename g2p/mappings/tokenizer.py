@@ -59,6 +59,8 @@ class Tokenizer(DefaultTokenizer):
         self._build_regex()
 
     def _build_regex(self):
+        if not self.case_sensitive:
+            self.inventory = [c.lower() for c in self.inventory]
         self.inventory = [re.sub(r"{[0-9]+}", "", x) for x in self.inventory]
         regex_pieces = sorted(self.inventory, key=lambda s: -len(s))
         regex_pieces = [re.escape(p) for p in regex_pieces]
