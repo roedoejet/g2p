@@ -1,0 +1,29 @@
+name: Run Tests
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.6"
+      - name: Install dependencies
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install -e .
+          pip3 install pip-licenses
+          if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
+          pip3 install coverage
+          pip3 install coveralls
+      - name: Run tests
+        run: |
+          gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
+          sleep 5
+          coverage run --source g2p run_tests.py dev
+          coverage xml
+          if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true # optional (default = false)
