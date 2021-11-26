@@ -282,7 +282,9 @@ def convert(
                 )
                 data["mappings"][index] = load_mapping_from_path(config, index)
         else:
-            data = load_mapping_from_path(config)
+            mapping = load_mapping_from_path(config)
+            data["mappings"] = [mapping]
+            mappings_legal_pairs.append((mapping["in_lang"], mapping["out_lang"]))
         for pair in mappings_legal_pairs:
             if pair[0] in LANGS_NETWORK.nodes:
                 LOGGER.warn(

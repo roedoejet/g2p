@@ -6,6 +6,9 @@ Test that the --config switch to g2p convert works
 This test modifies the g2p database in memory, so it's important that it get
 run last, in order to avoid changing the results of other unit test cases.
 
+This file is also the right place to include other tests that make use of --config
+to exercise different things.
+
 We accomplish that in two ways:
  - in "./run.py dev", it gets appended after all the other tests, explicitly.
  - the file name has a "z" so it sorts last when "./run.py all" uses LOADER.discover()
@@ -34,6 +37,31 @@ class LocalConfigTest(TestCase):
             convert, ["b", "local-config-in", "eng-ipa", "--config", config_path,],
         )
         self.assertIn("ɑ", result.stdout)
+
+    def test_case_insensitive_tokenizer(self):
+        # Unit testing for https://github.com/ReadAlongs/Studio/issues/40
+        # That issue was raised in Studio when the tokenizer was there, but
+        # the tokenizer has been migrated to g2p since then, so the test and
+        # fix belong here in g2p.
+
+        # This test incidentally exercises passing --config a config file with
+        # only one mapping in it, without the top-level "mappings:" list.
+        tok_config = os.path.join(PUBLIC_DIR, "mappings", "tokenize_punct_config.yaml")
+        results = self.runner.invoke(
+            convert, ["--tok", "--config", tok_config, "AAA-BBB", "tok-in", "tok-out"]
+        )
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("aac_dbb", results.output)
+
+        # While "AAA-BBB" gets tokenized as [word("AAA-BBB")], since "A-B" is
+        # in the inventory, "D-C" gets tokenized as [word("D"), non-word("-"),
+        # word("C")]. With rule D,d_end,,$, D will only become "d_end" if D is
+        # at the end, which only occurs where we tokenize.
+        results = self.runner.invoke(
+            convert, ["--tok", "--config", tok_config, "D-C", "tok-in", "tok-out"]
+        )
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("d_end-c", results.output)
 
 
 if __name__ == "__main__":
