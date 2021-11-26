@@ -26,6 +26,4 @@ jobs:
           if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
       - uses: codecov/codecov-action@v2
         with:
-          files: ./coverage.xml # optional
           fail_ci_if_error: true # optional (default = false)
-          verbose: true # optional (default = false)
