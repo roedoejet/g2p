@@ -62,13 +62,10 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
 
     # Find all mappings needed
     mappings_needed = []
-    for i, lang in enumerate(path):
-        try:
-            mapping = Mapping(in_lang=path[i], out_lang=path[i+1])
-            LOGGER.debug(f"Adding mapping between {path[i]} and {path[i+1]} to composite transducer.")
-            mappings_needed.append(mapping)
-        except IndexError:
-            continue
+    for lang1, lang2 in zip(path[:-1], path[1:]):
+        mapping = Mapping(in_lang=lang1, out_lang=lang2)
+        LOGGER.debug(f"Adding mapping between {lang1} and {lang2} to composite transducer.")
+        mappings_needed.append(mapping)
 
     # Either construct a Transducer or Composite Transducer
     if len(mappings_needed) == 1:

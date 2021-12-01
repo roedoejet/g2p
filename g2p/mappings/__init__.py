@@ -313,17 +313,18 @@ class Mapping:
                             io[k] = normalize(v, self.kwargs["norm_form"])
             elif kwarg == "reverse" and val:
                 mapping = self.reverse_mappings(mapping)
+
         # After all processing is done, turn into regex
-        for io in mapping:
+        for i, io in enumerate(mapping):
             if self.kwargs["prevent_feeding"] or (
                 "prevent_feeding" in io and io["prevent_feeding"]
             ):
-                io["intermediate_form"] = self._string_to_pua(
-                    io["out"], mapping.index(io)
-                )
+                io["intermediate_form"] = self._string_to_pua(io["out"], i)
             io["match_pattern"] = self.rule_to_regex(io)
-            if not io["match_pattern"]:
-                mapping.remove(io)
+
+        # Finally, remove rules with an empty match pattern, typically empty rules
+        mapping = [io for io in mapping if io["match_pattern"]]
+
         self.processed = True
         return mapping
 
