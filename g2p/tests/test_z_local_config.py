@@ -63,6 +63,19 @@ class LocalConfigTest(TestCase):
         self.assertEqual(results.exit_code, 0)
         self.assertIn("d_end-c", results.output)
 
+    def test_null_mapping(self):
+        """Empty lines in a mapping should just get ignored"""
+        # Unit test case for bug fix: as of 2021-12-01, an empty rule would
+        # cause the next rule to not get its match pattern created, and raise
+        # an exception later. The null.csv mapping has such an empty rule,
+        # which should get ignored, with the next rule, d->e, still working.
+        null_config = os.path.join(PUBLIC_DIR, "mappings", "null_config.yaml")
+        results = self.runner.invoke(
+            convert, ["--config", null_config, "x-ad-x", "null-in", "null-out"]
+        )
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("x-be-x", results.output)
+
 
 if __name__ == "__main__":
     main()
