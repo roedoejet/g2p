@@ -76,6 +76,16 @@ class LocalConfigTest(TestCase):
         self.assertEqual(results.exit_code, 0)
         self.assertIn("x-be-x", results.output)
 
+    def test_case_feeding_mapping(self):
+        """Exercise the mapping using case to prevent feeding on in/out but not context"""
+        case_feeding_config = os.path.join(PUBLIC_DIR, "mappings", "case-feed", "config.yaml")
+        results = self.runner.invoke(
+            convert, ["--config", case_feeding_config, "--tok", "ka-intinatin", "cf-in", "cf-out"]
+        )
+        print(results.output)
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("ke-antinetin", results.output)
+
 
 if __name__ == "__main__":
     main()

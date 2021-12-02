@@ -1,0 +1,28 @@
+<<: &shared
+  language_name: Example using case to prevent feeding rules but feed context
+mappings:
+  - display name: case-feed input lowercaser
+    mapping: empty.csv
+    in_lang: cf-in
+    out_lang: cf-in-lc
+    case_sensitive: false
+    authors:
+      - Eric Joanis
+    <<: *shared
+  - display_name: case-feed main mapping in is lc, out is uc, thus no feeding
+    mapping: cf-in-lc-to-cf-out-uc.csv
+    in_lang: cf-in-lc
+    out_lang: cf-out-uc
+    case_sensitive: true
+    prevent_feeding: false
+    authors:
+      - Eric Joanis
+    <<: *shared
+  - display name: case-feed output lowercaser
+    mapping: empty.csv
+    in_lang: cf-out-uc
+    out_lang: cf-out
+    case_sensitive: false
+    authors:
+      - Eric Joanis
+    <<: *shared
