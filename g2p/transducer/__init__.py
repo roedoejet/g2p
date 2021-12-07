@@ -524,15 +524,22 @@ class Transducer:
                     self.update_default_indices(
                         tg, match, intermediate_diff, out_string
                     )
-                tg.debugger[-1].append(
-                    {
-                        "input": debug_string,
-                        "output": tg.output_string,
-                        "rule": {k: v for k, v in io.items() if k != "match_pattern"},
-                        "start": start,
-                        "end": end,
-                    }
-                )
+                if (
+                    io["in"] != io["out"]
+                    or ("context_after" in io and io["context_after"])
+                    or ("context_before" in io and io["context_before"])
+                ):
+                    tg.debugger[-1].append(
+                        {
+                            "input": debug_string,
+                            "output": tg.output_string,
+                            "rule": {
+                                k: v for k, v in io.items() if k != "match_pattern"
+                            },
+                            "start": start,
+                            "end": end,
+                        }
+                    )
                 out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
                 intermediate_diff += len(out_string) - len(match.group())
         if intermediate_forms:
