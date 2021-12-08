@@ -16,6 +16,7 @@ We accomplish that in two ways:
 
 from unittest import main, TestCase
 import os
+import tempfile
 
 from g2p.app import APP
 from g2p.cli import convert
@@ -82,9 +83,31 @@ class LocalConfigTest(TestCase):
         results = self.runner.invoke(
             convert, ["--config", case_feeding_config, "--tok", "ka-intinatin", "cf-in", "cf-out"]
         )
-        print(results.output)
+        #print(results.output)
         self.assertEqual(results.exit_code, 0)
         self.assertIn("ke-antinetin", results.output)
+
+    def test_missing_files(self):
+        """Nice error messages when the mapping file or abbreviations file are missing"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
+            with open(config_file, "wt", encoding="utf8") as f:
+                print("mapping: no-such-file.csv", file=f)
+            results = self.runner.invoke(convert, ["--config", config_file, "a", "b", "c"])
+            self.assertNotEqual(results.exit_code, 0)
+            self.assertIn("Cannot load mapping data file", results.output + str(results.exception))
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_file = os.path.join(tmpdir, "abbrev-file-not-found.yaml")
+            with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
+                pass
+            with open(config_file, "wt", encoding="utf8") as f:
+                print("mapping: empty.csv", file=f)
+                print("abbreviations: no-such-file.csv", file=f)
+            results = self.runner.invoke(convert, ["--config", config_file, "a", "b", "c"])
+            self.assertNotEqual(results.exit_code, 0)
+            self.assertIn("Cannot load abbreviations data file", results.output + str(results.exception))
+
 
 
 if __name__ == "__main__":
