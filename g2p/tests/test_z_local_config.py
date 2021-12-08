@@ -79,11 +79,21 @@ class LocalConfigTest(TestCase):
 
     def test_case_feeding_mapping(self):
         """Exercise the mapping using case to prevent feeding on in/out but not context"""
-        case_feeding_config = os.path.join(PUBLIC_DIR, "mappings", "case-feed", "config.yaml")
-        results = self.runner.invoke(
-            convert, ["--config", case_feeding_config, "--tok", "ka-intinatin", "cf-in", "cf-out"]
+        case_feeding_config = os.path.join(
+            PUBLIC_DIR, "mappings", "case-feed", "config.yaml"
         )
-        #print(results.output)
+        results = self.runner.invoke(
+            convert,
+            [
+                "--config",
+                case_feeding_config,
+                "--tok",
+                "ka-intinatin",
+                "cf-in",
+                "cf-out",
+            ],
+        )
+        # print(results.output)
         self.assertEqual(results.exit_code, 0)
         self.assertIn("ke-antinetin", results.output)
 
@@ -93,9 +103,13 @@ class LocalConfigTest(TestCase):
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
             with open(config_file, "wt", encoding="utf8") as f:
                 print("mapping: no-such-file.csv", file=f)
-            results = self.runner.invoke(convert, ["--config", config_file, "a", "b", "c"])
+            results = self.runner.invoke(
+                convert, ["--config", config_file, "a", "b", "c"]
+            )
             self.assertNotEqual(results.exit_code, 0)
-            self.assertIn("Cannot load mapping data file", results.output + str(results.exception))
+            self.assertIn(
+                "Cannot load mapping data file", results.output + str(results.exception)
+            )
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "abbrev-file-not-found.yaml")
@@ -104,10 +118,14 @@ class LocalConfigTest(TestCase):
             with open(config_file, "wt", encoding="utf8") as f:
                 print("mapping: empty.csv", file=f)
                 print("abbreviations: no-such-file.csv", file=f)
-            results = self.runner.invoke(convert, ["--config", config_file, "a", "b", "c"])
+            results = self.runner.invoke(
+                convert, ["--config", config_file, "a", "b", "c"]
+            )
             self.assertNotEqual(results.exit_code, 0)
-            self.assertIn("Cannot load abbreviations data file", results.output + str(results.exception))
-
+            self.assertIn(
+                "Cannot load abbreviations data file",
+                results.output + str(results.exception),
+            )
 
 
 if __name__ == "__main__":
