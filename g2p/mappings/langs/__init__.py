@@ -34,7 +34,7 @@ def cache_langs():
                 data['mappings'][index] = load_mapping_from_path(path, index)
         else:
             data = load_mapping_from_path(path)
-        langs = {**langs, **{code: data}}
+        langs[code] = data
     
     # Save as a Directional Graph
     lang_network = DiGraph()

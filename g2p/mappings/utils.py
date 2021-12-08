@@ -198,7 +198,7 @@ def load_from_file(path: str) -> list:
         with open(path, encoding='utf8') as f:
             mapping = json.load(f)
     else:
-        raise TypeError(f"Path at {path} is not a valid filetype.")
+        raise exceptions.IncorrectFileType(f"File {path} is not a valid mapping filetype.")
     return validate(mapping, path)
 
 def load_mapping_from_path(path_to_mapping_config, index=0):
@@ -239,8 +239,11 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
             )
         # try to load the data from the mapping data file
         if 'mapping' in mapping:
-            mapping['mapping_data'] = load_from_file(
-                os.path.join(path.parent, mapping['mapping']))
+            try:
+                mapping['mapping_data'] = load_from_file(
+                    os.path.join(path.parent, mapping['mapping']))
+            except (OSError, exceptions.IncorrectFileType) as e:
+                raise exceptions.MalformedMapping(f"Cannot load mapping data file specified in {path}: {e}") from e
         elif mapping.get("type", "") == "unidecode":
             # This mapping is not implemented as a regular mapping, but as custom software
             pass
@@ -249,8 +252,11 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
             raise exceptions.MalformedMapping('Key "mapping:" missing from a mapping in {}.'.format(path))
         # load any abbreviations
         if 'abbreviations' in mapping:
-            mapping['abbreviations_data'] = load_abbreviations_from_file(
-                os.path.join(path.parent, mapping['abbreviations']))
+            try:
+                mapping['abbreviations_data'] = load_abbreviations_from_file(
+                    os.path.join(path.parent, mapping['abbreviations']))
+            except (OSError, exceptions.IncorrectFileType) as e:
+                raise exceptions.MalformedMapping(f"Cannot load abbreviations data file specified in {path}: {e}") from e
         return mapping
     else:
         raise FileNotFoundError
