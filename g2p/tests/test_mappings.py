@@ -274,7 +274,7 @@ class MappingTest(TestCase):
         )
         tf.write("good-in,good-out\n\ngood-in-no-out\n")
         tf.close()
-        self.assertRaises(TypeError, Mapping, tf.name)
+        self.assertRaises(exceptions.IncorrectFileType, Mapping, tf.name)
         os.unlink(tf.name)
 
     def test_extend_and_deduplicate(self):
