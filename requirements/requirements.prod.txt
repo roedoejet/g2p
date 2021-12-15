@@ -1,1 +1,1 @@
-gunicorn @ git+https://github.com/benoitc/gunicorn.git@ff58e0c
+https://github.com/benoitc/gunicorn/archive/ff58e0c6da83d5520916bc4cc109a529258d76e1.zip#egg=gunicorn==20.1.0
