@@ -34,6 +34,65 @@ def create_app():
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
+def parse_from_or_to_lang_spec(lang_spec):
+    """Parse a value given to g2p generate-mapping --from or --to.
+
+    See the documentation of generate_mapping() for the syntax of lang_spec.
+
+    Returns list[tuple[Mapping, io (str)]]:
+        the mapping(s) lang_spec refers to, and "in" or "out", to indicate if the
+        relevant inventory is the mapping's in_lang or out_lang.
+
+    Raises:
+        click.BadParameter if lang_spec is not valid
+    """
+    mapping_spec, comma, in_or_out = lang_spec.partition(",")
+    in_lang, _to_, out_lang = mapping_spec.partition("_to_")
+
+    if out_lang:
+        try:
+            mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
+        except MappingMissing as e:
+            raise click.BadParameter(
+                f'Cannot find mapping {in_lang}->{out_lang} for --from or --to spec "{lang_spec}": {e}'
+            )
+        if not in_or_out:
+            if is_ipa(out_lang):
+                in_or_out = "out"
+            elif is_ipa(in_lang):
+                in_or_out = "in"
+            else:
+                raise click.BadParameter(
+                    f'Cannot guess in/out for IPA lang spec "{lang_spec}" because neither {in_lang} nor {out_lang} is IPA. Specify ",in" or ",out" if you are sure it is correct.'
+                )
+        if in_or_out not in ("in", "out"):
+            raise click.BadParameter(
+                f'Invalid IPA language specification "{lang_spec}": only "in" or "out" is allowed after the comma.'
+            )
+        return [(mapping, in_or_out)]
+
+    else:
+        if in_or_out:
+            raise click.BadParameter(
+                f'Bad IPA lang spec "{lang_spec}": the ,in/,out option is only supported with the full in-lang_to_out-lang[,in][,out] syntax.'
+            )
+        if in_lang == "eng":
+            mapping = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
+            in_or_out = "in"
+            return [(mapping, in_or_out)]
+        else:
+            out_lang = in_lang + "-ipa"
+            # check_ipa_known_segs([out_lang])  # this outputs a lot of spurious noise...
+            mappings = [
+                Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+                for m in MAPPINGS_AVAILABLE
+                if m["out_lang"] == out_lang
+            ]
+            if not mappings:
+                raise click.BadParameter(f'No IPA mappings found for "{lang_spec}".')
+            return [(mapping, "out") for mapping in mappings]
+
+
 @click.version_option(version=VERSION, prog_name="g2p")
 @click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
 def cli():
@@ -44,6 +103,18 @@ def cli():
     "--out-dir",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
     help='Output results in DIRECTORY instead of the global "generated" directory.',
+)
+@click.option(
+    "--to",
+    "to_langs",
+    default=None,
+    help="Colon-separated list of to languages in from/to mode",
+)
+@click.option(
+    "--from",
+    "from_langs",
+    default=None,
+    help="Colon-separated list of from languages in from/to mode",
 )
 @click.option(
     "--list-dummy", default=False, is_flag=True, help="List the dummy phone inventory."
@@ -62,87 +133,135 @@ def cli():
     help="Merge multiple mappings together, in which case IN_LANG is a colon-seperated list and OUT_LANG is required.",
 )
 @click.argument(
-    "out_lang",
-    required=False,
-    default=None,
-    type=str,
+    "out_lang", required=False, default=None, type=str,
 )
 @click.argument(
-    "in_lang",
-    type=str,
+    "in_lang", required=False, default=None, type=str,
 )
 @cli.command(
     context_settings=CONTEXT_SETTINGS,
     short_help="Generate English IPA or dummy mapping.",
 )
-def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
-    """ For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
-        or from IN_LANG-ipa to a dummy minimalist phone inventory.
-        This assumes the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping
-        from the its output inventory.
+def generate_mapping(
+    in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge, from_langs, to_langs
+):
+    """ Generate a new mapping from existing mappings in the g2p system.
 
-        To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping following a
-        different patterns, e.g., from crl-equiv -> crl-ipa, specify both IN_LANG
-        (crl-equiv in this example) and OUT_LANG (crl-ipa in this example).
+        This command has different modes of operation:
 
-        If you just modified or created the IN_LANG to IN_LANG-ipa/OUT_LANG mapping,
-        don't forget to call "g2p update" first so "g2p generate-mapping" sees the
-        latest version.
+        Standard mode:
 
-        Call "g2p update" again after calling "g2p generate-mapping" to make the new
-        IN_LANG-ipa/OUT_LANG to eng-ipa mapping available.
+          g2p generate-mapping [--dummy|--ipa] IN_LANG [OUT_LANG]
 
-        Note: at least one of --ipa, --dummy or --list-dummy is required.
+          For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
+          or from IN_LANG-ipa to a dummy minimalist phone inventory.
+          This assumes the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping
+          from its output inventory.
+
+          To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping following a
+          different patterns, e.g., from crl-equiv -> crl-ipa, specify both IN_LANG
+          (crl-equiv in this example) and OUT_LANG (crl-ipa in this example).
+
+          \b
+          Sample usage:
+            Generate Algonquin IPA to English IPA from alq -> alq-ipa:
+                g2p generate-mapping --ipa alq
+            Generate Mohawk IPA to English IPA from moh-equiv -> moh-ipa:
+                g2p generate-mapping --ipa moh-equiv moh-ipa
+            Generate Michif IPA to English IPA from the union of crg-dv ->
+            crg-ipa and crg-tmd -> crg-ipa:
+                g2p generate-mapping --ipa --merge crg-dv:crg-tmd crg-ipa
+
+        List the dummy inventory used by --dummy:
+
+          g2p generate-mapping --list-dummy
+
+        General IPA to IPA mode:
+
+          g2p generate-mapping --from FROM_L1[:FROM_L2[:...]] --to TO_L1[:TO_L2[:...]]
+
+          Generate a mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to the
+          union of TO_L1-ipa, TO-L2-ipa, etc.
+
+          Syntax for specifying FROM_Ln and TO_Ln:
+
+          \b
+            lang:
+             - If there is only one mapping into lang-ipa, "lang" refers to the output
+               of that mapping, e.g., "fra" means "fra_to_fra-ipa,out".
+             - If there are several mappings into lang-ipa, "lang" refers to the union
+               of the outputs of those mappings, e.g., "moh" means the union of
+               "moh-equiv_to_moh-ipa,out" and "moh-festival_to_moh-ipa,out".
+             - It is an error if there is no mapping into lang-ipa.
+             - Only mappings from non-IPA to IPA are considered (i.e., IPA-to-IPA
+               mappings created by this command will not be included: use the longer
+               syntax below if you want to use them).
+             - Special case: "eng" refers to "eng-ipa_to_eng-arpabet,in".
+            in-lang_to_out-lang[,in|,out]:
+             - This expanded syntax is used to avoid the union, when it is not
+               desired, e.g., "moh-equiv_to_moh-ipa" only refers to
+               "moh-equiv_to_moh-ipa,out" rather than the union "moh" represents.
+             - If out-lang is IPA, ,out is assumed; else if in-lang is IPA, ,in is
+               assumed; it is an error if neither language is IPA.
+             - Specify ,in or ,out to override the above default.
+             - Note: "_to_" here is the joiner used to specify "the mapping from
+               'in-lang' to 'out-lang'" in the g2p network, regardless of the name of
+               the file it is stored in.
+
+        If you just modified or created the mappings from which the new mapping is
+        to be generated, don't forget to call "g2p update" first, so that "g2p
+        generate-mapping" can see the latest version.
+
+        Call "g2p update" again after calling "g2p generate-mapping" to compile the
+        newly generated mapping and make it available.
+
+        Note: at least one of --ipa, --dummy, --from/--to, or --list-dummy is required.
 
         You can list available mappings with "g2p doctor --list-ipa", or by visiting
         http://g2p-studio.herokuapp.com/api/v1/langs .
 
-        \b
-        Sample usage:
-            Generate Algonquin IPA to English IPA from alq -> alq-ipa
-                g2p generate-mapping --ipa alq
-            Generate Mohawk IPA to English IPA from moh-equiv -> moh-ipa
-                g2p generate-mapping --ipa moh-equiv moh-ipa
-            Generate Michif IPA to English IPA from the union of crg-dv ->
-            crg-ipa and crg-tmd -> crg-ipa
-                g2p generate-mapping --ipa --merge crg-dv:crg-tmd crg-ipa
     """
 
-    if merge:
-        if out_lang is None:
-            raise click.BadParameter("OUT_LANG is required with --merge.")
-        in_langs = in_lang.split(":")
-    else:
-        in_langs = [in_lang]
+    # Make sure only one mode was specified on the command line
+    mode_count = (
+        1
+        if ipa
+        else 0 + 1
+        if dummy
+        else 0 + 1
+        if list_dummy
+        else 0 + 1
+        if (from_langs is not None or to_langs is not None)
+        else 0
+    )
+    if mode_count == 0:
+        raise click.BadParameter(
+            "Nothing to do! Please specify at least one of --ipa, --dummy, "
+            "--list-dummy, or --from/--to."
+        )
+    if mode_count > 1:
+        raise click.BadParameter(
+            "Multiple modes selected. Choose only one of --ipa, --dummy, "
+            "--list-dummy, or --from/--to."
+        )
 
-    in_lang_choices = [x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)]
-    for l in in_langs:
-        if l not in in_lang_choices:
+    if list_dummy or from_langs is not None or to_langs is not None:
+        if in_lang is not None:
             raise click.BadParameter(
-                f'Invalid value for IN_LANG: "{l}".\n'
-                "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
-                f"i.e., one of:\n{', '.join(in_lang_choices)}."
+                "IN_LANG is not allowed with --list-dummy or --from/--too"
             )
 
-    out_lang_choices = [x for x in LANGS_NETWORK.nodes if is_ipa(x)]
-    if out_lang is None:
-        out_lang = f"{in_lang}-ipa"
-    elif out_lang not in out_lang_choices:
-        raise click.BadParameter(
-            f'Invalid value for OUT_LANG: "{out_lang}".\n'
-            "OUT_LANG must be an IPA language code with an existing mapping from IN_LANG, "
-            f"i.e., one of:\n{', '.join(out_lang_choices)}"
-        )
+    if from_langs is not None or to_langs is not None:
+        if from_langs is None or to_langs is None:
+            raise click.BadParameter("--from and --to must be used together")
 
-    if not ipa and not dummy and not list_dummy:
-        raise click.BadParameter(
-            "Nothing to do! Please specify at least one of --ipa, --dummy or --list-dummy."
-        )
-
-    if ipa and dummy:
-        raise click.BadParameter(
-            "Cannot do both --ipa and --dummy at the same time, please choose one or the other."
-        )
+    if merge:
+        if not ipa and not dummy:
+            raise click.BadParameter(
+                "--merge is only compatible with --ipa and --dummy."
+            )
+        if out_lang is None:
+            raise click.BadParameter("OUT_LANG is required with --merge.")
 
     if out_dir and not os.path.isdir(out_dir):
         raise click.BadParameter(
@@ -150,9 +269,37 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
         )
 
     if list_dummy:
+        # --list-dummy mode
         print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
 
-    if ipa or dummy:
+    elif ipa or dummy:
+        # --ipa and --dummy modes
+        if merge:
+            in_langs = in_lang.split(":")
+        else:
+            in_langs = [in_lang]
+
+        in_lang_choices = [
+            x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)
+        ]
+        for l in in_langs:
+            if l not in in_lang_choices:
+                raise click.BadParameter(
+                    f'Invalid value for IN_LANG: "{l}".\n'
+                    "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
+                    f"i.e., one of:\n{', '.join(in_lang_choices)}."
+                )
+
+        out_lang_choices = [x for x in LANGS_NETWORK.nodes if is_ipa(x)]
+        if out_lang is None:
+            out_lang = f"{in_lang}-ipa"
+        elif out_lang not in out_lang_choices:
+            raise click.BadParameter(
+                f'Invalid value for OUT_LANG: "{out_lang}".\n'
+                "OUT_LANG must be an IPA language code with an existing mapping from IN_LANG, "
+                f"i.e., one of:\n{', '.join(out_lang_choices)}"
+            )
+
         source_mappings = []
         for l in in_langs:
             try:
@@ -182,6 +329,62 @@ def generate_mapping(in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge):
         else:
             new_mapping.config_to_file()
             new_mapping.mapping_to_file()
+
+    elif from_langs is not None:
+        # --from/--to mode
+        assert to_langs is not None
+
+        from_mappings = []
+        for from_lang in from_langs.split(":"):
+            from_mappings.extend(parse_from_or_to_lang_spec(from_lang))
+        to_mappings = []
+        for to_lang in to_langs.split(":"):
+            to_mappings.extend(parse_from_or_to_lang_spec(to_lang))
+
+        if not from_mappings:
+            raise click.BadParameter(
+                f'Invalid --from value "{from_langs}": no mappings found.'
+            )
+        if not to_mappings:
+            raise click.BadParameter(
+                f'Invalid --to value "{to_langs}": no mappings found.'
+            )
+
+        for from_mapping, in_or_out in from_mappings:
+            LOGGER.info(f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]},{in_or_out}')
+        for to_mapping, in_or_out in to_mappings:
+            LOGGER.info(f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]},{in_or_out}')
+
+        if len(to_mappings) == 1:
+            to_mapping, to_in_or_out = to_mappings[0]
+            new_mapping = create_mapping(
+                mapping_1=from_mappings[0][0],
+                mapping_2=to_mapping,
+                mapping_1_io=from_mappings[0][1],
+                mapping_2_io=to_in_or_out,
+            )
+            for from_mapping, from_in_or_out in from_mappings[1:]:
+                new_mapping.extend(
+                    create_mapping(
+                        mapping_1=from_mapping,
+                        mapping_2=to_mapping,
+                        mapping_1_io=from_in_or_out,
+                        mapping_2_io=to_in_or_out,
+                    )
+                )
+            new_mapping.deduplicate()
+
+            if out_dir:
+                new_mapping.config_to_file(out_dir)
+                new_mapping.mapping_to_file(out_dir)
+            else:
+                new_mapping.config_to_file()
+                new_mapping.mapping_to_file()
+
+        else:
+            raise click.BadParameter(
+                "Multiple --to mappings mode is not implemented yet."
+            )
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))

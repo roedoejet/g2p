@@ -37,11 +37,15 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
     for mapping in [
-        x for x in MAPPINGS_AVAILABLE if x["out_lang"] in mappings_to_check
+        x
+        for x in MAPPINGS_AVAILABLE
+        if x["out_lang"] in mappings_to_check
     ]:
         if is_ipa(mapping["out_lang"]):
+            reverse = mapping.get("reverse", False)
             for rule in mapping["mapping_data"]:
-                if not is_panphon(rule["out"]):
+                output = rule["in"] if reverse else rule["out"]
+                if not is_panphon(output):
                     LOGGER.warning(
                         f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} "
                         f"and {mapping['out_lang']} is not recognized as valid IPA by panphon."
