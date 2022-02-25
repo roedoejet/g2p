@@ -224,48 +224,42 @@ def generate_mapping(
 
     # Make sure only one mode was specified on the command line
     mode_count = (
-        1
-        if ipa
-        else 0 + 1
-        if dummy
-        else 0 + 1
-        if list_dummy
-        else 0 + 1
-        if (from_langs is not None or to_langs is not None)
-        else 0
+        (1 if ipa else 0)
+        + (1 if dummy else 0)
+        + (1 if list_dummy else 0)
+        + (1 if (from_langs or to_langs) else 0)
     )
     if mode_count == 0:
-        raise click.BadParameter(
+        raise click.UsageError(
             "Nothing to do! Please specify at least one of --ipa, --dummy, "
             "--list-dummy, or --from/--to."
         )
     if mode_count > 1:
-        raise click.BadParameter(
+        raise click.UsageError(
             "Multiple modes selected. Choose only one of --ipa, --dummy, "
             "--list-dummy, or --from/--to."
         )
 
     if list_dummy or from_langs is not None or to_langs is not None:
         if in_lang is not None:
-            raise click.BadParameter(
-                "IN_LANG is not allowed with --list-dummy or --from/--too"
+            raise click.UsageError(
+                "IN_LANG is not allowed with --list-dummy or --from/--too",
             )
 
     if from_langs is not None or to_langs is not None:
         if from_langs is None or to_langs is None:
-            raise click.BadParameter("--from and --to must be used together")
+            raise click.UsageError("--from and --to must be used together")
 
     if merge:
         if not ipa and not dummy:
-            raise click.BadParameter(
-                "--merge is only compatible with --ipa and --dummy."
-            )
+            raise click.UsageError("--merge is only compatible with --ipa and --dummy.")
         if out_lang is None:
-            raise click.BadParameter("OUT_LANG is required with --merge.")
+            raise click.UsageError("OUT_LANG is required with --merge.")
 
     if out_dir and not os.path.isdir(out_dir):
         raise click.BadParameter(
-            f'Output directory "{out_dir}" does not exist. Cannot write mapping.'
+            f'Output directory "{out_dir}" does not exist. Cannot write mapping.',
+            param_hint="--out-dir",
         )
 
     if list_dummy:
@@ -274,6 +268,8 @@ def generate_mapping(
 
     elif ipa or dummy:
         # --ipa and --dummy modes
+        if in_lang is None:
+            raise click.UsageError("Missing argument 'IN_LANG'.")
         if merge:
             in_langs = in_lang.split(":")
         else:
@@ -284,7 +280,7 @@ def generate_mapping(
         ]
         for l in in_langs:
             if l not in in_lang_choices:
-                raise click.BadParameter(
+                raise click.UsageError(
                     f'Invalid value for IN_LANG: "{l}".\n'
                     "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
                     f"i.e., one of:\n{', '.join(in_lang_choices)}."
@@ -294,7 +290,7 @@ def generate_mapping(
         if out_lang is None:
             out_lang = f"{in_lang}-ipa"
         elif out_lang not in out_lang_choices:
-            raise click.BadParameter(
+            raise click.UsageError(
                 f'Invalid value for OUT_LANG: "{out_lang}".\n'
                 "OUT_LANG must be an IPA language code with an existing mapping from IN_LANG, "
                 f"i.e., one of:\n{', '.join(out_lang_choices)}"
@@ -305,7 +301,10 @@ def generate_mapping(
             try:
                 source_mapping = Mapping(in_lang=l, out_lang=out_lang)
             except MappingMissing as e:
-                raise click.BadParameter(f'Cannot find IPA mapping for "{l}": {e}')
+                raise click.BadParameter(
+                    f'Cannot find IPA mapping from "{l}" to "{out_lang}": {e}',
+                    param_hint=["IN_LANG", "OUT_LANG"],
+                )
             source_mappings.append(source_mapping)
 
         if ipa:
@@ -342,18 +341,22 @@ def generate_mapping(
             to_mappings.extend(parse_from_or_to_lang_spec(to_lang))
 
         if not from_mappings:
-            raise click.BadParameter(
+            raise click.UsageError(
                 f'Invalid --from value "{from_langs}": no mappings found.'
             )
         if not to_mappings:
-            raise click.BadParameter(
+            raise click.UsageError(
                 f'Invalid --to value "{to_langs}": no mappings found.'
             )
 
         for from_mapping, in_or_out in from_mappings:
-            LOGGER.info(f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]},{in_or_out}')
+            LOGGER.info(
+                f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]},{in_or_out}'
+            )
         for to_mapping, in_or_out in to_mappings:
-            LOGGER.info(f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]},{in_or_out}')
+            LOGGER.info(
+                f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]},{in_or_out}'
+            )
 
         if len(to_mappings) == 1:
             to_mapping, to_in_or_out = to_mappings[0]
@@ -382,7 +385,7 @@ def generate_mapping(
                 new_mapping.mapping_to_file()
 
         else:
-            raise click.BadParameter(
+            raise click.UsageError(
                 "Multiple --to mappings mode is not implemented yet."
             )
 

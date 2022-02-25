@@ -14,21 +14,24 @@ We accomplish that in two ways:
  - the file name has a "z" so it sorts last when "./run.py all" uses LOADER.discover()
 """
 
-from unittest import main, TestCase
+import json
 import os
 import tempfile
+from pathlib import Path
+from unittest import TestCase, main
 
 from g2p.app import APP
-from g2p.cli import convert
+from g2p.cli import convert, generate_mapping
 from g2p.tests.public import PUBLIC_DIR
 
 
 class LocalConfigTest(TestCase):
     def setUp(self):
         self.runner = APP.test_cli_runner()
+        self.mappings_dir = Path(PUBLIC_DIR) / "mappings"
 
     def test_local_config(self):
-        config_path = os.path.join(PUBLIC_DIR, "mappings", "test.yaml")
+        config_path = self.mappings_dir / "test.yaml"
         result = self.runner.invoke(
             convert,
             ["bbbb", "local-config-in", "local-config-out", "--config", config_path,],
@@ -47,7 +50,7 @@ class LocalConfigTest(TestCase):
 
         # This test incidentally exercises passing --config a config file with
         # only one mapping in it, without the top-level "mappings:" list.
-        tok_config = os.path.join(PUBLIC_DIR, "mappings", "tokenize_punct_config.yaml")
+        tok_config = self.mappings_dir / "tokenize_punct_config.yaml"
         results = self.runner.invoke(
             convert, ["--tok", "--config", tok_config, "AAA-BBB", "tok-in", "tok-out"]
         )
@@ -70,7 +73,7 @@ class LocalConfigTest(TestCase):
         # cause the next rule to not get its match pattern created, and raise
         # an exception later. The null.csv mapping has such an empty rule,
         # which should get ignored, with the next rule, d->e, still working.
-        null_config = os.path.join(PUBLIC_DIR, "mappings", "null_config.yaml")
+        null_config = self.mappings_dir / "null_config.yaml"
         results = self.runner.invoke(
             convert, ["--config", null_config, "x-ad-x", "null-in", "null-out"]
         )
@@ -79,9 +82,7 @@ class LocalConfigTest(TestCase):
 
     def test_case_feeding_mapping(self):
         """Exercise the mapping using case to prevent feeding on in/out but not context"""
-        case_feeding_config = os.path.join(
-            PUBLIC_DIR, "mappings", "case-feed", "config.yaml"
-        )
+        case_feeding_config = self.mappings_dir / "case-feed" / "config.yaml"
         results = self.runner.invoke(
             convert,
             [
@@ -126,6 +127,67 @@ class LocalConfigTest(TestCase):
                 "Cannot load abbreviations data file",
                 results.output + str(results.exception),
             )
+
+    def test_generate_mapping(self):
+        """Use a local config to test generate mapping with --from and --to"""
+        # This test is rather hacky, because it relies on the fact that calling
+        # g2p convert --config loads a config and keeps it in memory for the rest
+        # of the unit tests. While that's a potential bug for testing g2p update,
+        # and the very reason this file is called test_z_..., forcing it to be
+        # called last, we're using it as a feature here.
+
+        # It would be better to have a proper function to load in additional
+        # mappings from a given config file, but right now that's not
+        # implemented, and I don't want to make that a requirement for testing
+        # "g2p generate-mapping --from/--to", so it'll have to wait.
+        # TODO: write a internal load_from_config() function, or some such, and
+        # factor out the repeated code to use it.
+
+        mappings_dir = Path(PUBLIC_DIR) / "mappings"
+        # This first case has the side effect of loading gen-map_config.yaml
+        config_path = mappings_dir / "gen-map_config.yaml"
+        result = self.runner.invoke(
+            convert, ["uyoesnmklbdt", "gm2", "gm2-ipa", "--config", config_path],
+        )
+        self.assertIn("uyɔɛsnmklbdt", result.stdout)
+        # This second case confirms that gen-map_config.yaml is still loaded
+        result = self.runner.invoke(convert, ["uyoesnmklbdt", "gm3a", "gm3-ipa"])
+        self.assertIn("uyoesnmklbdt", result.stdout)
+
+        # Now we do the real tests
+        # TODO: use a temporary directory instead of this hard-coded one.
+        output_dir = Path(".") / "gen-map-tests"
+        output_dir.mkdir(exist_ok=True)
+
+        # 1 mapping in to 1 mapping out
+        result = self.runner.invoke(
+            generate_mapping, ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir]
+        )
+        self.assertEqual(result.exit_code, 0)
+        with open(mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
+            ref = json.load(f)
+        with open(output_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
+            output = json.load(f)
+        self.assertEqual(output, ref)
+
+        # 2 mappings in to 1 mapping out
+        result = self.runner.invoke(
+            generate_mapping, ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir]
+        )
+        self.assertEqual(result.exit_code, 0)
+        with open(mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
+            ref = json.load(f)
+        with open(output_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
+            output = json.load(f)
+        self.assertEqual(output, ref)
+
+        # 1 mapping in to 2 mappings out
+        result = self.runner.invoke(
+            generate_mapping, ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir]
+        )
+        print(result.output)
+        self.assertNotEqual(result.exit_code, 0)
+        # TODO Fix the code to support this config, and then assert something about the mapping
 
 
 if __name__ == "__main__":
