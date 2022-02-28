@@ -84,7 +84,7 @@ class ResourceIntegrationTest(TestCase):
         Ensure conversion returns proper response
         '''
         params = {'in-lang': 'dan', 'out-lang': 'eng-arpabet',
-                  'text': "hej", 'debugger': True, 'index': True}
+                  'text': "hej", 'debugger': True, 'index': False}
         bad_params = {'in-lang': 'dan', 'out-lang': 'moh', 'text': "hej"}
         missing_params = {'in-lang': 'not-here',
                           'out-lang': 'eng-arpabet', 'text': "hej"}
