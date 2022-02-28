@@ -2,7 +2,6 @@
 """
 import os
 import json
-from distutils.util import strtobool
 
 from flask import Blueprint, abort
 from flask_restful import Resource, Api, reqparse, inputs
