@@ -84,7 +84,9 @@ class ResourceIntegrationTest(TestCase):
         Ensure conversion returns proper response
         '''
         params = {'in-lang': 'dan', 'out-lang': 'eng-arpabet',
-                  'text': "hej", 'debugger': True, 'index': False}
+                  'text': "hej", 'debugger': True, 'index': True}
+        minimal_params = {'in-lang': 'dan', 'out-lang': 'eng-arpabet',
+                  'text': "hej", 'debugger': False, 'index': False}
         bad_params = {'in-lang': 'dan', 'out-lang': 'moh', 'text': "hej"}
         missing_params = {'in-lang': 'not-here',
                           'out-lang': 'eng-arpabet', 'text': "hej"}
@@ -96,6 +98,12 @@ class ResourceIntegrationTest(TestCase):
             data = json.load(f)
         self.assertEqual(
             res_json, data)
+        # check minimal response
+        minimal_response = self.client().get(self.conversion_route, query_string=minimal_params)
+        data['debugger'] = False
+        data['index'] = False
+        self.assertEqual(minimal_response.status_code, 200)
+        self.assertEqual(minimal_response.get_json(), data)
         bad_response = self.client().get(self.conversion_route, query_string=bad_params)
         self.assertEqual(bad_response.status_code, 400)
         missing_response = self.client().get(
