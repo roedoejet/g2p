@@ -155,42 +155,45 @@ class LocalConfigTest(TestCase):
         self.assertIn("uyoesnmklbdt", result.stdout)
 
         # Now we do the real tests
-        # TODO: use a temporary directory instead of this hard-coded one.
-        output_dir = Path(".") / "gen-map-tests"
-        output_dir.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir)
 
-        # 1 mapping in to 1 mapping out
-        result = self.runner.invoke(
-            generate_mapping, ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir]
-        )
-        self.assertEqual(result.exit_code, 0)
-        with open(mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
-            ref = json.load(f)
-        with open(output_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
-            output = json.load(f)
-        self.assertEqual(output, ref)
+            # for debugging:
+            # output_dir = Path(".") / "gen-map-tests"
+            # output_dir.mkdir(exist_ok=True)
 
-        # 2 mappings in to 1 mapping out
-        result = self.runner.invoke(
-            generate_mapping, ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir]
-        )
-        self.assertEqual(result.exit_code, 0)
-        with open(mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
-            ref = json.load(f)
-        with open(output_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
-            output = json.load(f)
-        self.assertEqual(output, ref)
+            # 1 mapping in to 1 mapping out
+            result = self.runner.invoke(
+                generate_mapping, ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir]
+            )
+            self.assertEqual(result.exit_code, 0)
+            with open(mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
+                ref = json.load(f)
+            with open(output_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
+                output = json.load(f)
+            self.assertEqual(output, ref)
 
-        # 1 mapping in to 2 mappings out
-        result = self.runner.invoke(
-            generate_mapping, ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir]
-        )
-        self.assertEqual(result.exit_code, 0)
-        with open(mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
-            ref = json.load(f)
-        with open(output_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
-            output = json.load(f)
-        self.assertEqual(output, ref)
+            # 2 mappings in to 1 mapping out
+            result = self.runner.invoke(
+                generate_mapping, ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir]
+            )
+            self.assertEqual(result.exit_code, 0)
+            with open(mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
+                ref = json.load(f)
+            with open(output_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
+                output = json.load(f)
+            self.assertEqual(output, ref)
+
+            # 1 mapping in to 2 mappings out
+            result = self.runner.invoke(
+                generate_mapping, ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir]
+            )
+            self.assertEqual(result.exit_code, 0)
+            with open(mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
+                ref = json.load(f)
+            with open(output_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
+                output = json.load(f)
+            self.assertEqual(output, ref)
 
 
 if __name__ == "__main__":
