@@ -23,6 +23,7 @@ from g2p.log import LOGGER
 from g2p.mappings.langs import LANGS, MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
 from g2p.mappings.utils import (
+    CompactJSONMappingEncoder,
     IndentDumper,
     create_fixed_width_lookbehind,
     escape_special_characters,
@@ -447,7 +448,7 @@ class Mapping:
         ]
         if file_type == "json":
             with open(fn, "w", encoding="utf8") as f:
-                json.dump(filtered, f, indent=4, ensure_ascii=False)
+                json.dump(filtered, f, indent=4, ensure_ascii=False, cls=CompactJSONMappingEncoder)
         elif file_type == "csv":
             with open(fn, "w", encoding="utf8") as f:
                 writer = csv.DictWriter(f, fieldnames=fieldnames)

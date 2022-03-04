@@ -446,3 +446,39 @@ def get_unicode_category(c):
     cat = ud.category(c)
     assert cat in CATEGORIES
     return CATEGORIES[cat]
+
+
+class CompactJSONMappingEncoder(json.JSONEncoder):
+    """A JSON Encoder that puts individual rules on a single line.
+
+    This way, it's easy to look at a generated mapping visually.
+
+    This code is adapted from https://stackoverflow.com/questions/16264515/json-dumps-custom-formatting
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.indentation_level = 0
+
+    def encode(self, obj):
+        if isinstance(obj, dict) and "in" in obj and "out" in obj:
+            # Compact, single-line output for the individual rules in the mapping
+            return json.dumps(obj, ensure_ascii=self.ensure_ascii)
+        elif isinstance(obj, (list, tuple)):
+            self.indentation_level += 1
+            output = [self.indent_str + self.encode(el) for el in obj]
+            self.indentation_level -= 1
+            return "[\n" + ",\n".join(output) + "\n" + self.indent_str + "]"
+        elif isinstance(obj, dict):
+            self.indentation_level += 1
+            output = [self.indent_str + f"{json.dumps(k)}: {self.encode(v)}" for k, v in obj.items()]
+            self.indentation_level -= 1
+            return "{\n" + ",\n".join(output) + "\n" + self.indent_str + "}"
+        else:
+            return json.dumps(obj, ensure_ascii=self.ensure_ascii)
+
+    @property
+    def indent_str(self) -> str:
+        return " " * self.indentation_level * self.indent
+
+    def iterencode(self, obj, **kwargs):
+        return self.encode(obj)
