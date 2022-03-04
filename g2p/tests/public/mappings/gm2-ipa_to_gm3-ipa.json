@@ -1,0 +1,6 @@
+[
+    {"in": "ɛ", "out": "i", "context_before": "", "context_after": ""},
+    {"in": "ɔ", "out": "o", "context_before": "", "context_after": ""},
+    {"in": "d", "out": "s", "context_before": "", "context_after": ""},
+    {"in": "n", "out": "m", "context_before": "", "context_after": ""}
+]

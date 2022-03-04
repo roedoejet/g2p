@@ -18,7 +18,7 @@ from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
 )
-from g2p.mappings.create_ipa_mapping import create_mapping
+from g2p.mappings.create_ipa_mapping import create_mapping, create_multi_mapping
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
@@ -358,36 +358,14 @@ def generate_mapping(
                 f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]},{in_or_out}'
             )
 
-        if len(to_mappings) == 1:
-            to_mapping, to_in_or_out = to_mappings[0]
-            new_mapping = create_mapping(
-                mapping_1=from_mappings[0][0],
-                mapping_2=to_mapping,
-                mapping_1_io=from_mappings[0][1],
-                mapping_2_io=to_in_or_out,
-            )
-            for from_mapping, from_in_or_out in from_mappings[1:]:
-                new_mapping.extend(
-                    create_mapping(
-                        mapping_1=from_mapping,
-                        mapping_2=to_mapping,
-                        mapping_1_io=from_in_or_out,
-                        mapping_2_io=to_in_or_out,
-                    )
-                )
-            new_mapping.deduplicate()
+        new_mapping = create_multi_mapping(from_mappings, to_mappings)
 
-            if out_dir:
-                new_mapping.config_to_file(out_dir)
-                new_mapping.mapping_to_file(out_dir)
-            else:
-                new_mapping.config_to_file()
-                new_mapping.mapping_to_file()
-
+        if out_dir:
+            new_mapping.config_to_file(out_dir)
+            new_mapping.mapping_to_file(out_dir)
         else:
-            raise click.UsageError(
-                "Multiple --to mappings mode is not implemented yet."
-            )
+            new_mapping.config_to_file()
+            new_mapping.mapping_to_file()
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))

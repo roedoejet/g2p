@@ -185,9 +185,12 @@ class LocalConfigTest(TestCase):
         result = self.runner.invoke(
             generate_mapping, ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir]
         )
-        print(result.output)
-        self.assertNotEqual(result.exit_code, 0)
-        # TODO Fix the code to support this config, and then assert something about the mapping
+        self.assertEqual(result.exit_code, 0)
+        with open(mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
+            ref = json.load(f)
+        with open(output_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
+            output = json.load(f)
+        self.assertEqual(output, ref)
 
 
 if __name__ == "__main__":

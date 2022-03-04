@@ -14,6 +14,7 @@
 ######################################################################
 
 from tqdm import tqdm
+from typing import Iterable, List, Tuple
 
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
@@ -60,6 +61,54 @@ def process_characters(inv, is_xsampa=False):
 ###################################
 
 
+def deduplicate_list(iterable: Iterable) -> List:
+    """Deduplicate the input iterable and return the result as a list"""
+    return list({v: v for v in iterable}.values())
+
+
+def create_multi_mapping(src_mappings: List[Tuple[Mapping, str]], tgt_mappings: List[Tuple[Mapping, str]]) -> Mapping:
+    """Create a mapping for a set of source mappings to a set of target mappings
+
+    Each src/tgt mappings is a (mapping: Mapping, in_or_out: str) pair specifying
+    the mapping to use and whether its input ("in") or output ("out") inventory
+    should be used to create the new mapping.
+
+    The name of the mapping is infered from src_mappings[0] and tgt_mappings[0]'s
+    metadata.
+    """
+
+    map_1_name = src_mappings[0][0].kwargs[f"{src_mappings[0][1]}_lang"]
+    map_2_name = tgt_mappings[0][0].kwargs[f"{tgt_mappings[0][1]}_lang"]
+
+    src_inventory = []
+    for (mapping, io) in src_mappings:
+        name = mapping.kwargs[f"{io}_lang"]
+        if not is_ipa(name):
+            LOGGER.warning("Unsupported orthography of src inventory: %s; must be IPA", name)
+        src_inventory.extend(mapping.inventory(io))
+    src_inventory = deduplicate_list(src_inventory)
+
+    tgt_inventory = []
+    for (mapping, io) in tgt_mappings:
+        name = mapping.kwargs[f"{io}_lang"]
+        if not is_ipa(name):
+            LOGGER.warning("Unsupported orthography of tgt inventory: %s; must be IPA", name)
+        tgt_inventory.extend(mapping.inventory(io))
+    tgt_inventory = deduplicate_list(tgt_inventory)
+
+    mapping = align_inventories(src_inventory, tgt_inventory)
+
+    config = {
+        "in_lang": map_1_name,
+        "out_lang": map_2_name,
+        "rule_ordering": "apply-longest-first",
+        "mapping": mapping,
+        "prevent_feeding": True,
+    }
+
+    return Mapping(**config)
+
+
 def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = 'out', mapping_2_io: str = 'in') -> Mapping:
     """Create a mapping from mapping_1's output inventory to mapping_2's input inventory"""
 
@@ -87,6 +136,7 @@ def create_mapping(mapping_1: Mapping, mapping_2: Mapping, mapping_1_io: str = '
         del config['display_name']
     if 'language_name' in config:
         del config['language_name']
+    config['prevent_feeding'] = True
     config['in_lang'] = map_1_name
     config['out_lang'] = map_2_name
     config['mapping'] = mapping
