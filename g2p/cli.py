@@ -176,37 +176,45 @@ def generate_mapping(
 
           g2p generate-mapping --list-dummy
 
-        General IPA to IPA mode:
+        From/to IPA mode:
 
           g2p generate-mapping --from FROM_L1[:FROM_L2[:...]] --to TO_L1[:TO_L2[:...]]
 
-          Generate a mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to the
-          union of TO_L1-ipa, TO-L2-ipa, etc.
-
-          Syntax for specifying FROM_Ln and TO_Ln:
+          Generate an IPA mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to
+          the union of TO_L1-ipa, TO-L2-ipa, etc.
 
           \b
-            lang:
+          Sample usage:
+            Generate a mapping from kwk-ipa to moh-ipa based on all mappings into
+            kwk-ipa and moh-ipa:
+                g2p generate-mapping --from kwk --to moh
+            Generate a mapping from eng-ipa to crg-ipa based only on crg-dv -> crg-ipa:
+                g2p generate-mapping --from eng --to crg-dv_to_crg-ipa
+
+          Full syntax for specifying FROM_Ln and TO_Ln:
+
+          \b
+            lang (i.e., 3-letter code):
              - If there is only one mapping into lang-ipa, "lang" refers to the output
                of that mapping, e.g., "fra" means "fra_to_fra-ipa,out".
              - If there are several mappings into lang-ipa, "lang" refers to the union
                of the outputs of those mappings, e.g., "moh" means the union of
                "moh-equiv_to_moh-ipa,out" and "moh-festival_to_moh-ipa,out".
-             - It is an error if there is no mapping into lang-ipa.
+             - It is an error if there are no mappings into lang-ipa.
              - Only mappings from non-IPA to IPA are considered (i.e., IPA-to-IPA
                mappings created by this command will not be included: use the longer
                syntax below if you want to use them).
              - Special case: "eng" refers to "eng-ipa_to_eng-arpabet,in".
             in-lang_to_out-lang[,in|,out]:
-             - This expanded syntax is used to avoid the union, when it is not
-               desired, e.g., "moh-equiv_to_moh-ipa" only refers to
+             - This expanded syntax is used to avoid the union when it is not
+               desired, e.g., "moh-equiv_to_moh-ipa" refers only to
                "moh-equiv_to_moh-ipa,out" rather than the union "moh" represents.
-             - If out-lang is IPA, ,out is assumed; else if in-lang is IPA, ,in is
+             - If out-lang is IPA, ",out" is assumed; else if in-lang is IPA, ",in" is
                assumed; it is an error if neither language is IPA.
-             - Specify ,in or ,out to override the above default.
-             - Note: "_to_" here is the joiner used to specify "the mapping from
-               'in-lang' to 'out-lang'" in the g2p network, regardless of the name of
-               the file it is stored in.
+             - Specify ",in" or ",out" to override the above default.
+             - "_to_" is the joiner used to specify "the mapping from 'in-lang' to
+               'out-lang'" in the g2p network, regardless of the name of the file
+               it is stored in.
 
         If you just modified or created the mappings from which the new mapping is
         to be generated, don't forget to call "g2p update" first, so that "g2p
@@ -215,11 +223,10 @@ def generate_mapping(
         Call "g2p update" again after calling "g2p generate-mapping" to compile the
         newly generated mapping and make it available.
 
-        Note: at least one of --ipa, --dummy, --from/--to, or --list-dummy is required.
+        Note: exactly one of --ipa, --dummy, --from/--to, or --list-dummy is required.
 
         You can list available mappings with "g2p doctor --list-ipa", or by visiting
         http://g2p-studio.herokuapp.com/api/v1/langs .
-
     """
 
     # Make sure only one mode was specified on the command line
