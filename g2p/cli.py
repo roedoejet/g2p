@@ -28,6 +28,7 @@ PRINTER = pprint.PrettyPrinter(indent=4)
 
 
 def create_app():
+    """Return the flask app for g2p"""
     return APP
 
 
@@ -46,8 +47,8 @@ def parse_from_or_to_lang_spec(lang_spec):
     Raises:
         click.BadParameter if lang_spec is not valid
     """
-    mapping_spec, comma, in_or_out = lang_spec.partition(",")
-    in_lang, _to_, out_lang = mapping_spec.partition("_to_")
+    mapping_spec, _, in_or_out = lang_spec.partition(",")
+    in_lang, _, out_lang = mapping_spec.partition("_to_")
 
     if out_lang:
         try:
@@ -63,7 +64,8 @@ def parse_from_or_to_lang_spec(lang_spec):
                 in_or_out = "in"
             else:
                 raise click.BadParameter(
-                    f'Cannot guess in/out for IPA lang spec "{lang_spec}" because neither {in_lang} nor {out_lang} is IPA. Specify ",in" or ",out" if you are sure it is correct.'
+                    f'Cannot guess in/out for IPA lang spec "{lang_spec}" because neither {in_lang} '
+                    f'nor {out_lang} is IPA. Specify ",in" or ",out" if you are sure it is correct.'
                 )
         if in_or_out not in ("in", "out"):
             raise click.BadParameter(
@@ -74,7 +76,8 @@ def parse_from_or_to_lang_spec(lang_spec):
     else:
         if in_or_out:
             raise click.BadParameter(
-                f'Bad IPA lang spec "{lang_spec}": the ,in/,out option is only supported with the full in-lang_to_out-lang[,in][,out] syntax.'
+                f'Bad IPA lang spec "{lang_spec}": the ,in/,out option is only '
+                "supported with the full in-lang_to_out-lang[,in][,out] syntax."
             )
         if in_lang == "eng":
             mapping = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
@@ -84,13 +87,13 @@ def parse_from_or_to_lang_spec(lang_spec):
             out_lang = in_lang + "-ipa"
             # check_ipa_known_segs([out_lang])  # this outputs a lot of spurious noise...
             mappings = [
-                Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+                (Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"]), "out")
                 for m in MAPPINGS_AVAILABLE
-                if m["out_lang"] == out_lang
+                if m["out_lang"] == out_lang and not is_ipa(m["in_lang"])
             ]
             if not mappings:
                 raise click.BadParameter(f'No IPA mappings found for "{lang_spec}".')
-            return [(mapping, "out") for mapping in mappings]
+            return mappings
 
 
 @click.version_option(version=VERSION, prog_name="g2p")
@@ -375,6 +378,7 @@ def generate_mapping(
             new_mapping.mapping_to_file()
 
 
+# TODO the path argument is ignored. What was it supposed to do? Code it...
 @click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping_network(path):
@@ -478,8 +482,9 @@ def convert(
             mappings_legal_pairs.append((mapping["in_lang"], mapping["out_lang"]))
         for pair in mappings_legal_pairs:
             if pair[0] in LANGS_NETWORK.nodes:
-                LOGGER.warn(
-                    f"A mapping with the name '{pair[0]}' is already defined in g2p. Your local mapping with the same name might not function properly."
+                LOGGER.warning(
+                    f"A mapping with the name '{pair[0]}' is already defined in g2p. "
+                    "Your local mapping with the same name might not function properly."
                 )
         LANGS_NETWORK.add_edges_from(mappings_legal_pairs)
         MAPPINGS_AVAILABLE.extend(data["mappings"])
@@ -545,7 +550,7 @@ def doctor(mapping, list_all, list_ipa):
         http://g2p-studio.herokuapp.com/api/v1/langs .
     """
     if list_all or list_ipa:
-        out_langs = sorted(set([x["out_lang"] for x in MAPPINGS_AVAILABLE]))
+        out_langs = sorted({x["out_lang"] for x in MAPPINGS_AVAILABLE})
         if list_ipa:
             out_langs = [x for x in out_langs if is_ipa(x)]
         LOGGER.info(
@@ -556,7 +561,7 @@ def doctor(mapping, list_all, list_ipa):
             print(
                 ("\n" + " " * len(m) + "  ").join(
                     sorted(
-                        [x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m]
+                        x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m
                     )
                 )
             )
