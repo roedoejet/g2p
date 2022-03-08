@@ -69,7 +69,9 @@ def parse_from_or_to_lang_spec(lang_spec):
                 )
         if in_or_out not in ("in", "out"):
             raise click.BadParameter(
-                f'Invalid IPA language specification "{lang_spec}": only "in" or "out" is allowed after the comma.'
+                f'Invalid IPA language specification "{lang_spec}": only "in" or "out" '
+                "is allowed after the comma, to disambiguate between input or output "
+                "inventory when necessary."
             )
         return [(mapping, in_or_out)]
 
@@ -208,6 +210,8 @@ def generate_mapping(
                mappings created by this command will not be included: use the longer
                syntax below if you want to use them).
              - Special case: "eng" refers to "eng-ipa_to_eng-arpabet,in".
+
+          \b
             in-lang_to_out-lang[,in|,out]:
              - This expanded syntax is used to avoid the union when it is not
                desired, e.g., "moh-equiv_to_moh-ipa" refers only to
