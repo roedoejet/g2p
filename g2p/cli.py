@@ -47,7 +47,7 @@ def parse_from_or_to_lang_spec(lang_spec):
     Raises:
         click.BadParameter if lang_spec is not valid
     """
-    mapping_spec, _, in_or_out = lang_spec.partition(",")
+    mapping_spec, _, in_or_out = lang_spec.partition(";")
     in_lang, _, out_lang = mapping_spec.partition("_to_")
 
     if out_lang:
@@ -65,12 +65,12 @@ def parse_from_or_to_lang_spec(lang_spec):
             else:
                 raise click.BadParameter(
                     f'Cannot guess in/out for IPA lang spec "{lang_spec}" because neither {in_lang} '
-                    f'nor {out_lang} is IPA. Specify ",in" or ",out" if you are sure it is correct.'
+                    f'nor {out_lang} is IPA. Specify ";in" or ";out" if you are sure it is correct.'
                 )
         if in_or_out not in ("in", "out"):
             raise click.BadParameter(
                 f'Invalid IPA language specification "{lang_spec}": only "in" or "out" '
-                "is allowed after the comma, to disambiguate between input or output "
+                "is allowed after the semicolon, to disambiguate between input or output "
                 "inventory when necessary."
             )
         return [(mapping, in_or_out)]
@@ -78,8 +78,8 @@ def parse_from_or_to_lang_spec(lang_spec):
     else:
         if in_or_out:
             raise click.BadParameter(
-                f'Bad IPA lang spec "{lang_spec}": the ,in/,out option is only '
-                "supported with the full in-lang_to_out-lang[,in][,out] syntax."
+                f'Bad IPA lang spec "{lang_spec}": the ;in/;out option is only '
+                "supported with the full in-lang_to_out-lang[;in][;out] syntax."
             )
         if in_lang == "eng":
             mapping = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
@@ -113,13 +113,13 @@ def cli():
     "--to",
     "to_langs",
     default=None,
-    help="Colon-separated list of to languages in from/to mode",
+    help="Colon- or comma-separated list of to languages in from/to mode",
 )
 @click.option(
     "--from",
     "from_langs",
     default=None,
-    help="Colon-separated list of from languages in from/to mode",
+    help="Colon- or comma-separated list of from languages in from/to mode",
 )
 @click.option(
     "--list-dummy", default=False, is_flag=True, help="List the dummy phone inventory."
@@ -212,13 +212,13 @@ def generate_mapping(
              - Special case: "eng" refers to "eng-ipa_to_eng-arpabet,in".
 
           \b
-            in-lang_to_out-lang[,in|,out]:
+            in-lang_to_out-lang[;in|;out]:
              - This expanded syntax is used to avoid the union when it is not
                desired, e.g., "moh-equiv_to_moh-ipa" refers only to
                "moh-equiv_to_moh-ipa,out" rather than the union "moh" represents.
-             - If out-lang is IPA, ",out" is assumed; else if in-lang is IPA, ",in" is
+             - If out-lang is IPA, ";out" is assumed; else if in-lang is IPA, ";in" is
                assumed; it is an error if neither language is IPA.
-             - Specify ",in" or ",out" to override the above default.
+             - Specify ";in" or ";out" to override the above default.
              - "_to_" is the joiner used to specify "the mapping from 'in-lang' to
                'out-lang'" in the g2p network, regardless of the name of the file
                it is stored in.
@@ -348,10 +348,10 @@ def generate_mapping(
         assert to_langs is not None
 
         from_mappings = []
-        for from_lang in from_langs.split(":"):
+        for from_lang in re.split(r"[:,]", from_langs):
             from_mappings.extend(parse_from_or_to_lang_spec(from_lang))
         to_mappings = []
-        for to_lang in to_langs.split(":"):
+        for to_lang in re.split(r"[:,]", to_langs):
             to_mappings.extend(parse_from_or_to_lang_spec(to_lang))
 
         if not from_mappings:
