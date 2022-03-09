@@ -47,7 +47,8 @@ def parse_from_or_to_lang_spec(lang_spec):
     Raises:
         click.BadParameter if lang_spec is not valid
     """
-    mapping_spec, _, in_or_out = lang_spec.partition(";")
+    mapping_spec, _, in_or_out = lang_spec.partition("[")
+    in_or_out.rstrip("]")
     in_lang, _, out_lang = mapping_spec.partition("_to_")
 
     if out_lang:
@@ -65,7 +66,7 @@ def parse_from_or_to_lang_spec(lang_spec):
             else:
                 raise click.BadParameter(
                     f'Cannot guess in/out for IPA lang spec "{lang_spec}" because neither {in_lang} '
-                    f'nor {out_lang} is IPA. Specify ";in" or ";out" if you are sure it is correct.'
+                    f'nor {out_lang} is IPA. Specify "[in]" or "[out]" if you are sure it is correct.'
                 )
         if in_or_out not in ("in", "out"):
             raise click.BadParameter(
@@ -78,8 +79,8 @@ def parse_from_or_to_lang_spec(lang_spec):
     else:
         if in_or_out:
             raise click.BadParameter(
-                f'Bad IPA lang spec "{lang_spec}": the ;in/;out option is only '
-                "supported with the full in-lang_to_out-lang[;in][;out] syntax."
+                f'Bad IPA lang spec "{lang_spec}": the [in]/[out] qualifier is only '
+                "supported with the full in-lang_to_out-lang[[in]|[out]] syntax."
             )
         if in_lang == "eng":
             mapping = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
@@ -113,13 +114,13 @@ def cli():
     "--to",
     "to_langs",
     default=None,
-    help="Colon- or comma-separated list of to languages in from/to mode",
+    help='Colon- or comma-separated list of "to" languages in from/to mode',
 )
 @click.option(
     "--from",
     "from_langs",
     default=None,
-    help="Colon- or comma-separated list of from languages in from/to mode",
+    help='Colon- or comma-separated list of "from" languages in from/to mode',
 )
 @click.option(
     "--list-dummy", default=False, is_flag=True, help="List the dummy phone inventory."
@@ -152,20 +153,21 @@ def generate_mapping(
 ):
     """ Generate a new mapping from existing mappings in the g2p system.
 
-        This command has different modes of operation:
+        This command has different modes of operation.
 
         Standard mode:
 
           g2p generate-mapping [--dummy|--ipa] IN_LANG [OUT_LANG]
 
           For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
-          or from IN_LANG-ipa to a dummy minimalist phone inventory.
-          This assumes the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping
-          from its output inventory.
+          or from IN_LANG-ipa to a dummy minimalist phone inventory. This assumes
+          the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping from its
+          output inventory.
 
-          To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping following a
-          different patterns, e.g., from crl-equiv -> crl-ipa, specify both IN_LANG
-          (crl-equiv in this example) and OUT_LANG (crl-ipa in this example).
+          To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping
+          following a different patterns, e.g., from crl-equiv -> crl-ipa, specify
+          both IN_LANG (crl-equiv in this example) and OUT_LANG (crl-ipa in this
+          example).
 
           \b
           Sample usage:
@@ -173,8 +175,8 @@ def generate_mapping(
                 g2p generate-mapping --ipa alq
             Generate Mohawk IPA to English IPA from moh-equiv -> moh-ipa:
                 g2p generate-mapping --ipa moh-equiv moh-ipa
-            Generate Michif IPA to English IPA from the union of crg-dv ->
-            crg-ipa and crg-tmd -> crg-ipa:
+            Generate Michif IPA to English IPA from the union of crg-dv -> crg-ipa
+            and crg-tmd -> crg-ipa:
                 g2p generate-mapping --ipa --merge crg-dv:crg-tmd crg-ipa
 
         List the dummy inventory used by --dummy:
@@ -183,42 +185,50 @@ def generate_mapping(
 
         From/to IPA mode:
 
-          g2p generate-mapping --from FROM_L1[:FROM_L2[:...]] --to TO_L1[:TO_L2[:...]]
+        \b
+          g2p generate-mapping --from FROM_L1 --to TO_L1
+          g2p generate-mapping --from FROM_L1:FROM_L2:... --to TO_L1:TO_L2:...
 
           Generate an IPA mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to
-          the union of TO_L1-ipa, TO-L2-ipa, etc.
+          the union of TO_L1-ipa, TO-L2-ipa, etc. One or more from/to language
+          code(s) can be specified in colon- or comma-separated lists.
 
-          \b
+        \b
           Sample usage:
             Generate a mapping from kwk-ipa to moh-ipa based on all mappings into
             kwk-ipa and moh-ipa:
                 g2p generate-mapping --from kwk --to moh
             Generate a mapping from eng-ipa to crg-ipa based only on crg-dv -> crg-ipa:
                 g2p generate-mapping --from eng --to crg-dv_to_crg-ipa
+            Generate a mapping from kwk-ipa to moh-ipa+crg-ipa+eng-ipa based on
+            all mappings into kwk-ipa (from side) and the union of all mappings
+            into moh-ipa and crg-ipa plus eng-ipa_to_eng-arpabet (to side):
+                g2p generate-mapping --from kwk --to moh:crg:eng
 
           Full syntax for specifying FROM_Ln and TO_Ln:
 
           \b
             lang (i.e., 3-letter code):
-             - If there is only one mapping into lang-ipa, "lang" refers to the output
-               of that mapping, e.g., "fra" means "fra_to_fra-ipa,out".
-             - If there are several mappings into lang-ipa, "lang" refers to the union
-               of the outputs of those mappings, e.g., "moh" means the union of
-               "moh-equiv_to_moh-ipa,out" and "moh-festival_to_moh-ipa,out".
+             - If there is only one mapping into lang-ipa, "lang" refers to the
+               output of that mapping, e.g., "fra" means "fra_to_fra-ipa[out]".
+             - If there are several mappings into lang-ipa, "lang" refers to the
+               union of the outputs of those mappings, e.g., "moh" means the union
+               of "moh-equiv_to_moh-ipa[out]" and "moh-festival_to_moh-ipa[out]".
              - It is an error if there are no mappings into lang-ipa.
              - Only mappings from non-IPA to IPA are considered (i.e., IPA-to-IPA
-               mappings created by this command will not be included: use the longer
-               syntax below if you want to use them).
-             - Special case: "eng" refers to "eng-ipa_to_eng-arpabet,in".
+               mappings created by this command will not be included: use the
+               longer syntax below if you want to use them).
+             - Special case: "eng" refers to "eng-ipa_to_eng-arpabet[in]".
 
           \b
-            in-lang_to_out-lang[;in|;out]:
+            in-lang_to_out-lang[[in]|[out]]:
              - This expanded syntax is used to avoid the union when it is not
                desired, e.g., "moh-equiv_to_moh-ipa" refers only to
                "moh-equiv_to_moh-ipa,out" rather than the union "moh" represents.
-             - If out-lang is IPA, ";out" is assumed; else if in-lang is IPA, ";in" is
-               assumed; it is an error if neither language is IPA.
-             - Specify ";in" or ";out" to override the above default.
+             - If out-lang is IPA, the output inventory is used; else if in-lang
+               is IPA, the input inventory is used; it is an error if neither
+               language is IPA.
+             - Specify "[in]" or "[out]" to override the above default.
              - "_to_" is the joiner used to specify "the mapping from 'in-lang' to
                'out-lang'" in the g2p network, regardless of the name of the file
                it is stored in.
@@ -227,13 +237,14 @@ def generate_mapping(
         to be generated, don't forget to call "g2p update" first, so that "g2p
         generate-mapping" can see the latest version.
 
-        Call "g2p update" again after calling "g2p generate-mapping" to compile the
-        newly generated mapping and make it available.
+        Call "g2p update" again after calling "g2p generate-mapping" to compile
+        the newly generated mapping and make it available.
 
-        Note: exactly one of --ipa, --dummy, --from/--to, or --list-dummy is required.
+        Note: exactly one of --ipa, --dummy, --from/--to, or --list-dummy is
+        required.
 
-        You can list available mappings with "g2p doctor --list-ipa", or by visiting
-        http://g2p-studio.herokuapp.com/api/v1/langs .
+        You can list available mappings with "g2p doctor --list-ipa", or by
+        visiting http://g2p-studio.herokuapp.com/api/v1/langs .
     """
 
     # Make sure only one mode was specified on the command line
@@ -365,11 +376,11 @@ def generate_mapping(
 
         for from_mapping, in_or_out in from_mappings:
             LOGGER.info(
-                f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]},{in_or_out}'
+                f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]}[{in_or_out}]'
             )
         for to_mapping, in_or_out in to_mappings:
             LOGGER.info(
-                f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]},{in_or_out}'
+                f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]}[{in_or_out}]'
             )
 
         new_mapping = create_multi_mapping(from_mappings, to_mappings)
@@ -386,7 +397,7 @@ def generate_mapping(
 @click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def generate_mapping_network(path):
-    """ Generate a png of the network of mapping languages. Requires matplotlib.
+    """Generate a png of the network of mapping languages. Requires matplotlib.
     """
     import matplotlib.pyplot as plt
 

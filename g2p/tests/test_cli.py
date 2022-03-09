@@ -243,11 +243,11 @@ class CliTest(TestCase):
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot guess in/out for IPA lang spec", results.output)
 
-        results = self.runner.invoke(generate_mapping, "--from eng --to fra;out")
+        results = self.runner.invoke(generate_mapping, "--from eng --to fra[out]")
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("is only supported with the full", results.output)
 
-        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa;foo --to eng")
+        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa[foo] --to eng")
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("is allowed after the semicolon", results.output)
 
