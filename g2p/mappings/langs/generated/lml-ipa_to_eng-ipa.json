@@ -1,38 +1,8 @@
 [
-    {
-        "in": "ŋ",
-        "out": "ŋ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ŋɡ",
-        "out": "ŋ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɑ",
-        "out": "ɑ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɡ",
-        "out": "ɡ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɣ",
-        "out": "ɡ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɹ",
-        "out": "ɹ",
-        "context_before": "",
-        "context_after": ""
-    }
+    {"in": "ŋ", "out": "ŋ", "context_before": "", "context_after": ""},
+    {"in": "ŋɡ", "out": "ŋ", "context_before": "", "context_after": ""},
+    {"in": "ɑ", "out": "ɑ", "context_before": "", "context_after": ""},
+    {"in": "ɡ", "out": "ɡ", "context_before": "", "context_after": ""},
+    {"in": "ɣ", "out": "ɡ", "context_before": "", "context_after": ""},
+    {"in": "ɹ", "out": "ɹ", "context_before": "", "context_after": ""}
 ]
