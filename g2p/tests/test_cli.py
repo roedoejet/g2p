@@ -186,9 +186,15 @@ class CliTest(TestCase):
         # inputs than our real g2p mappings, and with predictable results.
 
         results = self.runner.invoke(generate_mapping)
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Nothing to do", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--ipa")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Missing argument", results.output)
 
         results = self.runner.invoke(generate_mapping, "fra")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn(
             "Nothing to do",
             results.output,
@@ -196,33 +202,58 @@ class CliTest(TestCase):
         )
 
         results = self.runner.invoke(generate_mapping, "--ipa foo")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Invalid value for IN_LANG", results.output)
 
         results = self.runner.invoke(generate_mapping, "--dummy fra foo")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Invalid value for OUT_LANG", results.output)
 
         results = self.runner.invoke(generate_mapping, "--ipa crl")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot find IPA mapping", results.output)
 
         results = self.runner.invoke(generate_mapping, "--ipa fra dan-ipa")
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot find IPA mapping", results.output)
 
-        results = self.runner.invoke(generate_mapping, "--list-dummy fra")
+        results = self.runner.invoke(generate_mapping, "--list-dummy")
+        self.assertEqual(results.exit_code, 0)  # this one not an error
         self.assertIn("Dummy phone inventory", results.output)
 
         results = self.runner.invoke(generate_mapping, "--ipa --dummy fra")
-        self.assertIn(
-            "Cannot do both --ipa and --dummy at the same time", results.output
-        )
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Error: Multiple modes selected", results.output)
 
         results = self.runner.invoke(
             generate_mapping, "--out-dir does-not-exist --ipa fra"
         )
+        self.assertNotEqual(results.exit_code, 0)
         self.assertIn(
             "does not exist",
             results.output,
             "Non-existent out-dir must be reported as error",
         )
+
+        results = self.runner.invoke(generate_mapping, "--from asdf")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Error: --from and --to must be used together", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa --to haa_to_haa-equiv")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Cannot guess in/out for IPA lang spec", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--from eng --to fra[out]")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("is only supported with the full", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa[foo] --to eng")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("is allowed in square brackets", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--from fra_to_eng --to eng")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Cannot find mapping", results.output)
 
 
 if __name__ == "__main__":

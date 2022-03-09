@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: GenMap
+  authors:
+    - Eric Joanis
+mappings:
+  - display_name: GenMap 1 to IPA
+    mapping: gen-map-1.csv
+    in_lang: gm1
+    out_lang: gm1-ipa
+    <<: *shared
+  - display_name: GenMap 2 to IPA
+    mapping: gen-map-2.csv
+    in_lang: gm2
+    out_lang: gm2-ipa
+    <<: *shared
+  - display_name: GenMap 3a to IPA
+    mapping: gen-map-3a.csv
+    in_lang: gm3a
+    out_lang: gm3-ipa
+  - display_name: GenMap 3b to IPA
+    mapping: gen-map-3b.csv
+    in_lang: gm3b
+    out_lang: gm3-ipa

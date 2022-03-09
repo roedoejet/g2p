@@ -1,0 +1,10 @@
+[
+    {"in": "i", "out": "ɛ", "context_before": "", "context_after": ""},
+    {"in": "o", "out": "ɔ", "context_before": "", "context_after": ""},
+    {"in": "k", "out": "d", "context_before": "", "context_after": ""},
+    {"in": "m", "out": "n", "context_before": "", "context_after": ""},
+    {"in": "u", "out": "ɔ", "context_before": "", "context_after": ""},
+    {"in": "y", "out": "ɛ", "context_before": "", "context_after": ""},
+    {"in": "s", "out": "d", "context_before": "", "context_after": ""},
+    {"in": "ɲ", "out": "n", "context_before": "", "context_after": ""}
+]

@@ -16,7 +16,7 @@ from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
 
 
-def rules_from_strings(*mapping: List[str]) -> List[dict]:
+def rules_from_strings(*mapping: str) -> List[dict]:
     """Quick pseudo constructor for unit testing of mappings"""
     rules = []
     for rule in mapping:

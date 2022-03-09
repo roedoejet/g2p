@@ -1,404 +1,69 @@
 [
-    {
-        "in": "tθʼ",
-        "out": "tθ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tθʰ",
-        "out": "tθ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "θ",
-        "out": "θ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tθ",
-        "out": "tθ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ð",
-        "out": "ð",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʈʂʼ",
-        "out": "tʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʈʂʰ",
-        "out": "tʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʈʂ",
-        "out": "tʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tɬʼ",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tɬʰ",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tɬ",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ⁿtʃ",
-        "out": "nt͡ʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʃ",
-        "out": "ʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʒ",
-        "out": "ʒ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tʃʼ",
-        "out": "tʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tʃʰ",
-        "out": "tʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "xʷ",
-        "out": "kw",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "x",
-        "out": "k",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɤʷ",
-        "out": "ʌw",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɤ",
-        "out": "ʌ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "kʰʷ",
-        "out": "kw",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "kʷ",
-        "out": "kw",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "kʼʷ",
-        "out": "kw",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "kʼ",
-        "out": "k",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʂ",
-        "out": "ʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ᵐp",
-        "out": "mp",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʐ",
-        "out": "ʒ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ts",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ⁿt",
-        "out": "nt",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tʼ",
-        "out": "t",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tsʰ",
-        "out": "ts",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "b",
-        "out": "b",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "m",
-        "out": "m",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "v",
-        "out": "v",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "w",
-        "out": "w",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tʰ",
-        "out": "t",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "t",
-        "out": "t",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "n",
-        "out": "n",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "s",
-        "out": "s",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "z",
-        "out": "z",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɻ",
-        "out": "j",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "l",
-        "out": "l",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɬ",
-        "out": "s",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "tʃ",
-        "out": "t͡ʃ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "j",
-        "out": "j",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "kʰ",
-        "out": "k",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "k",
-        "out": "k",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʔ",
-        "out": "ʔ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "h",
-        "out": "h",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "iː",
-        "out": "eː",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ĩː",
-        "out": "ẽː",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɛ̃ː",
-        "out": "ẽː",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɛː",
-        "out": "eː",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "uː",
-        "out": "u",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ũː",
-        "out": "ũ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɑː",
-        "out": "ɑ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɑ̃ː",
-        "out": "ɑ̃",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɪ̃",
-        "out": "ɪ̃",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɪ",
-        "out": "ɪ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɛ̃",
-        "out": "ɛ̃",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ɛ",
-        "out": "ɛ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʊ̃",
-        "out": "ʊ̃",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ʊ",
-        "out": "ʊ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "õ",
-        "out": "õ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "o",
-        "out": "ɔ",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ə̃",
-        "out": "ʌ̃",
-        "context_before": "",
-        "context_after": ""
-    },
-    {
-        "in": "ə",
-        "out": "ə",
-        "context_before": "",
-        "context_after": ""
-    }
+    {"in": "tθʼ", "out": "tθ", "context_before": "", "context_after": ""},
+    {"in": "tθʰ", "out": "tθ", "context_before": "", "context_after": ""},
+    {"in": "θ", "out": "θ", "context_before": "", "context_after": ""},
+    {"in": "tθ", "out": "tθ", "context_before": "", "context_after": ""},
+    {"in": "ð", "out": "ð", "context_before": "", "context_after": ""},
+    {"in": "ʈʂʼ", "out": "tʃ", "context_before": "", "context_after": ""},
+    {"in": "ʈʂʰ", "out": "tʃ", "context_before": "", "context_after": ""},
+    {"in": "ʈʂ", "out": "tʃ", "context_before": "", "context_after": ""},
+    {"in": "tɬʼ", "out": "ts", "context_before": "", "context_after": ""},
+    {"in": "tɬʰ", "out": "ts", "context_before": "", "context_after": ""},
+    {"in": "tɬ", "out": "ts", "context_before": "", "context_after": ""},
+    {"in": "ⁿtʃ", "out": "nt͡ʃ", "context_before": "", "context_after": ""},
+    {"in": "ʃ", "out": "ʃ", "context_before": "", "context_after": ""},
+    {"in": "ʒ", "out": "ʒ", "context_before": "", "context_after": ""},
+    {"in": "tʃʼ", "out": "tʃ", "context_before": "", "context_after": ""},
+    {"in": "tʃʰ", "out": "tʃ", "context_before": "", "context_after": ""},
+    {"in": "xʷ", "out": "kw", "context_before": "", "context_after": ""},
+    {"in": "x", "out": "k", "context_before": "", "context_after": ""},
+    {"in": "ɤʷ", "out": "ʌw", "context_before": "", "context_after": ""},
+    {"in": "ɤ", "out": "ʌ", "context_before": "", "context_after": ""},
+    {"in": "kʰʷ", "out": "kw", "context_before": "", "context_after": ""},
+    {"in": "kʷ", "out": "kw", "context_before": "", "context_after": ""},
+    {"in": "kʼʷ", "out": "kw", "context_before": "", "context_after": ""},
+    {"in": "kʼ", "out": "k", "context_before": "", "context_after": ""},
+    {"in": "ʂ", "out": "ʃ", "context_before": "", "context_after": ""},
+    {"in": "ᵐp", "out": "mp", "context_before": "", "context_after": ""},
+    {"in": "ʐ", "out": "ʒ", "context_before": "", "context_after": ""},
+    {"in": "ts", "out": "ts", "context_before": "", "context_after": ""},
+    {"in": "ⁿt", "out": "nt", "context_before": "", "context_after": ""},
+    {"in": "tʼ", "out": "t", "context_before": "", "context_after": ""},
+    {"in": "tsʰ", "out": "ts", "context_before": "", "context_after": ""},
+    {"in": "b", "out": "b", "context_before": "", "context_after": ""},
+    {"in": "m", "out": "m", "context_before": "", "context_after": ""},
+    {"in": "v", "out": "v", "context_before": "", "context_after": ""},
+    {"in": "w", "out": "w", "context_before": "", "context_after": ""},
+    {"in": "tʰ", "out": "t", "context_before": "", "context_after": ""},
+    {"in": "t", "out": "t", "context_before": "", "context_after": ""},
+    {"in": "n", "out": "n", "context_before": "", "context_after": ""},
+    {"in": "s", "out": "s", "context_before": "", "context_after": ""},
+    {"in": "z", "out": "z", "context_before": "", "context_after": ""},
+    {"in": "ɻ", "out": "j", "context_before": "", "context_after": ""},
+    {"in": "l", "out": "l", "context_before": "", "context_after": ""},
+    {"in": "ɬ", "out": "s", "context_before": "", "context_after": ""},
+    {"in": "tʃ", "out": "t͡ʃ", "context_before": "", "context_after": ""},
+    {"in": "j", "out": "j", "context_before": "", "context_after": ""},
+    {"in": "kʰ", "out": "k", "context_before": "", "context_after": ""},
+    {"in": "k", "out": "k", "context_before": "", "context_after": ""},
+    {"in": "ʔ", "out": "ʔ", "context_before": "", "context_after": ""},
+    {"in": "h", "out": "h", "context_before": "", "context_after": ""},
+    {"in": "iː", "out": "eː", "context_before": "", "context_after": ""},
+    {"in": "ĩː", "out": "ẽː", "context_before": "", "context_after": ""},
+    {"in": "ɛ̃ː", "out": "ẽː", "context_before": "", "context_after": ""},
+    {"in": "ɛː", "out": "eː", "context_before": "", "context_after": ""},
+    {"in": "uː", "out": "u", "context_before": "", "context_after": ""},
+    {"in": "ũː", "out": "ũ", "context_before": "", "context_after": ""},
+    {"in": "ɑː", "out": "ɑ", "context_before": "", "context_after": ""},
+    {"in": "ɑ̃ː", "out": "ɑ̃", "context_before": "", "context_after": ""},
+    {"in": "ɪ̃", "out": "ɪ̃", "context_before": "", "context_after": ""},
+    {"in": "ɪ", "out": "ɪ", "context_before": "", "context_after": ""},
+    {"in": "ɛ̃", "out": "ɛ̃", "context_before": "", "context_after": ""},
+    {"in": "ɛ", "out": "ɛ", "context_before": "", "context_after": ""},
+    {"in": "ʊ̃", "out": "ʊ̃", "context_before": "", "context_after": ""},
+    {"in": "ʊ", "out": "ʊ", "context_before": "", "context_after": ""},
+    {"in": "õ", "out": "õ", "context_before": "", "context_after": ""},
+    {"in": "o", "out": "ɔ", "context_before": "", "context_after": ""},
+    {"in": "ə̃", "out": "ʌ̃", "context_before": "", "context_after": ""},
+    {"in": "ə", "out": "ə", "context_before": "", "context_after": ""}
 ]
