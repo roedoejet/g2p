@@ -249,7 +249,7 @@ class CliTest(TestCase):
 
         results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa[foo] --to eng")
         self.assertNotEqual(results.exit_code, 0)
-        self.assertIn("is allowed after the semicolon", results.output)
+        self.assertIn("is allowed in square brackets", results.output)
 
         results = self.runner.invoke(generate_mapping, "--from fra_to_eng --to eng")
         self.assertNotEqual(results.exit_code, 0)

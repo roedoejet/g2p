@@ -71,7 +71,7 @@ def parse_from_or_to_lang_spec(lang_spec):
         if in_or_out not in ("in", "out"):
             raise click.BadParameter(
                 f'Invalid IPA language specification "{lang_spec}": only "in" or "out" '
-                "is allowed after the semicolon, to disambiguate between input or output "
+                "is allowed in square brackets, to disambiguate between input or output "
                 "inventory when necessary."
             )
         return [(mapping, in_or_out)]
