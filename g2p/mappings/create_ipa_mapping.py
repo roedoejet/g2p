@@ -129,6 +129,7 @@ def create_multi_mapping(
         "rule_ordering": "apply-longest-first",
         "mapping": mapping,
         "prevent_feeding": True,
+        "norm_form": "NFC",
         "display_name": (
             long_ipa_names(map_1_names) + " to " + long_ipa_names(map_2_names)
         ),
