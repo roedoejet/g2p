@@ -110,17 +110,19 @@ class CliTest(TestCase):
         self.assertIn("eng-ipa:", result.stdout)
 
     def test_scan_fra(self):
-        result = self.runner.invoke(
-            scan, ["fra", os.path.join(self.data_dir, "fra_panagrams.txt")]
-        )
-        self.assertEqual(result.exit_code, 0)
-        self.assertLogs(level="WARNING")
-        diacritics = "àâéèêëîïôùûüç"
-        for d in diacritics:
-            self.assertNotIn(d, result.stdout)
-        unmapped_chars = ":/,'-()2"
-        for c in unmapped_chars:
-            self.assertIn(c, result.stdout)
+        """Test g2p scan with all French characters, in NFC and NFD"""
+        for paragram_file in ["fra_panagrams.txt", "fra_panagrams_NFD.txt"]:
+            result = self.runner.invoke(
+                scan, ["fra", os.path.join(self.data_dir, paragram_file)]
+            )
+            self.assertEqual(result.exit_code, 0)
+            self.assertLogs(level="WARNING")
+            diacritics = "àâéèêëîïôùûüç"
+            for d in diacritics:
+                self.assertNotIn(d, result.stdout)
+            unmapped_chars = ":/,'-()2"
+            for c in unmapped_chars:
+                self.assertIn(c, result.stdout)
 
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
