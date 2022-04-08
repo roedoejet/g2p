@@ -57,6 +57,7 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
         node = {'name': node, 'symbolSize': size,
                 'id': node, 'category': lang_name}
         nodes.append(node)
+    nodes.sort(key=lambda x: x['name'])
     edges = []
     for edge in LANGS_NETWORK.edges:
         edges.append({'source': edge[0], 'target': edge[1]})
