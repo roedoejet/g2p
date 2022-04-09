@@ -11,10 +11,11 @@ var option = {
     tooltip: {},
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
+    textStyle: { fontSize: 36 },
     series: [{
         type: 'graph',
         layout: 'none',
-        symbolSize: 70,
+        symbolSize: 72,
         roam: true,
         label: {
             normal: {
