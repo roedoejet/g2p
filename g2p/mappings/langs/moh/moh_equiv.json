@@ -74,6 +74,7 @@
     },
     {
         "in": ":",
-        "out": ":"
+        "out": ":",
+        "comment": "force the tokenizer to recognize colon as a letter"
     }
 ]
