@@ -26,12 +26,24 @@ mappings:
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-10-24 16:21:41.605592
+    authors:
+      - Generated 2022-04-12 11:26:30.098188
     display_name: "SEN\u0106O\u0166EN IPA to English IPA"
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
     mapping: str-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-10-24 16:21:41.605592
+    authors:
+      - Generated 2022-04-12 11:26:30.098188
+    display_name: "SEN\u0106O\u0166EN IPA to English IPA"
+    in_lang: str-ipa
+    language_name: "SEN\u0106O\u0166EN"
+    mapping: str-ipa_to_hamming-eng-ipa.json
+    norm_form: NFD
+    out_lang: hamming-eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-10-23 11:18:26.278696
     display_name: Algonquin IPA to English IPA
@@ -249,7 +261,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-05-17 09:45:25.335064
+      - Generated 2022-04-12 11:42:52.894700
     case_sensitive: false
     display_name: moh-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -258,6 +270,19 @@ mappings:
     mapping: moh-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-12 11:42:52.894700
+    case_sensitive: false
+    display_name: moh-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: moh-ipa
+    language_name: moh-ipa
+    mapping: moh-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
