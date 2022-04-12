@@ -287,3 +287,55 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:47:28.528081
+    case_sensitive: true
+    display_name: str-equiv dummy to dummy dummy
+    escape_special: false
+    in_lang: str-equiv
+    language_name: str-equiv
+    mapping: str-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:47:28.528081
+    case_sensitive: true
+    display_name: str-equiv dummy to hamming dummy
+    escape_special: false
+    in_lang: str-equiv
+    language_name: str-equiv
+    mapping: str-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:57:49.409626
+    case_sensitive: true
+    display_name: und-ascii dummy to dummy dummy
+    escape_special: false
+    in_lang: und-ascii
+    language_name: und-ascii
+    mapping: und-ascii_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-12 10:56:44.604694
+    case_sensitive: true
+    display_name: und-ascii dummy to dummy dummy
+    escape_special: false
+    in_lang: und-ascii
+    language_name: und-ascii
+    mapping: und-ascii_to_hamming_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
