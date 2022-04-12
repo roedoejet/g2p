@@ -12,7 +12,7 @@ from networkx.exception import NetworkXNoPath
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
-import g2p.mappings.tokenizer as tok
+from g2p.mappings.tokenizer import make_tokenizer
 from g2p.transducer import CompositeTransducer, Transducer, TokenizingTransducer
 from g2p.log import LOGGER
 
@@ -76,17 +76,13 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
     # If tokenization was requested, return a TokenizingTransducer
     if tok_lang:
         if tok_lang == "path":
-            tokenizer = tok.get_tokenizer(in_lang=in_lang, tok_path=path)
+            tokenizer = make_tokenizer(in_lang=in_lang, tok_path=path)
         else:
-            tokenizer = tok.get_tokenizer(in_lang=tok_lang)
+            tokenizer = make_tokenizer(in_lang=tok_lang)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
     _g2p_cache[(in_lang, out_lang, tok_lang)] = transducer
     return transducer
-
-
-def get_tokenizer(in_lang=None):
-    return tok.get_tokenizer(in_lang)
 
 
 def tokenize_and_map(tokenizer, transducer, input: str):

@@ -100,7 +100,7 @@ class TokenizerLibrary:
     def __init__(self):
         self.tokenizers = {None: DefaultTokenizer()}
 
-    def get_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
+    def make_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
         if not in_lang:
             return None
         if tok_path:
@@ -109,14 +109,14 @@ class TokenizerLibrary:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang
 
-    def get_tokenizer(self, in_lang, out_lang=None, tok_path=None):
-        tokenizer_key = self.get_tokenizer_key(in_lang, out_lang, tok_path)
+    def make_tokenizer(self, in_lang, out_lang=None, tok_path=None):
+        tokenizer_key = self.make_tokenizer_key(in_lang, out_lang, tok_path)
         if not self.tokenizers.get(tokenizer_key):
             # This tokenizer was not created yet, initialize it now.
             if tok_path:
                 #LOGGER.warning(f"in_lang={in_lang} tok_path={tok_path}")
                 if tok_path[0] != in_lang:
-                    raise ValueError("calling get_tokenizer() with tok_path requires that tok_path[0] == in_lang")
+                    raise ValueError("calling make_tokenizer() with tok_path requires that tok_path[0] == in_lang")
                 assert len(tok_path) >= 2
                 if len(tok_path) == 2 or is_ipa(tok_path[1]):
                     out_lang = tok_path[1]
@@ -189,7 +189,7 @@ class TokenizerLibrary:
 _TOKENIZER_LIBRARY = TokenizerLibrary()
 
 
-def get_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
     """ Get the tokenizer for input in language in_lang
 
         Logic used when only in_lang is provided:
@@ -207,4 +207,4 @@ def get_tokenizer(in_lang=None, out_lang=None, tok_path=None):
         Logic used when in_lang and tok_path are provided:
         - use the first one or two hops in path, stopping at the first -ipa node
     """
-    return _TOKENIZER_LIBRARY.get_tokenizer(in_lang, out_lang, tok_path)
+    return _TOKENIZER_LIBRARY.make_tokenizer(in_lang, out_lang, tok_path)
