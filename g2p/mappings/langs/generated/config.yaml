@@ -261,3 +261,29 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-11 16:24:52.967497
+    case_sensitive: true
+    display_name: moh-equiv dummy to dummy dummy
+    escape_special: false
+    in_lang: moh-equiv
+    language_name: moh-equiv
+    mapping: moh-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-11 16:24:52.967497
+    case_sensitive: true
+    display_name: moh-equiv dummy to hamming dummy
+    escape_special: false
+    in_lang: moh-equiv
+    language_name: moh-equiv
+    mapping: moh-equiv_to_hamming_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
