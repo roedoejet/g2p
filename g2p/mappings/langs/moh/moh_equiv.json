@@ -72,5 +72,10 @@
     {
         "in": "o:",
         "out": "ó:"
+    },
+    {
+        "in": ":",
+        "out": ":",
+        "comment": "force the tokenizer to recognize colon as a letter"
     }
 ]
