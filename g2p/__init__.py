@@ -2,6 +2,18 @@
 
 Basic init file for g2p module
 
+The main entry points for the g2p module are make_g2p() and make_tokenizer()
+
+Basic Usage:
+    from g2p import make_g2p
+    converter = make_g2p(in_lang, out_lang, tok_lang)
+    transduction_graph = converter(input_text_in_in_alang)
+    converted_text_in_out_lang = transduction_graph.output_string
+
+    from g2p import make_tokenizer
+    tokenizer = make_tokenizer(lang)
+    list_of_tokens = tokenizer.tokenize_text(input_text)
+
 """
 import sys
 import io
