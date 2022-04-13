@@ -190,7 +190,7 @@ _TOKENIZER_LIBRARY = TokenizerLibrary()
 
 
 def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
-    """ Get the tokenizer for input in language in_lang
+    """ Make the tokenizer for input in language in_lang
 
         Logic used when only in_lang is provided:
         - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
@@ -208,3 +208,16 @@ def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
         - use the first one or two hops in path, stopping at the first -ipa node
     """
     return _TOKENIZER_LIBRARY.make_tokenizer(in_lang, out_lang, tok_path)
+
+_deprecated_warning_printed = False
+def get_tokenizer(*args, **kwargs):
+    """ Deprecated; use make_tokenizer() instead. """
+
+    global _deprecated_warning_printed
+    if not _deprecated_warning_printed:
+        LOGGER.warning(
+            "g2p.get_tokenizer() / g2p.mappings.tokenizer.get_tokenizer() is deprecated. Import and use g2p.make_tokenizer() instead."
+        )
+        _deprecated_warning_printed = True
+
+    return make_tokenizer(*args, **kwargs)
