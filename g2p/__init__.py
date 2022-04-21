@@ -53,6 +53,10 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
         LOGGER.error(f"No lang called '{out_lang}'. Please try again.")
         raise InvalidLanguageCode(out_lang)
 
+    if in_lang == out_lang:
+        LOGGER.error(f"Sorry, you can't transduce between the same language. Please select a different output language code.")
+        raise NoPath(in_lang, out_lang)
+
     # Try to find the shortest path between the nodes
     try:
         path = shortest_path(LANGS_NETWORK, in_lang, out_lang)
