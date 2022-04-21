@@ -6,9 +6,11 @@
 Welcome to the G2P documentation!
 ==========================================
 
-.. note:: G2P is UNDER CONSTRUCTION and should not be expected to be fully documented or even work as expected! Check back soon for more information.
+G2P is a tool for doing rule-based conversions for text.
 
-G2P is a tool for visualizing and interacting with computational linguistic models.
+This website has the technical documentation for G2P, but we've also written a `7-part blog series <https://blog.mothertongues.org/g2p-background/>`__ if you want a more thorough introduction to why G2P exists and what you can use it for.
+
+
 
 .. toctree::
    :maxdepth: 2
