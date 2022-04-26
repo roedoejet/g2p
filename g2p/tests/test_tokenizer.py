@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from unittest import main, TestCase
 import os
+from unittest import TestCase, main
+
 import g2p.mappings.tokenizer as tok
+from g2p.log import LOGGER
 
 
 class TokenizerTest(TestCase):
@@ -116,6 +118,15 @@ class TokenizerTest(TestCase):
         self.assertEqual(
             tok.make_tokenizer("fra", "not_a_language"), tok.make_tokenizer()
         )
+
+    def test_make_tokenizer_error(self):
+        with self.assertRaises(ValueError):
+            _ = tok.make_tokenizer("fra", "eng-arpabet", ["fra-ipa", "eng-ipa"])
+
+    def test_deprecated_warning(self):
+        with self.assertLogs(LOGGER, level="WARNING") as cm:
+            self.assertEquals(tok.get_tokenizer("fra"), tok.make_tokenizer("fra"))
+        self.assertIn("deprecated", "".join(cm.output))
 
 
 if __name__ == "__main__":
