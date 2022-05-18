@@ -2,6 +2,18 @@
 
 Basic init file for g2p module
 
+The main entry points for the g2p module are make_g2p() and make_tokenizer()
+
+Basic Usage:
+    from g2p import make_g2p
+    converter = make_g2p(in_lang, out_lang, tok_lang)
+    transduction_graph = converter(input_text_in_in_alang)
+    converted_text_in_out_lang = transduction_graph.output_string
+
+    from g2p import make_tokenizer
+    tokenizer = make_tokenizer(lang)
+    list_of_tokens = tokenizer.tokenize_text(input_text)
+
 """
 import sys
 import io
@@ -12,7 +24,7 @@ from networkx.exception import NetworkXNoPath
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
-import g2p.mappings.tokenizer as tok
+from g2p.mappings.tokenizer import make_tokenizer
 from g2p.transducer import CompositeTransducer, Transducer, TokenizingTransducer
 from g2p.log import LOGGER
 
@@ -80,17 +92,13 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
     # If tokenization was requested, return a TokenizingTransducer
     if tok_lang:
         if tok_lang == "path":
-            tokenizer = tok.get_tokenizer(in_lang=in_lang, tok_path=path)
+            tokenizer = make_tokenizer(in_lang=in_lang, tok_path=path)
         else:
-            tokenizer = tok.get_tokenizer(in_lang=tok_lang)
+            tokenizer = make_tokenizer(in_lang=tok_lang)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
     _g2p_cache[(in_lang, out_lang, tok_lang)] = transducer
     return transducer
-
-
-def get_tokenizer(in_lang=None):
-    return tok.get_tokenizer(in_lang)
 
 
 def tokenize_and_map(tokenizer, transducer, input: str):
