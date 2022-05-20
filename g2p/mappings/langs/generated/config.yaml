@@ -364,3 +364,16 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2022-05-20 16:36:31.566493
+    case_sensitive: true
+    display_name: iku-ipa to hamming-eng-ipa
+    escape_special: false
+    in_lang: iku-ipa
+    language_name: IPA
+    mapping: iku-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
