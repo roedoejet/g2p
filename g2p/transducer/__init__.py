@@ -557,7 +557,7 @@ class Transducer:
         original_input=None,
     ):
         out_lang = self.mapping.kwargs["out_lang"]
-        if out_lang == "eng-arpabet":
+        if "eng-arpabet" in out_lang:
             if not is_arpabet(tg.output_string):
                 if display_warnings:
                     display_input = (
