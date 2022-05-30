@@ -254,6 +254,33 @@ Then, you can generate the mapping between `dan-ipa` and `eng-ipa` by running `g
 This project exists thanks to all the
 [people who contribute](https://github.com/roedoejet/g2p/graphs/contributors).
 
+## Citation
+
+If you use this work in a project of yours and write about it, please cite us using the following:
+
+```
+@inproceedings{pine-etal-2022-gi22pi,
+    title = "{G}$_i$2{P}$_i$ Rule-based, index-preserving grapheme-to-phoneme transformations",
+    author = "Pine, Aidan  and
+      Littell, Patrick  and
+      Joanis, Eric  and
+      Huggins-Daines, David  and
+      Cox, Christopher  and
+      Davis, Fineen  and
+      Antonio Santos, Eddie  and
+      Srikanth, Shankhalika  and
+      Torkornoo, Delasie  and
+      Yu, Sabrina",
+    booktitle = "Proceedings of the Fifth Workshop on the Use of Computational Methods in the Study of Endangered Languages",
+    month = may,
+    year = "2022",
+    address = "Dublin, Ireland",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.computel-1.7",
+    pages = "52--60",
+    abstract = "This paper describes the motivation and implementation details for a rule-based, index-preserving grapheme-to-phoneme engine {`}G$_i$2P$_i$' implemented in pure Python and released under the open source MIT license. The engine and interface have been designed to prioritize the developer experience of potential contributors without requiring a high level of programming knowledge. {`}G$_i$2P$_i$' already provides mappings for 30 (mostly Indigenous) languages, and the package is accompanied by a web-based interactive development environment, a RESTful API, and extensive documentation to encourage the addition of more mappings in the future. We also present three downstream applications of {`}G$_i$2P$_i$' and show results of a preliminary evaluation.",
+}
+```
 
 ## License
 
