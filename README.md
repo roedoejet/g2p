@@ -27,6 +27,7 @@ This library is for handling arbitrary conversions between input and output segm
   - [Maintainers](#maintainers)
   - [Contributing](#contributing)
     - [Contributors](#contributors)
+  - [How to Cite](#citation)
   - [License](#license)
 
 ## Background
