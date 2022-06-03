@@ -1,4 +1,4 @@
-# Gⁱ-2-Pⁱ
+# Gᵢ2Pᵢ
 
 [![codecov](https://codecov.io/gh/roedoejet/g2p/branch/master/graph/badge.svg)](https://codecov.io/gh/roedoejet/g2p)
 [![Documentation Status](https://readthedocs.org/projects/g2p/badge/?version=latest)](https://g2p.readthedocs.io/en/latest/?badge=latest)
@@ -14,7 +14,7 @@ This library is for handling arbitrary conversions between input and output segm
 ![indices](https://raw.githubusercontent.com/roedoejet/g2p/master/g2p/static/assets/bonjour.png)
 
 ## Table of Contents
-- [Gⁱ-2-Pⁱ](#g%e2%81%b1-2-p%e2%81%b1)
+- [Gᵢ2Pᵢ](#gᵢ2pᵢ)
   - [Table of Contents](#table-of-contents)
   - [Background](#background)
   - [Install](#install)
@@ -27,11 +27,17 @@ This library is for handling arbitrary conversions between input and output segm
   - [Maintainers](#maintainers)
   - [Contributing](#contributing)
     - [Contributors](#contributors)
+  - [How to Cite](#citation)
   - [License](#license)
+
+See also:
+  - [Gᵢ2Pᵢ documentation](https://g2p.readthedocs.io/en/latest/?badge=latest)
+  - [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/)
+  - [Gᵢ2Pᵢ Studio](https://g2p-studio.herokuapp.com)
 
 ## Background
 
-The initial version of this package was developed by [Patrick Littell](https://github.com/littell) and was developed in order to allow for g2p from community orthographies to IPA and back again in [ReadAlong-Studio](https://github.com/dhdaines/ReadAlong-Studio). We decided to then pull out the g2p mechanism from [Convertextract](https://github.com/roedoejet/convertextract) which allows transducer relations to be declared in CSV files, and turn it into its own library - here it is! For an in-depth series on the motivation and how to use this tool, have a look at this [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/).
+The initial version of this package was developed by [Patrick Littell](https://github.com/littell) and was developed in order to allow for g2p from community orthographies to IPA and back again in [ReadAlong-Studio](https://github.com/dhdaines/ReadAlong-Studio). We decided to then pull out the g2p mechanism from [Convertextract](https://github.com/roedoejet/convertextract) which allows transducer relations to be declared in CSV files, and turn it into its own library - here it is! For an in-depth series on the motivation and how to use this tool, have a look at this [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/), or for a more technical overview, have a look at [this paper](https://aclanthology.org/2022.computel-1.7.pdf).
 
 ## Install
 
@@ -254,6 +260,37 @@ Then, you can generate the mapping between `dan-ipa` and `eng-ipa` by running `g
 This project exists thanks to all the
 [people who contribute](https://github.com/roedoejet/g2p/graphs/contributors).
 
+## Citation
+
+If you use this work in a project of yours and write about it, please cite us using the following:
+
+Aidan Pine, Patrick Littell, Eric Joanis, David Huggins-Daines, Christopher Cox, Fineen Davis, Eddie Antonio Santos, Shankhalika Srikanth, Delasie Torkornoo, and Sabrina Yu. 2022. [Gᵢ2Pᵢ Rule-based, index-preserving grapheme-to-phoneme transformations Rule-based, index-preserving grapheme-to-phoneme transformations](https://aclanthology.org/2022.computel-1.7). In _Proceedings of the Fifth Workshop on the Use of Computational Methods in the Study of Endangered Languages_, pages 52–60, Dublin, Ireland. Association for Computational Linguistics.
+
+Or in BibTeX:
+
+```
+@inproceedings{pine-etal-2022-gi22pi,
+    title = "{G}$_i$2{P}$_i$ Rule-based, index-preserving grapheme-to-phoneme transformations",
+    author = "Pine, Aidan  and
+      Littell, Patrick  and
+      Joanis, Eric  and
+      Huggins-Daines, David  and
+      Cox, Christopher  and
+      Davis, Fineen  and
+      Antonio Santos, Eddie  and
+      Srikanth, Shankhalika  and
+      Torkornoo, Delasie  and
+      Yu, Sabrina",
+    booktitle = "Proceedings of the Fifth Workshop on the Use of Computational Methods in the Study of Endangered Languages",
+    month = may,
+    year = "2022",
+    address = "Dublin, Ireland",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2022.computel-1.7",
+    pages = "52--60",
+    abstract = "This paper describes the motivation and implementation details for a rule-based, index-preserving grapheme-to-phoneme engine {`}G$_i$2P$_i$' implemented in pure Python and released under the open source MIT license. The engine and interface have been designed to prioritize the developer experience of potential contributors without requiring a high level of programming knowledge. {`}G$_i$2P$_i$' already provides mappings for 30 (mostly Indigenous) languages, and the package is accompanied by a web-based interactive development environment, a RESTful API, and extensive documentation to encourage the addition of more mappings in the future. We also present three downstream applications of {`}G$_i$2P$_i$' and show results of a preliminary evaluation.",
+}
+```
 
 ## License
 

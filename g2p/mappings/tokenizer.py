@@ -20,7 +20,8 @@ class DefaultTokenizer:
         self.inventory = []
         self.delim = ""
         self.case_sensitive = False
-        self.dot_is_letter = False # Hack for Tlingit where . is a letter when not word final
+        # Hack for Tlingit where . is a letter when not word final:
+        self.dot_is_letter = False
 
     def tokenize_aux(self, text):
         return text
@@ -42,7 +43,11 @@ class DefaultTokenizer:
         units = [{"text": m, "is_word": self.is_word_character(m)} for m in matches]
         if self.dot_is_letter:
             for i, unit in enumerate(units):
-                if unit["text"] == "." and i+1 < len(units) and units[i+1]["is_word"]:
+                if (
+                    unit["text"] == "."
+                    and i + 1 < len(units)
+                    and units[i + 1]["is_word"]
+                ):
                     unit["is_word"] = True
         units = merge_if_same_label(units, "text", "is_word")
         return units
@@ -68,7 +73,7 @@ class Tokenizer(DefaultTokenizer):
             regex_pieces.append(self.delim)
         pattern = "|".join(regex_pieces + ["."])
         pattern = "(" + pattern + ")"
-        #LOGGER.warning(f"pattern for {self.lang}: {pattern}.")
+        # LOGGER.warning(f"pattern for {self.lang}: {pattern}.")
         flags = re.DOTALL
         if not self.case_sensitive:
             flags |= re.I
@@ -100,7 +105,7 @@ class TokenizerLibrary:
     def __init__(self):
         self.tokenizers = {None: DefaultTokenizer()}
 
-    def get_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
+    def make_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
         if not in_lang:
             return None
         if tok_path:
@@ -109,14 +114,16 @@ class TokenizerLibrary:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang
 
-    def get_tokenizer(self, in_lang, out_lang=None, tok_path=None):
-        tokenizer_key = self.get_tokenizer_key(in_lang, out_lang, tok_path)
+    def make_tokenizer(self, in_lang, out_lang=None, tok_path=None):
+        tokenizer_key = self.make_tokenizer_key(in_lang, out_lang, tok_path)
         if not self.tokenizers.get(tokenizer_key):
             # This tokenizer was not created yet, initialize it now.
             if tok_path:
-                #LOGGER.warning(f"in_lang={in_lang} tok_path={tok_path}")
+                # LOGGER.warning(f"in_lang={in_lang} tok_path={tok_path}")
                 if tok_path[0] != in_lang:
-                    raise ValueError("calling get_tokenizer() with tok_path requires that tok_path[0] == in_lang")
+                    raise ValueError(
+                        "calling make_tokenizer() with tok_path requires that tok_path[0] == in_lang"
+                    )
                 assert len(tok_path) >= 2
                 if len(tok_path) == 2 or is_ipa(tok_path[1]):
                     out_lang = tok_path[1]
@@ -151,7 +158,7 @@ class TokenizerLibrary:
                     # There is no two-hop IPA successor, use the first direct successor
                     if out_lang is None and successors:
                         out_lang = successors[0]
-            #LOGGER.warning(f"Tokenizer for {in_lang} is {out_lang}.")
+            # LOGGER.warning(f"Tokenizer for {in_lang} is {out_lang}.")
             if out_lang is None:
                 # Default tokenizer:
                 self.tokenizers[tokenizer_key] = self.tokenizers[None]
@@ -161,7 +168,9 @@ class TokenizerLibrary:
                 try:
                     mappings = [Mapping(in_lang=in_lang, out_lang=out_lang[0])]
                     for i in range(1, len(out_lang)):
-                        mappings.append(Mapping(in_lang=out_lang[i - 1], out_lang=out_lang[i]))
+                        mappings.append(
+                            Mapping(in_lang=out_lang[i - 1], out_lang=out_lang[i])
+                        )
                     self.tokenizers[tokenizer_key] = MultiHopTokenizer(mappings)
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]
@@ -186,11 +195,11 @@ class TokenizerLibrary:
         return self.tokenizers.get(tokenizer_key)
 
 
-_TOKENIZER_LIBRARY = TokenizerLibrary()
+_the_tokenizer_library = TokenizerLibrary()
 
 
-def get_tokenizer(in_lang=None, out_lang=None, tok_path=None):
-    """ Get the tokenizer for input in language in_lang
+def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+    """ Make the tokenizer for input in language in_lang
 
         Logic used when only in_lang is provided:
         - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
@@ -207,4 +216,20 @@ def get_tokenizer(in_lang=None, out_lang=None, tok_path=None):
         Logic used when in_lang and tok_path are provided:
         - use the first one or two hops in path, stopping at the first -ipa node
     """
-    return _TOKENIZER_LIBRARY.get_tokenizer(in_lang, out_lang, tok_path)
+    return _the_tokenizer_library.make_tokenizer(in_lang, out_lang, tok_path)
+
+
+_deprecated_warning_printed = False
+
+
+def get_tokenizer(*args, **kwargs):
+    """ Deprecated; use make_tokenizer() instead. """
+
+    global _deprecated_warning_printed
+    if not _deprecated_warning_printed:
+        LOGGER.warning(
+            "g2p.get_tokenizer() / g2p.mappings.tokenizer.get_tokenizer() is deprecated. Import and use g2p.make_tokenizer() instead."
+        )
+        _deprecated_warning_printed = True
+
+    return make_tokenizer(*args, **kwargs)

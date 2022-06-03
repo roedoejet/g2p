@@ -18,7 +18,7 @@ class TokenizeAndMapTest(TestCase):
     def test_tok_and_map_fra(self):
         """ Chaining tests: tokenize and map a string """
         transducer = g2p.make_g2p("fra", "fra-ipa")
-        tokenizer = g2p.get_tokenizer("fra")
+        tokenizer = g2p.make_tokenizer("fra")
         # "teste" in isolation is at string and word end and beginning
         word_ipa = transducer("teste").output_string
         # "teste" followed by space or punctuation should be mapped to the same string
@@ -29,7 +29,7 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tok_and_map_mic(self):
         transducer = g2p.make_g2p("mic", "mic-ipa")
-        tokenizer = g2p.get_tokenizer("mic")
+        tokenizer = g2p.make_tokenizer("mic")
         word_ipa = transducer("sq").output_string
         string_ipa = g2p.tokenize_and_map(
             tokenizer, transducer, self.contextualize("sq")

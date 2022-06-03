@@ -88,6 +88,7 @@ class ResourceIntegrationTest(TestCase):
         minimal_params = {'in-lang': 'dan', 'out-lang': 'eng-arpabet',
                   'text': "hej", 'debugger': False, 'index': False}
         bad_params = {'in-lang': 'dan', 'out-lang': 'moh', 'text': "hej"}
+        same_params = {'in-lang': 'dan', 'out-lang': 'dan', 'text': "hej"}
         missing_params = {'in-lang': 'not-here',
                           'out-lang': 'eng-arpabet', 'text': "hej"}
         self.maxDiff = None
@@ -105,10 +106,13 @@ class ResourceIntegrationTest(TestCase):
         self.assertEqual(minimal_response.status_code, 200)
         self.assertEqual(minimal_response.get_json(), data)
         bad_response = self.client().get(self.conversion_route, query_string=bad_params)
+        same_response = self.client().get(self.conversion_route, query_string=same_params)
         self.assertEqual(bad_response.status_code, 400)
+        self.assertEqual(same_response.status_code, 400)
         missing_response = self.client().get(
             self.conversion_route, query_string=missing_params)
         self.assertEqual(missing_response.status_code, 404)
+        
 
 
 if __name__ == '__main__':
