@@ -30,6 +30,11 @@ This library is for handling arbitrary conversions between input and output segm
   - [How to Cite](#citation)
   - [License](#license)
 
+See also:
+  - [Gᵢ2Pᵢ documentation](https://g2p.readthedocs.io/en/latest/?badge=latest)
+  - [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/)
+  - [Gᵢ2Pᵢ Studio](https://g2p-studio.herokuapp.com)
+
 ## Background
 
 The initial version of this package was developed by [Patrick Littell](https://github.com/littell) and was developed in order to allow for g2p from community orthographies to IPA and back again in [ReadAlong-Studio](https://github.com/dhdaines/ReadAlong-Studio). We decided to then pull out the g2p mechanism from [Convertextract](https://github.com/roedoejet/convertextract) which allows transducer relations to be declared in CSV files, and turn it into its own library - here it is! For an in-depth series on the motivation and how to use this tool, have a look at this [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/), or for a more technical overview, have a look at [this paper](https://aclanthology.org/2022.computel-1.7.pdf).
