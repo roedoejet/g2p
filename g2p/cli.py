@@ -18,7 +18,11 @@ from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
 )
-from g2p.mappings.create_ipa_mapping import create_mapping, create_multi_mapping
+from g2p.mappings.create_ipa_mapping import (
+    create_mapping,
+    create_multi_mapping,
+    DISTANCE_METRICS,
+)
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
@@ -150,16 +154,7 @@ def cli():
 )
 @click.option(
     "--distance",
-    type=click.Choice(
-        [
-            "weighted_feature_edit_distance",
-            "hamming_feature_edit_distance",
-            "feature_edit_distance",
-            "dogol_prime_distance",
-            "fast_levenshtein_distance",
-            "levenshtein_distance",
-        ],
-    ),
+    type=click.Choice(DISTANCE_METRICS),
     required=False,
     default="weighted_feature_edit_distance",
 )
@@ -409,7 +404,9 @@ def generate_mapping(
                 f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]}[{in_or_out}]'
             )
 
-        new_mapping = create_multi_mapping(from_mappings, to_mappings, distance=distance)
+        new_mapping = create_multi_mapping(
+            from_mappings, to_mappings, distance=distance
+        )
 
         if out_dir:
             new_mapping.config_to_file(out_dir)

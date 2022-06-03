@@ -7,7 +7,11 @@ Test all Mappings
 from unittest import TestCase, main
 
 from g2p.mappings import Mapping
-from g2p.mappings.create_ipa_mapping import create_mapping
+from g2p.mappings.create_ipa_mapping import (
+    DISTANCE_METRICS,
+    create_mapping,
+    create_multi_mapping,
+)
 from g2p.transducer import Transducer
 
 
@@ -23,6 +27,8 @@ class MappingCreationTest(TestCase):
             {"in": "t",	"out": "T"},
             {"in": "k",	"out": "K"},
             {"in": "w",	"out": "W"},
+            {"in": "ɡ", "out": "G"},
+            {"in": "ʒ", "out": "ZH"},
         ]
         self.target_mapping = Mapping(
             self.mappings, in_lang='eng-ipa', out_lang='eng-arpabet', out_delimiter=' ')
@@ -68,16 +74,73 @@ class MappingCreationTest(TestCase):
 
     def test_long_mappings(self):
         src_mappings = [
-                {"in": "ᐧᐯ", "out": "pʷeː"},
-                {"in": "ᐧᑌ", "out": "tʷeː"},
-                {"in": "ᐧᑫ", "out": "kʷeː"},
-            ]
+            {"in": "ᐧᐯ", "out": "pʷeː"},
+            {"in": "ᐧᑌ", "out": "tʷeː"},
+            {"in": "ᐧᑫ", "out": "kʷeː"},
+        ]
         src_mapping = Mapping(src_mappings, in_lang='crj', out_lang='crj-ipa')
         mapping = create_mapping(src_mapping, self.target_mapping)
         transducer = Transducer(mapping)
         self.assertEqual(transducer('pʷeː').output_string, 'pweː')
         self.assertEqual(transducer('tʷeː').output_string, 'tweː')
         self.assertEqual(transducer('kʷeː').output_string, 'kweː')
+
+    def test_distance_errors(self):
+        src_mappings = [{"in": "ᐃ", "out": "i"}]
+        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        # Exercise looking up distances in the known list
+        with self.assertRaises(ValueError):
+            mapping = create_mapping(
+                src_mapping, self.target_mapping, distance="not_a_distance"
+            )
+        with self.assertRaises(ValueError):
+            mapping = create_multi_mapping(
+                [(src_mapping, "out")],
+                [(self.target_mapping, "in")],
+                distance="not_a_distance",
+            )
+        # White box testing: monkey-patch an invalid distance to validate the
+        # second way we make sure distances are supported
+        DISTANCE_METRICS.append("not_a_real_distance")
+        with self.assertRaises(ValueError):
+            mapping = create_mapping(
+                src_mapping, self.target_mapping, distance="not_a_real_distance"
+            )
+        with self.assertRaises(ValueError):
+            mapping = create_multi_mapping(
+                [(src_mapping, "out")],
+                [(self.target_mapping, "in")],
+                distance="not_a_real_distance",
+            )
+        DISTANCE_METRICS.pop()
+
+    def test_distances(self):
+        # These mapppings are chosen to create different generated mappings
+        # from the various distances.
+        src_mappings = [
+            {"in": "ᐧᐯ", "out": "pʷeː"},
+            {"in": "ᒋ", "out": "t͡ʃi"},
+            {"in": "ᕃ", "out": "ʁaj"},
+        ]
+        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        mapping = create_mapping(src_mapping, self.target_mapping)
+        # print("mapping", mapping, list(mapping), "distance", "default")
+        self.assertTrue(isinstance(mapping, Mapping))
+        set_of_mappings = {tuple(m["out"] for m in mapping)}
+        for distance in DISTANCE_METRICS:
+            mapping = create_mapping(
+                src_mapping, self.target_mapping, distance=distance
+            )
+            # print("mapping", mapping, list(mapping), "distance", distance)
+            self.assertTrue(isinstance(mapping, Mapping))
+            set_of_mappings.add(tuple(m["out"] for m in mapping))
+
+            mapping = create_multi_mapping(
+                [(src_mapping, "in")], [(self.target_mapping, "out")], distance=distance
+            )
+            self.assertTrue(isinstance(mapping, Mapping))
+            set_of_mappings.add(tuple(m["out"] for m in mapping))
+        self.assertGreater(len(set_of_mappings), 3)
 
 
 if __name__ == '__main__':

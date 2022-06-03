@@ -63,24 +63,27 @@ def process_characters(inv, is_xsampa=False):
 #
 ###################################
 
+
+DISTANCE_METRICS = [
+    "weighted_feature_edit_distance",
+    "hamming_feature_edit_distance",
+    "feature_edit_distance",
+    "dolgo_prime_distance",
+    "fast_levenshtein_distance",
+    "levenshtein_distance",
+]
+
+
 def get_distance_method(dst, distance: str):
-    if distance == "weighted_feature_edit_distance":
-        distance_method = dst.weighted_feature_edit_distance
-    elif distance == "hamming_feature_edit_distance":
-        distance_method = dst.hamming_feature_edit_distance
-    elif distance == "feature_edit_distance":
-        distance_method = dst.feature_edit_distance
-    elif distance == "dogol_prime_distance":
-        distance_method = dst.dogol_prime_distance
-    elif distance == "fast_levenshtein_distance":
-        distance_method = dst.fast_levenshtein_distance
-    elif distance == "levenshtein_distance":
-        distance_method = dst.levenshtein_distance
-    else:
-        LOGGER.error(
-            f"Sorry, the distance metric {distance} is not supported by PanPhon"
-        )
+    if distance not in DISTANCE_METRICS:
+        raise ValueError(f"Distance metric {distance} not supported")
+    try:
+        distance_method = getattr(dst, distance)
+    except AttributeError as e:
+        LOGGER.error(f"The distance metric {distance} is not supported by PanPhon")
+        raise ValueError(f"Distance metric {distance} not supported") from e
     return distance_method
+
 
 def create_multi_mapping(
     src_mappings: List[Tuple[Mapping, str]],
