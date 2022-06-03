@@ -137,7 +137,7 @@ class MappingCreationTest(TestCase):
             set_of_mappings.add(tuple(m["out"] for m in mapping))
 
             mapping = create_multi_mapping(
-                [(src_mapping, "in")], [(self.target_mapping, "out")], distance=distance
+                [(src_mapping, "out")], [(self.target_mapping, "in")], distance=distance
             )
             self.assertTrue(isinstance(mapping, Mapping))
             set_of_mappings.add(tuple(m["out"] for m in mapping))
