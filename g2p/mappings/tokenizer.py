@@ -109,7 +109,7 @@ class TokenizerLibrary:
         if not in_lang:
             return None
         if tok_path:
-            return "-to-".join(tok_path)
+            return in_lang + "+tok_path=" + "-to-".join(tok_path)
         if not out_lang:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang

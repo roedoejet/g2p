@@ -1,6 +1,28 @@
 <<: &shared
   language_name: English
 mappings:
+  - display_name: Dummy to Arpabet
+    in_lang: dummy
+    out_lang: dummy-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFD"
+    authors:
+      - Aidan Pine
+    mapping: dummy_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
+  - display_name: Hamming Dummy to Arpabet
+    in_lang: hamming-dummy
+    out_lang: hamming-dummy-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFD"
+    authors:
+      - Aidan Pine
+    mapping: dummy_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
   - display_name: English IPA to Arpabet
     in_lang: eng-ipa
     out_lang: eng-arpabet
@@ -12,4 +34,16 @@ mappings:
     mapping: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
+  - display_name: English IPA to Arpabet
+    in_lang: hamming-eng-ipa
+    out_lang: hamming-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFD"
+    authors:
+      - Patrick Littell
+    mapping: eng_ipa_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
     # TODO: Need lexicon mapping
+  

@@ -26,12 +26,24 @@ mappings:
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-10-24 16:21:41.605592
+    authors:
+      - Generated 2022-04-12 11:26:30.098188
     display_name: "SEN\u0106O\u0166EN IPA to English IPA"
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
     mapping: str-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
+    rule_ordering: apply-longest-first
+  - author: Generated 2019-10-24 16:21:41.605592
+    authors:
+      - Generated 2022-04-12 11:26:30.098188
+    display_name: "SEN\u0106O\u0166EN IPA to English IPA"
+    in_lang: str-ipa
+    language_name: "SEN\u0106O\u0166EN"
+    mapping: str-ipa_to_hamming-eng-ipa.json
+    norm_form: NFD
+    out_lang: hamming-eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-10-23 11:18:26.278696
     display_name: Algonquin IPA to English IPA
@@ -249,7 +261,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-05-17 09:45:25.335064
+      - Generated 2022-04-12 11:42:52.894700
     case_sensitive: false
     display_name: moh-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -261,3 +273,133 @@ mappings:
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-12 11:42:52.894700
+    case_sensitive: false
+    display_name: moh-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: moh-ipa
+    language_name: moh-ipa
+    mapping: moh-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-11 16:24:52.967497
+    case_sensitive: true
+    display_name: moh-equiv dummy to dummy dummy
+    escape_special: false
+    in_lang: moh-equiv
+    language_name: moh-equiv
+    mapping: moh-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-11 16:24:52.967497
+    case_sensitive: true
+    display_name: moh-equiv dummy to hamming dummy
+    escape_special: false
+    in_lang: moh-equiv
+    language_name: moh-equiv
+    mapping: moh-equiv_to_hamming_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:47:28.528081
+    case_sensitive: true
+    display_name: str-equiv dummy to dummy dummy
+    escape_special: false
+    in_lang: str-equiv
+    language_name: str-equiv
+    mapping: str-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:47:28.528081
+    case_sensitive: true
+    display_name: str-equiv dummy to hamming dummy
+    escape_special: false
+    in_lang: str-equiv
+    language_name: str-equiv
+    mapping: str-equiv_to_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-04-12 10:57:49.409626
+    case_sensitive: true
+    display_name: und-ascii dummy to dummy dummy
+    escape_special: false
+    in_lang: und-ascii
+    language_name: und-ascii
+    mapping: und-ascii_to_dummy.json
+    norm_form: NFD
+    out_lang: dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2022-04-12 10:56:44.604694
+    case_sensitive: true
+    display_name: und-ascii dummy to dummy dummy
+    escape_special: false
+    in_lang: und-ascii
+    language_name: und-ascii
+    mapping: und-ascii_to_hamming_dummy.json
+    norm_form: NFD
+    out_lang: hamming-dummy
+    prevent_feeding: false
+    reverse: false
+    rule_ordering: as-written
+  - authors:
+      - Generated 2022-05-20 16:36:31.566493
+    case_sensitive: true
+    display_name: iku-ipa to hamming-eng-ipa
+    escape_special: false
+    in_lang: iku-ipa
+    language_name: IPA
+    mapping: iku-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-05-20 16:55:13.188319
+    case_sensitive: true
+    display_name: und-ipa to hamming-eng-ipa
+    escape_special: false
+    in_lang: und-ipa
+    language_name: IPA
+    mapping: und-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-05-20 19:12:51.416268
+    case_sensitive: true
+    display_name: ikt-ipa to hamming-eng-ipa
+    escape_special: false
+    in_lang: ikt-ipa
+    language_name: IPA
+    mapping: ikt-ipa_to_hamming-eng-ipa.json
+    norm_form: NFC
+    out_lang: hamming-eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first

@@ -18,7 +18,11 @@ from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
 )
-from g2p.mappings.create_ipa_mapping import create_mapping, create_multi_mapping
+from g2p.mappings.create_ipa_mapping import (
+    create_mapping,
+    create_multi_mapping,
+    DISTANCE_METRICS,
+)
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
 from g2p.mappings.langs.utils import check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
@@ -148,8 +152,23 @@ def cli():
     context_settings=CONTEXT_SETTINGS,
     short_help="Generate English IPA or dummy mapping.",
 )
+@click.option(
+    "--distance",
+    type=click.Choice(DISTANCE_METRICS),
+    required=False,
+    default="weighted_feature_edit_distance",
+)
 def generate_mapping(
-    in_lang, out_lang, dummy, ipa, list_dummy, out_dir, merge, from_langs, to_langs
+    in_lang,
+    out_lang,
+    dummy,
+    ipa,
+    list_dummy,
+    out_dir,
+    merge,
+    from_langs,
+    to_langs,
+    distance,
 ):
     """ Generate a new mapping from existing mappings in the g2p system.
 
@@ -191,7 +210,9 @@ def generate_mapping(
 
           Generate an IPA mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to
           the union of TO_L1-ipa, TO-L2-ipa, etc. One or more from/to language
-          code(s) can be specified in colon- or comma-separated lists.
+          code(s) can be specified in colon- or comma-separated lists. Note, by default
+          we use Panphon's weighted_feature_edit_distance, but you can change this with
+          the --distance argument
 
         \b
           Sample usage:
@@ -336,14 +357,14 @@ def generate_mapping(
             check_ipa_known_segs([f"{in_lang}-ipa"])
             eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
             click.echo(f"Writing English IPA mapping for {out_lang} to file")
-            new_mapping = create_mapping(source_mappings[0], eng_ipa)
+            new_mapping = create_mapping(source_mappings[0], eng_ipa, distance=distance)
             for m in source_mappings[1:]:
-                new_mapping.extend(create_mapping(m, eng_ipa))
+                new_mapping.extend(create_mapping(m, eng_ipa, distance=distance))
         else:  # dummy
             click.echo(f"Writing dummy fallback mapping for {out_lang} to file")
-            new_mapping = align_to_dummy_fallback(source_mappings[0])
+            new_mapping = align_to_dummy_fallback(source_mappings[0], distance=distance)
             for m in source_mappings[1:]:
-                new_mapping.extend(align_to_dummy_fallback(m))
+                new_mapping.extend(align_to_dummy_fallback(m, distance=distance))
 
         new_mapping.deduplicate()
 
@@ -383,7 +404,9 @@ def generate_mapping(
                 f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]}[{in_or_out}]'
             )
 
-        new_mapping = create_multi_mapping(from_mappings, to_mappings)
+        new_mapping = create_multi_mapping(
+            from_mappings, to_mappings, distance=distance
+        )
 
         if out_dir:
             new_mapping.config_to_file(out_dir)

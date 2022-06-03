@@ -64,8 +64,37 @@ def process_characters(inv, is_xsampa=False):
 ###################################
 
 
+DISTANCE_METRICS = [
+    "weighted_feature_edit_distance",
+    "hamming_feature_edit_distance",
+    "feature_edit_distance",
+    "dolgo_prime_distance",
+    "fast_levenshtein_distance",
+    "levenshtein_distance",
+]
+
+
+def get_distance_method(dst, distance: str):
+    if distance not in DISTANCE_METRICS:
+        raise ValueError(f"Distance metric {distance} not supported")
+    try:
+        distance_method = getattr(dst, distance)
+    except AttributeError as e:
+        # Older versions of panphon mispelled Dolgopolsky's name as Dogolpolsky...
+        # Try again with the older name, so we stay compatible with both <=0.19
+        # and >=0.19.1
+        if distance == "dolgo_prime_distance":
+            return getattr(dst, "dogol_prime_distance")
+
+        LOGGER.error(f"The distance metric {distance} is not supported by PanPhon")
+        raise ValueError(f"Distance metric {distance} not supported") from e
+    return distance_method
+
+
 def create_multi_mapping(
-    src_mappings: List[Tuple[Mapping, str]], tgt_mappings: List[Tuple[Mapping, str]]
+    src_mappings: List[Tuple[Mapping, str]],
+    tgt_mappings: List[Tuple[Mapping, str]],
+    distance: str = "weighted_feature_edit_distance",
 ) -> Mapping:
     """Create a mapping for a set of source mappings to a set of target mappings
 
@@ -120,7 +149,7 @@ def create_multi_mapping(
         tgt_inventory.extend(mapping.inventory(io))
     tgt_inventory = deduplicate(tgt_inventory)
 
-    mapping = align_inventories(src_inventory, tgt_inventory)
+    mapping = align_inventories(src_inventory, tgt_inventory, distance=distance)
 
     config = {
         "in_lang": compact_ipa_names(map_1_names),
@@ -143,6 +172,7 @@ def create_mapping(
     mapping_2: Mapping,
     mapping_1_io: str = "out",
     mapping_2_io: str = "in",
+    distance: str = "weighted_feature_edit_distance",
 ) -> Mapping:
     """Create a mapping from mapping_1's output inventory to mapping_2's input inventory"""
 
@@ -164,6 +194,7 @@ def create_mapping(
         mapping_2.inventory(mapping_2_io),
         l1_is_xsampa,
         l2_is_xsampa,
+        distance=distance,
     )
 
     # Initialize mapping with input language parameters (as_is,
@@ -185,7 +216,11 @@ def create_mapping(
 
 
 def align_inventories(
-    inventory_l1, inventory_l2, l1_is_xsampa=False, l2_is_xsampa=False
+    inventory_l1,
+    inventory_l2,
+    l1_is_xsampa=False,
+    l2_is_xsampa=False,
+    distance="weighted_feature_edit_distance",
 ):
     """Align inventories by finding a good sequence in inventory_l2 for each
     character in inventory_l1"""
@@ -228,9 +263,8 @@ def align_inventories(
                     continue
                 e = min(i + len(p2_pseq), len(p1_pseq))
                 input_seg = p1_pseq[i:e]
-                score = dst.weighted_feature_edit_distance(
-                    "".join(input_seg), "".join(p2_pseq)
-                )
+                distance_method = get_distance_method(dst, distance)
+                score = distance_method("".join(input_seg), "".join(p2_pseq))
                 # Be very greedy and take the longest match
                 if (
                     score < best_score
