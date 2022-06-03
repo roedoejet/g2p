@@ -80,6 +80,12 @@ def get_distance_method(dst, distance: str):
     try:
         distance_method = getattr(dst, distance)
     except AttributeError as e:
+        # Older versions of panphon mispelled Dolgopolsky's name as Dogolpolsky...
+        # Try again with the older name, so we stay compatible with both <=0.19
+        # and >=0.19.1
+        if distance == "dolgo_prime_distance":
+            return getattr(dst, "dogol_prime_distance")
+
         LOGGER.error(f"The distance metric {distance} is not supported by PanPhon")
         raise ValueError(f"Distance metric {distance} not supported") from e
     return distance_method
