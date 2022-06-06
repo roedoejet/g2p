@@ -1,5 +1,5 @@
 openpyxl
-click
+click==8.0.4
 coloredlogs<=14.0
 dnspython>=2.1.0
 eventlet>=0.33.0
