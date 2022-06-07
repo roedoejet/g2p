@@ -1,177 +1,44 @@
 [
-  {
-    "in": "tshish",
-    "out": "tʃʃ"
-  },
-  {
-    "in": "enish",
-    "out": "ẽːjh"
-  },
-  {
-    "in": "enish",
-    "out": "ẽːjʃ"
-  },
-  {
-    "in": "anish",
-    "out": "ãːjʃ"
-  },
-  {
-    "in": "anish",
-    "out": "ẽːjh"
-  },
-  {
-    "in": "anish",
-    "out": "ẽːjʃ"
-  },
-  {
-    "in": "nish",
-    "out": "nəʃ"
-  },
-  {
-    "in": "nish",
-    "out": "nə̀ʃ"
-  },
-  {
-    "in": "auk",
-    "out": "ãwk"
-  },
-  {
-    "in": "shp",
-    "out": "ʃp"
-  },
-  {
-    "in": "shp",
-    "out": "hp"
-  },
-  {
-    "in": "sht",
-    "out": "st"
-  },
-  {
-    "in": "shk",
-    "out": "ʃk"
-  },
-  {
-    "in": "shk",
-    "out": "hk"
-  },
-  {
-    "in": "tsh",
-    "out": "tʃ"
-  },
-  {
-    "in": "ikw",
-    "out": "ukw",
-    "context_after": ""
-  },
-  {
-    "in": "akw ",
-    "out": "ukw",
-    "context_after": ""
-  },
-  {
-    "in": "aa",
-    "out": "aː"
-  },
-  {
-    "in": "ai",
-    "out": "ej"
-  },
-  {
-    "in": "ii",
-    "out": "iː"
-  },
-  {
-    "in": "uu",
-    "out": "uː"
-  },
-  {
-    "in": "tsh",
-    "out": "tʃ"
-  },
-  {
-    "in": "sh",
-    "out": "ʃ"
-  },
-  {
-    "in": "sh",
-    "out": "h"
-  },
-  {
-    "in": "a",
-    "out":  "a"
-  },
-  {
-    "in": "a",
-    "out":  "ə"
-  },
-  {
-    "in": "i",
-    "out": "i",
-    "context_before": ""
-  },
-  {
-    "in": "i",
-    "out": "ɨ",
-    "context_before": "VOWEL",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "i",
-    "out": "u",
-    "context_before": "VOWEL",
-    "context_after": "VOWEL"
-  },
-  {
-    "in": "i",
-    "out": "i"
-  },
-  {
-    "in": "e",
-    "out": "eː"
-  },
-  {
-    "in": "u",
-    "out": "u"
-  },
-  {
-    "in": "h",
-    "out": "h"
-  },
-  {
-    "in": "ǹ",
-    "out": "l"
-  },
-  {
-    "in": "ᵘ",
-    "out": "u"
-  },
-  {
-    "in": "w",
-    "out": "u"
-  },
-  {
-    "in": "k",
-    "out": "k"
-  },
-  {
-    "in": "m",
-    "out": "m"
-  },
-  {
-    "in": "n",
-    "out": "n"
-  },
-  {
-    "in": "p",
-    "out": "p"
-  },
-  {
-    "in": "s",
-    "out": "s"
-  },
-  {
-    "in": "t",
-    "out": "t"
-  }
+    {"in": "tshish", "out": "tʃʃ"},
+    {"in": "enish", "out": "ẽːjh"},
+    {"in": "enish", "out": "ẽːjʃ"},
+    {"in": "anish", "out": "ãːjʃ"},
+    {"in": "anish", "out": "ẽːjh"},
+    {"in": "anish", "out": "ẽːjʃ"},
+    {"in": "nish", "out": "nəʃ"},
+    {"in": "nish", "out": "nə̀ʃ"},
+    {"in": "auk", "out": "ãwk"},
+    {"in": "shp", "out": "ʃp"},
+    {"in": "shp", "out": "hp"},
+    {"in": "sht", "out": "st"},
+    {"in": "shk", "out": "ʃk"},
+    {"in": "shk", "out": "hk"},
+    {"in": "tsh", "out": "tʃ"},
+    {"in": "ikw", "out": "ukw", "context_after": ""},
+    {"in": "akw ", "out": "ukw", "context_after": ""},
+    {"in": "aa", "out": "aː"},
+    {"in": "ai", "out": "ej"},
+    {"in": "ii", "out": "iː"},
+    {"in": "uu", "out": "uː"},
+    {"in": "tsh", "out": "tʃ"},
+    {"in": "sh", "out": "ʃ"},
+    {"in": "sh", "out": "h"},
+    {"in": "a", "out": "a"},
+    {"in": "a", "out": "ə"},
+    {"in": "i", "out": "i", "context_before": ""},
+    {"in": "i", "out": "ɨ", "context_before": "VOWEL", "context_after": "VOWEL"},
+    {"in": "i", "out": "u", "context_before": "VOWEL", "context_after": "VOWEL"},
+    {"in": "i", "out": "i"},
+    {"in": "e", "out": "eː"},
+    {"in": "u", "out": "u"},
+    {"in": "h", "out": "h"},
+    {"in": "ǹ", "out": "l"},
+    {"in": "ᵘ", "out": "u"},
+    {"in": "w", "out": "u"},
+    {"in": "k", "out": "k"},
+    {"in": "m", "out": "m"},
+    {"in": "n", "out": "n"},
+    {"in": "p", "out": "p"},
+    {"in": "s", "out": "s"},
+    {"in": "t", "out": "t"}
 ]
