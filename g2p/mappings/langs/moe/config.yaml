@@ -12,11 +12,3 @@ mappings:
     abbreviations: moe_abbs.csv
     case_sensitive: false
     <<: *shared
-  - display_name: Innu-aimun IPA to English IPA
-    in_lang: moe-ipa
-    out_lang: eng-ipa
-    type: mapping
-    mapping: moe_ipa_to_eng_ipa.json
-    rule_ordering: as-written
-    case_sensitive: false
-    <<: *shared
