@@ -403,3 +403,16 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-06-07 10:24:54.512807
+    case_sensitive: true
+    display_name: moe-ipa to eng-ipa
+    escape_special: false
+    in_lang: moe-ipa
+    language_name: IPA
+    mapping: moe-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first

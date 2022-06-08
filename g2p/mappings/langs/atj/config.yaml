@@ -16,4 +16,5 @@ mappings:
     out_lang: eng-ipa
     type: mapping
     mapping: atj_ipa_to_eng_ipa.json
+    case_sensitive: false
     <<: *shared
