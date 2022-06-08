@@ -44,46 +44,46 @@ GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 
 
 class Mapping:
-    """ Class for lookup tables
+    """Class for lookup tables
 
-        @param as_is: bool = True
-            Affects whether or not rules are sorted or left as is.
-            Please use ``rule_ordering`` instead.
-            If True, Evaluate g2p rules in mapping in the order they are written.
-            If False, rules will be reverse sorted by length.
+    @param as_is: bool = True
+        Affects whether or not rules are sorted or left as is.
+        Please use ``rule_ordering`` instead.
+        If True, Evaluate g2p rules in mapping in the order they are written.
+        If False, rules will be reverse sorted by length.
 
-            .. deprecated:: 0.6
-                use ``rule_ordering`` instead
+        .. deprecated:: 0.6
+            use ``rule_ordering`` instead
 
-        @param case_sensitive: bool = True
-            Lower all rules and conversion input
+    @param case_sensitive: bool = True
+        Lower all rules and conversion input
 
-        @param escape_special: bool = False
-            Escape special characters in rules
+    @param escape_special: bool = False
+        Escape special characters in rules
 
-        @param norm_form: str = "NFD"
-            Normalization standard to follow. NFC | NKFC | NFD | NKFD | none
+    @param norm_form: str = "NFD"
+        Normalization standard to follow. NFC | NKFC | NFD | NKFD | none
 
-        @param out_delimiter: str = ""
-            Separate output transformations with a delimiter
+    @param out_delimiter: str = ""
+        Separate output transformations with a delimiter
 
-        @param reverse: bool = False
-            Reverse all mappings
+    @param reverse: bool = False
+        Reverse all mappings
 
-        @param rule_ordering: str = "as-written"
-            Affects in what order the rules are applied.
+    @param rule_ordering: str = "as-written"
+        Affects in what order the rules are applied.
 
-            If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
-            are written in the source file
-            (previously this was accomplished with ``as_is=True``).
+        If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
+        are written in the source file
+        (previously this was accomplished with ``as_is=True``).
 
-            If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
-            input are applied first. Sorting the rules like this prevents shorter rules
-            from taking part in feeding relations
-            (previously this was accomplished with ``as_is=False``).
+        If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
+        input are applied first. Sorting the rules like this prevents shorter rules
+        from taking part in feeding relations
+        (previously this was accomplished with ``as_is=False``).
 
-        @param prevent_feeding: bool = False
-            Converts each rule into an intermediary form
+    @param prevent_feeding: bool = False
+        Converts each rule into an intermediary form
 
     """
 
@@ -178,14 +178,14 @@ class Mapping:
         else:  # invalid index type
             raise TypeError(
                 "{cls} indices must be integers or slices, not {idx}".format(
-                    cls=type(self).__name__, idx=type(item).__name__,
+                    cls=type(self).__name__,
+                    idx=type(item).__name__,
                 )
             )
 
     @staticmethod
     def find_mapping_by_id(map_id: str):
-        """ Find the mapping with a given ID
-        """
+        """Find the mapping with a given ID"""
         for mapping in MAPPINGS_AVAILABLE:
             if mapping.get("id", "") == map_id:
                 return deepcopy(mapping)
@@ -221,13 +221,12 @@ class Mapping:
         return self.mapping.index(item)
 
     def inventory(self, in_or_out: str = "in"):
-        """ Return just inputs or outputs as inventory of mapping
-        """
+        """Return just inputs or outputs as inventory of mapping"""
         return [x[in_or_out] for x in self.mapping]
 
     def process_loaded_config(self, config):
-        """ For a mapping loaded from a file, take the keyword arguments and supply them to the
-            Mapping, and get any abbreviations data.
+        """For a mapping loaded from a file, take the keyword arguments and supply them to the
+        Mapping, and get any abbreviations data.
         """
         if config.get("type", "") == "unidecode":
             self.mapping = []
@@ -241,8 +240,7 @@ class Mapping:
         self.kwargs = {**mapping_kwargs, **self.kwargs}
 
     def plain_mapping(self):
-        """ Return mapping
-        """
+        """Return mapping"""
         return [
             {
                 k: v
@@ -253,8 +251,7 @@ class Mapping:
         ]
 
     def process_kwargs(self, mapping):
-        """ Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6
-        """
+        """Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6"""
 
         if "as_is" in self.kwargs:
             as_is = self.kwargs["as_is"]
@@ -392,8 +389,7 @@ class Mapping:
         return rule_regex
 
     def reverse_mappings(self, mapping):
-        """ Reverse the mapping
-        """
+        """Reverse the mapping"""
         for io in mapping:
             io["in"], io["out"] = io["out"], io["in"]
             del io["context_before"]
@@ -415,7 +411,7 @@ class Mapping:
         self.mapping = list({repr(rule): rule for rule in self.mapping}.values())
 
     def add_abbreviations(self, abbs, mappings):
-        """ Return abbreviated forms, given a list of abbreviations.
+        """Return abbreviated forms, given a list of abbreviations.
 
         {'in': 'a', 'out': 'b', 'context_before': 'V', 'context_after': '' }
         {'abbreviation': 'V', 'stands_for': ['a','b','c']}
@@ -429,9 +425,36 @@ class Mapping:
                         io[key] = abb["stands_for"]
         return mappings
 
+    def mapping_to_stream(self, out_stream, file_type: str = "json"):
+        """Write mapping to a stream"""
+
+        internal_fields = ["match_pattern", "intermediate_form"]
+        filtered = [
+            {
+                k: v
+                for k, v in io.items()
+                if k not in internal_fields and ("context_" not in k or v != "")
+            }
+            for io in self.mapping
+        ]
+        if file_type == "json":
+            json.dump(
+                filtered,
+                out_stream,
+                indent=4,
+                ensure_ascii=False,
+                cls=CompactJSONMappingEncoder,
+            )
+        elif file_type == "csv":
+            writer = csv.DictWriter(out_stream, fieldnames=fieldnames)
+            for io in filtered:
+                writer.writerow(io)
+        else:
+            raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
+
     def mapping_to_file(self, output_path: str = GEN_DIR, file_type: str = "json"):
-        """ Write mapping to file
-        """
+        """Write mapping to file"""
+
         if not os.path.isdir(output_path):
             raise Exception("Path %s is not a directory", output_path)
         fn = os.path.join(
@@ -442,28 +465,15 @@ class Mapping:
             + "."
             + file_type,
         )
-        fieldnames = ["in", "out", "context_before", "context_after"]
-        filtered = [
-            {k: v for k, v in io.items() if k in fieldnames} for io in self.mapping
-        ]
-        if file_type == "json":
-            with open(fn, "w", encoding="utf8") as f:
-                json.dump(filtered, f, indent=4, ensure_ascii=False, cls=CompactJSONMappingEncoder)
-        elif file_type == "csv":
-            with open(fn, "w", encoding="utf8") as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
-                for io in filtered:
-                    writer.writerow(io)
-        else:
-            raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
+        with open(fn, "w", encoding="utf8") as f:
+            self.mapping_to_stream(f, file_type)
 
     def config_to_file(
         self,
         output_path: str = os.path.join(GEN_DIR, "config.yaml"),
         mapping_type: str = "json",
     ):
-        """ Write config to file
-        """
+        """Write config to file"""
         add_config = False
         if os.path.isdir(output_path):
             output_path = os.path.join(output_path, "config.yaml")
