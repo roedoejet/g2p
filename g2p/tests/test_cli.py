@@ -241,7 +241,9 @@ class CliTest(TestCase):
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Error: --from and --to must be used together", results.output)
 
-        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa --to haa_to_haa-equiv")
+        results = self.runner.invoke(
+            generate_mapping, "--from fra_to_fra-ipa --to haa_to_haa-equiv"
+        )
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot guess in/out for IPA lang spec", results.output)
 
@@ -249,7 +251,9 @@ class CliTest(TestCase):
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("is only supported with the full", results.output)
 
-        results = self.runner.invoke(generate_mapping, "--from fra_to_fra-ipa[foo] --to eng")
+        results = self.runner.invoke(
+            generate_mapping, "--from fra_to_fra-ipa[foo] --to eng"
+        )
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("is allowed in square brackets", results.output)
 
@@ -269,6 +273,15 @@ class CliTest(TestCase):
         results = self.runner.invoke(show_mappings, ["fra", "fra-ipa"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("French to IPA", results.output)
+        self.assertIn(r'{"in": "&", "out": "et"},', results.output)
+        self.assertIn(
+            r'{"in": "c", "out": "s", "context_after": "e|i|è|é|ê|ë|î|ï|ÿ"},',
+            results.output,
+        )
+        self.assertIn(
+            r'{"in": "e", "out": "", "context_before": "\\S", "context_after": "\\b"},',
+            results.output,
+        )
         self.assertEqual(len(re.findall(r"display_name", results.output)), 1)
 
         # Two args connected via a intermediate steps = all mappings on that path
@@ -288,8 +301,8 @@ class CliTest(TestCase):
         results = self.runner.invoke(show_mappings, ["--csv", "crl-equiv"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("Northern East Cree Equivalencies", results.output)
-        self.assertIn("Northern East Cree to IPA", results.output)
         self.assertIn("thwaa,ᕨ,,", results.output)
+        self.assertIn("Northern East Cree to IPA", results.output)
         self.assertIn("ᐧᕓ,vʷeː,,", results.output)
 
         # No args = error

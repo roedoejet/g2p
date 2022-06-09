@@ -239,14 +239,18 @@ class Mapping:
         # Merge kwargs, but prioritize kwargs that initialized the Mapping
         self.kwargs = {**mapping_kwargs, **self.kwargs}
 
-    def plain_mapping(self, skip_empty_contexts=False):
-        """Return the plain mapping for displaying or save to disk."""
-        internal_fields = ["match_pattern", "intermediate_form"]
+    def plain_mapping(self, skip_empty_contexts: bool = False):
+        """Return the plain mapping for displaying or saving to disk.
+
+        Args:
+            skip_empty_contexts: when set, filter out empty context_before/after
+        """
         return [
             {
                 k: v
                 for k, v in io.items()
-                if k not in internal_fields and (not skip_empty_contexts or "context_" not in k or v != "")
+                if k not in ["match_pattern", "intermediate_form"]
+                and (not skip_empty_contexts or k[:8] != "context_" or v != "")
             }
             for io in self.mapping
         ]
@@ -439,7 +443,9 @@ class Mapping:
             )
         elif file_type == "csv":
             fieldnames = ["in", "out", "context_before", "context_after"]
-            writer = csv.DictWriter(out_stream, fieldnames=fieldnames, extrasaction="ignore")
+            writer = csv.DictWriter(
+                out_stream, fieldnames=fieldnames, extrasaction="ignore"
+            )
             for io in self.mapping:
                 writer.writerow(io)
         else:
