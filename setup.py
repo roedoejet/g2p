@@ -34,9 +34,15 @@ setup(
     description="Module for creating context-aware, rule-based G2P mappings that preserve indices",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    platform=["any"],
     packages=find_packages(),
     include_package_data=True,
     install_requires=REQS,
     entry_points={"console_scripts": ["g2p = g2p.cli:cli"]},
     zip_safe=False,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
 )
