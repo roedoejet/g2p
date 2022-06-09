@@ -7,7 +7,7 @@ from glob import glob
 from unittest import TestCase, main
 
 from g2p.app import APP
-from g2p.cli import convert, doctor, generate_mapping, scan, update
+from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
 from g2p.log import LOGGER
 from g2p.tests.public.data import __file__ as data_dir
 
@@ -256,6 +256,47 @@ class CliTest(TestCase):
         results = self.runner.invoke(generate_mapping, "--from fra_to_eng --to eng")
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot find mapping", results.output)
+
+    def test_show_mappings(self):
+        # One arg = all mappings to or from that language
+        results = self.runner.invoke(show_mappings, ["fra-ipa"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("French to IPA", results.output)
+        self.assertIn("French IPA to English IPA", results.output)
+        self.assertEqual(len(re.findall(r"display_name", results.output)), 2)
+
+        # Two conencted args = that mapping
+        results = self.runner.invoke(show_mappings, ["fra", "fra-ipa"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("French to IPA", results.output)
+        self.assertEqual(len(re.findall(r"display_name", results.output)), 1)
+
+        # Two args connected via a intermediate steps = all mappings on that path
+        results = self.runner.invoke(show_mappings, ["fra", "eng-arpabet"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("French to IPA", results.output)
+        self.assertIn("French IPA to English IPA", results.output)
+        self.assertIn("English IPA to Arpabet", results.output)
+        self.assertEqual(len(re.findall(r"display_name", results.output)), 3)
+
+        # --all = all mappings
+        results = self.runner.invoke(show_mappings, ["--all"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertGreater(len(re.findall(r"display_name", results.output)), 100)
+
+        # No args = error
+        results = self.runner.invoke(show_mappings, [])
+        self.assertNotEqual(results.exit_code, 0)
+
+        # Bad language code
+        results = self.runner.invoke(show_mappings, ["not-a-lang"])
+        self.assertNotEqual(results.exit_code, 0)
+        results = self.runner.invoke(show_mappings, ["fra", "not-a-lang"])
+        self.assertNotEqual(results.exit_code, 0)
+
+        # No path
+        results = self.runner.invoke(show_mappings, ["fra", "moe"])
+        self.assertNotEqual(results.exit_code, 0)
 
 
 if __name__ == "__main__":
