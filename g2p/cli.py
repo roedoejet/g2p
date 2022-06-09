@@ -414,11 +414,12 @@ def generate_mapping(
             new_mapping.mapping_to_file()
 
 
-# TODO the path argument is ignored. What was it supposed to do? Code it...
-@click.argument("path", type=click.Path(exists=True, file_okay=False, dir_okay=True))
-@cli.command(context_settings=CONTEXT_SETTINGS)
-def generate_mapping_network(path):
-    """Generate a png of the network of mapping languages. Requires matplotlib."""
+@cli.command(
+    context_settings=CONTEXT_SETTINGS,
+    short_help="Generate an image of the mapping network.",
+)
+def generate_mapping_network():
+    """Generate a png image of the network of language mappings. Requires matplotlib."""
     import matplotlib.pyplot as plt
 
     draw(LANGS_NETWORK, with_labels=True)
@@ -681,21 +682,17 @@ def scan(lang, path):
 
 
 @click.option(
-    "-a",
-    "--all",
-    "all_mappings",
-    is_flag=True,
-    help="Display all mappings in the database",
+    "--all", "all_mappings", is_flag=True, help="Display all cached mappings."
 )
+@click.option("--csv", is_flag=True, help="Output mappings in CSV format.")
 @click.argument("lang2", required=False, default=None)
 @click.argument("lang1", required=False, default=None)
 @cli.command(context_settings=CONTEXT_SETTINGS, short_help="Show cached mappings.")
-def show_mappings(all_mappings, lang1, lang2):
+def show_mappings(lang1, lang2, all_mappings, csv):
     """Show cached mappings, as last updated by "g2p update".
 
     Mappings on the path from LANG1 to LANG2 are displayed.
     If only LANG1 is used, all mappings to or from LANG1 are displayed.
-    With --all, all mappings in the database are displayed.
     """
 
     if all_mappings:
@@ -731,9 +728,10 @@ def show_mappings(all_mappings, lang1, lang2):
     else:
         raise click.UsageError("Nothing to do!")
 
+    file_type = "csv" if csv else "json"
     for m in mappings:
         json.dump(m.kwargs, sys.stdout, indent=4, ensure_ascii=False)
         print()
-        m.mapping_to_stream(sys.stdout)
+        m.mapping_to_stream(sys.stdout, file_type=file_type)
         print()
         print()

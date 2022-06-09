@@ -284,6 +284,14 @@ class CliTest(TestCase):
         self.assertEqual(results.exit_code, 0)
         self.assertGreater(len(re.findall(r"display_name", results.output)), 100)
 
+        # --csv = CSV formatted output
+        results = self.runner.invoke(show_mappings, ["--csv", "crl-equiv"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("Northern East Cree Equivalencies", results.output)
+        self.assertIn("Northern East Cree to IPA", results.output)
+        self.assertIn("thwaa,ᕨ,,", results.output)
+        self.assertIn("ᐧᕓ,vʷeː,,", results.output)
+
         # No args = error
         results = self.runner.invoke(show_mappings, [])
         self.assertNotEqual(results.exit_code, 0)

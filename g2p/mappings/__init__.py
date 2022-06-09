@@ -239,13 +239,14 @@ class Mapping:
         # Merge kwargs, but prioritize kwargs that initialized the Mapping
         self.kwargs = {**mapping_kwargs, **self.kwargs}
 
-    def plain_mapping(self):
-        """Return mapping"""
+    def plain_mapping(self, skip_empty_contexts=False):
+        """Return the plain mapping for displaying or save to disk."""
+        internal_fields = ["match_pattern", "intermediate_form"]
         return [
             {
                 k: v
                 for k, v in io.items()
-                if k not in ["match_pattern", "intermediate_form"]
+                if k not in internal_fields and (not skip_empty_contexts or "context_" not in k or v != "")
             }
             for io in self.mapping
         ]
@@ -428,26 +429,18 @@ class Mapping:
     def mapping_to_stream(self, out_stream, file_type: str = "json"):
         """Write mapping to a stream"""
 
-        internal_fields = ["match_pattern", "intermediate_form"]
-        filtered = [
-            {
-                k: v
-                for k, v in io.items()
-                if k not in internal_fields and ("context_" not in k or v != "")
-            }
-            for io in self.mapping
-        ]
         if file_type == "json":
             json.dump(
-                filtered,
+                self.plain_mapping(skip_empty_contexts=True),
                 out_stream,
                 indent=4,
                 ensure_ascii=False,
                 cls=CompactJSONMappingEncoder,
             )
         elif file_type == "csv":
-            writer = csv.DictWriter(out_stream, fieldnames=fieldnames)
-            for io in filtered:
+            fieldnames = ["in", "out", "context_before", "context_after"]
+            writer = csv.DictWriter(out_stream, fieldnames=fieldnames, extrasaction="ignore")
+            for io in self.mapping:
                 writer.writerow(io)
         else:
             raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
