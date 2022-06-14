@@ -12,7 +12,7 @@ from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
 from g2p.mappings.tokenizer import DefaultTokenizer
-from g2p.mappings.utils import create_fixed_width_lookbehind, normalize, is_ipa
+from g2p.mappings.utils import compose_indices, create_fixed_width_lookbehind, normalize, normalize_with_indices, is_ipa, unicode_escape
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
@@ -63,9 +63,9 @@ class TransductionGraph:
 
     @input_string.setter
     def input_string(self, value):
-        raise ValueError(
-            f"Sorry, you tried to change the input string to {value} but it cannot be changed"
-        )
+        # Only modify this if you're also adjusting the edges at the same time!
+        self._input_string = value
+        self._input_nodes = [[i, x] for i, x in enumerate(value)]
 
     @property
     def output_string(self):
@@ -455,8 +455,12 @@ class Transducer:
                             tg.edges[i][1] -= 1
 
     def apply_unidecode(self, to_convert: str):
+        to_convert = unicode_escape(to_convert)
+        saved_to_convert = to_convert
         if self.norm_form:
-            to_convert = normalize(to_convert, self.norm_form)
+            to_convert, norm_indices = normalize_with_indices(to_convert, self.norm_form)
+        else:
+            norm_indices = None
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
@@ -479,7 +483,11 @@ class Transducer:
                 else:
                     edges.append((x_len, max(y_len - 1, 0)))
                 x_len += 1
-            tg.edges = edges
+            if norm_indices:
+                tg.edges = compose_indices(norm_indices, edges)
+                tg.input_string = saved_to_convert
+            else:
+                tg.edges = edges
 
         return tg
 
@@ -488,12 +496,17 @@ class Transducer:
             return self.apply_unidecode(to_convert)
 
         # perform any normalization
+        to_convert = unicode_escape(to_convert)
+        saved_to_convert = to_convert
         if not self.case_sensitive:
             to_convert = to_convert.lower()
         if self.norm_form:
-            to_convert = normalize(to_convert, self.norm_form)
+            to_convert, norm_indices = normalize_with_indices(to_convert, self.norm_form)
+        else:
+            norm_indices = None
         tg = TransductionGraph(to_convert)
         tg.debugger.append([])
+
         # initialize values
         intermediate_forms = False
         # iterate rules
@@ -547,6 +560,9 @@ class Transducer:
         tg.edges = list(
             dict.fromkeys([tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])])
         )
+        if norm_indices is not None:
+            tg.edges = compose_indices(norm_indices, tg.edges)
+            tg.input_string = saved_to_convert
         return tg
 
     def check(

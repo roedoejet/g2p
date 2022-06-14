@@ -24,8 +24,7 @@ GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
 
 
 def flatten_abbreviations(data):
-    """ Turn a CSV-sourced list of lists into a flattened DefaultDict
-    """
+    """Turn a CSV-sourced list of lists into a flattened DefaultDict"""
     default_dict = defaultdict(list)
     for line in data:
         if line[0]:
@@ -34,8 +33,7 @@ def flatten_abbreviations(data):
 
 
 def expand_abbreviations(data):
-    """ Exapand a flattened DefaultDict into a CSV-formatted list of lists
-    """
+    """Expand a flattened DefaultDict into a CSV-formatted list of lists"""
     lines = []
     if data:
         for key in data.keys():
@@ -50,8 +48,9 @@ def expand_abbreviations(data):
 
 
 def normalize(inp: str, norm_form: str):
-    """ Normalize to NFC(omposed) or NFD(ecomposed).
-        Also, find any Unicode Escapes & decode 'em!
+    """Normalize to NFC(omposed) or NFD(ecomposed).
+
+    Also, find any Unicode Escapes & decode 'em!
     """
     if norm_form not in ["none", "NFC", "NFD", "NFKC", "NFKD"]:
         raise exceptions.InvalidNormalization(normalize)
@@ -68,6 +67,68 @@ def normalize(inp: str, norm_form: str):
                 norm_form,
             )
         return normalized
+
+
+def normalize_to_NFD_with_indices(inp: str):
+    """Normalize to NFD and return the indices mapping input to output characters"""
+    result = ""
+    indices = []
+    for i, c in enumerate(inp):
+        c_nfd = ud.normalize("NFD", c)
+        result_pos = len(result)
+        result += c_nfd
+        indices.extend([(i, result_pos + n) for n in range(len(c_nfd))])
+    return result, indices
+
+
+def compose_indices(indices1, indices2):
+    """Compose indices1 + indices2 into direct arcs from the inputs of indices1
+    to the outputs of indices 2.
+
+    E.g., [(0,1), (1,4)] composed with [(0,0), (1,2), (1,3), (4,2)] is
+    [(0,2), (0,3), (1,2)]
+    """
+    # EJJ: I'm still dithering as to which implementation I want to keep here...
+
+    # This implementation takes linear time but it has a bigger constant:
+    indices2_as_dict = defaultdict(dict)  # For O(1) lookup of arcs leaving indices2
+    for a, b in indices2:
+        indices2_as_dict[a][b] = True  # we're using dict as an ordered set...
+
+    result = ((a, c) for a, b in indices1 for c in indices2_as_dict[b].keys())
+    return list(dict.fromkeys(result).keys())  # return a deduplicated list
+
+    # This implementation takes quadratic time but it has a smaller constant.
+    # It's probably faster when handling the small index lists we're typically using.
+    # result = {}
+    # for a, b in indices1:
+    #     for b2, c in indices2:
+    #         if b == b2:
+    #             result[(a, c)] = True
+    # return list(result.keys())
+
+
+def normalize_to_NFC_with_indices(inp: str):
+    """ Normalize to NFC and return the indices mapping input to output characters """
+    inp_nfc = ud.normalize("NFC", inp)
+    inp_nfd, indices_to_nfd = normalize_to_NFD_with_indices(inp)
+    remapped_nfd, reverse_indices_to_nfc = normalize_to_NFD_with_indices(inp_nfc)
+    assert inp_nfd == remapped_nfd
+    indices_to_nfc = [(b, a) for a, b in reverse_indices_to_nfc]
+    return inp_nfc, compose_indices(indices_to_nfd, indices_to_nfc)
+
+
+def normalize_with_indices(inp: str, norm_form: str):
+    """ Normalize inp to the specified norm_form (NFC or NFD) and return both
+        the string and the mapping indices
+    """
+    if norm_form == "NFC":
+        return normalize_to_NFC_with_indices(inp)
+    if norm_form == "NFD":
+        return normalize_to_NFD_with_indices(inp)
+    if norm_form == "none" or norm_form is None:
+        return inp, [(i, i) for i in range(len(inp))]
+    raise exceptions.InvalidNormalization(normalize)
 
 
 def unicode_escape(text):
@@ -455,6 +516,7 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
 
     This code is adapted from https://stackoverflow.com/questions/16264515/json-dumps-custom-formatting
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.indentation_level = 0
@@ -470,7 +532,10 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
             return "[\n" + ",\n".join(output) + "\n" + self.indent_str + "]"
         elif isinstance(obj, dict):
             self.indentation_level += 1
-            output = [self.indent_str + f"{json.dumps(k)}: {self.encode(v)}" for k, v in obj.items()]
+            output = [
+                self.indent_str + f"{json.dumps(k)}: {self.encode(v)}"
+                for k, v in obj.items()
+            ]
             self.indentation_level -= 1
             return "{\n" + ",\n".join(output) + "\n" + self.indent_str + "}"
         else:

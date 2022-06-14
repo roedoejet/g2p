@@ -22,6 +22,7 @@ from unittest import TestCase, main
 
 from g2p.app import APP
 from g2p.cli import convert, generate_mapping
+from g2p.mappings.utils import normalize
 from g2p.tests.public import PUBLIC_DIR
 
 
@@ -143,11 +144,10 @@ class LocalConfigTest(TestCase):
         # TODO: write a internal load_from_config() function, or some such, and
         # factor out the repeated code to use it.
 
-        mappings_dir = Path(PUBLIC_DIR) / "mappings"
         # This first case has the side effect of loading gen-map_config.yaml
-        config_path = mappings_dir / "gen-map_config.yaml"
+        config_path = self.mappings_dir / "gen-map_config.yaml"
         result = self.runner.invoke(
-            convert, ["uyoesnmklbdt", "gm2", "gm2-ipa", "--config", config_path],
+            convert, ["uyoesnmklbdt", "gm2", "gm2-ipa", "--config", config_path]
         )
         self.assertIn("uyɔɛsnmklbdt", result.stdout)
         # This second case confirms that gen-map_config.yaml is still loaded
@@ -167,7 +167,7 @@ class LocalConfigTest(TestCase):
                 generate_mapping, ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir]
             )
             self.assertEqual(result.exit_code, 0)
-            with open(mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
+            with open(self.mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
                 ref = json.load(f)
             with open(output_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
                 output = json.load(f)
@@ -178,7 +178,7 @@ class LocalConfigTest(TestCase):
                 generate_mapping, ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir]
             )
             self.assertEqual(result.exit_code, 0)
-            with open(mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
+            with open(self.mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
                 ref = json.load(f)
             with open(output_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
                 output = json.load(f)
@@ -189,11 +189,27 @@ class LocalConfigTest(TestCase):
                 generate_mapping, ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir]
             )
             self.assertEqual(result.exit_code, 0)
-            with open(mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
+            with open(self.mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
                 ref = json.load(f)
             with open(output_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
                 output = json.load(f)
             self.assertEqual(output, ref)
+
+    def test_compose_NFC_NFD(self):
+        config_path = self.mappings_dir / "compose.yaml"
+        result = self.runner.invoke(
+            convert, [normalize("é", "NFD"), "c1", "c3", "--config", config_path, "-d", "-e"]
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("[[(0, 0), (1, 0)], [(0, 0), (0, 1)]]", result.output)
+        self.assertIn("[[['e', 'ò'], ['́', 'ò']], [['ò', 'u'], ['ò', '̀']]]", result.output)
+
+        result = self.runner.invoke(
+            convert, [normalize("é", "NFC"), "c1", "c3", "--config", config_path, "-d", "-e"]
+        )
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("[[(0, 0)], [(0, 0), (0, 1)]]", result.output)
+        self.assertIn("[[['é', 'ò']], [['ò', 'u'], ['ò', '̀']]]", result.output)
 
 
 if __name__ == "__main__":

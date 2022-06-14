@@ -5,6 +5,7 @@ from unittest import TestCase, main
 
 from g2p import make_g2p
 from g2p.mappings import Mapping
+from g2p.mappings.utils import normalize
 from g2p.transducer import Transducer
 
 
@@ -19,9 +20,13 @@ class UnidecodeTransducerTest(TestCase):
 
     def test_unidecode_g2p(self):
         transducer = make_g2p("und", "und-ascii")
-        tg = transducer("éçà")
+        tg = transducer(normalize("éçà", "NFD"))
         self.assertEqual(tg.output_string, "eca")
         self.assertEqual(tg.edges, [(0,0),(1,0),(2,1),(3,1),(4,2),(5,2)])
+
+        tg = transducer(normalize("éçà", "NFC"))
+        self.assertEqual(tg.output_string, "eca")
+        self.assertEqual(tg.edges, [(0,0),(1,1),(2,2)])
 
     def test_unidecode_empty_output(self):
         transducer = make_g2p("und", "und-ascii")
