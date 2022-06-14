@@ -150,7 +150,8 @@ class UtilsTest(TestCase):
         # http://www.alanwood.net/unicode/combining_diacritical_marks.html
         e_acute_nfd = "e\u0301"
         self.assertEqual(
-            utils.normalize_with_indices("é", "NFD"), (e_acute_nfd, [(0, 0), (0, 1)])
+            utils.normalize_with_indices("é", "NFD"),
+            (e_acute_nfd, [(0, 0), (0, 1)]),
         )
         o_graveabove_nfd = "o\u0300"
         self.assertEqual(
@@ -190,10 +191,12 @@ class UtilsTest(TestCase):
 
     def test_normalize_to_NFC_with_indices(self):
         self.assertEqual(
-            utils.normalize_with_indices("e\u0301", "NFC"), ("é", [(0, 0), (1, 0)])
+            utils.normalize_with_indices("e\u0301", "NFC"),
+            ("é", [(0, 0), (1, 0)]),
         )
         self.assertEqual(
-            utils.normalize_with_indices("ò\u0317", "NFC"), ("ò̗", [(0, 0), (1, 1)])
+            utils.normalize_with_indices("ò\u0317", "NFC"),
+            ("ò̗", [(0, 0), (1, 1)]),
         )
         self.assertEqual(
             utils.normalize_with_indices("\u014d\u0301", "NFC"),
@@ -206,6 +209,17 @@ class UtilsTest(TestCase):
         self.assertEqual(
             utils.normalize_with_indices("\u014d\u0301", "none"),
             ("\u014d\u0301", [(0, 0), (1, 1)]),
+        )
+
+    def test_normalize_to_NFK_with_indices(self):
+        e_acute_nfd = "e\u0301"
+        self.assertEqual(
+            utils.normalize_with_indices(e_acute_nfd, "NFKC"),
+            ("é", [(0, 0), (1, 0)]),
+        )
+        self.assertEqual(
+            utils.normalize_with_indices("é", "NFKD"),
+            (e_acute_nfd, [(0, 0), (0, 1)]),
         )
 
 
