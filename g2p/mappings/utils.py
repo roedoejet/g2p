@@ -10,7 +10,7 @@ import unicodedata as ud
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import regex as re
 import yaml
@@ -24,8 +24,7 @@ GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
 
 
 def flatten_abbreviations(data):
-    """ Turn a CSV-sourced list of lists into a flattened DefaultDict
-    """
+    """Turn a CSV-sourced list of lists into a flattened DefaultDict"""
     default_dict = defaultdict(list)
     for line in data:
         if line[0]:
@@ -34,8 +33,7 @@ def flatten_abbreviations(data):
 
 
 def expand_abbreviations(data):
-    """ Exapand a flattened DefaultDict into a CSV-formatted list of lists
-    """
+    """Expand a flattened DefaultDict into a CSV-formatted list of lists"""
     lines = []
     if data:
         for key in data.keys():
@@ -50,8 +48,9 @@ def expand_abbreviations(data):
 
 
 def normalize(inp: str, norm_form: str):
-    """ Normalize to NFC(omposed) or NFD(ecomposed).
-        Also, find any Unicode Escapes & decode 'em!
+    """Normalize to NFC(omposed) or NFD(ecomposed).
+
+    Also, find any Unicode Escapes & decode 'em!
     """
     if norm_form not in ["none", "NFC", "NFD", "NFKC", "NFKD"]:
         raise exceptions.InvalidNormalization(normalize)
@@ -70,22 +69,84 @@ def normalize(inp: str, norm_form: str):
         return normalized
 
 
-def unicode_escape(text):
-    """ Find any escaped characters and turn them into codepoints
+def compose_indices(
+    indices1: List[Tuple[int, int]], indices2: List[Tuple[int, int]]
+) -> List[Tuple[int, int]]:
+    """Compose indices1 + indices2 into direct arcs from the inputs of indices1
+    to the outputs of indices 2.
+
+    E.g., [(0,1), (1,4)] composed with [(0,0), (1,2), (1,3), (4,2)] is
+    [(0,2), (0,3), (1,2)]
     """
+    indices2_as_dict = defaultdict(dict)  # For O(1) lookup of arcs leaving indices2
+    for a, b in indices2:
+        indices2_as_dict[a][b] = True  # we're using dict as an ordered set...
+
+    result = ((a, c) for a, b in indices1 for c in indices2_as_dict[b].keys())
+    return list(dict.fromkeys(result).keys())  # return a deduplicated list
+
+
+def normalize_to_NFD_with_indices(
+    inp: str, norm_form: str
+) -> Tuple[str, List[Tuple[int, int]]]:
+    """Normalize to NFD and return the indices mapping input to output characters"""
+    assert norm_form in ("NFD", "NFKD")
+    result = ""
+    indices = []
+    for i, c in enumerate(inp):
+        c_nfd = ud.normalize(norm_form, c)
+        result_pos = len(result)
+        result += c_nfd
+        indices.extend([(i, result_pos + n) for n in range(len(c_nfd))])
+    return result, indices
+
+
+def normalize_to_NFC_with_indices(
+    inp: str, norm_form: str
+) -> Tuple[str, List[Tuple[int, int]]]:
+    """Normalize to NFC and return the indices mapping input to output characters"""
+    assert norm_form in ("NFC", "NFKC")
+    inp_nfc = ud.normalize(norm_form, inp)
+    NFD_form = norm_form[:-1] + "D"  # NFC->NFD or NFKC->NFKD
+    inp_nfd, indices_to_nfd = normalize_to_NFD_with_indices(inp, NFD_form)
+    remapped_nfd, reverse_indices_to_nfc = normalize_to_NFD_with_indices(
+        inp_nfc, NFD_form
+    )
+    assert inp_nfd == remapped_nfd
+    indices_to_nfc = [(b, a) for a, b in reverse_indices_to_nfc]
+    return inp_nfc, compose_indices(indices_to_nfd, indices_to_nfc)
+
+
+def normalize_with_indices(
+    inp: str, norm_form: str
+) -> Tuple[str, List[Tuple[int, int]]]:
+    """Normalize inp to the specified norm_form (NFC, NFD, NFKC, or NFKD)
+
+    Returns:
+        Tuple(normalized string, mapping indices)
+    """
+    if norm_form in ("NFC", "NFKC"):
+        return normalize_to_NFC_with_indices(inp, norm_form)
+    if norm_form in ("NFD", "NFKD"):
+        return normalize_to_NFD_with_indices(inp, norm_form)
+    if norm_form in ("none", None):
+        return inp, [(i, i) for i in range(len(inp))]
+    raise exceptions.InvalidNormalization(normalize)
+
+
+def unicode_escape(text):
+    """Find any escaped characters and turn them into codepoints"""
     return re.sub(r"""\\(u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{6})""", escape_to_codepoint, text)
 
 
 def escape_to_codepoint(match):
-    """ Turn escape into codepoint
-    """
+    """Turn escape into codepoint"""
     hex_codepoint = match.group(1)[1:]
     return chr(int(hex_codepoint, base=16))
 
 
 def create_fixed_width_lookbehind(pattern):
-    """Turn all characters into fixed width lookbehinds
-    """
+    """Turn all characters into fixed width lookbehinds"""
     return re.sub(
         re.compile(
             r"""
@@ -101,8 +162,7 @@ def create_fixed_width_lookbehind(pattern):
 
 
 def pattern_to_fixed_width_lookbehinds(match):
-    """ Python must have fixed-width lookbehinds.
-    """
+    """Python must have fixed-width lookbehinds."""
     pattern = match.group()
     pattern = sorted(pattern.split("|"), key=len, reverse=True)
     current_len = len(pattern[0])
@@ -122,8 +182,7 @@ def pattern_to_fixed_width_lookbehinds(match):
 
 
 def load_from_workbook(language):
-    """ Parse mapping from Excel workbook
-    """
+    """Parse mapping from Excel workbook"""
     from openpyxl import load_workbook  # Expensive import, do it only when needed
 
     work_book = load_workbook(language)
@@ -163,8 +222,7 @@ def load_from_workbook(language):
 
 
 def load_from_csv(language, delimiter=","):
-    """ Parse mapping from csv
-    """
+    """Parse mapping from csv"""
     work_sheet = []
     with open(language, encoding="utf8") as f:
         reader = csv.reader(f, delimiter=delimiter)
@@ -204,8 +262,7 @@ def load_from_csv(language, delimiter=","):
 
 
 def load_from_file(path: str) -> list:
-    """ Helper method to load mapping from file.
-    """
+    """Helper method to load mapping from file."""
     if path.endswith("csv"):
         mapping = load_from_csv(path, ",")
     elif path.endswith("tsv"):
@@ -225,8 +282,8 @@ def load_from_file(path: str) -> list:
 
 
 def load_mapping_from_path(path_to_mapping_config, index=0):
-    """ Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
-        provided to the 'index' argument. Default is 0.
+    """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
+    provided to the 'index' argument. Default is 0.
     """
     path = Path(path_to_mapping_config)
     # If path leads to actual mapping config
@@ -294,8 +351,7 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
 
 
 def find_mapping(in_lang: str, out_lang: str) -> list:
-    """ Given an input and output, find a mapping to get between them.
-    """
+    """Given an input and output, find a mapping to get between them."""
     for mapping in langs.MAPPINGS_AVAILABLE:
         map_in_lang = mapping.get("in_lang", "")
         map_out_lang = mapping.get("out_lang", "")
@@ -341,8 +397,7 @@ def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
 
 
 def load_abbreviations_from_file(path):
-    """ Helper method to load abbreviations from file.
-    """
+    """Helper method to load abbreviations from file."""
     if path.endswith("csv"):
         abbs = []
         with open(path, encoding="utf8") as f:
@@ -441,8 +496,8 @@ CATEGORIES = {
 
 
 def get_unicode_category(c):
-    """ Maps a character to one of [ "letter", "number", "diacritic", "punctuation",
-        "symbol", "whitespace", "other"] """
+    """Maps a character to one of [ "letter", "number", "diacritic", "punctuation",
+    "symbol", "whitespace", "other"]"""
     cat = ud.category(c)
     assert cat in CATEGORIES
     return CATEGORIES[cat]
@@ -455,6 +510,7 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
 
     This code is adapted from https://stackoverflow.com/questions/16264515/json-dumps-custom-formatting
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.indentation_level = 0
@@ -470,7 +526,10 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
             return "[\n" + ",\n".join(output) + "\n" + self.indent_str + "]"
         elif isinstance(obj, dict):
             self.indentation_level += 1
-            output = [self.indent_str + f"{json.dumps(k)}: {self.encode(v)}" for k, v in obj.items()]
+            output = [
+                self.indent_str + f"{json.dumps(k)}: {self.encode(v)}"
+                for k, v in obj.items()
+            ]
             self.indentation_level -= 1
             return "{\n" + ",\n".join(output) + "\n" + self.indent_str + "}"
         else:
