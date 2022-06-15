@@ -670,7 +670,12 @@ def scan(lang, path):
 
 
 @click.option("--csv", is_flag=True, help="Output mappings in CSV format.")
-@click.option("--verbose", is_flag=True, help="Output verbose cached")
+@click.option(
+    "-v",
+    "--verbose",
+    is_flag=True,
+    help="Display mapping configs and all rules too.",
+)
 @click.argument("lang2", required=False, default=None)
 @click.argument("lang1", required=False, default=None)
 @cli.command(context_settings=CONTEXT_SETTINGS, short_help="Show cached mappings.")
@@ -679,6 +684,7 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     Mappings on the path from LANG1 to LANG2 are displayed.
     If only LANG1 is used, all mappings to or from LANG1 are displayed.
+    With no LANG, all cached mappings are included.
     """
 
     if lang1 is not None and lang2 is not None:
