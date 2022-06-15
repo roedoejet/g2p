@@ -263,14 +263,21 @@ class CliTest(TestCase):
 
     def test_show_mappings(self):
         # One arg = all mappings to or from that language
-        results = self.runner.invoke(show_mappings, ["fra-ipa"])
+        results = self.runner.invoke(show_mappings, ["fra-ipa", "--verbose"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("French to IPA", results.output)
         self.assertIn("French IPA to English IPA", results.output)
         self.assertEqual(len(re.findall(r"display_name", results.output)), 2)
 
+        # One arg = all mappings to or from that language, terse output
+        results = self.runner.invoke(show_mappings, ["fra-ipa"])
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("fra-ipa", results.output)
+        self.assertIn("eng-ipa", results.output)
+        self.assertEqual(len(re.findall(r"→", results.output)), 2)
+
         # Two conencted args = that mapping
-        results = self.runner.invoke(show_mappings, ["fra", "fra-ipa"])
+        results = self.runner.invoke(show_mappings, ["fra", "fra-ipa", "--verbose"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("French to IPA", results.output)
         self.assertIn(r'{"in": "&", "out": "et"},', results.output)
@@ -285,7 +292,7 @@ class CliTest(TestCase):
         self.assertEqual(len(re.findall(r"display_name", results.output)), 1)
 
         # Two args connected via a intermediate steps = all mappings on that path
-        results = self.runner.invoke(show_mappings, ["fra", "eng-arpabet"])
+        results = self.runner.invoke(show_mappings, ["fra", "eng-arpabet", "--verbose"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("French to IPA", results.output)
         self.assertIn("French IPA to English IPA", results.output)
@@ -293,21 +300,17 @@ class CliTest(TestCase):
         self.assertEqual(len(re.findall(r"display_name", results.output)), 3)
 
         # --all = all mappings
-        results = self.runner.invoke(show_mappings, ["--all"])
+        results = self.runner.invoke(show_mappings, [])
         self.assertEqual(results.exit_code, 0)
-        self.assertGreater(len(re.findall(r"display_name", results.output)), 100)
+        self.assertGreater(len(re.findall(r"→", results.output)), 100)
 
         # --csv = CSV formatted output
-        results = self.runner.invoke(show_mappings, ["--csv", "crl-equiv"])
+        results = self.runner.invoke(show_mappings, ["--csv", "crl-equiv", "--verbose"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("Northern East Cree Equivalencies", results.output)
         self.assertIn("thwaa,ᕨ,,", results.output)
         self.assertIn("Northern East Cree to IPA", results.output)
         self.assertIn("ᐧᕓ,vʷeː,,", results.output)
-
-        # No args = error
-        results = self.runner.invoke(show_mappings, [])
-        self.assertNotEqual(results.exit_code, 0)
 
         # Bad language code
         results = self.runner.invoke(show_mappings, ["not-a-lang"])
