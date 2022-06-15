@@ -414,18 +414,6 @@ def generate_mapping(
             new_mapping.mapping_to_file()
 
 
-@cli.command(
-    context_settings=CONTEXT_SETTINGS,
-    short_help="Generate an image of the mapping network.",
-)
-def generate_mapping_network():
-    """Generate a png image of the network of language mappings. Requires matplotlib."""
-    import matplotlib.pyplot as plt
-
-    draw(LANGS_NETWORK, with_labels=True)
-    plt.show()
-
-
 @click.option(
     "--pretty-edges",
     "-e",
