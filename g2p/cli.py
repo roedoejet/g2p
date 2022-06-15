@@ -681,27 +681,19 @@ def scan(lang, path):
             print(unmapped)
 
 
-@click.option(
-    "--all", "all_mappings", is_flag=True, help="Display all cached mappings."
-)
 @click.option("--csv", is_flag=True, help="Output mappings in CSV format.")
+@click.option("--verbose", is_flag=True, help="Output verbose cached")
 @click.argument("lang2", required=False, default=None)
 @click.argument("lang1", required=False, default=None)
 @cli.command(context_settings=CONTEXT_SETTINGS, short_help="Show cached mappings.")
-def show_mappings(lang1, lang2, all_mappings, csv):
+def show_mappings(lang1, lang2, verbose, csv):
     """Show cached mappings, as last updated by "g2p update".
 
     Mappings on the path from LANG1 to LANG2 are displayed.
     If only LANG1 is used, all mappings to or from LANG1 are displayed.
     """
 
-    if all_mappings:
-        mappings = (
-            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
-            for m in MAPPINGS_AVAILABLE
-        )
-
-    elif lang1 is not None and lang2 is not None:
+    if lang1 is not None and lang2 is not None:
         try:
             transducer = make_g2p(lang1, lang2)
         except (NoPath, InvalidLanguageCode) as e:
@@ -726,12 +718,19 @@ def show_mappings(lang1, lang2, all_mappings, csv):
             )
 
     else:
-        raise click.UsageError("Nothing to do!")
+        mappings = (
+            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+            for m in MAPPINGS_AVAILABLE
+        )
 
     file_type = "csv" if csv else "json"
-    for m in mappings:
-        json.dump(m.kwargs, sys.stdout, indent=4, ensure_ascii=False)
-        print()
-        m.mapping_to_stream(sys.stdout, file_type=file_type)
-        print()
-        print()
+    if verbose:
+        for m in mappings:
+            json.dump(m.kwargs, sys.stdout, indent=4, ensure_ascii=False)
+            print()
+            m.mapping_to_stream(sys.stdout, file_type=file_type)
+            print()
+            print()
+    else:
+        for i, m in enumerate(mappings):
+            print(f"{i+1}: {m.kwargs['in_lang']} → {m.kwargs['out_lang']}")
