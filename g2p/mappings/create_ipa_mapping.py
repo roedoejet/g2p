@@ -207,10 +207,16 @@ def create_mapping(
         del config["display_name"]
     if "language_name" in config:
         del config["language_name"]
-    config["prevent_feeding"] = True
+
     config["in_lang"] = map_1_name
     config["out_lang"] = map_2_name
     config["mapping"] = mapping
+
+    # generated IPA mappings should always prevent feeding and be applied from
+    # longest first, by virtue of how they are created.
+    config["prevent_feeding"] = True
+    config["rule_ordering"] = "apply-longest-first"
+
     mapping = Mapping(**config)
     return mapping
 
