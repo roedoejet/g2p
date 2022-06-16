@@ -9,8 +9,7 @@ from tempfile import NamedTemporaryFile
 from typing import List
 from unittest import TestCase, main
 
-from g2p import exceptions
-from g2p import transducer
+from g2p import exceptions, transducer
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer

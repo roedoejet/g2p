@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
+from unittest import TestCase, main
+
 from g2p.log import LOGGER
 from g2p.mappings.langs.utils import check_ipa_known_segs
 

@@ -4,25 +4,27 @@ This module contains the Transducer and CompositeTransducer classes
 which are responsible for performing transductions in the g2p library.
 """
 
-import re
 import copy
-import text_unidecode
-from typing import Dict, List, Pattern, Tuple, Union
-from collections import defaultdict, OrderedDict
+import re
+from collections import OrderedDict, defaultdict
 from collections.abc import Iterable
+from typing import Dict, List, Pattern, Tuple, Union
+
+import text_unidecode
+
+from g2p.exceptions import MalformedMapping
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
+from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import (
     compose_indices,
     create_fixed_width_lookbehind,
+    is_ipa,
     normalize,
     normalize_with_indices,
-    is_ipa,
     unicode_escape,
 )
-from g2p.mappings.langs.utils import is_arpabet, is_panphon
-from g2p.exceptions import MalformedMapping
-from g2p.log import LOGGER
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)

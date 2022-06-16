@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
 import re
+from unittest import TestCase, main
+
 from g2p.mappings import Mapping
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
 from g2p.tests.public import __file__ as public_data

@@ -15,18 +15,18 @@ Basic Usage:
     list_of_tokens = tokenizer.tokenize_text(input_text)
 
 """
-import sys
 import io
+import sys
 
 from networkx import shortest_path
 from networkx.exception import NetworkXNoPath
 
 from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.tokenizer import make_tokenizer
-from g2p.transducer import CompositeTransducer, Transducer, TokenizingTransducer
-from g2p.log import LOGGER
+from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
 if sys.stdout.encoding != "utf8" and hasattr(sys.stdout, "buffer"):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")

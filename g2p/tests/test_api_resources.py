@@ -4,10 +4,10 @@
 """ Checks all data resources give 200s
 """
 
-from unittest import main, TestCase
-import re
-import os
 import json
+import os
+import re
+from unittest import TestCase, main
 
 import requests
 

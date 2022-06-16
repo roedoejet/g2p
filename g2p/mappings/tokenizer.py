@@ -5,14 +5,16 @@ A token is defined as a sequence of characters that are either part of the
 language's input mapping or that are unicode letters, numbers and diacritics.
 
 """
-import re
-from g2p.mappings import Mapping
-from g2p.mappings.utils import merge_if_same_label, get_unicode_category, is_ipa
-from g2p.exceptions import MappingMissing
-from g2p.mappings.langs import LANGS_NETWORK
-from g2p.log import LOGGER
-from networkx.exception import NetworkXError
 import pprint
+import re
+
+from networkx.exception import NetworkXError
+
+from g2p.exceptions import MappingMissing
+from g2p.log import LOGGER
+from g2p.mappings import Mapping
+from g2p.mappings.langs import LANGS_NETWORK
+from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
 
 
 class DefaultTokenizer:

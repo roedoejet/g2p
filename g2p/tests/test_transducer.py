@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import os
-from unittest import main, TestCase
+from unittest import TestCase, main
+
 from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
 from g2p.transducer import CompositeTransducer, Transducer

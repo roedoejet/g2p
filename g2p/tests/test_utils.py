@@ -4,15 +4,14 @@
 """
 
 import os
-from unittest import main, TestCase
 from collections import defaultdict
+from unittest import TestCase, main
 
 import yaml
 
-from g2p.mappings import utils
-from g2p.mappings import Mapping
-from g2p.tests.public import PUBLIC_DIR
 from g2p.exceptions import IncorrectFileType, MalformedMapping
+from g2p.mappings import Mapping, utils
+from g2p.tests.public import PUBLIC_DIR
 
 
 class UtilsTest(TestCase):

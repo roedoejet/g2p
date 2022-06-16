@@ -4,8 +4,9 @@
 """
 
 import logging
-import coloredlogs
 import sys
+
+import coloredlogs
 
 FIELD_STYLES = dict(
     levelname=dict(color="green"),

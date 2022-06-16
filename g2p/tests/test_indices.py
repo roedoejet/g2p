@@ -4,7 +4,8 @@
     Unittests for index preservation
 """
 
-from unittest import main, TestCase
+from unittest import TestCase, main
+
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 

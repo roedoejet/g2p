@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from unittest import main, TestCase
 import os
+from unittest import TestCase, main
+
 import g2p
 
 

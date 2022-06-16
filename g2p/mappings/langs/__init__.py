@@ -1,14 +1,14 @@
 import os
 import pickle
+import timeit
 from copy import deepcopy
 from pathlib import Path
-import timeit
-import yaml
 
+import yaml
 from networkx import DiGraph, read_gpickle, shortest_path, write_gpickle
 
-from g2p.mappings.utils import find_mapping, load_mapping_from_path
 from g2p.exceptions import MappingMissing
+from g2p.mappings.utils import find_mapping, load_mapping_from_path
 
 LANGS_DIR = os.path.dirname(__file__)
 LANGS_PKL = os.path.join(LANGS_DIR, "langs.pkl")

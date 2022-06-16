@@ -5,33 +5,34 @@ Views and config to the g2p Studio web app
 """
 import json
 import os
+from typing import List, Union
+
 import requests
-from networkx.algorithms.dag import ancestors, descendants
-from networkx.drawing.layout import (
-    spring_layout,
-    spectral_layout,
-    shell_layout,
-    circular_layout,
-)
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_talisman import Talisman
-from typing import List, Union
-
-from g2p.mappings import Mapping
-from g2p.mappings.langs import LANGS, LANGS_NETWORK
-from g2p.transducer import (
-    CompositeTransducer,
-    Transducer,
-    TransductionGraph,
-    CompositeTransductionGraph,
+from networkx.algorithms.dag import ancestors, descendants
+from networkx.drawing.layout import (
+    circular_layout,
+    shell_layout,
+    spectral_layout,
+    spring_layout,
 )
-from g2p.static import __file__ as static_file
-from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
+
+from g2p import make_g2p
 from g2p.api import g2p_api
 from g2p.log import LOGGER
-from g2p import make_g2p
+from g2p.mappings import Mapping
+from g2p.mappings.langs import LANGS, LANGS_NETWORK
+from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
+from g2p.static import __file__ as static_file
+from g2p.transducer import (
+    CompositeTransducer,
+    CompositeTransductionGraph,
+    Transducer,
+    TransductionGraph,
+)
 
 APP = Flask(__name__)
 APP.register_blueprint(g2p_api, url_prefix="/api/v1")
