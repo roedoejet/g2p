@@ -12,7 +12,14 @@ from collections import defaultdict, OrderedDict
 from collections.abc import Iterable
 from g2p.mappings import Mapping
 from g2p.mappings.tokenizer import DefaultTokenizer
-from g2p.mappings.utils import compose_indices, create_fixed_width_lookbehind, normalize, normalize_with_indices, is_ipa, unicode_escape
+from g2p.mappings.utils import (
+    compose_indices,
+    create_fixed_width_lookbehind,
+    normalize,
+    normalize_with_indices,
+    is_ipa,
+    unicode_escape,
+)
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
@@ -154,8 +161,8 @@ class TransductionGraph:
         self._debugger = []
 
     def append(self, tg):
-        """ Append the nodes, edges, strings and debugger from tg to self,
-            shifting indices so tg nodes and edges are added after those of self.
+        """Append the nodes, edges, strings and debugger from tg to self,
+        shifting indices so tg nodes and edges are added after those of self.
         """
         in_offset = len(self._input_nodes)
         out_offset = len(self._output_nodes)
@@ -227,8 +234,8 @@ class Transducer:
             return -1
 
     def resolve_intermediate_chars(self, output_string):
-        """ Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
-            to their mapped equivalents.
+        """Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
+        to their mapped equivalents.
         """
         indices_seen = defaultdict(int)
         for i, char in enumerate(output_string):
@@ -255,14 +262,14 @@ class Transducer:
         return output_string
 
     def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string):
-        """ Takes an arbitrary number of input & output strings and their corresponding index offsets.
-            It then zips them up according to the provided indexing notation.
+        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
+        It then zips them up according to the provided indexing notation.
 
-            Example:
-                A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
-                It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
-                For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
-                Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+        Example:
+            A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
+            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
+            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
+            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
         """
         input_char_matches = [
             x.group() for x in self._char_match_pattern.finditer(io["in"])
@@ -458,7 +465,9 @@ class Transducer:
         to_convert = unicode_escape(to_convert)
         saved_to_convert = to_convert
         if self.norm_form:
-            to_convert, norm_indices = normalize_with_indices(to_convert, self.norm_form)
+            to_convert, norm_indices = normalize_with_indices(
+                to_convert, self.norm_form
+            )
         else:
             norm_indices = None
         tg = TransductionGraph(to_convert)
@@ -501,7 +510,9 @@ class Transducer:
         if not self.case_sensitive:
             to_convert = to_convert.lower()
         if self.norm_form:
-            to_convert, norm_indices = normalize_with_indices(to_convert, self.norm_form)
+            to_convert, norm_indices = normalize_with_indices(
+                to_convert, self.norm_form
+            )
         else:
             norm_indices = None
         tg = TransductionGraph(to_convert)

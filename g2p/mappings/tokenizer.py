@@ -199,22 +199,22 @@ _the_tokenizer_library = TokenizerLibrary()
 
 
 def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
-    """ Make the tokenizer for input in language in_lang
+    """Make the tokenizer for input in language in_lang
 
-        Logic used when only in_lang is provided:
-        - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
-          inventory of that mapping.
-        - elif in_lang -> X -> Y-ipa exists, e.g., tce -> tce-equiv -> tce-ipa, tokenize
-          using the input inventory of those two hops.
-        - otherwise, just use the default tokenizer, which accepts as part of words all
-          unicode letter, numbers and diacritics
+    Logic used when only in_lang is provided:
+    - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
+      inventory of that mapping.
+    - elif in_lang -> X -> Y-ipa exists, e.g., tce -> tce-equiv -> tce-ipa, tokenize
+      using the input inventory of those two hops.
+    - otherwise, just use the default tokenizer, which accepts as part of words all
+      unicode letter, numbers and diacritics
 
-        Logic used when in_lang and out_lang are provided:
-        - if in_lang -> out_lang exists, tokenize using the input inventory of that mapping
-        - otherwise use the default tokenizer
+    Logic used when in_lang and out_lang are provided:
+    - if in_lang -> out_lang exists, tokenize using the input inventory of that mapping
+    - otherwise use the default tokenizer
 
-        Logic used when in_lang and tok_path are provided:
-        - use the first one or two hops in path, stopping at the first -ipa node
+    Logic used when in_lang and tok_path are provided:
+    - use the first one or two hops in path, stopping at the first -ipa node
     """
     return _the_tokenizer_library.make_tokenizer(in_lang, out_lang, tok_path)
 
@@ -223,7 +223,7 @@ _deprecated_warning_printed = False
 
 
 def get_tokenizer(*args, **kwargs):
-    """ Deprecated; use make_tokenizer() instead. """
+    """Deprecated; use make_tokenizer() instead."""
 
     global _deprecated_warning_printed
     if not _deprecated_warning_printed:

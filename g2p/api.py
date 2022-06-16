@@ -138,8 +138,7 @@ class Text(Resource):
 
 
 def update_docs():
-    """ Update the swagger documentation with all nodes from the network
-    """
+    """Update the swagger documentation with all nodes from the network"""
     swagger_path = os.path.join(os.path.dirname(static_file), "swagger.json")
     with open(swagger_path) as f:
         data = json.load(f)

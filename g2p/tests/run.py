@@ -56,49 +56,55 @@ MAPPINGS_TESTS = [
 ]
 
 LANGS_TESTS = [
-    LOADER.loadTestsFromTestCase(test) for test in [
+    LOADER.loadTestsFromTestCase(test)
+    for test in [
         LangTest,
     ]
 ]
 
 INTEGRATION_TESTS = [
-    LOADER.loadTestsFromTestCase(test) for test in [
-        CliTest, ResourceIntegrationTest, StudioTest, DoctorTest
+    LOADER.loadTestsFromTestCase(test)
+    for test in [
+        CliTest,
+        ResourceIntegrationTest,
+        StudioTest,
+        DoctorTest,
     ]
 ]
 
 # LocalConfigTest has to get run last, to avoid interactions with other test
 # cases, since it has side effects on the global database
 LAST_DEV_TEST = [
-    LOADER.loadTestsFromTestCase(test) for test in [
+    LOADER.loadTestsFromTestCase(test)
+    for test in [
         LocalConfigTest,
     ]
 ]
 
-DEV_TESTS = TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS + LAST_DEV_TEST
+DEV_TESTS = (
+    TRANSDUCER_TESTS + MAPPINGS_TESTS + LANGS_TESTS + INTEGRATION_TESTS + LAST_DEV_TEST
+)
 
 
 def run_tests(suite):
-    ''' Decide which Test Suite to run
-    '''
-    if suite == 'all':
+    """Decide which Test Suite to run"""
+    if suite == "all":
         suite = LOADER.discover(os.path.dirname(__file__))
-    elif suite == 'trans':
+    elif suite == "trans":
         suite = TestSuite(TRANSDUCER_TESTS)
-    elif suite == 'langs':
+    elif suite == "langs":
         suite = TestSuite(LANGS_TESTS)
-    elif suite == 'mappings':
+    elif suite == "mappings":
         suite = TestSuite(MAPPINGS_TESTS)
-    elif suite == 'integ':
+    elif suite == "integ":
         suite = TestSuite(INTEGRATION_TESTS)
-    elif suite == 'dev':
+    elif suite == "dev":
         suite = TestSuite(DEV_TESTS)
     runner = TextTestRunner(verbosity=3)
     if isinstance(suite, str):
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
     else:
         return runner.run(suite)
-
 
 
 if __name__ == "__main__":

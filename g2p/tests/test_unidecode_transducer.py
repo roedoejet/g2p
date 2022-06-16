@@ -22,11 +22,11 @@ class UnidecodeTransducerTest(TestCase):
         transducer = make_g2p("und", "und-ascii")
         tg = transducer(normalize("éçà", "NFD"))
         self.assertEqual(tg.output_string, "eca")
-        self.assertEqual(tg.edges, [(0,0),(1,0),(2,1),(3,1),(4,2),(5,2)])
+        self.assertEqual(tg.edges, [(0, 0), (1, 0), (2, 1), (3, 1), (4, 2), (5, 2)])
 
         tg = transducer(normalize("éçà", "NFC"))
         self.assertEqual(tg.output_string, "eca")
-        self.assertEqual(tg.edges, [(0,0),(1,1),(2,2)])
+        self.assertEqual(tg.edges, [(0, 0), (1, 1), (2, 2)])
 
     def test_unidecode_empty_output(self):
         transducer = make_g2p("und", "und-ascii")
@@ -38,7 +38,9 @@ class UnidecodeTransducerTest(TestCase):
     def test_unidecode_to_arpabet(self):
         transducer = make_g2p("und", "eng-arpabet")
         tg = transducer("été Nunavut ᓄᓇᕗᑦ")
-        self.assertEqual(tg.output_string, "EY T EY  N UW N AA V UW T  N OW N AA F OW T ")
+        self.assertEqual(
+            tg.output_string, "EY T EY  N UW N AA V UW T  N OW N AA F OW T "
+        )
 
 
 if __name__ == "__main__":

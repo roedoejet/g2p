@@ -28,14 +28,15 @@ from g2p.mappings.tokenizer import make_tokenizer
 from g2p.transducer import CompositeTransducer, Transducer, TokenizingTransducer
 from g2p.log import LOGGER
 
-if sys.stdout.encoding != 'utf8' and hasattr(sys.stdout, 'buffer'):
+if sys.stdout.encoding != "utf8" and hasattr(sys.stdout, "buffer"):
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
 
-if sys.stderr.encoding != 'utf8' and hasattr(sys.stderr, 'buffer'):
+if sys.stderr.encoding != "utf8" and hasattr(sys.stderr, "buffer"):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 
 _g2p_cache = {}
+
 
 def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
@@ -66,21 +67,27 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
         raise InvalidLanguageCode(out_lang)
 
     if in_lang == out_lang:
-        LOGGER.error(f"Sorry, you can't transduce between the same language. Please select a different output language code.")
+        LOGGER.error(
+            f"Sorry, you can't transduce between the same language. Please select a different output language code."
+        )
         raise NoPath(in_lang, out_lang)
 
     # Try to find the shortest path between the nodes
     try:
         path = shortest_path(LANGS_NETWORK, in_lang, out_lang)
     except NetworkXNoPath as e:
-        LOGGER.error(f"Sorry, we couldn't find a way to convert {in_lang} to {out_lang}. Please update your langs by running `g2p update` and try again.")
+        LOGGER.error(
+            f"Sorry, we couldn't find a way to convert {in_lang} to {out_lang}. Please update your langs by running `g2p update` and try again."
+        )
         raise NoPath(in_lang, out_lang) from e
 
     # Find all mappings needed
     mappings_needed = []
     for lang1, lang2 in zip(path[:-1], path[1:]):
         mapping = Mapping(in_lang=lang1, out_lang=lang2)
-        LOGGER.debug(f"Adding mapping between {lang1} and {lang2} to composite transducer.")
+        LOGGER.debug(
+            f"Adding mapping between {lang1} and {lang2} to composite transducer."
+        )
         mappings_needed.append(mapping)
 
     # Either construct a Transducer or Composite Transducer

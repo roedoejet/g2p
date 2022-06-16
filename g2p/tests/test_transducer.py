@@ -8,8 +8,7 @@ from g2p.transducer import CompositeTransducer, Transducer
 
 
 class TransducerTest(TestCase):
-    """ Basic Transducer Test
-    """
+    """Basic Transducer Test"""
 
     @classmethod
     def setUpClass(cls):

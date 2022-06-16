@@ -26,8 +26,7 @@ def rules_from_strings(*mapping: str) -> List[dict]:
 
 
 class MappingTest(TestCase):
-    """ Basic Mapping Test
-    """
+    """Basic Mapping Test"""
 
     def setUp(self):
         self.test_mapping_no_norm = Mapping(

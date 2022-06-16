@@ -47,7 +47,7 @@ class TokenizerTest(TestCase):
         self.assertEqual(tokens[1]["text"], " ")
 
     def test_tokenize_win(self):
-        """ win is easy to tokenize because win -> win-ipa exists and has ' in its inventory """
+        """win is easy to tokenize because win -> win-ipa exists and has ' in its inventory"""
         input = "p'ōį̄ą"
         self.assertEqual(len(tok.make_tokenizer("fra").tokenize_text(input)), 3)
 
@@ -58,14 +58,14 @@ class TokenizerTest(TestCase):
         self.assertEqual(tokens[0]["text"], "p'ōį̄ą")
 
     def test_tokenize_tce(self):
-        """ tce is hard to tokenize correctly because we have tce -> tce-equiv -> tce-ipa, and ' is
-            only mapped in the latter.
-            Challenges:
-             - since tce->tce-ipa is not a direct mapping, we're probably getting a default
-               tokenizer
-             - we want to merge the input inventory of both tce->tce-equiv and tce-equiv->tce-ipa
-               into just one joint inventory for the purpose of tokenization.
-            Now works - issue #46 fixed this.
+        """tce is hard to tokenize correctly because we have tce -> tce-equiv -> tce-ipa, and ' is
+        only mapped in the latter.
+        Challenges:
+         - since tce->tce-ipa is not a direct mapping, we're probably getting a default
+           tokenizer
+         - we want to merge the input inventory of both tce->tce-equiv and tce-equiv->tce-ipa
+           into just one joint inventory for the purpose of tokenization.
+        Now works - issue #46 fixed this.
         """
         input = "ts'nj"
         self.assertEqual(len(tok.make_tokenizer("fra").tokenize_text(input)), 3)
@@ -89,9 +89,9 @@ class TokenizerTest(TestCase):
         self.assertEqual(tok.make_tokenizer("eng"), tok.make_tokenizer())
 
     def test_tokenize_kwk(self):
-        """ kwk is easier than tce: we just need to use kwk-umista -> kwk-ipa, but that's not
-            implemented yet.
-            Now works - issue #46 fixed this.
+        """kwk is easier than tce: we just need to use kwk-umista -> kwk-ipa, but that's not
+        implemented yet.
+        Now works - issue #46 fixed this.
         """
         self.assertEqual(
             len(tok.make_tokenizer("kwk-umista").tokenize_text("kwak'wala")), 1
