@@ -14,6 +14,7 @@ mappings:
     in_lang: win-ipa
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
+    prevent_feeding: true
     authors:
       - David Huggins-Daines
     <<: *shared

@@ -83,7 +83,9 @@ class CheckIpaArpabetTest(TestCase):
         transducer = make_g2p("win", "eng-arpabet", tok_lang="win")
         # This is False, but should be True! It's False because the mapping outputs :
         # instead of ː
-        self.assertFalse(transducer.check(transducer("uu")))
+        # EJJ 2022-06-16 With #100 fixed, this check is no longer failing.
+        # self.assertFalse(transducer.check(transducer("uu")))
+        self.assertTrue(transducer.check(transducer("uu")))
         self.assertTrue(transducer.check(transducer("uu"), shallow=True))
 
     def test_check_with_equiv(self):
