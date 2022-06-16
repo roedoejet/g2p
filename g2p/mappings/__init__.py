@@ -245,10 +245,21 @@ class Mapping:
         Args:
             skip_empty_contexts: when set, filter out empty context_before/after
         """
+
+        def sorted_rule_items(rule: dict):
+            """Iterate over the items of rule starting with "in", then "out", then the rest"""
+            if "in" in rule:
+                yield "in", rule["in"]
+            if "out" in rule:
+                yield "out", rule["out"]
+            for k, v in rule.items():
+                if k not in ("in", "out"):
+                    yield k, v
+
         return [
             {
                 k: v
-                for k, v in io.items()
+                for k, v in sorted_rule_items(io)
                 if k not in ["match_pattern", "intermediate_form"]
                 and (not skip_empty_contexts or k[:8] != "context_" or v != "")
             }
