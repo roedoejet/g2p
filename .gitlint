@@ -2,7 +2,8 @@
 # Enable conventional commit linting
 contrib=contrib-title-conventional-commits
 
-# Ignore any data sent to gitlint via stdin (useful on Windows)
+# Ignore any data sent to gitlint via stdin (helpful on Windows)
 ignore-stdin=true
 
-#ignore=body-is-missing
+# We don't require a body, just a title, even though a body is also a good idea
+ignore=body-is-missing

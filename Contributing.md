@@ -21,8 +21,9 @@ Please considering running these commands in each of your sandboxes to enable ou
 pre-commit hooks and commitlint:
 
 ```sh
+pip install -r requirements/requirements.dev.txt
 pre-commit install
-npm install
+gitlint install-hook
 ```
 
 ## Pre-commit hooks
@@ -64,11 +65,11 @@ Note that you have to run the second command in every g2p sandbox you create.
 
 ## commitlint
 
-The team has also agreed to use commitlint-style commit messages. Install and enable
-[commitlint](https://github.com/conventional-changelog/commitlint) to have your commits
-validated systematically.
+The team has also agreed to use [Conventional Commits](https://www.conventionalcommits.org/).
+Install and enable [gitlint](https://jorisroovers.com/gitlint/) to have your
+commit messages scanned automatically.
 
-Commitlint commits look like this:
+Convential commits look like this:
 
     type(optional-scope): subject (i.e., short description)
 
@@ -112,31 +113,13 @@ These rules are inspired by these commit formatting guides:
 ### Enabling commitlint
 
 We run commitlint on each commit message that you write by enabling the commit-msg hook in
-Git. It is run via [husky](https://www.npmjs.com/package/husky), which is a JS Git hook
-manager, and you need Node to run it.
+Git.
 
-If you don't already use Node, this is a bit more work to install than the pre-commit
-hooks above, but please take a moment to do this:
+Run this command in your g2p sandbox to install and enable the commit-msg hook:
 
-- If you don't already use Node or nvm, or if you don't have admin access to the system
-  version of node, install nvm in your ~/.nvm folder:
 ```sh
-wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-```
-This will add a few lines to your `.bashrc` file, which you'll need to execute now,
-possibly by starting a new shell.
-
-- Install Node:
-```sh
-nvm install node
-```
-
-- In your g2p sandbox, install the husky commit-msg hook using npm, the node
-  package manager you just installed using nvm. The file `package.json` in g2p is what
-  tells npm to install husky as a pre-commit hook, and also what tells husky to invoke
-  commitlint on your commit messages.
-```sh
-npm install
+pip install -r requirements/requirements.dev.txt
+gitlint install-hook
 ```
 
 - Now, next time you make a change and commit it, your commit log will be checked:
