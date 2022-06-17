@@ -13,8 +13,9 @@
 # AP Note: Taken from ReadAlongs-Studio and implemented with G2P formatting
 ######################################################################
 
-from tqdm import tqdm
 from typing import Iterable, List, Tuple
+
+from tqdm import tqdm
 
 from g2p.log import LOGGER
 from g2p.mappings import Mapping

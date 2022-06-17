@@ -20,10 +20,12 @@ from g2p.mappings.utils import is_ipa
 
 _PANPHON_DISTANCE_SINGLETON = None
 
+
 def getPanphonDistanceSingleton():
     global _PANPHON_DISTANCE_SINGLETON
     if _PANPHON_DISTANCE_SINGLETON is None:
         import panphon.distance  # Expensive import, only do it when actually needed
+
         _PANPHON_DISTANCE_SINGLETON = panphon.distance.Distance()
     return _PANPHON_DISTANCE_SINGLETON
 
@@ -37,9 +39,7 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
         mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
     found_error = False
     for mapping in [
-        x
-        for x in MAPPINGS_AVAILABLE
-        if x["out_lang"] in mappings_to_check
+        x for x in MAPPINGS_AVAILABLE if x["out_lang"] in mappings_to_check
     ]:
         if is_ipa(mapping["out_lang"]):
             reverse = mapping.get("reverse", False)
@@ -105,10 +105,13 @@ is_panphon.colon_warning_printed = False
 
 _ARPABET_SET = None
 
+
 def is_arpabet(string):
     global _ARPABET_SET
     if _ARPABET_SET is None:
-        _ARPABET_SET = set(Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out"))
+        _ARPABET_SET = set(
+            Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out")
+        )
     # print(f"arpabet_set={_ARPABET_SET}")
     for sound in string.split():
         if sound not in _ARPABET_SET:

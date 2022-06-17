@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from unittest import main, TestCase
 import os
+from unittest import TestCase, main
+
 import g2p
 
 
 class TokenizeAndMapTest(TestCase):
-    """ Test suite for chaining tokenization and transduction """
+    """Test suite for chaining tokenization and transduction"""
 
     def setUp(self):
         pass
@@ -16,7 +17,7 @@ class TokenizeAndMapTest(TestCase):
         return word + " " + word + " ," + word + ", " + word
 
     def test_tok_and_map_fra(self):
-        """ Chaining tests: tokenize and map a string """
+        """Chaining tests: tokenize and map a string"""
         transducer = g2p.make_g2p("fra", "fra-ipa")
         tokenizer = g2p.make_tokenizer("fra")
         # "teste" in isolation is at string and word end and beginning
@@ -75,8 +76,10 @@ class TokenizeAndMapTest(TestCase):
         ref_edges = [
             # "est est" -> "ɛ ɛ"
             [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)],
-            [(0, 0), (1, 1), (2, 2)],  # "ɛ ɛ" -> "ɛ ɛ"
-            [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (2, 5), (2, 6)],  # "ɛ ɛ" -> "EH  EH "
+            # "ɛ ɛ" -> "ɛ ɛ"
+            [(0, 0), (1, 1), (2, 2)],
+            # "ɛ ɛ" -> "EH  EH "
+            [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (2, 5), (2, 6)],
         ]
         self.assertEqual(edges, ref_edges)
 
@@ -84,9 +87,12 @@ class TokenizeAndMapTest(TestCase):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
         edges = transducer("  a, ").edges
         ref_edges = [
-            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],  # "  a, " -> "  a, "
-            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],  # "  a, " -> "  ɑ, "
-            [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],  # "  ɑ, " -> "  AA , "
+            # "  a, " -> "  a, "
+            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],
+            # "  a, " -> "  ɑ, "
+            [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],
+            # "  ɑ, " -> "  AA , "
+            [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],
         ]
         self.assertEqual(edges, ref_edges)
 

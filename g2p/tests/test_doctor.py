@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
-from unittest import main, TestCase
+from unittest import TestCase, main
+
 from g2p.log import LOGGER
 from g2p.mappings.langs.utils import check_ipa_known_segs
+
 
 class DoctorTest(TestCase):
     def setUp(self):
@@ -31,10 +33,10 @@ class DoctorTest(TestCase):
     # Migrated to test_doctor_expensive.py so we can still run it, manually or via
     # ./run.py all.
     def not_test_ipa_known_segs_all(self):
-        with self.assertLogs(LOGGER, level='WARNING') as cm:
+        with self.assertLogs(LOGGER, level="WARNING") as cm:
             check_ipa_known_segs()
         self.assertGreaterEqual(len(cm.output), 20)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

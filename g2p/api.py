@@ -1,19 +1,19 @@
 """ Very Basic API
 """
-import os
 import json
+import os
 
 from flask import Blueprint, abort
-from flask_restful import Resource, Api, reqparse, inputs
 from flask_cors import CORS
-
-from networkx.exception import NetworkXError
+from flask_restful import Api, Resource, inputs, reqparse
 from networkx.algorithms.dag import ancestors, descendants
-from g2p.exceptions import InvalidLanguageCode, NoPath
-from g2p.static import __file__ as static_file
-from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
-from g2p.log import LOGGER
+from networkx.exception import NetworkXError
+
 from g2p import make_g2p
+from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.log import LOGGER
+from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
+from g2p.static import __file__ as static_file
 
 
 class Ancestors(Resource):
@@ -138,8 +138,7 @@ class Text(Resource):
 
 
 def update_docs():
-    """ Update the swagger documentation with all nodes from the network
-    """
+    """Update the swagger documentation with all nodes from the network"""
     swagger_path = os.path.join(os.path.dirname(static_file), "swagger.json")
     with open(swagger_path) as f:
         data = json.load(f)
