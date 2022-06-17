@@ -1,5 +1,5 @@
 {
-  "name": "readalongs",
+  "name": "g2p",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -18,15 +18,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ReadAlongs/Studio.git"
+    "url": "git+https://github.com/roedoejet/g2p.git"
   },
   "keywords": [],
   "author": "",
   "license": "",
   "bugs": {
-    "url": "https://github.com/ReadAlongs/Studio/issues"
+    "url": "https://github.com/roedoejet/g2p/issues"
   },
-  "homepage": "https://github.com/ReadAlongs/Studio#readme",
+  "homepage": "https://github.com/roedoejet/g2p#readme",
   "dependencies": {
     "@commitlint/config-conventional": "^8.3.4",
     "commitlint": "^8.3.5",
