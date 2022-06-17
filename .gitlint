@@ -1,0 +1,8 @@
+[general]
+# Enable conventional commit linting
+contrib=contrib-title-conventional-commits
+
+# Ignore any data sent to gitlint via stdin (useful on Windows)
+ignore-stdin=true
+
+#ignore=body-is-missing
