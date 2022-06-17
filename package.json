@@ -1,0 +1,35 @@
+{
+  "name": "readalongs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReadAlongs/Studio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/ReadAlongs/Studio/issues"
+  },
+  "homepage": "https://github.com/ReadAlongs/Studio#readme",
+  "dependencies": {
+    "@commitlint/config-conventional": "^8.3.4",
+    "commitlint": "^8.3.5",
+    "husky": "^4.2.3"
+  }
+}

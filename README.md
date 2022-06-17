@@ -41,7 +41,7 @@ The initial version of this package was developed by [Patrick Littell](https://g
 
 ## Install
 
-The best thing to do is install with pip `pip install g2p`. 
+The best thing to do is install with pip `pip install g2p`.
 This command will install the latest release published on [PyPI g2p releases](https://pypi.org/project/g2p/).
 
 You can also clone the repo and pip install it locally:
@@ -72,9 +72,9 @@ There must be a valid path between the `in_lang` and `out_lang` in order for thi
 
 ### Writing mapping files
 
-Mapping files are written as either CSV or JSON files. 
+Mapping files are written as either CSV or JSON files.
 
-#### CSV 
+#### CSV
 
 CSV files write each new rule as a new line and consist of at least two columns, and up to four. The first column is required and corresponds to the rule's input. The second column is also
 required and corresponds to the rule's output. The third column is optional and corresponds to the context before the rule input. The fourth column is also optional and corresponds to the context after the rule input. For example:
@@ -86,7 +86,7 @@ a,b
 c,d
 ```
 
-2. This mapping describes two rules; a -> b / c _ d<sup id="a1">[1](#f1)</sup> and a -> e 
+2. This mapping describes two rules; a -> b / c _ d<sup id="a1">[1](#f1)</sup> and a -> e
 
 ```csv
 a,b,c,d
@@ -139,14 +139,14 @@ If you edit or add new mappings to the `g2p.mappings.langs` folder, you need to 
 
 ### `convert`
 If you want to convert a string on the command line, you can use `g2p convert <input_text> <in_lang> <out_lang>`
-  
+
 Ex. `g2p convert hej dan eng-arpabet` would produce `HH EH Y`
 
 If you have written your own mapping that is not included in the standard `g2p` library, you can point to its configuration file using the `--config` flag, as in `g2p convert <input_text> <in_lang> <out_lang> --config path/to/config.yml`. This will add the mappings defined in your configuration to the existing `g2p` network, so be careful to avoid namespace errors.
 
 ### `generate-mapping`
 If your language has a mapping to IPA and you want to generate a mapping between that and the English IPA mapping, you can use `g2p generate-mapping <in_lang> --ipa`.  Remember to run `g2p update` before so that it has the latest mappings for your language.
-  
+
 Ex. `g2p generate-mapping dan --ipa` will produce a mapping from `dan-ipa` to `eng-ipa`. You must also run `g2p update` afterwards to update `g2p`. The resulting mapping will be added to the folder in `g2p.mappings.langs.generated`
 
 Note: if your language goes through an intermediate representation, e.g., lang -> lang-equiv -> lang-ipa, specify both the `<in_lang>` and `<out_lang>` of your final IPA mapping to `g2p generate-mapping`. E.g., to generate `crl-ipa -> eng-ipa`, you would run `g2p generate-mapping --ipa crl-equiv crl-ipa`.
@@ -163,7 +163,7 @@ Text DB: this is the textual database of g2p conversion rules created by contrib
 * g2p/mappings/langs/\*/\*.yaml
 
 Gen DB: this is the part of the textual database that is generated when running the `g2p generate-mapping` command:
-* g2p/mappings/generated/*
+* g2p/mappings/generated/\*
 
 Compiled DB: this contains the same info as Text DB + Gen DB, but in a format optimized for fast reading by the machine. This is what any program using `g2p` reads: `g2p convert`, `readalongs align`, `convertextract`, and also `g2p generate-mapping`. It consists of these files:
 * g2p/mappings/langs/langs.pkl
@@ -174,14 +174,14 @@ Compiled DB: this contains the same info as Text DB + Gen DB, but in a format op
 So, when you write a new g2p mapping for a language, say `lll`, and you want to be able to convert text from `lll` to `eng-ipa` or `eng-arpabet`, you need to do the following:
 1. Write the mapping from `lll` to `lll-ipa` in g2p/mappings/langs/lll/. You've just updated Text DB.
 2. Run `g2p update` to regenerate Compiled DB from the current Text DB and Gen DB, i.e., to incorporate your new mapping rules.
-3. Run `g2p generate-mapping --ipa lll` to generate g2p/mappings/langs/generated/lll-ipa_to_eng-ipa.json. This is not based on what you wrote directly, but rather on what's in Generated DB.
+3. Run `g2p generate-mapping --ipa lll` to generate g2p/mappings/langs/generated/lll-ipa\_to\_eng-ipa.json. This is not based on what you wrote directly, but rather on what's in Generated DB.
 4. Run `g2p udpate` again. `g2p generate-mapping` updates Gen DB only, so what gets written there will only be reflected in Compiled DB when you run `g2p update` once more.
 
 Once you have the Compiled DB, it is then possible to use the `g2p convert` command, create time-aligned audiobooks with [readalongs align](https://github.com/ReadAlongs/Studio), or convert files with the [convertextract](https://github.com/roedoejet/convertextract) library.
 
 ## Studio
 
-You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally using `python run_studio.py`. 
+You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally using `python run_studio.py`.
 
 Alternatively, you can run the app from the command line: `g2p run`
 
@@ -195,6 +195,8 @@ Alternatively, you can run the app from the command line: `g2p run`
 Feel free to dive in! [Open an issue](https://github.com/roedoejet/g2p/issues/new) or submit PRs.
 
 This repo follows the [Contributor Covenant](http://contributor-covenant.org/version/1/3/0/) Code of Conduct.
+
+Have a look at [Contributing.md](Contributing.md) for help using our standardized formatting conventions and pre-commit hooks.
 
 ### Adding a new mapping
 
@@ -220,7 +222,7 @@ mappings:
 
 4. Add a mapping file. Look at the other mappings for examples, or visit the [g2p studio](https://g2p-studio.herokuapp.com) to practise your mappings.
 Mappings are defined in either a CSV or json file. See [writing mapping files](#writing-mapping-files) for more info.
-5. After installing your local version (`pip3 install -e .`), update with `g2p update`  
+5. After installing your local version (`pip3 install -e .`), update with `g2p update`
 6. Add some tests in `g2p/testspublic/data/<YourIsoCode>.psv`. Each line in the file will run a test with the following structure: `<in_lang>|<out_lang>|<input_string>|<expected_output>`
 7. Run `python3 run_tests.py langs` to make sure your tests pass.
 8. Make sure you have [checked all the boxes](https://github.com/roedoejet/g2p/blob/master/.github/pull_request_template.md) and make a [pull request]((https://github.com/roedoejet/g2p/pulls)!
