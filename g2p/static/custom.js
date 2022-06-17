@@ -59,6 +59,7 @@ function createSettings(index, data) {
     let out_delimiter = '';
     let prevent_feeding = '';
     let norm_form = 'NFC';
+    let type = 'mapping';
     if (index === 0) {
         active = 'active'
     }
@@ -86,6 +87,9 @@ function createSettings(index, data) {
     if (data['norm_form']) {
         norm_form = data['norm_form']
     }
+    if (data['type']) {
+        type = data['type']
+    }
     let settings_template = `
     <div class='${active} settings'>
         <form>
@@ -93,40 +97,41 @@ function createSettings(index, data) {
                 <div></div>
                 <div>
                     <input ${include} class='include' id='include-${index}' type='checkbox' name='include' value='include'>
-                        <label for='include'>Include rules in output</label>
+                    <label for='include'>Include rules in output</label>
                 </div>
                 <div>
                     <input ${as_is} id='as_is-${index}' type='checkbox' name='as_is' value='as_is'>
-                        <label for='as_is'>Leave order as is</label>
+                    <label for='as_is'>Leave order as is</label>
                 </div>
                 <div>
                     <input  ${case_sensitive} id='case_sensitive-${index}' type='checkbox' name='case_sensitive'
                         value='case_sensitive'>
-                        <label for='case_sensitive'>Rules are case sensitive</label>
+                    <label for='case_sensitive'>Rules are case sensitive</label>
                 </div>
                 <div>
                     <input ${escape_special} id='escape_special-${index}' type='checkbox' name='escape_special' value='escape_special'>
-                        <label for='escape_special'>Escape special characters</label>
+                    <label for='escape_special'>Escape special characters</label>
                 </div>
                 <div>
                     <input ${reverse} id='reverse-${index}' type='checkbox' name='reverse' value='reverse'>
-                        <label for='reverse'>Reverse the rules</label>
+                    <label for='reverse'>Reverse the rules</label>
                 </div>
                 <div>
-                <input ${prevent_feeding} id='prevent_feeding-${index}' type='checkbox' name='prevent_feeding' value='prevent_feeding'>
-                    <label for='reverse'>Prevent all rules from feeding</label>
+                    <input ${prevent_feeding} id='prevent_feeding-${index}' type='checkbox' name='prevent_feeding' value='prevent_feeding'>
+                    <label for='prevent_feeding'>Prevent all rules from feeding</label>
                 </div>
-                 <div>
+                <div>
                     <label for='reverse'>Normalization</label>
                     <input id='norm_form-${index}' type='text' name='norm_form' value='${norm_form}' maxlength='4' minlength='3'>
                 </div>
                 <div>
-                <label for='out_delimiter'>Output Delimiter</label>
-                <input id='out_delimiter-${index}' type='text' name='out_delimiter' value='${out_delimiter}' placeholder='delimiter' maxlength='1'>
-            </div>
-        </fieldset>
-    </form>
-</div>`
+                    <label for='out_delimiter'>Output Delimiter</label>
+                    <input id='out_delimiter-${index}' type='text' name='out_delimiter' value='${out_delimiter}' placeholder='delimiter' maxlength='1'>
+                </div>
+                <input id='type-${index}' type='hidden' name='type' value='${type}' maxlength='20' minlength='0'>
+            </fieldset>
+        </form>
+    </div>`
     $('#settings-container').append(settings_template)
     document.getElementById(`include-${index}`).addEventListener('click', function(event) {
         const include = event.target.checked
@@ -327,7 +332,8 @@ var getKwargs = function(index) {
     const out_delimiter = document.getElementById(`out_delimiter-${index}`).value
     const prevent_feeding = document.getElementById(`prevent_feeding-${index}`).checked
     const norm_form = document.getElementById(`norm_form-${index}`).value
-    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding }
+    const type = document.getElementById(`type-${index}`).value
+    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding, type }
 }
 
 var setKwargs = function(index, kwargs) {
@@ -354,6 +360,9 @@ var setKwargs = function(index, kwargs) {
     }
     if ('norm_form' in kwargs) {
         document.getElementById(`norm_form-${index}`).value = kwargs['norm_form']
+    }
+    if ('type' in kwargs) {
+        document.getElementById(`type-${index}`).value = kwargs['type']
     }
     convert()
 }
@@ -461,7 +470,7 @@ function showSettings(index) {
 
 tableSocket.on('table response', function(msg) {
     // msg arg is list of {
-    //  mappings: io pairs to be applied to hot table 
+    //  mappings: io pairs to be applied to hot table
     //  abbs: abbreviations to be included in abbreviations table
     //  kwargs: settings to be added to settings forms
     // }
