@@ -28,7 +28,3 @@ docs/_build/
 
 # coverage annotation output
 *,cover
-
-# Node stuff for our pre-commit hooks and commitlint
-node_modules
-package-lock.json
