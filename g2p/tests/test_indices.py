@@ -248,7 +248,7 @@ class IndicesTest(TestCase):
     def test_case_two(self):
         transducer = self.trans_two("test")
         self.assertEqual(transducer.output_string, "tst")
-        self.assertEqual(transducer.edges, [(0, 0), (1, None), (2, 1), (3, 2)])
+        self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 1), (3, 2)])
 
     def test_case_three(self):
         transducer = self.trans_three("test")
@@ -308,30 +308,11 @@ class IndicesTest(TestCase):
         self.assertEqual(tg.output_string, "abab")
         self.assertEqual(tg_default.output_string, "abab")
         self.assertEqual(
-            tg.edges,
-            [
-                (0, None),
-                (1, None),
-                (2, 0),
-                (2, 1),
-                (3, None),
-                (4, None),
-                (5, 2),
-                (5, 3),
-            ],
+            tg.edges, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 2), (5, 2), (5, 3),],
         )
         self.assertEqual(
             tg_default.edges,
-            [
-                (0, None),
-                (1, None),
-                (2, 0),
-                (2, 1),
-                (3, None),
-                (4, None),
-                (5, 2),
-                (5, 3),
-            ],
+            [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 2), (5, 2), (5, 3),],
         )
 
 

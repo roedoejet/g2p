@@ -570,9 +570,23 @@ class Transducer:
                 intermediate_diff += len(out_string) - len(match.group())
         if intermediate_forms:
             tg.output_string = self.resolve_intermediate_chars(tg.output_string)
-        tg.edges = list(
-            dict.fromkeys([tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])])
-        )
+
+        # fix None
+        n_edges = len(tg.edges)
+        tg.edges.sort()
+        for i, edge in enumerate(reversed(tg.edges)):
+            if edge[1] is None:
+                # if previous exists, use that, otherwise use following, otherwise None
+                previous = tg.edges[max(0, n_edges - (i + 2))]
+                try:
+                    following = tg.edges[n_edges - i]
+                except IndexError:
+                    following = None
+                if previous[1] != None:
+                    edge[1] = previous[1]
+                elif following:
+                    edge[1] = following[1]
+        tg.edges = list(dict.fromkeys([tuple(x) for x in tg.edges]))
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
