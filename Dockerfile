@@ -3,16 +3,30 @@ FROM debian:bullseye-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Dependencies that don't change with g2p updates and can be cached
-RUN apt-get update -y && apt-get install -y apt-transport-https
-RUN apt-get install -y libffi-dev openssl libssl-dev python3 python3-pip python3-dev build-essential nano git
+# Dependencies that don't change with g2p updates and can be cached, and make it lean
+run apt-get update -y \
+    && apt-get install -y \
+        apt-transport-https \
+        libffi-dev \
+        openssl \
+        libssl-dev \
+        python3 \
+        python3-pip \
+        python3-dev \
+        build-essential \
+        nano \
+        git \
+    && apt-get clean \
+    && apt-get autoremove \
+    && rm -fr /var/lib/apt/lists/*
 
 # Get g2p-specific dependencies that can also often be cached
 RUN mkdir -p /g2p/g2p
 COPY requirements /g2p/requirements
 COPY requirements.txt /g2p
 COPY setup.py /g2p
-RUN MAKEFLAGS="-j$(nproc)" pip3 install -r /g2p/requirements.txt
+RUN python3 -m pip install --upgrade pip \
+    && MAKEFLAGS="-j$(nproc)" pip3 install -r /g2p/requirements.txt
 
 # Install g2p itself, last
 COPY g2p /g2p/g2p
