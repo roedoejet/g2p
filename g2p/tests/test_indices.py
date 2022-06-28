@@ -5,6 +5,7 @@
 """
 
 from unittest import TestCase, main
+from g2p import transducer
 
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
@@ -188,6 +189,7 @@ class IndicesTest(TestCase):
         )
         self.test_mapping_nine = Mapping([{"in": "aa", "out": ""}])
         self.test_mapping_ten = Mapping([{"in": "abc", "out": "a"}])
+        self.test_mapping_eleven = Mapping([{"in": "a", "out": "aaaa"}])
         self.test_mapping_combining = Mapping(
             [{"in": "k{1}\u0313{2}", "out": "'{2}k{1}"}]
         )
@@ -204,10 +206,13 @@ class IndicesTest(TestCase):
         )
         self.test_mapping_circum = Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}])
         self.test_mapping_explicit_equal_1 = Mapping(
-            [{"in": "a{1}b{1}", "out": "A{1}"}]
+            [{"in": "a{1}b{1}", "out": "c{1}d{1}"}]
         )
-        self.test_mapping_explicit_equal_2 = Mapping([{"in": "ab{1}", "out": "A{1}"}])
-        self.test_mapping_explicit_equal_3 = Mapping([{"in": "ab", "out": "A"}])
+        self.test_mapping_explicit_equal_2 = Mapping([{"in": "ab{1}", "out": "cd{1}"}])
+        self.test_mapping_explicit_equal_3 = Mapping([{"in": "ab", "out": "cd"}])
+        self.test_mapping_explicit_equal_4 = Mapping(
+            [{"in": "a{1}b{2}", "out": "c{1}d{2}"}]
+        )
         self.test_issue_173_1 = Mapping(
             [
                 {"in": "x{1}y{2}z{3}", "out": "a{2}b{1}"},
@@ -220,13 +225,19 @@ class IndicesTest(TestCase):
                 {"in": "d{1}e{2}f{3}", "out": "d{1}e{2}f{3}"},
             ]
         )
-        self.test_issue_157 = Mapping(
+        self.test_issue_157_mapping = Mapping(
             [
                 {"in": "a", "out": "d"},
                 {"in": "bc", "out": "e"},
                 {"in": "g{1}h{2}i{3}", "out": "G{2}H{1}I{3}J{1}"},
                 {"in": "m{1}n{2}", "out": "N{2}M{1}"},
             ]
+        )
+        self.test_feeding_mapping_1 = Mapping(
+            [{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"},]
+        )
+        self.test_feeding_mapping_2 = Mapping(
+            [{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"},]
         )
         self.test_issue_173_3 = Mapping([{"in": "ab{1}c{2}", "out": "X{1}Y{2}"}])
         self.test_issue_173_4 = Mapping([{"in": "a{1}bc{2}", "out": "xy{1}z{2}"}])
@@ -241,6 +252,7 @@ class IndicesTest(TestCase):
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_nine = Transducer(self.test_mapping_nine)
         self.trans_ten = Transducer(self.test_mapping_ten)
+        self.trans_eleven = Transducer(self.test_mapping_eleven)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
         self.trans_wacky_lite = Transducer(self.test_mapping_wacky_lite)
@@ -248,11 +260,23 @@ class IndicesTest(TestCase):
         self.trans_explicit_equal_1 = Transducer(self.test_mapping_explicit_equal_1)
         self.trans_explicit_equal_2 = Transducer(self.test_mapping_explicit_equal_2)
         self.trans_explicit_equal_3 = Transducer(self.test_mapping_explicit_equal_3)
+        self.trans_explicit_equal_4 = Transducer(self.test_mapping_explicit_equal_4)
         self.trans_173_1 = Transducer(self.test_issue_173_1)
         self.trans_173_2 = Transducer(self.test_issue_173_2)
         self.trans_173_3 = Transducer(self.test_issue_173_3)
         self.trans_173_4 = Transducer(self.test_issue_173_4)
-        self.trans_157 = Transducer(self.test_issue_157)
+        self.trans_157 = Transducer(self.test_issue_157_mapping)
+        self.trans_feeding_1 = Transducer(self.test_feeding_mapping_1)
+        self.trans_feeding_2 = Transducer(self.test_feeding_mapping_2)
+
+    def test_feeding(self):
+        """Test feeding"""
+        transducer_1 = self.trans_feeding_1("ab")
+        self.assertEqual(transducer_1.output_string, "cd")
+        self.assertEqual(transducer_1.edges, [(0, 0), (0, 1), (1, 0), (1, 1)])
+        transducer_2 = self.trans_feeding_2("a")
+        self.assertEqual(transducer_2.output_string, "b")
+        self.assertEqual(transducer_2.edges, [(0, 0)])
 
     def test_issue_157(self):
         """Test explicit problem from Issue 157"""
@@ -285,13 +309,16 @@ class IndicesTest(TestCase):
         """Test synonymous syntax for explicit indices"""
         explicit_1 = self.trans_explicit_equal_1("ab")
         explicit_2 = self.trans_explicit_equal_2("ab")
+        explicit_3 = self.trans_explicit_equal_4("ab")
         implicit = self.trans_explicit_equal_3("ab")
-        self.assertEqual(explicit_1.output_string, "A")
-        self.assertEqual(explicit_2.output_string, "A")
-        self.assertEqual(implicit.output_string, "A")
-        self.assertEqual(explicit_1.edges, [(0, 0), (1, 0)])
-        self.assertEqual(explicit_2.edges, [(0, 0), (1, 0)])
-        self.assertEqual(implicit.edges, [(0, 0), (1, 0)])
+        self.assertEqual(explicit_1.output_string, "cd")
+        self.assertEqual(explicit_2.output_string, "cd")
+        self.assertEqual(implicit.output_string, "cd")
+        self.assertEqual(explicit_3.output_string, "cd")
+        self.assertEqual(explicit_1.edges, [(0, 0), (1, 1)])
+        self.assertEqual(explicit_2.edges, [(0, 0), (1, 1)])
+        self.assertEqual(implicit.edges, [(0, 0), (1, 1)])
+        self.assertEqual(explicit_3.edges, [(0, 0), (1, 1)])
 
     def test_no_indices(self):
         """Test straightforward conversion without returning indices."""
@@ -388,6 +415,11 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.output_string, "a")
         self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 0)])
 
+    def test_case_eleven(self):
+        transducer = self.trans_eleven("a")
+        self.assertEqual(transducer.output_string, "aaaa")
+        self.assertEqual(transducer.edges, [(0, 0), (0, 1), (0, 2), (0, 3)])
+
     def test_case_acdc(self):
         transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
         tg = transducer("acdc")
@@ -395,21 +427,21 @@ class IndicesTest(TestCase):
         self.assertEqual(tg.edges, [(0, 1), (1, 0), (1, 2), (2, 3), (3, 4)])
 
     def test_case_acac(self):
-        # transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
-        transducer_default = Transducer(
-            Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
-        )
-        # tg = transducer("abcabc")
-        tg_default = transducer_default("abcabc")
-        # self.assertEqual(tg.output_string, "abab")
-        self.assertEqual(tg_default.output_string, "abab")
-        # self.assertEqual(
-        #     tg.edges, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 2), (5, 2), (5, 3),],
+        transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
+        # transducer_default = Transducer(
+        #     Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
         # )
+        tg = transducer("abcabc")
+        self.assertEqual(tg.output_string, "abab")
         self.assertEqual(
-            tg_default.edges,
-            [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 2), (5, 2), (5, 3),],
+            tg.edges, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 1), (5, 2), (5, 3),],
         )
+        # tg_default = transducer_default("abcabc")
+        # self.assertEqual(tg_default.output_string, "abab")
+        # self.assertEqual(
+        #     tg_default.edges,
+        #     [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 1), (5, 2), (5, 3),],
+        # )
 
 
 if __name__ == "__main__":
