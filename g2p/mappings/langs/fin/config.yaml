@@ -8,7 +8,7 @@ mappings:
       - David Huggins-Daines
     type: mapping
     mapping: fin_to_ipa.csv
-    rule_ordering: as-written
+    rule_ordering: apply-longest-first
     case_sensitive: false
     norm_form: 'NFC'
     <<: *shared

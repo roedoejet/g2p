@@ -404,7 +404,7 @@ mappings:
     reverse: false
     rule_ordering: apply-longest-first
   - authors:
-      - Generated 2022-07-09 00:59:04.675694
+      - Generated 2022-07-09 01:10:50.227399
     case_sensitive: false
     display_name: fin-ipa IPA to eng-ipa IPA
     escape_special: false
