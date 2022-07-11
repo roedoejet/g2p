@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 from networkx import DiGraph, read_gpickle, shortest_path, write_gpickle
 
-from g2p.exceptions import MappingMissing
+from g2p.exceptions import MappingMissing, MalformedMapping
 from g2p.mappings.utils import find_mapping, load_mapping_from_path
 
 LANGS_DIR = os.path.dirname(__file__)
@@ -59,12 +59,22 @@ with open(LANGS_PKL, "rb") as f:
     LANGS = pickle.load(f)
 
 LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
+for k, v in LANGS.items():
+    if k in ["generated", "font-encodings"]:
+        continue
+    if "language_name" not in v:
+        raise MalformedMapping("language_name missing from mapping for " + k);
 LANGS_AVAILABLE = [
     {k: v["language_name"]}
     for k, v in LANGS.items()
     if k not in ["generated", "font-encodings"]
 ]
-MAPPINGS_AVAILABLE = [mapping for k, v in LANGS.items() for mapping in v["mappings"]]
+MAPPINGS_AVAILABLE = []
+for k, v in LANGS.items():
+    if "mappings" in v:
+        MAPPINGS_AVAILABLE.extend(v["mappings"])
+    else:
+        MAPPINGS_AVAILABLE.append(v)
 
 if __name__ == "__main__":
     cache_langs()
