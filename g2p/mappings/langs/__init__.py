@@ -62,13 +62,18 @@ LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
 for k, v in LANGS.items():
     if k in ["generated", "font-encodings"]:
         continue
-    if "language_name" not in v:
-        raise MalformedMapping("language_name missing from mapping for " + k);
-LANGS_AVAILABLE = [
-    {k: v["language_name"]}
-    for k, v in LANGS.items()
-    if k not in ["generated", "font-encodings"]
-]
+    if "mappings" in v:
+        for vv in v["mappings"]:
+            if "language_name" not in vv:
+                raise MalformedMapping("language_name missing from mapping for " + k);
+LANGS_AVAILABLE = []
+for k, v in LANGS.items():
+    if k in ["generated", "font-encodings"]:
+        continue
+    if "mappings" in v:
+        LANGS_AVAILABLE.extend(vv["language_name"] for vv in v["mappings"])
+    else:
+        LANGS_AVAILABLE.append(v["language_name"])
 MAPPINGS_AVAILABLE = []
 for k, v in LANGS.items():
     if "mappings" in v:
