@@ -17,6 +17,7 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
 from g2p.mappings.utils import is_ipa
+from g2p.exceptions import MalformedMapping
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -157,15 +158,19 @@ def cache_langs(dir_path: str = LANGS_DIR,
         # mappings and warn when they override
         if "mappings" in data:
             for index, mapping in enumerate(data["mappings"]):
-                mappings_legal_pairs.append(
-                    (
-                        data["mappings"][index]["in_lang"],
-                        data["mappings"][index]["out_lang"],
-                    )
-                )
+                in_lang = data["mappings"][index]["in_lang"]
+                out_lang = data["mappings"][index]["out_lang"]
+                mappings_legal_pairs.append((in_lang, out_lang))
+                if "language_name" not in mapping:
+                    raise MalformedMapping(
+
+                        F"language_name missing in {path} from mapping "
+                        f"from {in_lang} to {out_lang}")
                 data["mappings"][index] = load_mapping_from_path(path, index)
         else:
             data = load_mapping_from_path(path)
+            if "language_name" not in data:
+                raise MalformedMapping(f"language_name missing in {path}")
         langs[code] = data
 
     # Save as a Directional Graph
