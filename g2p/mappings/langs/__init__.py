@@ -4,8 +4,9 @@ Language mappings for g2p.
 import os
 import pickle
 
-from networkx import read_gpickle
+from networkx import read_gpickle, DiGraph
 from g2p.exceptions import MalformedMapping
+from g2p.log import LOGGER
 
 LANGS_DIR = os.path.dirname(__file__)
 LANGS_PKL_NAME = "langs.pkl"
@@ -14,10 +15,21 @@ NETWORK_PKL_NAME = "network.pkl"
 LANGS_NWORK_PATH = os.path.join(LANGS_DIR, NETWORK_PKL_NAME)
 
 # Cache mappings as pickle file for quick loading
-with open(LANGS_PKL, "rb") as f:
-    LANGS = pickle.load(f)
+try:
+    with open(LANGS_PKL, "rb") as f:
+        LANGS = pickle.load(f)
+except Exception as e:
+    LOGGER.warning(
+        f"Failed to read language cache from {LANGS_PKL}: {e}")
+    LANGS = {}
 
-LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
+try:
+    LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
+except Exception as e:
+    LOGGER.warning(
+        f"Failed to read language network from {LANGS_NWORK_PATH}: {e}")
+    LANGS_NETWORK = DiGraph()
+
 for k, v in LANGS.items():
     if k in ["generated", "font-encodings"]:
         continue
