@@ -30,14 +30,6 @@ except Exception as e:
         f"Failed to read language network from {LANGS_NWORK_PATH}: {e}")
     LANGS_NETWORK = DiGraph()
 
-for k, v in LANGS.items():
-    if k in ["generated", "font-encodings"]:
-        continue
-    if "mappings" in v:
-        for vv in v["mappings"]:
-            if "language_name" not in vv:
-                raise MalformedMapping(
-                    "language_name missing from mapping for " + k)
 # language_name is not unique for each mapping
 language_names = set()
 for k, v in LANGS.items():
@@ -45,8 +37,9 @@ for k, v in LANGS.items():
         continue
     if "mappings" in v:
         for vv in v["mappings"]:
-            language_names.add(vv["language_name"])
-    else:
+            if "language_name" in vv:
+                language_names.add(vv["language_name"])
+    elif "language_name" in v:
         language_names.add(v["language_name"])
 LANGS_AVAILABLE = sorted(language_names)
 MAPPINGS_AVAILABLE = []
