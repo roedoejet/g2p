@@ -77,7 +77,7 @@ class MalformedMapping(CommandLineError):
                 "There is something wrong with your mapping. \n"
                 "You might be missing some keywords or \n"
                 'Not all of the input and output pairs in your mapping have values for "in" and "out"\n'
-                'You may need to revert g2p/mappings/langs.pkl after resolving this problem\n'
+                'You may need to rerun "g2p update" after resolving this problem.\n'
                 "Please refer to the documentation and fix your mapping." + self.message
             )
         )
