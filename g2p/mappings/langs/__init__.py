@@ -3,16 +3,14 @@ Language mappings for g2p.
 """
 import os
 import pickle
-import timeit
-from copy import deepcopy
 from pathlib import Path
 
 import yaml
 import argparse
-from networkx import DiGraph, read_gpickle, shortest_path, write_gpickle
+from networkx import DiGraph, read_gpickle, write_gpickle
 
-from g2p.exceptions import MappingMissing, MalformedMapping
-from g2p.mappings.utils import find_mapping, load_mapping_from_path
+from g2p.exceptions import MalformedMapping
+from g2p.mappings.utils import load_mapping_from_path
 
 LANGS_DIR = os.path.dirname(__file__)
 LANGS_PKL_NAME = "langs.pkl"
