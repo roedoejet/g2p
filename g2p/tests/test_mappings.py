@@ -308,8 +308,8 @@ class MappingTest(TestCase):
         tf.close()
         mapping = Mapping(tf.name)
         transducer = Transducer(mapping)
-        self.assertEqual(transducer("tee on herkullinen").output_string,
-                         "teː on herkullinen")
+        self.assertEqual(transducer("tee on herkullista").output_string,
+                         "teː on herkullistɑ")
         os.unlink(tf.name)
 
 
