@@ -26,6 +26,7 @@ from g2p.mappings.create_ipa_mapping import (
     create_multi_mapping,
 )
 from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
+from g2p.mappings.langs import LANGS_DIR, LANGS_PKL_NAME, NETWORK_PKL_NAME
 from g2p.mappings.langs.utils import check_ipa_known_segs, cache_langs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
 from g2p.transducer import Transducer
@@ -614,10 +615,30 @@ def doctor(mapping, list_all, list_ipa):
     check_ipa_known_segs(list(mapping))
 
 
+@click.option(
+    "-i", "--in-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Scan DIRECTORY for mappings instead of the installed directory.',
+)
+@click.option(
+    "-o", "--out-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help='Output results in DIRECTORY instead of the global "generated" directory.',
+)
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def update():
+def update(in_dir, out_dir):
     """Update cached language files."""
-    cache_langs()
+    if in_dir is None:
+        in_dir = LANGS_DIR
+    if out_dir is None:
+        langs_path = os.path.join(in_dir, LANGS_PKL_NAME)
+        network_path = os.path.join(in_dir, NETWORK_PKL_NAME)
+    else:
+        langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
+        network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
+    cache_langs(dir_path=in_dir,
+                langs_path=langs_path,
+                network_path=network_path)
     update_docs()
     network_to_echart(write_to_file=True)
 

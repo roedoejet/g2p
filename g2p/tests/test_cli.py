@@ -3,6 +3,8 @@
 import csv
 import os
 import re
+import tempfile
+import pickle
 from glob import glob
 from unittest import TestCase, main
 
@@ -38,8 +40,21 @@ class CliTest(TestCase):
                         self.langs_to_test.append(row)
 
     def test_update(self):
-        result = self.runner.invoke(update)
-        self.assertEqual(result.exit_code, 0)
+        # Make sure it produces output
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.runner.invoke(update, ["-o", tmpdir])
+            self.assertEqual(result.exit_code, 0)
+            self.assertTrue(os.path.exists(os.path.join(tmpdir, "langs.pkl")))
+            self.assertTrue(os.path.exists(os.path.join(tmpdir,
+                                                        "network.pkl")))
+        # Make sure it fails meaningfully on invalid input
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_langs_dir = os.path.join(self.data_dir,
+                                         "..", "mappings", "bad_langs")
+            result = self.runner.invoke(update, ["-i", bad_langs_dir,
+                                                 "-o", tmpdir])
+            self.assertNotEqual(result.exit_code, 0)
+            self.assertIn("language_name", str(result.exception))
 
     def test_convert(self):
         LOGGER.info(
