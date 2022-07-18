@@ -230,8 +230,10 @@ def load_from_csv(language, delimiter=","):
             work_sheet.append(line)
     # Create wordlist
     mapping = []
-    # Loop through rows in worksheet, create if statements for different columns
-    # and append mappings to self.mapping.
+    # Loop through rows in worksheet, remove any stray BOMs
+    # (zero-width non-breaking spaces), create if statements for
+    # different columns and append mappings to self.mapping.
+    remove_bom = str.maketrans("", "", "\ufeff")
     for entry in work_sheet:
         new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
         if len(entry) == 0:
@@ -243,14 +245,14 @@ def load_from_csv(language, delimiter=","):
                 'Entry {} in mapping {} has no "out" value.'.format(entry, language)
             )
 
-        new_io["in"] = entry[0]
-        new_io["out"] = entry[1]
+        new_io["in"] = entry[0].translate(remove_bom)
+        new_io["out"] = entry[1].translate(remove_bom)
         try:
-            new_io["context_before"] = entry[2]
+            new_io["context_before"] = entry[2].translate(remove_bom)
         except IndexError:
             new_io["context_before"] = ""
         try:
-            new_io["context_after"] = entry[3]
+            new_io["context_after"] = entry[3].translate(remove_bom)
         except IndexError:
             new_io["context_after"] = ""
         for k in new_io:
