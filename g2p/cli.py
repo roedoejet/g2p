@@ -25,8 +25,8 @@ from g2p.mappings.create_ipa_mapping import (
     create_mapping,
     create_multi_mapping,
 )
-from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
-from g2p.mappings.langs.utils import check_ipa_known_segs
+from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
+from g2p.mappings.langs.utils import check_ipa_known_segs, cache_langs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
 from g2p.transducer import Transducer
 
