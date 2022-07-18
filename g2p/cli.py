@@ -623,7 +623,7 @@ def doctor(mapping, list_all, list_ipa):
 @click.option(
     "-o", "--out-dir",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    help='Output results in DIRECTORY instead of the global "generated" directory.',
+    help='Output results in DIRECTORY instead of the installed directory.',
 )
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update(in_dir, out_dir):
