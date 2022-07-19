@@ -11,16 +11,13 @@ import os
 import re
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
-from itertools import chain
-from operator import methodcaller
-from pathlib import Path
 from typing import DefaultDict, List, Pattern, Union
 
 import yaml
 
 from g2p import exceptions
 from g2p.log import LOGGER
-from g2p.mappings.langs import LANGS, MAPPINGS_AVAILABLE
+from g2p.mappings.langs import MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
 from g2p.mappings.utils import (
     CompactJSONMappingEncoder,
@@ -28,7 +25,6 @@ from g2p.mappings.utils import (
     create_fixed_width_lookbehind,
     escape_special_characters,
     find_mapping,
-    flatten_abbreviations,
     is_dummy,
     is_ipa,
     is_xsampa,

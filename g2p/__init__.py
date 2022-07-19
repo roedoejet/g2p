@@ -68,7 +68,7 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
 
     if in_lang == out_lang:
         LOGGER.error(
-            f"Sorry, you can't transduce between the same language. Please select a different output language code."
+            "Sorry, you can't transduce between the same language. Please select a different output language code."
         )
         raise NoPath(in_lang, out_lang)
 

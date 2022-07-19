@@ -91,11 +91,11 @@ class MappingCreationTest(TestCase):
         src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
         # Exercise looking up distances in the known list
         with self.assertRaises(ValueError):
-            mapping = create_mapping(
+            _ = create_mapping(
                 src_mapping, self.target_mapping, distance="not_a_distance"
             )
         with self.assertRaises(ValueError):
-            mapping = create_multi_mapping(
+            _ = create_multi_mapping(
                 [(src_mapping, "out")],
                 [(self.target_mapping, "in")],
                 distance="not_a_distance",
@@ -104,11 +104,11 @@ class MappingCreationTest(TestCase):
         # second way we make sure distances are supported
         DISTANCE_METRICS.append("not_a_real_distance")
         with self.assertRaises(ValueError):
-            mapping = create_mapping(
+            _ = create_mapping(
                 src_mapping, self.target_mapping, distance="not_a_real_distance"
             )
         with self.assertRaises(ValueError):
-            mapping = create_multi_mapping(
+            _ = create_multi_mapping(
                 [(src_mapping, "out")],
                 [(self.target_mapping, "in")],
                 distance="not_a_real_distance",

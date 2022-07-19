@@ -365,9 +365,9 @@ def find_mapping(in_lang: str, out_lang: str) -> list:
 def validate(mapping, path):
     try:
         for io in mapping:
-            if not "context_before" in io:
+            if "context_before" not in io:
                 io["context_before"] = ""
-            if not "context_after" in io:
+            if "context_after" not in io:
                 io["context_after"] = ""
         valid = all("in" in d for d in mapping) and all("out" in d for d in mapping)
         if not valid:
