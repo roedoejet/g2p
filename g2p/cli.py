@@ -160,7 +160,7 @@ def cli():
     "--distance",
     type=click.Choice(DISTANCE_METRICS),
     required=False,
-    default="weighted_feature_edit_distance",
+    default="hamming_feature_edit_distance",
 )
 def generate_mapping(  # noqa: C901
     in_lang,
