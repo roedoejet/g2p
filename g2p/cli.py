@@ -7,7 +7,7 @@ import sys
 import click
 import yaml
 from flask.cli import FlaskGroup
-from networkx import draw, has_path
+from networkx import has_path
 
 from g2p import make_g2p
 from g2p._version import VERSION
@@ -25,8 +25,14 @@ from g2p.mappings.create_ipa_mapping import (
     create_mapping,
     create_multi_mapping,
 )
-from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE, cache_langs
-from g2p.mappings.langs.utils import check_ipa_known_segs
+from g2p.mappings.langs import (
+    LANGS_DIR,
+    LANGS_NETWORK,
+    LANGS_PKL_NAME,
+    MAPPINGS_AVAILABLE,
+    NETWORK_PKL_NAME,
+)
+from g2p.mappings.langs.utils import cache_langs, check_ipa_known_segs
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
 from g2p.transducer import Transducer
 
@@ -156,7 +162,7 @@ def cli():
     required=False,
     default="weighted_feature_edit_distance",
 )
-def generate_mapping(
+def generate_mapping(  # noqa: C901
     in_lang,
     out_lang,
     dummy,
@@ -322,10 +328,10 @@ def generate_mapping(
         in_lang_choices = [
             x for x in LANGS_NETWORK.nodes if not is_ipa(x) and not is_xsampa(x)
         ]
-        for l in in_langs:
-            if l not in in_lang_choices:
+        for in_lang in in_langs:
+            if in_lang not in in_lang_choices:
                 raise click.UsageError(
-                    f'Invalid value for IN_LANG: "{l}".\n'
+                    f'Invalid value for IN_LANG: "{in_lang}".\n'
                     "IN_LANG must be a non-IPA language code with an existing IPA mapping, "
                     f"i.e., one of:\n{', '.join(in_lang_choices)}."
                 )
@@ -341,12 +347,12 @@ def generate_mapping(
             )
 
         source_mappings = []
-        for l in in_langs:
+        for in_lang in in_langs:
             try:
-                source_mapping = Mapping(in_lang=l, out_lang=out_lang)
+                source_mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
             except MappingMissing as e:
                 raise click.BadParameter(
-                    f'Cannot find IPA mapping from "{l}" to "{out_lang}": {e}',
+                    f'Cannot find IPA mapping from "{in_lang}" to "{out_lang}": {e}',
                     param_hint=["IN_LANG", "OUT_LANG"],
                 )
             source_mappings.append(source_mapping)
@@ -464,7 +470,7 @@ def generate_mapping(
     context_settings=CONTEXT_SETTINGS,
     short_help="Convert text through a g2p mapping path.",
 )
-def convert(
+def convert(  # noqa: C901
     in_lang,
     out_lang,
     input_text,
@@ -614,10 +620,30 @@ def doctor(mapping, list_all, list_ipa):
     check_ipa_known_segs(list(mapping))
 
 
+@click.option(
+    "-i",
+    "--in-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help=f"Scan DIRECTORY for mappings instead of the installed directory ({LANGS_DIR}).",
+)
+@click.option(
+    "-o",
+    "--out-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help=f"Output results in DIRECTORY instead of the installed directory ({LANGS_DIR}).",
+)
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def update():
+def update(in_dir, out_dir):
     """Update cached language files."""
-    cache_langs()
+    if in_dir is None:
+        in_dir = LANGS_DIR
+    if out_dir is None:
+        langs_path = os.path.join(in_dir, LANGS_PKL_NAME)
+        network_path = os.path.join(in_dir, NETWORK_PKL_NAME)
+    else:
+        langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
+        network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
+    cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
     update_docs()
     network_to_echart(write_to_file=True)
 
@@ -635,7 +661,7 @@ def scan(lang, path):
     Accounts for case sensitivity in the configuration.
     """
     # Check input lang exists
-    if not lang in LANGS_NETWORK.nodes:
+    if lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{lang}' is not a valid value for 'LANG'")
 
     # Retrieve the mappings for lang

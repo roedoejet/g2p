@@ -1,70 +1,64 @@
+"""
+Language mappings for g2p.
+"""
 import os
 import pickle
-import timeit
-from copy import deepcopy
-from pathlib import Path
 
-import yaml
-from networkx import DiGraph, read_gpickle, shortest_path, write_gpickle
+from networkx import DiGraph, read_gpickle
 
-from g2p.exceptions import MappingMissing
-from g2p.mappings.utils import find_mapping, load_mapping_from_path
+from g2p.log import LOGGER
 
 LANGS_DIR = os.path.dirname(__file__)
-LANGS_PKL = os.path.join(LANGS_DIR, "langs.pkl")
-LANGS_NWORK_PATH = os.path.join(LANGS_DIR, "network.pkl")
+LANGS_PKL_NAME = "langs.pkl"
+LANGS_PKL = os.path.join(LANGS_DIR, LANGS_PKL_NAME)
+NETWORK_PKL_NAME = "network.pkl"
+LANGS_NWORK_PATH = os.path.join(LANGS_DIR, NETWORK_PKL_NAME)
 
 
-def cache_langs():
-    """Read in all files and save as pickle"""
-    langs = {}
-    dir_path = Path(LANGS_DIR)
-    # Sort by language code
-    paths = sorted(dir_path.glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
-    mappings_legal_pairs = []
-    for path in paths:
-        code = path.parent.stem
-        with open(path, encoding="utf8") as f:
-            data = yaml.safe_load(f)
-        # If there is a mappings key, there is more than one mapping
-        # TODO: should put in some measure to prioritize non-generated mappings and warn when they override
-        if "mappings" in data:
-            for index, mapping in enumerate(data["mappings"]):
-                mappings_legal_pairs.append(
-                    (
-                        data["mappings"][index]["in_lang"],
-                        data["mappings"][index]["out_lang"],
-                    )
-                )
-                data["mappings"][index] = load_mapping_from_path(path, index)
+def load_langs(path: str = LANGS_PKL):
+    try:
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    except Exception as e:
+        LOGGER.warning(f"Failed to read language cache from {path}: {e}")
+        return {}
+
+
+LANGS = load_langs()
+
+
+def load_network(path: str = LANGS_NWORK_PATH):
+    try:
+        return read_gpickle(path)
+    except Exception as e:
+        LOGGER.warning(f"Failed to read language network from {path}: {e}")
+        return DiGraph()
+
+
+def get_available_languages(langs: dict = LANGS) -> list:
+    language_names = set()
+    for k, v in langs.items():
+        if k in ["generated", "font-encodings"]:
+            continue
+        if "mappings" in v:
+            for vv in v["mappings"]:
+                if "language_name" in vv:
+                    language_names.add(vv["language_name"])
+        elif "language_name" in v:
+            language_names.add(v["language_name"])
+    return sorted(language_names)
+
+
+def get_available_mappings(langs: dict = LANGS) -> list:
+    mappings_available = []
+    for k, v in LANGS.items():
+        if "mappings" in v:
+            mappings_available.extend(v["mappings"])
         else:
-            data = load_mapping_from_path(path)
-        langs[code] = data
-
-    # Save as a Directional Graph
-    lang_network = DiGraph()
-    lang_network.add_edges_from(mappings_legal_pairs)
-
-    with open(LANGS_NWORK_PATH, "wb") as f:
-        write_gpickle(lang_network, f, protocol=4)
-
-    with open(LANGS_PKL, "wb") as f:
-        pickle.dump(langs, f, protocol=4)
-
-    return langs
+            mappings_available.append(v)
+    return mappings_available
 
 
-# Cache mappings as pickle file for quick loading
-with open(LANGS_PKL, "rb") as f:
-    LANGS = pickle.load(f)
-
-LANGS_NETWORK = read_gpickle(LANGS_NWORK_PATH)
-LANGS_AVAILABLE = [
-    {k: v["language_name"]}
-    for k, v in LANGS.items()
-    if k not in ["generated", "font-encodings"]
-]
-MAPPINGS_AVAILABLE = [mapping for k, v in LANGS.items() for mapping in v["mappings"]]
-
-if __name__ == "__main__":
-    cache_langs()
+LANGS_NETWORK = load_network()
+LANGS_AVAILABLE = get_available_languages()
+MAPPINGS_AVAILABLE = get_available_mappings()

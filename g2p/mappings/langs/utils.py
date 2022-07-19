@@ -4,10 +4,22 @@ Utilities used by other classes
 
 """
 
+import pickle
+from pathlib import Path
+
+import yaml
+from networkx import DiGraph, write_gpickle
+
+from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
-from g2p.mappings.langs import MAPPINGS_AVAILABLE
-from g2p.mappings.utils import is_ipa
+from g2p.mappings.langs import (
+    LANGS_DIR,
+    LANGS_NWORK_PATH,
+    LANGS_PKL,
+    MAPPINGS_AVAILABLE,
+)
+from g2p.mappings.utils import is_ipa, load_mapping_from_path
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -58,6 +70,10 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     return not found_error
 
 
+_is_panphon_g_warning_printed = False
+_is_panphon_colon_warning_printed = False
+
+
 def is_panphon(string, display_warnings=False):
     # Deferred importing required here, because g2p.transducer also imports this file.
     # Such circular dependency is probably bad design, maybe a reviewer of this code will
@@ -79,16 +95,18 @@ def is_panphon(string, display_warnings=False):
             LOGGER.warning(
                 f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
             )
-            if "g" in word and not is_panphon.g_warning_printed:
+            global _is_panphon_g_warning_printed
+            if "g" in word and not _is_panphon_g_warning_printed:
                 LOGGER.warning(
-                    f"Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
+                    "Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
                 )
-                is_panphon.g_warning_printed = True
-            if ":" in word and not is_panphon.colon_warning_printed:
+                _is_panphon_g_warning_printed = True
+            global _is_panphon_colon_warning_printed
+            if ":" in word and not _is_panphon_colon_warning_printed:
                 LOGGER.warning(
-                    f"Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
+                    "Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
                 )
-                is_panphon.colon_warning_printed = True
+                _is_panphon_colon_warning_printed = True
             for c in word:
                 if c not in word_ipa:
                     LOGGER.warning(
@@ -97,10 +115,6 @@ def is_panphon(string, display_warnings=False):
                     )
             result = False
     return result
-
-
-is_panphon.g_warning_printed = False
-is_panphon.colon_warning_printed = False
 
 
 _ARPABET_SET = None
@@ -117,3 +131,60 @@ def is_arpabet(string):
         if sound not in _ARPABET_SET:
             return False
     return True
+
+
+def cache_langs(
+    dir_path: str = LANGS_DIR,
+    langs_path: str = LANGS_PKL,
+    network_path: str = LANGS_NWORK_PATH,
+):
+    """Read in all files and save as pickle.
+
+    Args:
+       dir_path: Path to scan for config.yaml files.  Default is the
+                 installed g2p/mappings/langs directory.
+       langs_path: Path to output langs.pkl pickle file.  Default is
+                   the installed g2p/mappings/langs/langs.pkl
+       network_path: Path to output pickle file.  Default is the
+                     installed g2p/mappings/langs/network.pkl.
+    """
+    langs = {}
+
+    # Sort by language code
+    paths = sorted(Path(dir_path).glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
+    mappings_legal_pairs = []
+    for path in paths:
+        code = path.parent.stem
+        with open(path, encoding="utf8") as f:
+            data = yaml.safe_load(f)
+        # If there is a mappings key, there is more than one mapping
+        # TODO: should put in some measure to prioritize non-generated
+        # mappings and warn when they override
+        if "mappings" in data:
+            for index, mapping in enumerate(data["mappings"]):
+                in_lang = data["mappings"][index]["in_lang"]
+                out_lang = data["mappings"][index]["out_lang"]
+                mappings_legal_pairs.append((in_lang, out_lang))
+                if "language_name" not in mapping:
+                    raise MalformedMapping(
+                        f"language_name missing in {path} from mapping "
+                        f"from {in_lang} to {out_lang}"
+                    )
+                data["mappings"][index] = load_mapping_from_path(path, index)
+        else:
+            data = load_mapping_from_path(path)
+            if "language_name" not in data:
+                raise MalformedMapping(f"language_name missing in {path}")
+        langs[code] = data
+
+    # Save as a Directional Graph
+    lang_network = DiGraph()
+    lang_network.add_edges_from(mappings_legal_pairs)
+
+    with open(network_path, "wb") as f:
+        write_gpickle(lang_network, f, protocol=4)
+
+    with open(langs_path, "wb") as f:
+        pickle.dump(langs, f, protocol=4)
+
+    return langs
