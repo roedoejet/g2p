@@ -70,6 +70,10 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     return not found_error
 
 
+_is_panphon_g_warning_printed = False
+_is_panphon_colon_warning_printed = False
+
+
 def is_panphon(string, display_warnings=False):
     # Deferred importing required here, because g2p.transducer also imports this file.
     # Such circular dependency is probably bad design, maybe a reviewer of this code will
@@ -91,16 +95,18 @@ def is_panphon(string, display_warnings=False):
             LOGGER.warning(
                 f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
             )
-            if "g" in word and not is_panphon.g_warning_printed:
+            global is_panphon_g_warning_printed
+            if "g" in word and not is_panphon_g_warning_printed:
                 LOGGER.warning(
                     "Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
                 )
-                is_panphon.g_warning_printed = True
-            if ":" in word and not is_panphon.colon_warning_printed:
+                is_panphon_g_warning_printed = True
+            global is_panphon_colon_warning_printed
+            if ":" in word and not is_panphon_colon_warning_printed:
                 LOGGER.warning(
                     "Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
                 )
-                is_panphon.colon_warning_printed = True
+                is_panphon_colon_warning_printed = True
             for c in word:
                 if c not in word_ipa:
                     LOGGER.warning(
@@ -109,10 +115,6 @@ def is_panphon(string, display_warnings=False):
                     )
             result = False
     return result
-
-
-is_panphon.g_warning_printed = False  # type: ignore
-is_panphon.colon_warning_printed = False  # type: ignore
 
 
 _ARPABET_SET = None
