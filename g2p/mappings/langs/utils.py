@@ -95,18 +95,18 @@ def is_panphon(string, display_warnings=False):
             LOGGER.warning(
                 f'String "{word}" is not identical to its IPA segmentation: {word_ipa_segs}'
             )
-            global is_panphon_g_warning_printed
-            if "g" in word and not is_panphon_g_warning_printed:
+            global _is_panphon_g_warning_printed
+            if "g" in word and not _is_panphon_g_warning_printed:
                 LOGGER.warning(
                     "Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
                 )
-                is_panphon_g_warning_printed = True
-            global is_panphon_colon_warning_printed
-            if ":" in word and not is_panphon_colon_warning_printed:
+                _is_panphon_g_warning_printed = True
+            global _is_panphon_colon_warning_printed
+            if ":" in word and not _is_panphon_colon_warning_printed:
                 LOGGER.warning(
                     "Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
                 )
-                is_panphon_colon_warning_printed = True
+                _is_panphon_colon_warning_printed = True
             for c in word:
                 if c not in word_ipa:
                     LOGGER.warning(
