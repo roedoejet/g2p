@@ -4,7 +4,8 @@ Language mappings for g2p.
 import os
 import pickle
 
-from networkx import read_gpickle, DiGraph
+from networkx import DiGraph, read_gpickle
+
 from g2p.log import LOGGER
 
 LANGS_DIR = os.path.dirname(__file__)
@@ -19,8 +20,7 @@ def load_langs(path: str = LANGS_PKL):
         with open(path, "rb") as f:
             return pickle.load(f)
     except Exception as e:
-        LOGGER.warning(
-            f"Failed to read language cache from {path}: {e}")
+        LOGGER.warning(f"Failed to read language cache from {path}: {e}")
         return {}
 
 
@@ -31,8 +31,7 @@ def load_network(path: str = LANGS_NWORK_PATH):
     try:
         return read_gpickle(path)
     except Exception as e:
-        LOGGER.warning(
-            f"Failed to read language network from {path}: {e}")
+        LOGGER.warning(f"Failed to read language network from {path}: {e}")
         return DiGraph()
 
 

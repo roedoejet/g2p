@@ -4,20 +4,22 @@ Utilities used by other classes
 
 """
 
+import pickle
 from pathlib import Path
 
 import yaml
-import pickle
 from networkx import DiGraph, write_gpickle
 
-from g2p.mappings.langs import LANGS_DIR, LANGS_PKL, LANGS_NWORK_PATH
-from g2p.mappings.utils import load_mapping_from_path
-
+from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
-from g2p.mappings.langs import MAPPINGS_AVAILABLE
-from g2p.mappings.utils import is_ipa
-from g2p.exceptions import MalformedMapping
+from g2p.mappings.langs import (
+    LANGS_DIR,
+    LANGS_NWORK_PATH,
+    LANGS_PKL,
+    MAPPINGS_AVAILABLE,
+)
+from g2p.mappings.utils import is_ipa, load_mapping_from_path
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -91,12 +93,12 @@ def is_panphon(string, display_warnings=False):
             )
             if "g" in word and not is_panphon.g_warning_printed:
                 LOGGER.warning(
-                    f"Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
+                    "Common IPA gotcha: the ASCII 'g' character is not IPA, use 'ɡ' (\\u0261) instead."
                 )
                 is_panphon.g_warning_printed = True
             if ":" in word and not is_panphon.colon_warning_printed:
                 LOGGER.warning(
-                    f"Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
+                    "Common IPA gotcha: the ASCII ':' character is not IPA, use 'ː' (\\u02D0) instead."
                 )
                 is_panphon.colon_warning_printed = True
             for c in word:
@@ -109,8 +111,8 @@ def is_panphon(string, display_warnings=False):
     return result
 
 
-is_panphon.g_warning_printed = False
-is_panphon.colon_warning_printed = False
+is_panphon.g_warning_printed = False  # type: ignore
+is_panphon.colon_warning_printed = False  # type: ignore
 
 
 _ARPABET_SET = None
@@ -129,9 +131,11 @@ def is_arpabet(string):
     return True
 
 
-def cache_langs(dir_path: str = LANGS_DIR,
-                langs_path: str = LANGS_PKL,
-                network_path: str = LANGS_NWORK_PATH):
+def cache_langs(
+    dir_path: str = LANGS_DIR,
+    langs_path: str = LANGS_PKL,
+    network_path: str = LANGS_NWORK_PATH,
+):
     """Read in all files and save as pickle.
 
     Args:
@@ -143,11 +147,9 @@ def cache_langs(dir_path: str = LANGS_DIR,
                      installed g2p/mappings/langs/network.pkl.
     """
     langs = {}
-    dir_path = Path(dir_path)
 
     # Sort by language code
-    paths = sorted(dir_path.glob("./*/config.y*ml"),
-                   key=lambda x: x.parent.stem)
+    paths = sorted(Path(dir_path).glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
     mappings_legal_pairs = []
     for path in paths:
         code = path.parent.stem
@@ -163,9 +165,9 @@ def cache_langs(dir_path: str = LANGS_DIR,
                 mappings_legal_pairs.append((in_lang, out_lang))
                 if "language_name" not in mapping:
                     raise MalformedMapping(
-
-                        F"language_name missing in {path} from mapping "
-                        f"from {in_lang} to {out_lang}")
+                        f"language_name missing in {path} from mapping "
+                        f"from {in_lang} to {out_lang}"
+                    )
                 data["mappings"][index] = load_mapping_from_path(path, index)
         else:
             data = load_mapping_from_path(path)

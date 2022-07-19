@@ -3,18 +3,17 @@
 import csv
 import os
 import re
-import tempfile
 import shutil
-
+import tempfile
 from glob import glob
 from unittest import TestCase, main
 
 from g2p.app import APP
-from g2p.cli import convert, doctor, generate_mapping, scan
-from g2p.cli import show_mappings, update
+from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
 from g2p.log import LOGGER
-from g2p.tests.public.data import __file__ as data_dir
 from g2p.mappings.langs import load_langs, load_network
+from g2p.tests.public.data import __file__ as data_dir
+
 
 class CliTest(TestCase):
     """Test suite for the g2p Command Line Interface"""
@@ -50,10 +49,13 @@ class CliTest(TestCase):
             mappings_dir = os.path.join(self.data_dir, "..", "mappings")
             for name in os.listdir(mappings_dir):
                 if name.startswith("minimal."):
-                    shutil.copy(os.path.join(mappings_dir, name),
-                                os.path.join(lang1_dir, name))
-            shutil.copy(os.path.join(mappings_dir, "minimal_configs.yaml"),
-                        os.path.join(lang1_dir, "config.yaml"))
+                    shutil.copy(
+                        os.path.join(mappings_dir, name), os.path.join(lang1_dir, name)
+                    )
+            shutil.copy(
+                os.path.join(mappings_dir, "minimal_configs.yaml"),
+                os.path.join(lang1_dir, "config.yaml"),
+            )
             result = self.runner.invoke(update, ["-i", tmpdir])
             langs_pkl = os.path.join(tmpdir, "langs.pkl")
             network_pkl = os.path.join(tmpdir, "network.pkl")
@@ -83,17 +85,13 @@ class CliTest(TestCase):
             self.assertTrue(network is not None)
         # Make sure it fails meaningfully on invalid input
         with tempfile.TemporaryDirectory() as tmpdir:
-            bad_langs_dir = os.path.join(self.data_dir,
-                                         "..", "mappings", "bad_langs")
-            result = self.runner.invoke(update, ["-i", bad_langs_dir,
-                                                 "-o", tmpdir])
+            bad_langs_dir = os.path.join(self.data_dir, "..", "mappings", "bad_langs")
+            result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("language_name", str(result.exception))
         with tempfile.TemporaryDirectory() as tmpdir:
-            bad_langs_dir = os.path.join(self.data_dir,
-                                         "..", "mappings", "bad_langs2")
-            result = self.runner.invoke(update, ["-i", bad_langs_dir,
-                                                 "-o", tmpdir])
+            bad_langs_dir = os.path.join(self.data_dir, "..", "mappings", "bad_langs2")
+            result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("language_name", str(result.exception))
             self.assertIn("min to min", str(result.exception))
