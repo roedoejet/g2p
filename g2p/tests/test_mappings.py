@@ -299,16 +299,22 @@ class MappingTest(TestCase):
         )
         # Concatenate them (this is not a good idea) and make sure it works anyway
         tf = NamedTemporaryFile(
-            prefix="test_g2p_g2p_", mode="w", suffix=".csv", delete=False
+            prefix="test_g2p_g2p_",
+            mode="w",
+            suffix=".csv",
+            delete=False,
+            encoding="utf8",
         )
         with open(
-            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv")
+            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv"),
+            encoding="utf8",
         ) as fh:
             tf.write(fh.read())
         # In fact you can't concatenate them anyway. They don't end in newline.
         tf.write("\n")
         with open(
-            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio2.csv")
+            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio2.csv"),
+            encoding="utf8",
         ) as fh:
             tf.write(fh.read())
         tf.close()
