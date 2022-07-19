@@ -2,9 +2,6 @@ name: Run full matrix Tests before Releases
 on:
   pull_request:
     branches: [ release ]
-  push:
-    # for testing this CI while I'm developing it.
-    branches: dev.matrix-ci
 jobs:
   pre-release-matrix-test:
     strategy:
