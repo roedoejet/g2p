@@ -624,13 +624,13 @@ def doctor(mapping, list_all, list_ipa):
     "-i",
     "--in-dir",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    help="Scan DIRECTORY for mappings instead of the installed directory.",
+    help=f"Scan DIRECTORY for mappings instead of the installed directory ({LANGS_DIR}).",
 )
 @click.option(
     "-o",
     "--out-dir",
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    help="Output results in DIRECTORY instead of the installed directory.",
+    help=f"Output results in DIRECTORY instead of the installed directory ({LANGS_DIR}).",
 )
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update(in_dir, out_dir):
