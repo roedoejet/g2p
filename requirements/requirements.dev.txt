@@ -2,6 +2,6 @@ black~=22.0
 flake8>=4.0.1
 gitlint-core==0.17.0
 isort>=5.10.1
-mypy>=0.941
+mypy>=0.941,<=0.971
 pre-commit>=2.6.0
 types-PyYAML
