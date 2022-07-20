@@ -34,6 +34,12 @@ if sys.stdout.encoding != "utf8" and hasattr(sys.stdout, "buffer"):
 if sys.stderr.encoding != "utf8" and hasattr(sys.stderr, "buffer"):
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
+if sys.version_info < (3, 6):
+    sys.exit(
+        f"Python 3.6 or more recent is required. You are using {sys.version}.\n"
+        "Please use a newer version of Python."
+    )
+
 
 _g2p_cache = {}
 
