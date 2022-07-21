@@ -5,26 +5,18 @@ Views and config to the g2p Studio web app
 """
 import json
 import os
-from typing import List, Union
+from typing import Union
 
-import requests
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-from flask_talisman import Talisman
 from networkx.algorithms.dag import ancestors, descendants
-from networkx.drawing.layout import (
-    circular_layout,
-    shell_layout,
-    spectral_layout,
-    spring_layout,
-)
 
 from g2p import make_g2p
 from g2p.api import g2p_api
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
-from g2p.mappings.langs import LANGS, LANGS_NETWORK
+from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
 from g2p.static import __file__ as static_file
 from g2p.transducer import (
@@ -88,7 +80,7 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
             os.path.join(os.path.dirname(static_file), "languages-network.json"), "w"
         ) as f:
             f.write(json.dumps({"nodes": nodes, "edges": edges}))
-        LOGGER.info(f"Wrote network nodes and edges to static file.")
+        LOGGER.info("Wrote network nodes and edges to static file.")
     return nodes, edges
 
 
@@ -131,7 +123,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
                 "target": x[1] + len(tier.input_string) + index_offset,
             }
             for x in tier.edges
-            if x[1] != None
+            if x[1] is not None
         ]
         index_offset += len(tier.input_string)
         symbol_size = min(300 / max(1, len(tier.output_string)), 40)

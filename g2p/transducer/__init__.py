@@ -6,20 +6,17 @@ which are responsible for performing transductions in the g2p library.
 
 import copy
 import re
-from collections import OrderedDict, defaultdict
-from collections.abc import Iterable
-from typing import Dict, List, Pattern, Tuple, Union
+from collections import defaultdict
+from typing import Dict, List
 
 import text_unidecode
 
-from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import (
     compose_indices,
-    create_fixed_width_lookbehind,
     is_ipa,
     normalize,
     normalize_with_indices,
@@ -347,7 +344,7 @@ class Transducer:
                             + tg.output_string[output_index:]
                         )
                         for i, edge in enumerate(tg.edges):
-                            if edge[1] != None and edge[1] >= output_index:
+                            if edge[1] is not None and edge[1] >= output_index:
                                 tg.edges[i][1] += 1
                         tg.edges.append([input_index, output_index])
                     else:
@@ -367,10 +364,10 @@ class Transducer:
                             tg.edges = [x for x in tg.edges if x[1] != output_index]
                         else:
                             for i, edge in enumerate(tg.edges):
-                                if edge[1] != None and edge[1] == output_index:
+                                if edge[1] is not None and edge[1] == output_index:
                                     tg.edges[i][1] = None
                         for i, edge in enumerate(tg.edges):
-                            if edge[1] != None and edge[1] > output_index:
+                            if edge[1] is not None and edge[1] > output_index:
                                 tg.edges[i][1] -= 1
 
     def update_default_indices(self, tg, match, intermediate_diff, out_string):
@@ -425,7 +422,7 @@ class Transducer:
                     # Edges
                     # Remove previously deleted and increment
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] != None and edge[1] >= index_to_add:
+                        if edge[1] is not None and edge[1] >= index_to_add:
                             tg.edges[i][1] += 1
                     # add edge to index of last input character
                     last_input_node = max(
@@ -456,11 +453,11 @@ class Transducer:
                         tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
                     else:
                         for i, edge in enumerate(tg.edges):
-                            if edge[1] != None and edge[1] == index_to_delete:
+                            if edge[1] is not None and edge[1] == index_to_delete:
                                 tg.edges[i][1] = None
                     # decrement
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] != None and edge[1] > index_to_delete:
+                        if edge[1] is not None and edge[1] > index_to_delete:
                             tg.edges[i][1] -= 1
 
     def apply_unidecode(self, to_convert: str):

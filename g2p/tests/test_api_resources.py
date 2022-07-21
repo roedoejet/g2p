@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """ Checks all data resources give 200s
 """
@@ -8,8 +7,6 @@ import json
 import os
 import re
 from unittest import TestCase, main
-
-import requests
 
 from g2p.app import APP
 from g2p.log import LOGGER
@@ -36,7 +33,7 @@ class ResourceIntegrationTest(TestCase):
         self.routes_no_args = [
             route
             for route in self.routes
-            if not "<" in route and route != self.conversion_route
+            if "<" not in route and route != self.conversion_route
         ]
         self.routes_only_args = [
             route

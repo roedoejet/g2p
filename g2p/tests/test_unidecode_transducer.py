@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 from unittest import TestCase, main
 
 from g2p import make_g2p

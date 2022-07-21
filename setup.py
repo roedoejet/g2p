@@ -1,15 +1,16 @@
 """ Setup for g2p
 """
-from os import path
 import datetime as dt
-from setuptools import setup, find_packages
+from os import path
+
+from setuptools import find_packages, setup
 
 build_no = dt.datetime.today().strftime("%Y%m%d")
 
 # Ugly hack to read the current version number without importing g2p:
 # (works by )
 with open("g2p/_version.py", "r", encoding="utf8") as version_file:
-    namespace = {}
+    namespace = {}  # type: ignore
     exec(version_file.read(), namespace)
     VERSION = namespace["VERSION"] + "." + build_no
 
