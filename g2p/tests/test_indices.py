@@ -4,8 +4,8 @@
     Unittests for index preservation
 """
 
+from unicodedata import normalize
 from unittest import TestCase, main
-from g2p import transducer
 
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
@@ -151,7 +151,7 @@ class IndicesTest(TestCase):
 
         [ ((0, 'a'), (None, '')),
           ((1, 'a'), (None, '')) ]
-        
+
     Test Case # 10
         # Another deletion test
         0 1 2
@@ -234,10 +234,10 @@ class IndicesTest(TestCase):
             ]
         )
         self.test_feeding_mapping_1 = Mapping(
-            [{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"},]
+            [{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"}]
         )
         self.test_feeding_mapping_2 = Mapping(
-            [{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"},]
+            [{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"}]
         )
         self.test_issue_173_3 = Mapping([{"in": "ab{1}c{2}", "out": "X{1}Y{2}"}])
         self.test_issue_173_4 = Mapping([{"in": "a{1}bc{2}", "out": "xy{1}z{2}"}])
@@ -428,20 +428,81 @@ class IndicesTest(TestCase):
 
     def test_case_acac(self):
         transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
-        # transducer_default = Transducer(
-        #     Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
-        # )
+        transducer_default = Transducer(
+            Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
+        )
         tg = transducer("abcabc")
         self.assertEqual(tg.output_string, "abab")
         self.assertEqual(
-            tg.edges, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 1), (5, 2), (5, 3),],
+            tg.edges,
+            [
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (2, 1),
+                (3, 1),
+                (4, 1),
+                (5, 2),
+                (5, 3),
+            ],
         )
-        # tg_default = transducer_default("abcabc")
-        # self.assertEqual(tg_default.output_string, "abab")
-        # self.assertEqual(
-        #     tg_default.edges,
-        #     [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1), (4, 1), (5, 2), (5, 3),],
-        # )
+        tg_default = transducer_default("abcabc")
+        self.assertEqual(tg_default.output_string, "abab")
+        self.assertEqual(
+            tg_default.edges,
+            [
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (2, 1),
+                (3, 1),
+                (4, 1),
+                (5, 2),
+                (5, 3),
+            ],
+        )
+
+    def test_arpabet(self):
+        transducer = Transducer(
+            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFC", out_delimiter=" ")
+        )
+        transducer_nfd = Transducer(
+            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFD", out_delimiter=" ")
+        )
+        tg = transducer(normalize("NFC", "ĩĩ"))
+        tg_nfd = transducer_nfd(normalize("NFD", "ĩĩ"))
+        self.assertEqual(tg.output_string, "IY N IY N ")
+        self.assertEqual(tg_nfd.output_string, "IY N IY N ")
+        self.assertEqual(
+            tg.edges,
+            [
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (0, 4),
+                (1, 5),
+                (1, 6),
+                (1, 7),
+                (1, 8),
+                (1, 9),
+            ],
+        )
+        self.assertEqual(
+            tg_nfd.edges,
+            [
+                (0, 0),
+                (1, 1),
+                (1, 2),
+                (1, 3),
+                (1, 4),
+                (2, 5),
+                (3, 6),
+                (3, 7),
+                (3, 8),
+                (3, 9),
+            ],
+        )
 
 
 if __name__ == "__main__":

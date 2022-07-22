@@ -5,23 +5,18 @@ which are responsible for performing transductions in the g2p library.
 """
 
 import copy
-from email.policy import default
 import re
-from collections import OrderedDict, Counter, defaultdict
-from collections.abc import Iterable
-from tracemalloc import start
-from typing import Dict, List, Pattern, Tuple, Union
+from collections import defaultdict
+from typing import Dict, List
 
 import text_unidecode
 
-from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import DefaultTokenizer
 from g2p.mappings.utils import (
     compose_indices,
-    create_fixed_width_lookbehind,
     is_ipa,
     normalize,
     normalize_with_indices,
@@ -30,7 +25,7 @@ from g2p.mappings.utils import (
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
-copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r
+copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r  # type: ignore
 
 # An Index is typed as follows:
 # {input_index: int, {'input_string': str, 'output': {output_index: int, str}}}
@@ -62,7 +57,7 @@ class TransductionGraph:
         # Edges
         self._edges = [[i, i] for i, x in enumerate(input_string)]
         # Debugger
-        self._debugger = []
+        self._debugger = []  # type: ignore
 
     def __str__(self):
         return self._output_string
@@ -266,7 +261,7 @@ class Transducer:
         return output_string
 
     def update_explicit_indices(
-        self, tg, match, io, diff_from_input, diff_from_output, out_string, match_i
+        self, tg, match, start_end, io, diff_from_input, diff_from_output, out_string
     ):
         """Takes an arbitrary number of input & output strings and their corresponding index offsets.
         It then zips them up according to the provided indexing notation.
@@ -288,10 +283,9 @@ class Transducer:
         index = 0
 
         input_start = (
-            match.start()
-            - diff_from_input[self.get_input_from_output(tg, match.start())]
+            start_end[0] - diff_from_input[self.get_input_from_output(tg, start_end[0])]
         )
-        output_start = match.start() - diff_from_output[match.start()]
+        output_start = start_end[0] - diff_from_output[start_end[0]]
         for i, m in enumerate(input_match_indices):
             for char in input_char_matches[i]:
                 if m in inputs:
@@ -316,9 +310,6 @@ class Transducer:
                 index += 1
         out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
         deleted = 0
-        print(diff_from_input)
-        print(diff_from_output)
-        breakpoint()
         for match_index, input_matches in inputs.items():
             try:
                 output_matches = outputs[match_index]
@@ -339,18 +330,14 @@ class Transducer:
             for i, char in enumerate(longest):
                 # do basic transduction
                 if i <= len(shortest) - 1:
-                    print("basic")
                     input_index = input_matches[i]["index"]
                     output_index = (
                         output_matches[i]["index"]
                         + diff_from_output[output_matches[i]["index"]]
-                    )  # TODO: Do I need intermediate diff on output?
-                    # I don't understand this block
+                    )
                     if output_index >= len(match.group()) + output_start:
                         output_index = len(match.group()) + output_start - 1
 
-                    # I don't think this is needed
-                    # out_str = out_string[i] if process == "delete" else char["string"]
                     tg.output_string = (
                         tg.output_string[:output_index]
                         + output_matches[i]["string"]
@@ -359,11 +346,7 @@ class Transducer:
                     # this is needed for metathesis
                     tg.edges = [x for x in tg.edges if x[1] != output_index]
                     tg.edges.append([input_index, output_index])
-                    print(tg.output_string)
-                    print(tg.edges)
                 elif process == "insert":
-
-                    print(process)
                     # for insertion, take last character of input
                     input_index = input_matches[-1]["index"]
                     output_index = (
@@ -381,10 +364,7 @@ class Transducer:
                             tg.edges[i][1] += 1
                     # then add insertion edge
                     tg.edges.append([input_index, output_index])
-                    print(tg.output_string)
-                    print(tg.edges)
                 elif process == "delete":
-                    print(process)
                     input_index = input_matches[i]["index"]
                     # I don't understand this either, the output index should be
                     if output_matches:
@@ -408,14 +388,17 @@ class Transducer:
                             tg.edges[i][1] = None
                         if edge[1] != None and edge[1] > output_index:
                             tg.edges[i][1] -= 1
-                    print(tg.output_string)
-                    print(tg.edges)
 
     def get_input_from_output(self, tg, output_node):
         return max(x[0] for x in tg.edges if x[1] == output_node)
 
     def update_default_indices(
-        self, tg, match_start, diff_from_output, in_string, out_string
+        self,
+        tg,
+        match_start,
+        diff_from_output,
+        in_string,
+        out_string,
     ):
         in_length = len(in_string)
         out_length = len(out_string)
@@ -433,6 +416,7 @@ class Transducer:
             shortest = out_string
             process = "delete"
         # iterate the longest string
+
         deleted = 0
         for i, char in enumerate(longest):
             output_index = i + match_start + diff_from_output[i + match_start]
@@ -558,11 +542,14 @@ class Transducer:
                 int, {n: 0 for n in range(len(tg.output_string))}
             )
             for match_i, match in enumerate(
-                io["match_pattern"].finditer(tg.output_string)
+                reversed(list(io["match_pattern"].finditer(tg.output_string)))
             ):
                 debug_string = tg.output_string
                 start = match.start()
                 end = match.end()
+                if match_i:
+                    start += diff_from_output[start]
+                    end += diff_from_output[end - 1]
                 if "intermediate_form" in io:
                     out_string = io["intermediate_form"]
                     intermediate_forms = True
@@ -576,15 +563,19 @@ class Transducer:
                     self.update_explicit_indices(
                         tg,
                         match,
+                        (start, end),
                         io,
                         diff_from_input,
                         diff_from_output,
                         out_string,
-                        match_i,
                     )
                 else:
                     self.update_default_indices(
-                        tg, match.start(), diff_from_output, match.group(), out_string
+                        tg,
+                        match.start(),
+                        diff_from_output,
+                        match.group(),
+                        out_string,
                     )
                 if (
                     io["in"] != io["out"]
@@ -598,8 +589,8 @@ class Transducer:
                             "rule": {
                                 k: v for k, v in io.items() if k != "match_pattern"
                             },
-                            "start": start,
-                            "end": end,
+                            "start": match.start(),
+                            "end": match.end(),
                         }
                     )
                 out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
@@ -611,9 +602,8 @@ class Transducer:
                 except:
                     # it's been deleted
                     input_index = match.end() - 1
-                # breakpoint()
                 for n in range(
-                    match.end() + diff,
+                    match.end() - 1 + diff,
                     max(len(diff_from_output) + diff, len(diff_from_output)),
                 ):
                     diff_from_output[n] += diff
