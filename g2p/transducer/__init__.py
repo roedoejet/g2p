@@ -360,7 +360,7 @@ class Transducer:
                     )
                     # update edges
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] != None and edge[1] >= output_index:
+                        if edge[1] is not None and edge[1] >= output_index:
                             tg.edges[i][1] += 1
                     # then add insertion edge
                     tg.edges.append([input_index, output_index])
@@ -384,9 +384,9 @@ class Transducer:
                         tg.edges = [x for x in tg.edges if x[1] != output_index]
                         tg.edges.append([input_index, None])
                     for i, edge in enumerate(tg.edges):
-                        if edge[1] != None and edge[1] == output_index:
+                        if edge[1] is not None and edge[1] == output_index:
                             tg.edges[i][1] = None
-                        if edge[1] != None and edge[1] > output_index:
+                        if edge[1] is not None and edge[1] > output_index:
                             tg.edges[i][1] -= 1
 
     def get_input_from_output(self, tg, output_node):
@@ -440,7 +440,7 @@ class Transducer:
                 )
 
                 for j, edge in enumerate(tg.edges):
-                    if edge[1] != None and edge[1] >= output_index:
+                    if edge[1] is not None and edge[1] >= output_index:
                         tg.edges[j][1] += 1
 
                 for edge in tg.edges:
@@ -460,12 +460,16 @@ class Transducer:
                 deleted += 1
                 for k, edge in enumerate(tg.edges):
                     if (
-                        edge[1] != None
+                        edge[1] is not None
                         and (i == 0 or tg.edges[k - 1][1] is None)
                         and edge[1] == index_to_delete
                     ):
                         tg.edges[k][1] = None
-                    elif edge[1] != None and edge[1] > 0 and edge[1] >= index_to_delete:
+                    elif (
+                        edge[1] is not None
+                        and edge[1] > 0
+                        and edge[1] >= index_to_delete
+                    ):
                         tg.edges[k][1] -= 1
 
     def apply_unidecode(self, to_convert: str):
@@ -599,7 +603,7 @@ class Transducer:
 
                 try:
                     input_index = self.get_input_from_output(tg, match.end() - 1)
-                except:
+                except ValueError:
                     # it's been deleted
                     input_index = match.end() - 1
                 for n in range(
@@ -610,17 +614,6 @@ class Transducer:
                 for n in range(input_index, len(diff_from_input)):
                     diff_from_input[n] += diff
 
-            # only update the input intermediate diff between rules
-            # diff_from_input = copy.deepcopy(diff_from_output)
-            # diff_from_output = defaultdict(
-            #     int, {n: 0 for n in range(len(tg.output_string))}
-            # )
-            # try:
-            #     diff = len(out_string) - len(match.group())
-            #     for n in range(match.end() + diff, len(tg.output_string) + 1):
-            #         diff_from_input[n] += diff
-            # except UnboundLocalError:
-            #     pass
         if intermediate_forms:
             tg.output_string = self.resolve_intermediate_chars(tg.output_string)
 

@@ -6,19 +6,19 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: "3.6"
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip3 install -r requirements.txt
           pip3 install -e .
           pip3 install pip-licenses
           if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
-          pip3 install coverage
-          pip3 install coveralls
+          pip3 install coverage coveralls
       - name: Run tests
         run: |
           gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
@@ -29,3 +29,18 @@ jobs:
       - uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true # optional (default = false)
+
+  test-on-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.6"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip3 install -e .
+      - name: Run tests on Windows
+        run: python run_tests.py dev

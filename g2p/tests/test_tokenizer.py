@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import os
 from unittest import TestCase, main
 
 import g2p.mappings.tokenizer as tok

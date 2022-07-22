@@ -42,6 +42,7 @@ _xsampa_converter = None  # Cache this but create it only if needed
 
 def process_character(p, is_xsampa=False):
     if is_xsampa:
+        global _xsampa_converter
         if _xsampa_converter is None:
             # Expensive import, do it only when needed:
             from panphon.xsampa import XSampa

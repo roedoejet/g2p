@@ -9,7 +9,7 @@ from tempfile import NamedTemporaryFile
 from typing import List
 from unittest import TestCase, main
 
-from g2p import exceptions, transducer
+from g2p import exceptions
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
@@ -286,6 +286,44 @@ class MappingTest(TestCase):
         dedup_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
         mapping1.deduplicate()
         self.assertEquals(mapping1.mapping, dedup_ref.mapping)
+
+    def test_g2p_studio_csv(self):
+        # Ensure that a single CSV file from Studio works properly
+        mapping = Mapping(
+            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv")
+        )
+        transducer = Transducer(mapping)
+        self.assertEqual(
+            transducer("Jouni haluaa juoda kahvia").output_string,
+            "Jouni hɑluɑː juodɑ kɑhviɑ",
+        )
+        # Concatenate them (this is not a good idea) and make sure it works anyway
+        tf = NamedTemporaryFile(
+            prefix="test_g2p_g2p_",
+            mode="w",
+            suffix=".csv",
+            delete=False,
+            encoding="utf8",
+        )
+        with open(
+            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv"),
+            encoding="utf8",
+        ) as fh:
+            tf.write(fh.read())
+        # In fact you can't concatenate them anyway. They don't end in newline.
+        tf.write("\n")
+        with open(
+            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio2.csv"),
+            encoding="utf8",
+        ) as fh:
+            tf.write(fh.read())
+        tf.close()
+        mapping = Mapping(tf.name)
+        transducer = Transducer(mapping)
+        self.assertEqual(
+            transducer("tee on herkullista").output_string, "teː on herkullistɑ"
+        )
+        os.unlink(tf.name)
 
 
 if __name__ == "__main__":

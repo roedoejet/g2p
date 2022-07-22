@@ -1,0 +1,14 @@
+<<: &shared
+  - language_name: Finnish
+mappings:
+  - display_name: Finnish to IPA
+    in_lang: fin
+    out_lang: fin-ipa
+    authors:
+      - David Huggins-Daines
+    type: mapping
+    mapping: fin_to_ipa.csv
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    norm_form: 'NFC'
+    <<: *shared

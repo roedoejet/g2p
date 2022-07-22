@@ -8,9 +8,7 @@ from unittest import TestCase, main
 
 from g2p import make_g2p
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
 from g2p.tests.public.data import __file__ as data_dir
-from g2p.transducer import Transducer
 
 
 class LangTest(TestCase):
