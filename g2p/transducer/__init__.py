@@ -260,19 +260,24 @@ class Transducer:
             indices_seen[intermediate_index] += 1
         return output_string
 
-    def update_explicit_indices(
-        self, tg, match, start_end, io, diff_from_input, diff_from_output, out_string
+    def get_match_groups(
+        self, tg, start_end, io, diff_from_input, out_string, output_start
     ):
-        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
-        It then zips them up according to the provided indexing notation.
+        """Take the inputs to explicit indices matching and create groups of
+            Input and Output matches that are grouped by their explicit indices.
 
-        Example:
-            A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
-            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
-            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
-            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+        Args:
+            tg (TransductionGraph): the graph holding information about the transduction
+            start_end (Tuple(int, int)): a tuple contianing the start and end of the input match
+            io (List): an input/output rule
+            diff_from_input (DefaultDict): A dictionary containing the single character distance from a given character index to its input
+            out_string (str): the raw output string
+            output_start (int): the diff-offset start of the match with respect to the output
+
+        Returns:
+            inputs (dict): dictionary containing matches grouped by explicit index match
+            outputs (dict): dictionary containing matches grouped by explicit index match
         """
-
         input_char_matches = [
             x.group() for x in self._char_match_pattern.finditer(io["in"])
         ]
@@ -285,7 +290,7 @@ class Transducer:
         input_start = (
             start_end[0] - diff_from_input[self.get_input_from_output(tg, start_end[0])]
         )
-        output_start = start_end[0] - diff_from_output[start_end[0]]
+
         for i, m in enumerate(input_match_indices):
             for char in input_char_matches[i]:
                 if m in inputs:
@@ -308,25 +313,35 @@ class Transducer:
                 else:
                     outputs[m] = [{"index": index + output_start, "string": char}]
                 index += 1
+        return inputs, outputs
+
+    def update_explicit_indices(
+        self, tg, match, start_end, io, diff_from_input, diff_from_output, out_string
+    ):
+        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
+        It then zips them up according to the provided indexing notation.
+
+        Example:
+            A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
+            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
+            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
+            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+        """
+        output_start = start_end[0] - diff_from_output[start_end[0]]
+        inputs, outputs = self.get_match_groups(
+            tg, start_end, io, diff_from_input, out_string, output_start
+        )
         out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
+        # keep track of deletions that haven't yet been processed by diff_from_x
         deleted = 0
         for match_index, input_matches in inputs.items():
             try:
                 output_matches = outputs[match_index]
             except KeyError:
                 output_matches = []
-            if len(input_matches) == len(output_matches):
-                shortest = input_matches
-                longest = output_matches
-                process = "basic"
-            elif len(input_matches) < len(output_matches):
-                shortest = input_matches
-                longest = output_matches
-                process = "insert"
-            else:
-                shortest = output_matches
-                longest = input_matches
-                process = "delete"
+            process, longest, shortest = self.get_longest_and_shortest(
+                input_matches, output_matches
+            )
             for i, char in enumerate(longest):
                 # do basic transduction
                 if i <= len(shortest) - 1:
@@ -392,6 +407,25 @@ class Transducer:
     def get_input_from_output(self, tg, output_node):
         return max(x[0] for x in tg.edges if x[1] == output_node)
 
+    def get_longest_and_shortest(self, in_string_or_matches, out_string_or_matches):
+        """Given two strings or match lists determine the longest and shortest. If
+           the input is longer than the output, the process is to delete,
+           if the output is longer than the input, the process is to insert.
+           If the input and output are the same length, the process is basic.
+
+        Args:
+            in_string_or_matches (str|List): input string
+            out_string_or_matches (str|List): output string
+        """
+        in_length = len(in_string_or_matches)
+        out_length = len(out_string_or_matches)
+        if in_length > out_length:
+            return "delete", in_string_or_matches, out_string_or_matches
+        elif in_length < out_length:
+            return "insert", out_string_or_matches, in_string_or_matches
+        else:
+            return "basic", out_string_or_matches, in_string_or_matches
+
     def update_default_indices(
         self,
         tg,
@@ -400,22 +434,9 @@ class Transducer:
         in_string,
         out_string,
     ):
-        in_length = len(in_string)
-        out_length = len(out_string)
-        if in_length == out_length:
-            longest = out_string
-            shortest = in_string
-            process = "basic"
-        elif in_length < out_length:
-            longest = out_string
-            shortest = in_string
-            process = "insert"
-        # default deletion(s)
-        else:
-            longest = in_string
-            shortest = out_string
-            process = "delete"
-        # iterate the longest string
+        process, longest, shortest = self.get_longest_and_shortest(
+            in_string, out_string
+        )
 
         deleted = 0
         for i, char in enumerate(longest):
@@ -488,7 +509,7 @@ class Transducer:
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
-        if tg.output_string == "":
+        if not tg.output_string:
             # Some inputs get completely deleted by unidecode, in which case there are no
             # valid edges to output.
             tg.edges = []
@@ -497,7 +518,7 @@ class Transducer:
             x_len, y_len = 0, 0
             for tgt in converted:
                 if tgt:
-                    for c in tgt:
+                    for _ in tgt:
                         edges.append((x_len, y_len))
                         y_len += 1
                 else:
@@ -621,9 +642,11 @@ class Transducer:
         to_remove = []
         for i, edge in enumerate(tg.edges):
             if edge[1] is None:
-                for other_edge in tg.edges:
-                    if other_edge != edge and other_edge[0] == edge[0]:
-                        to_remove.append(i)
+                to_remove.extend(
+                    i
+                    for other_edge in tg.edges
+                    if other_edge != edge and other_edge[0] == edge[0]
+                )
 
         for i in set(to_remove):
             del tg.edges[i]
@@ -657,29 +680,23 @@ class Transducer:
     ):
         out_lang = self.mapping.kwargs["out_lang"]
         if "eng-arpabet" in out_lang:
-            if not is_arpabet(tg.output_string):
-                if display_warnings:
-                    display_input = (
-                        original_input if original_input else tg.input_string
-                    )
-                    LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
-                    )
-                return False
-            else:
+            if is_arpabet(tg.output_string):
                 return True
+            if display_warnings:
+                display_input = original_input or tg.input_string
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                )
+            return False
         elif is_ipa(out_lang):
-            if not is_panphon(tg.output_string, display_warnings=display_warnings):
-                if display_warnings:
-                    display_input = (
-                        original_input if original_input else tg.input_string
-                    )
-                    LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
-                    )
-                return False
-            else:
+            if is_panphon(tg.output_string, display_warnings=display_warnings):
                 return True
+            if display_warnings:
+                display_input = original_input or tg.input_string
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
+                )
+            return False
         else:
             # No check implemented at this tier, just return True
             return True
@@ -796,20 +813,20 @@ class CompositeTransducer:
                 display_warnings=display_warnings,
                 original_input=tg.input_string,
             )
-        else:
-            result = True
-            for i, transducer in enumerate(self._transducers):
-                if not transducer.check(
-                    tg._tiers[i],
-                    display_warnings=display_warnings,
-                    original_input=tg.input_string,
-                ):
-                    # Don't short circuit if warnings are required
-                    if display_warnings:
-                        result = False
-                    else:
-                        return False
-            return result
+        # if not shallow, go deeper
+        result = True
+        for i, transducer in enumerate(self._transducers):
+            if not transducer.check(
+                tg._tiers[i],
+                display_warnings=display_warnings,
+                original_input=tg.input_string,
+            ):
+                # Don't short circuit if warnings are required
+                if display_warnings:
+                    result = False
+                else:
+                    return False
+        return result
 
 
 class TokenizingTransducer:
