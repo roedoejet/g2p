@@ -1,0 +1,76 @@
+cff-version: 1.2.0
+message: >-
+  If you use this work in a project of yours and write about it, please cite
+  our ComputEL 2022 paper using the following citation data.
+title: Gi2Pi
+url: https://github.com/roedoejet/g2p
+preferred-citation:
+  type: conference-paper
+  title: >-
+    G$_i$2P$_i$ Rule-based, index-preserving grapheme-to-phoneme
+    transformations
+  authors:
+    - given-names: Aidan
+      family-names: Pine
+      email: Aidan.Pine@nrc-cnrc.gc.ca
+      affiliation: National Research Council Canada
+    - given-names: Patrick
+      family-names: Littell
+      email: Patrick.Littell@nrc-cnrc.gc.ca
+      affiliation: National Research Council Canada
+    - given-names: Eric
+      family-names: Joanis
+      email: Eric.Joanis@nrc-cnrc.gc.ca
+      affiliation: National Research Council Canada
+    - given-names: David
+      family-names: Huggins-Daines
+      email: dhdaines@gmail.com
+      affiliation: Independent Researcher
+    - given-names: Christopher
+      family-names: Cox
+      email: christopher.cox@carleton.ca
+      affiliation: Carleton University
+    - given-names: Fineen
+      family-names: Davis
+      email: fineen.davis@gmail.com
+      affiliation: Wiichihitotaak ILR Inc
+    - given-names: Eddie
+      family-names: Antonio Santos
+      email: eddie.santos@ucdconnect.ie
+      affiliation: University College Dublin
+    - given-names: Shankhalika
+      family-names: Srikanth
+      email: ssrikanth@uvic.ca
+      affiliation: University of Victoria
+    - given-names: Delasie
+      family-names: Torkornoo
+      email: delasie.torkornoo@carleton.ca
+      affiliation: Carleton University
+    - given-names: Sabrina
+      family-names: Yu
+      email: sab.yu@mail.utoronto.ca
+      affiliation: University of Toronto
+  collection-title: >-
+    Proceedings of the Fifth Workshop on the Use of Computational Methods in the
+    Study of Endangered Languages
+  year: 2022
+  month: 5
+  publisher:
+    name: Association for Computational Linguistics
+  url: https://aclanthology.org/2022.computel-1.7
+  start: 52
+  end: 60
+  location:
+    name: Dublin, Ireland
+  abstract: >-
+    This paper describes the motivation and implementation details for a
+    rule-based, index-preserving grapheme-to-phoneme engine {`}G$_i$2P$_i$'
+    implemented in pure Python and released under the open source MIT license.
+    The engine and interface have been designed to prioritize the developer
+    experience of potential contributors without requiring a high level of
+    programming knowledge. {`}G$_i$2P$_i$' already provides mappings for 30
+    (mostly Indigenous) languages, and the package is accompanied by a web-based
+    interactive development environment, a RESTful API, and extensive
+    documentation to encourage the addition of more mappings in the future. We
+    also present three downstream applications of {`}G$_i$2P$_i$' and show
+    results of a preliminary evaluation.
