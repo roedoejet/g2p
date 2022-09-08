@@ -35,7 +35,9 @@ class LangTest(TestCase):
             with open(fn, encoding="utf-8") as csvfile:
                 reader = csv.reader(csvfile, delimiter=delimiter)
                 for row in reader:
-                    if len(row) < 4:
+                    if len(row) == 0:
+                        continue
+                    elif len(row) < 4:
                         LOGGER.warning(
                             f"Row in {fn} containing values {row} does not have the right values. Please check your data."
                         )
