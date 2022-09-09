@@ -6,3 +6,8 @@ mic|mic-ipa|sq|səx
 
 # Test that ' is tokenized correctly as part of the words.
 mic|mic-ipa|mípi'tiꞌnála'jaꞌpéke'qeꞌ|miːbiːdiːnɑːlɑːtʃɑːpeːɡeːɣeː
+
+# Problem words detected by Marc, fixed by adding o->o "no-op" rule and regenerating mic-ipa to eng-ipa
+mic|eng-arpabet|Nsituoqn|N Z IY D UW AO G N
+mic|eng-arpabet|koqoey|K AO G AO EY Y
+mic|eng-arpabet|Penoqite'lsultinen|P EY N AO G IY D EY L Z UW L D IY N EY N
