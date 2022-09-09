@@ -3,4 +3,6 @@ mic|mic-ipa|Miꞌkmaq|miːɡmɑx
 mic|mic-ipa|mi'kmaq|miːɡmɑx
 mic|mic-ipa|sqolj|əsxoltʃ
 mic|mic-ipa|sq|səx
+
+# Test that ' is tokenized correctly as part of the words.
 mic|mic-ipa|mípi'tiꞌnála'jaꞌpéke'qeꞌ|miːbiːdiːnɑːlɑːtʃɑːpeːɡeːɣeː

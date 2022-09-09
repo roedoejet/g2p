@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
-import csv
-import os
-from glob import glob
 from unittest import TestCase, main
 
 from g2p import make_g2p
 from g2p.log import LOGGER
-from g2p.tests.public.data import __file__ as data_dir
+from g2p.tests.public.data import load_public_test_data
 
 
 class LangTest(TestCase):
@@ -22,35 +18,15 @@ class LangTest(TestCase):
 
     """
 
-    def setUp(self):
-        DATA_DIR = os.path.dirname(data_dir)
-        self.langs_to_test = []
-        for fn in glob(f"{DATA_DIR}/*.*sv"):
-            if fn.endswith("csv"):
-                delimiter = ","
-            elif fn.endswith("psv"):
-                delimiter = "|"
-            elif fn.endswith("tsv"):
-                delimiter = "\t"
-            with open(fn, encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile, delimiter=delimiter)
-                for row in reader:
-                    if len(row) == 0:
-                        continue
-                    elif len(row) < 4:
-                        LOGGER.warning(
-                            f"Row in {fn} containing values {row} does not have the right values. Please check your data."
-                        )
-                    else:
-                        self.langs_to_test.append(row)
-
     def test_io(self):
+        langs_to_test = load_public_test_data()
+
         # go through each language declared in the test case set up
         # Instead of asserting immediately, we go through all the cases first, so that
         # running test_langs.py prints all the errors at once, to help debugging a given g2p mapping.
         # Then we call assertEqual on the first failed case, to make unittest register the failure.
         error_count = 0
-        for test in self.langs_to_test:
+        for test in langs_to_test:
             transducer = make_g2p(test[0], test[1])
             output_string = transducer(test[2]).output_string.strip()
             if output_string != test[3].strip():
@@ -70,7 +46,7 @@ class LangTest(TestCase):
                 first_failed_test[3].strip(),
             )
 
-        # for test in self.langs_to_test:
+        # for test in langs_to_test:
         #    transducer = make_g2p(test[0], test[1])
         #    self.assertEqual(transducer(test[2]).output_string, test[3])
 
