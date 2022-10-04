@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 
-import csv
 import os
 import re
 import shutil
 import tempfile
-from glob import glob
 from unittest import TestCase, main
 
 from g2p.app import APP
 from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
 from g2p.log import LOGGER
 from g2p.mappings.langs import load_langs, load_network
-from g2p.tests.public.data import __file__ as data_dir
+from g2p.tests.public.data import DATA_DIR, load_public_test_data
 
 
 class CliTest(TestCase):
@@ -20,25 +18,6 @@ class CliTest(TestCase):
 
     def setUp(self):
         self.runner = APP.test_cli_runner()
-        self.data_dir = os.path.dirname(data_dir)
-        self.langs_to_test = []
-        for fn in glob(os.path.join(self.data_dir, "*.*sv")):
-            if fn.endswith("csv"):
-                delimiter = ","
-            elif fn.endswith("psv"):
-                delimiter = "|"
-            elif fn.endswith("tsv"):
-                delimiter = "\t"
-            with open(fn, encoding="utf-8") as csvfile:
-                reader = csv.reader(csvfile, delimiter=delimiter)
-                for row in reader:
-                    if len(row) < 4:
-                        LOGGER.warning(
-                            f"Row in {fn} containing values {row} does not have the right values."
-                            f"Please check your data."
-                        )
-                    else:
-                        self.langs_to_test.append(row)
 
     def test_update(self):
         result = self.runner.invoke(update)
@@ -46,7 +25,7 @@ class CliTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             lang1_dir = os.path.join(tmpdir, "lang1")
             os.mkdir(lang1_dir)
-            mappings_dir = os.path.join(self.data_dir, "..", "mappings")
+            mappings_dir = os.path.join(DATA_DIR, "..", "mappings")
             for name in os.listdir(mappings_dir):
                 if name.startswith("minimal."):
                     shutil.copy(
@@ -85,24 +64,25 @@ class CliTest(TestCase):
             self.assertTrue(network is not None)
         # Make sure it fails meaningfully on invalid input
         with tempfile.TemporaryDirectory() as tmpdir:
-            bad_langs_dir = os.path.join(self.data_dir, "..", "mappings", "bad_langs")
+            bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("language_name", str(result.exception))
         with tempfile.TemporaryDirectory() as tmpdir:
-            bad_langs_dir = os.path.join(self.data_dir, "..", "mappings", "bad_langs2")
+            bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs2")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
             self.assertIn("language_name", str(result.exception))
             self.assertIn("min to min", str(result.exception))
 
     def test_convert(self):
+        langs_to_test = load_public_test_data()
         LOGGER.info(
-            f"Running {len(self.langs_to_test)} g2p convert test cases found in public/data"
+            f"Running {len(langs_to_test)} g2p convert test cases found in public/data"
         )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
-            for test in self.langs_to_test:
+            for test in langs_to_test:
                 output_string = self.runner.invoke(
                     convert, [*tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
@@ -168,7 +148,7 @@ class CliTest(TestCase):
         """Test g2p scan with all French characters, in NFC and NFD"""
         for paragram_file in ["fra_panagrams.txt", "fra_panagrams_NFD.txt"]:
             result = self.runner.invoke(
-                scan, ["fra", os.path.join(self.data_dir, paragram_file)]
+                scan, ["fra", os.path.join(DATA_DIR, paragram_file)]
             )
             self.assertEqual(result.exit_code, 0)
             self.assertLogs(level="WARNING")
@@ -182,7 +162,7 @@ class CliTest(TestCase):
     def test_scan_fra_simple(self):
         # For now, unit test g2p scan using a simpler piece of French
         result = self.runner.invoke(
-            scan, ["fra", os.path.join(self.data_dir, "fra_simple.txt")]
+            scan, ["fra", os.path.join(DATA_DIR, "fra_simple.txt")]
         )
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
@@ -195,7 +175,7 @@ class CliTest(TestCase):
 
     def test_scan_str_case(self):
         result = self.runner.invoke(
-            scan, ["str", os.path.join(self.data_dir, "str_un_human_rights.txt")]
+            scan, ["str", os.path.join(DATA_DIR, "str_un_human_rights.txt")]
         )
         returned_set = re.search("{(.*)}", result.stdout).group(1)
         self.assertEqual(result.exit_code, 0)

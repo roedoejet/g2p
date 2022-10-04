@@ -67,7 +67,14 @@ class Tokenizer(DefaultTokenizer):
     def _build_regex(self):
         if not self.case_sensitive:
             self.inventory = [c.lower() for c in self.inventory]
+        # Remove the indices, they're not part of the text input for the rules
         self.inventory = [re.sub(r"{[0-9]+}", "", x) for x in self.inventory]
+        # Rules with "in": "è|é" have two distinct inputs, split them.
+        self.inventory = [
+            part
+            for rule_input in self.inventory
+            for part in re.split(r"(?<!\\)\|", rule_input)
+        ]
         regex_pieces = sorted(self.inventory, key=lambda s: -len(s))
         regex_pieces = [re.escape(p) for p in regex_pieces]
         if self.delim:
@@ -115,7 +122,7 @@ class TokenizerLibrary:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang
 
-    def make_tokenizer(self, in_lang, out_lang=None, tok_path=None):
+    def make_tokenizer(self, in_lang, out_lang=None, tok_path=None):  # noqa C901
         tokenizer_key = self.make_tokenizer_key(in_lang, out_lang, tok_path)
         if not self.tokenizers.get(tokenizer_key):
             # This tokenizer was not created yet, initialize it now.
