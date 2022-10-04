@@ -170,7 +170,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2021-01-04 13:11:19.507484
+      - Generated 2022-09-09 13:04:46.128081
     case_sensitive: false
     display_name: mic-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -179,7 +179,7 @@ mappings:
     mapping: mic-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
-    prevent_feeding: false
+    prevent_feeding: true
     reverse: false
     rule_ordering: as-written
   - authors:
