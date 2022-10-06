@@ -7,6 +7,7 @@
 from unicodedata import normalize
 from unittest import TestCase, main
 
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
@@ -166,16 +167,21 @@ class IndicesTest(TestCase):
 
     """
 
-    def setUp(self):
+    def __init__(self, *args):
+        # Let's use __init__() to set all these up just once at class creation
+        # time, instead of setUp() which repeatedly does it for each test case
+        super().__init__(*args)
         self.test_mapping_one = Mapping([{"in": "t", "out": "p", "context_after": "e"}])
         self.test_mapping_two = Mapping([{"in": "e", "out": ""}])
         self.test_mapping_three = Mapping(
             [{"in": "t", "out": "ch", "context_after": "e"}]
         )
         self.test_mapping_four = Mapping([{"in": "te", "out": "p"}])
-        self.test_mapping_five = Mapping(
-            [{"context_before": "t", "context_after": "$", "in": "", "out": "y"}]
-        )
+        # We know this issues a warning, so let's silence it by asserting it.
+        with self.assertLogs(LOGGER, "WARNING"):
+            self.test_mapping_five = Mapping(
+                [{"context_before": "t", "context_after": "$", "in": "", "out": "y"}]
+            )
         self.test_mapping_six = Mapping([{"in": "e{1}s{2}", "out": "s{2}e{1}"}])
         self.test_mapping_seven = Mapping(
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}],

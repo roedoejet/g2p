@@ -58,9 +58,11 @@ class CliTest(TestCase):
                 fh.write(b"spam spam spam")
             with open(network_pkl, "wb") as fh:
                 fh.write(b"eggs bacon spam")
-            langs = load_langs(langs_pkl)
+            with self.assertLogs(LOGGER, "WARNING"):
+                langs = load_langs(langs_pkl)
             self.assertTrue(langs is not None)
-            network = load_network(network_pkl)
+            with self.assertLogs(LOGGER, "WARNING"):
+                network = load_network(network_pkl)
             self.assertTrue(network is not None)
         # Make sure it fails meaningfully on invalid input
         with tempfile.TemporaryDirectory() as tmpdir:
