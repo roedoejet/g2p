@@ -520,7 +520,9 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
     def encode(self, obj):
         if isinstance(obj, dict) and "in" in obj and "out" in obj:
             # Compact, single-line output for the individual rules in the mapping
-            return json.dumps(obj, ensure_ascii=self.ensure_ascii)
+            ordered_rule = {"in": obj["in"], "out": obj["out"], **obj}
+            assert obj == ordered_rule
+            return json.dumps(ordered_rule, ensure_ascii=self.ensure_ascii)
         elif isinstance(obj, (list, tuple)):
             self.indentation_level += 1
             output = [self.indent_str + self.encode(el) for el in obj]
