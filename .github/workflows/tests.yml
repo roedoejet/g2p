@@ -5,6 +5,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # #no-ci in the commit log flags commit we don't want CI-validated
+    if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -32,6 +34,7 @@ jobs:
 
   test-on-windows:
     runs-on: windows-latest
+    if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
