@@ -823,20 +823,20 @@ class CompositeTransducer:
                 display_warnings=display_warnings,
                 original_input=tg.input_string,
             )
-        # if not shallow, go deeper
-        result = True
-        for i, transducer in enumerate(self._transducers):
-            if not transducer.check(
-                tg._tiers[i],
-                display_warnings=display_warnings,
-                original_input=tg.input_string,
-            ):
-                # Don't short circuit if warnings are required
-                if display_warnings:
-                    result = False
-                else:
-                    return False
-        return result
+        else:
+            result = True
+            for i, transducer in enumerate(self._transducers):
+                if not transducer.check(
+                    tg._tiers[i],
+                    display_warnings=display_warnings,
+                    original_input=tg.input_string,
+                ):
+                    # Don't short circuit if warnings are required
+                    if display_warnings:
+                        result = False
+                    else:
+                        return False
+            return result
 
 
 class TokenizingTransducer:
