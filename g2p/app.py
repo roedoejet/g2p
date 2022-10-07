@@ -79,7 +79,7 @@ def network_to_echart(write_to_file: bool = False, layout: bool = False):
         with open(
             os.path.join(os.path.dirname(static_file), "languages-network.json"), "w"
         ) as f:
-            f.write(json.dumps({"nodes": nodes, "edges": edges}))
+            f.write(json.dumps({"nodes": nodes, "edges": edges}) + "\n")
         LOGGER.info("Wrote network nodes and edges to static file.")
     return nodes, edges
 

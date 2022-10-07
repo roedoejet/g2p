@@ -6,7 +6,7 @@ mappings:
     out_lang: dummy-eng-arpabet
     out_delimiter: " "
     type: mapping
-    norm_form: "NFD"
+    norm_form: "NFC"
     authors:
       - Aidan Pine
     mapping: dummy_to_arpabet.json
@@ -17,7 +17,7 @@ mappings:
     out_lang: hamming-dummy-eng-arpabet
     out_delimiter: " "
     type: mapping
-    norm_form: "NFD"
+    norm_form: "NFC"
     authors:
       - Aidan Pine
     mapping: dummy_to_arpabet.json
@@ -28,7 +28,7 @@ mappings:
     out_lang: eng-arpabet
     out_delimiter: " "
     type: mapping
-    norm_form: "NFD"
+    norm_form: "NFC"
     authors:
       - Patrick Littell
     mapping: eng_ipa_to_arpabet.json
@@ -39,11 +39,11 @@ mappings:
     out_lang: hamming-eng-arpabet
     out_delimiter: " "
     type: mapping
-    norm_form: "NFD"
+    norm_form: "NFC"
     authors:
       - Patrick Littell
     mapping: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
     # TODO: Need lexicon mapping
-  
+

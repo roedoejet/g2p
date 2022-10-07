@@ -25,7 +25,7 @@ from g2p.mappings.utils import (
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
-copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r
+copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r  # type: ignore
 
 # An Index is typed as follows:
 # {input_index: int, {'input_string': str, 'output': {output_index: int, str}}}
@@ -57,7 +57,7 @@ class TransductionGraph:
         # Edges
         self._edges = [[i, i] for i, x in enumerate(input_string)]
         # Debugger
-        self._debugger = []
+        self._debugger = []  # type: ignore
 
     def __str__(self):
         return self._output_string
@@ -260,15 +260,31 @@ class Transducer:
             indices_seen[intermediate_index] += 1
         return output_string
 
-    def update_explicit_indices(self, tg, match, io, intermediate_diff, out_string):
-        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
-        It then zips them up according to the provided indexing notation.
+    def get_match_groups(
+        self, tg, start_end, io, diff_from_input, out_string, output_start
+    ):
+        """Take the inputs to explicit indices matching and create groups of
+            Input and Output matches that are grouped by their explicit indices.
 
-        Example:
-            A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
-            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
-            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
-            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+            For example, applying a rule that is defined: a{1}b{2} → b{2}a{1} on the input "ab"
+            will return inputs, outputs where:
+
+            inputs = {'1': [{'index': 0, 'string': 'a'}], '2': [{'index': 1, 'string': 'b'}] }
+            outputs = {'1': [{'index': 0, 'string': 'b'}], '2': [{'index': 1, 'string': 'a'}] }
+
+            This allows input match groups to be iterated through in sequence regardless of their character sequence.
+
+        Args:
+            tg (TransductionGraph): the graph holding information about the transduction
+            start_end (Tuple(int, int)): a tuple contianing the start and end of the input match
+            io (List): an input/output rule
+            diff_from_input (DefaultDict): A dictionary containing the single character distance from a given character index to its input
+            out_string (str): the raw output string
+            output_start (int): the diff-offset start of the match with respect to the output
+
+        Returns:
+            inputs (dict): dictionary containing matches grouped by explicit index match
+            outputs (dict): dictionary containing matches grouped by explicit index match
         """
         input_char_matches = [
             x.group() for x in self._char_match_pattern.finditer(io["in"])
@@ -278,13 +294,17 @@ class Transducer:
         ]
         inputs = {}
         index = 0
-        start = match.start() + intermediate_diff
+
+        input_start = (
+            start_end[0] - diff_from_input[self.get_input_from_output(tg, start_end[0])]
+        )
+
         for i, m in enumerate(input_match_indices):
-            for j, char in enumerate(input_char_matches[i]):
+            for char in input_char_matches[i]:
                 if m in inputs:
-                    inputs[m].append({"index": index + start, "string": char})
+                    inputs[m].append({"index": index + input_start, "string": char})
                 else:
-                    inputs[m] = [{"index": index + start, "string": char}]
+                    inputs[m] = [{"index": index + input_start, "string": char}]
                 index += 1
         output_char_matches = [
             x.group() for x in self._char_match_pattern.finditer(out_string)
@@ -295,170 +315,194 @@ class Transducer:
         outputs = {}
         index = 0
         for i, m in enumerate(output_match_indices):
-            for j, char in enumerate(output_char_matches[i]):
+            for char in output_char_matches[i]:
                 if m in outputs:
-                    outputs[m].append({"index": index + start, "string": char})
+                    outputs[m].append({"index": index + output_start, "string": char})
                 else:
-                    outputs[m] = [{"index": index + start, "string": char}]
+                    outputs[m] = [{"index": index + output_start, "string": char}]
                 index += 1
+        return inputs, outputs
+
+    def delete_character(self, tg, index_to_delete, ahh):
+        """Delete character at `index_to_delete` in TransductionGraph output
+
+        Args:
+            tg (TransductionGraph): the current Transduction Graph
+            index_to_delete (int): index of character to delete
+            ahh (int): current value of i in calling loop
+        """
+        # delete character
+        tg.output_string = (
+            tg.output_string[:index_to_delete] + tg.output_string[index_to_delete + 1 :]
+        )
+        # update indices
+        for k, edge in enumerate(tg.edges):
+            if (
+                edge[1] is not None
+                and (ahh == 0 or tg.edges[k - 1][1] is None)
+                and edge[1] == index_to_delete
+            ):
+                tg.edges[k][1] = None
+            elif edge[1] is not None and edge[1] >= index_to_delete:
+                tg.edges[k][1] -= 1
+
+    def insert_character(self, tg, character_to_insert, index_to_insert_character):
+        """Insert character at `index_to_insert_character` in TransductionGraph output
+
+        Args:
+            tg (TransductionGraph): the current Transduction Graph
+            character_to_insert (str): the character to insert
+            index_to_insert_character (int): index of character to insert
+        """
+        assert len(character_to_insert) == 1
+        tg.output_string = (
+            tg.output_string[:index_to_insert_character]
+            + character_to_insert
+            + tg.output_string[index_to_insert_character:]
+        )
+        for j, edge in enumerate(tg.edges):
+            if edge[1] is not None and edge[1] >= index_to_insert_character:
+                tg.edges[j][1] += 1
+
+    def change_character(self, tg, character, index_to_change):
+        """Change character at `index_to_change` in TransductionGraph output to `character`
+
+        Args:
+            tg (TransductionGraph): the current Transduction Graph
+            character (str): the character to change to
+            index_to_change (int): index of character to change
+        """
+        assert len(character) == 1
+        tg.output_string = (
+            tg.output_string[:index_to_change]
+            + character
+            + tg.output_string[index_to_change + 1 :]
+        )
+
+    def update_explicit_indices(
+        self, tg, match, start_end, io, diff_from_input, diff_from_output, out_string
+    ):
+        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
+        It then zips them up according to the provided indexing notation.
+
+        Example:
+            A rule that turns a sequence of k\u0313 to 'k might would have a default indexing of k -> ' and \u0313 -> k
+            It might be desired though to show that k -> k and \u0313 -> ' and their indices were transposed.
+            For this, the Mapping could be given the following: [{'in': 'k{1}\u0313{2}', 'out': "'{2}k{1}"}]
+            Indices are found with r'(?<={)\d+(?=})' and characters are found with r'[^0-9\{\}]+(?={\d+})'
+        """
+        output_start = start_end[0] - diff_from_output[start_end[0]]
+        inputs, outputs = self.get_match_groups(
+            tg, start_end, io, diff_from_input, out_string, output_start
+        )
         out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
+        # keep track of deletions that haven't yet been processed by diff_from_x
         deleted = 0
         for match_index, input_matches in inputs.items():
             try:
                 output_matches = outputs[match_index]
             except KeyError:
                 output_matches = []
-            if len(input_matches) == len(output_matches):
-                shortest = input_matches
-                longest = output_matches
-                process = "basic"
-            elif len(input_matches) < len(output_matches):
-                shortest = input_matches
-                longest = output_matches
-                process = "insert"
-            else:
-                shortest = output_matches
-                longest = input_matches
-                process = "delete"
+            process, longest, shortest = self.get_longest_and_shortest(
+                input_matches, output_matches
+            )
             for i, char in enumerate(longest):
-                if process == "basic" or i <= len(shortest) - 1:
-                    input_index = input_matches[i]["index"] - intermediate_diff
-                    output_index = output_matches[i]["index"]
-                    # don't allow insertion in basic process
-                    if output_index >= len(match.group()) + start:
-                        output_index = len(match.group()) + start - 1
-                    tg.output_string = (
-                        tg.output_string[:output_index]
-                        + char["string"]
-                        + tg.output_string[output_index + 1 :]
+                # deleted segments don't have indices
+                if process != "delete" or i <= len(shortest) - 1:
+                    output_index = (
+                        output_matches[i]["index"]
+                        + diff_from_output[output_matches[i]["index"]]
                     )
+                # do basic transduction
+                if i <= len(shortest) - 1:
+                    if output_index >= len(match.group()) + output_start:
+                        output_index = len(match.group()) + output_start - 1
+                    self.change_character(tg, output_matches[i]["string"], output_index)
+                    # this is needed for metathesis,
+                    # but metathesis is only expressable by using explicit indices,
+                    # so we fix these indices outside of the change_character method
                     tg.edges = [x for x in tg.edges if x[1] != output_index]
-                    tg.edges.append([input_index, output_index])
-                else:
-                    if process == "insert":
-                        input_index = input_matches[-1]["index"] - intermediate_diff
-                        output_index = output_matches[i]["index"]
-                        tg.output_string = (
-                            tg.output_string[:output_index]
-                            + char["string"]
-                            + tg.output_string[output_index:]
-                        )
-                        for i, edge in enumerate(tg.edges):
-                            if edge[1] is not None and edge[1] >= output_index:
-                                tg.edges[i][1] += 1
-                        tg.edges.append([input_index, output_index])
+                    tg.edges.append([input_matches[i]["index"], output_index])
+                elif process == "insert":
+                    self.insert_character(tg, char["string"], output_index)
+                    # then add insertion edge
+                    tg.edges.append([input_matches[-1]["index"], output_index])
+                elif process == "delete":
+                    if output_matches:
+                        index_to_delete = output_matches[-1]["index"] + i - deleted
+                    # if there is no output_matches
                     else:
-                        input_index = input_matches[i]["index"] - intermediate_diff
-                        if output_matches:
-                            output_index = output_matches[-1]["index"] - deleted
-                        else:
-                            output_index = input_index + intermediate_diff - deleted
-                        tg.output_string = (
-                            tg.output_string[:output_index]
-                            + tg.output_string[output_index + 1 :]
+                        index_to_delete = (
+                            input_matches[i]["index"]
+                            + diff_from_output[input_matches[i]["index"]]
+                            - deleted
                         )
-                        deleted += 1
-                        if len(output_matches) > 0:
-                            if [input_index, output_index] not in tg.edges:
-                                tg.edges.append([input_index, output_index])
-                            tg.edges = [x for x in tg.edges if x[1] != output_index]
-                        else:
-                            for i, edge in enumerate(tg.edges):
-                                if edge[1] is not None and edge[1] == output_index:
-                                    tg.edges[i][1] = None
-                        for i, edge in enumerate(tg.edges):
-                            if edge[1] is not None and edge[1] > output_index:
-                                tg.edges[i][1] -= 1
-
-    def update_default_indices(self, tg, match, intermediate_diff, out_string):
-        start = match.start() + intermediate_diff
-        in_string = match.group()
-        in_length = len(in_string)
-        out_length = len(out_string)
-        if in_length == out_length:
-            for i, char in enumerate(out_string):
-                tg.output_string = (
-                    tg.output_string[: i + start]
-                    + char
-                    + tg.output_string[i + start + 1 :]
-                )
-            return
-        # default insertion(s)
-        elif in_length < out_length:
-            longest = out_string
-            shortest = in_string
-            process = "insert"
-        # default deletion(s)
-        else:
-            longest = in_string
-            shortest = out_string
-            process = "delete"
-        # iterate the longest string
-        deleted = 0
-        last_input_node = start
-        last_output_node = start
-        for i, char in enumerate(longest):
-            # if the shorter string still has that output, keep that index
-            if i <= len(shortest) - 1:
-                tg.output_string = (
-                    tg.output_string[: i + start]
-                    + out_string[i]
-                    + tg.output_string[i + start + 1 :]
-                )
-                last_input_node = i + start
-                last_output_node = i + start
-            # otherwise...
-            else:
-                # add a new node and increment each following node
-                # log the change in order to update the edges.
-                if process == "insert":
-                    # Nodes
-                    index_to_add = i + start
-                    tg.output_string = (
-                        tg.output_string[:index_to_add]
-                        + char
-                        + tg.output_string[index_to_add:]
-                    )
-                    # Edges
-                    # Remove previously deleted and increment
-                    for i, edge in enumerate(tg.edges):
-                        if edge[1] is not None and edge[1] >= index_to_add:
-                            tg.edges[i][1] += 1
-                    # add edge to index of last input character
-                    last_input_node = max(
-                        [x[0] for x in tg.edges if x[1] == last_output_node]
-                    )
-                    last_output_node = index_to_add
-                    tg.edges.append([last_input_node, index_to_add])
-                # delete the node and decrement each following node
-                # log the change in order to update the edges.
-                else:
-                    # Nodes
-                    index_to_delete = i + start - deleted
-                    tg.output_string = (
-                        tg.output_string[:index_to_delete]
-                        + tg.output_string[index_to_delete + 1 :]
-                    )
+                    self.delete_character(tg, index_to_delete, i)
                     deleted += 1
-                    # Edges
-                    # delete
-                    last_input_node = max(
-                        [x[0] for x in tg.edges if x[1] == index_to_delete]
-                    )
-                    # if rule is not just a simple deletion,
-                    # add an edge between the node and the last output node
-                    if out_length > 0:
-                        if [last_input_node, last_output_node] not in tg.edges:
-                            tg.edges.append([last_input_node, last_output_node])
+                    if output_matches:
                         tg.edges = [x for x in tg.edges if x[1] != index_to_delete]
-                    else:
-                        for i, edge in enumerate(tg.edges):
-                            if edge[1] is not None and edge[1] == index_to_delete:
-                                tg.edges[i][1] = None
-                    # decrement
-                    for i, edge in enumerate(tg.edges):
-                        if edge[1] is not None and edge[1] > index_to_delete:
-                            tg.edges[i][1] -= 1
+                        tg.edges.append([input_matches[i]["index"], None])
+
+    def get_input_from_output(self, tg, output_node):
+        return max(x[0] for x in tg.edges if x[1] == output_node)
+
+    def get_longest_and_shortest(self, in_string_or_matches, out_string_or_matches):
+        """Given two strings or match lists determine the longest and shortest. If
+           the input is longer than the output, the process is to delete,
+           if the output is longer than the input, the process is to insert.
+           If the input and output are the same length, the process is basic.
+
+        Args:
+            in_string_or_matches (str|List): input string
+            out_string_or_matches (str|List): output string
+        """
+        in_length = len(in_string_or_matches)
+        out_length = len(out_string_or_matches)
+        if in_length > out_length:
+            return "delete", in_string_or_matches, out_string_or_matches
+        elif in_length < out_length:
+            return "insert", out_string_or_matches, in_string_or_matches
+        else:
+            return "basic", out_string_or_matches, in_string_or_matches
+
+    def update_default_indices(
+        self,
+        tg,
+        match_start,
+        diff_from_output,
+        in_string,
+        out_string,
+    ):
+        process, longest, shortest = self.get_longest_and_shortest(
+            in_string, out_string
+        )
+
+        deleted = 0
+        for i, char in enumerate(longest):
+            output_index = i + match_start + diff_from_output[i + match_start]
+            # if the shorter string still has that output:
+            #   keep that index, and convert the character
+            if i <= len(shortest) - 1:
+                self.change_character(tg, out_string[i], output_index)
+            # if the output string is longer than the input string
+            # then it is an insertion and we should:
+            #  - increment every edge after the insertion
+            #  - connect every input edge connected to the previous output to that new insertion
+            elif process == "insert":
+                self.insert_character(tg, char, output_index)
+                # add insertion edge
+                for edge in tg.edges:
+                    if edge[1] == output_index - 1:
+                        tg.edges.append([edge[0], output_index])
+            # if the input string is longer than the output string
+            # then it is a deletion and we should:
+            #  - turn the edge to the deleted index to None if there are no non-None preceding characters
+            #  - decrement edges following the deleted character
+            elif process == "delete":
+                # Nodes
+                index_to_delete = output_index - deleted
+                self.delete_character(tg, index_to_delete, i)
+                deleted += 1
 
     def apply_unidecode(self, to_convert: str):
         to_convert = unicode_escape(to_convert)
@@ -476,7 +520,7 @@ class Transducer:
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
-        if tg.output_string == "":
+        if not tg.output_string:
             # Some inputs get completely deleted by unidecode, in which case there are no
             # valid edges to output.
             tg.edges = []
@@ -485,7 +529,7 @@ class Transducer:
             x_len, y_len = 0, 0
             for tgt in converted:
                 if tgt:
-                    for c in tgt:
+                    for _ in tgt:
                         edges.append((x_len, y_len))
                         y_len += 1
                 else:
@@ -520,16 +564,28 @@ class Transducer:
         # initialize values
         intermediate_forms = False
         # iterate rules
+        # these variables tracks changes in the output string across processing
+        # matches of the same pattern
+        diff_from_input = defaultdict(int, {n: 0 for n in range(len(tg.output_string))})
         for io in self.mapping:
             # Do not allow empty rules
             if not io["in"] and not io["out"]:
                 continue
             io = copy.deepcopy(io)
-            intermediate_diff = 0
-            for match in io["match_pattern"].finditer(tg.output_string):
+            # create empty out_string
+            out_string = ""
+            diff_from_output = defaultdict(
+                int, {n: 0 for n in range(len(tg.output_string))}
+            )
+            for match_i, match in enumerate(
+                reversed(list(io["match_pattern"].finditer(tg.output_string)))
+            ):
                 debug_string = tg.output_string
-                start = match.start() + intermediate_diff
-                end = match.end() + intermediate_diff
+                start = match.start()
+                end = match.end()
+                if match_i:
+                    start += diff_from_output[start]
+                    end += diff_from_output[end - 1]
                 if "intermediate_form" in io:
                     out_string = io["intermediate_form"]
                     intermediate_forms = True
@@ -541,11 +597,21 @@ class Transducer:
                     self._char_match_pattern.finditer(out_string)
                 ):
                     self.update_explicit_indices(
-                        tg, match, io, intermediate_diff, out_string
+                        tg,
+                        match,
+                        (start, end),
+                        io,
+                        diff_from_input,
+                        diff_from_output,
+                        out_string,
                     )
                 else:
                     self.update_default_indices(
-                        tg, match, intermediate_diff, out_string
+                        tg,
+                        match.start(),
+                        diff_from_output,
+                        match.group(),
+                        out_string,
                     )
                 if (
                     io["in"] != io["out"]
@@ -559,17 +625,58 @@ class Transducer:
                             "rule": {
                                 k: v for k, v in io.items() if k != "match_pattern"
                             },
-                            "start": start,
-                            "end": end,
+                            "start": match.start(),
+                            "end": match.end(),
                         }
                     )
                 out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
-                intermediate_diff += len(out_string) - len(match.group())
+                # update the output intermediate diff after each match
+                diff = len(out_string) - len(match.group())
+
+                try:
+                    input_index = self.get_input_from_output(tg, match.end() - 1)
+                except ValueError:
+                    # it's been deleted
+                    input_index = match.end() - 1
+                for n in range(
+                    match.end() - 1 + diff,
+                    max(len(diff_from_output) + diff, len(diff_from_output)),
+                ):
+                    diff_from_output[n] += diff
+                for n in range(input_index, len(diff_from_input)):
+                    diff_from_input[n] += diff
+
         if intermediate_forms:
             tg.output_string = self.resolve_intermediate_chars(tg.output_string)
-        tg.edges = list(
-            dict.fromkeys([tuple(x) for x in sorted(tg.edges, key=lambda x: x[0])])
-        )
+
+        # fix None
+        to_remove = []  # type: ignore
+        for i, edge in enumerate(tg.edges):
+            if edge[1] is None:
+                to_remove.extend(
+                    i
+                    for other_edge in tg.edges
+                    if other_edge != edge and other_edge[0] == edge[0]
+                )
+
+        for i in set(to_remove):
+            del tg.edges[i]
+        # sort based on inputs
+        tg.edges.sort(key=lambda x: x[0])
+        for i, edge in enumerate(tg.edges):
+            if edge[1] is None:
+
+                # if previous exists, use that, otherwise use following, otherwise None
+                previous = [x for x in tg.edges[:i] if x[1] is not None]
+                try:
+                    following = [x for x in tg.edges[i + 1 :] if x[1] is not None]
+                except IndexError:
+                    following = None
+                if previous:
+                    edge[1] = previous[-1][1]
+                elif following:
+                    edge[1] = following[0][1]
+        tg.edges = list(dict.fromkeys([tuple(x) for x in tg.edges]))
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
@@ -584,29 +691,23 @@ class Transducer:
     ):
         out_lang = self.mapping.kwargs["out_lang"]
         if "eng-arpabet" in out_lang:
-            if not is_arpabet(tg.output_string):
-                if display_warnings:
-                    display_input = (
-                        original_input if original_input else tg.input_string
-                    )
-                    LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
-                    )
-                return False
-            else:
+            if is_arpabet(tg.output_string):
                 return True
+            if display_warnings:
+                display_input = original_input or tg.input_string
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                )
+            return False
         elif is_ipa(out_lang):
-            if not is_panphon(tg.output_string, display_warnings=display_warnings):
-                if display_warnings:
-                    display_input = (
-                        original_input if original_input else tg.input_string
-                    )
-                    LOGGER.warning(
-                        f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
-                    )
-                return False
-            else:
+            if is_panphon(tg.output_string, display_warnings=display_warnings):
                 return True
+            if display_warnings:
+                display_input = original_input or tg.input_string
+                LOGGER.warning(
+                    f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid {out_lang}.'
+                )
+            return False
         else:
             # No check implemented at this tier, just return True
             return True

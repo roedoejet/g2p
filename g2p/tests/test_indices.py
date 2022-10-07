@@ -4,8 +4,10 @@
     Unittests for index preservation
 """
 
+from unicodedata import normalize
 from unittest import TestCase, main
 
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
@@ -141,18 +143,45 @@ class IndicesTest(TestCase):
           ((2, 's'), (3, 's')),
           ((3, 't'), (4, 's')) ]
 
+    Test Case # 9
+        # Allow multiple character deletion
+        0 1
+        a a
+
+        None None
+
+        [ ((0, 'a'), (None, '')),
+          ((1, 'a'), (None, '')) ]
+
+    Test Case # 10
+        # Another deletion test
+        0 1 2
+        a b c
+
+        a
+        0
+
+        [ ((0, 'a'), (0, 'a')),
+          ((1, 'b'), (0, '')),
+          ((1, 'c'), (0, '')) ]
+
     """
 
-    def setUp(self):
+    def __init__(self, *args):
+        # Let's use __init__() to set all these up just once at class creation
+        # time, instead of setUp() which repeatedly does it for each test case
+        super().__init__(*args)
         self.test_mapping_one = Mapping([{"in": "t", "out": "p", "context_after": "e"}])
         self.test_mapping_two = Mapping([{"in": "e", "out": ""}])
         self.test_mapping_three = Mapping(
             [{"in": "t", "out": "ch", "context_after": "e"}]
         )
         self.test_mapping_four = Mapping([{"in": "te", "out": "p"}])
-        self.test_mapping_five = Mapping(
-            [{"context_before": "t", "context_after": "$", "in": "", "out": "y"}]
-        )
+        # We know this issues a warning, so let's silence it by asserting it.
+        with self.assertLogs(LOGGER, "WARNING"):
+            self.test_mapping_five = Mapping(
+                [{"context_before": "t", "context_after": "$", "in": "", "out": "y"}]
+            )
         self.test_mapping_six = Mapping([{"in": "e{1}s{2}", "out": "s{2}e{1}"}])
         self.test_mapping_seven = Mapping(
             [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}],
@@ -166,6 +195,7 @@ class IndicesTest(TestCase):
         )
         self.test_mapping_nine = Mapping([{"in": "aa", "out": ""}])
         self.test_mapping_ten = Mapping([{"in": "abc", "out": "a"}])
+        self.test_mapping_eleven = Mapping([{"in": "a", "out": "aaaa"}])
         self.test_mapping_combining = Mapping(
             [{"in": "k{1}\u0313{2}", "out": "'{2}k{1}"}]
         )
@@ -181,6 +211,42 @@ class IndicesTest(TestCase):
             [{"in": "a{1}bc{2}c{3}", "out": "ccc{2}c{3}c{1}"}]
         )
         self.test_mapping_circum = Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}])
+        self.test_mapping_explicit_equal_1 = Mapping(
+            [{"in": "a{1}b{1}", "out": "c{1}d{1}"}]
+        )
+        self.test_mapping_explicit_equal_2 = Mapping([{"in": "ab{1}", "out": "cd{1}"}])
+        self.test_mapping_explicit_equal_3 = Mapping([{"in": "ab", "out": "cd"}])
+        self.test_mapping_explicit_equal_4 = Mapping(
+            [{"in": "a{1}b{2}", "out": "c{1}d{2}"}]
+        )
+        self.test_issue_173_1 = Mapping(
+            [
+                {"in": "x{1}y{2}z{3}", "out": "a{2}b{1}"},
+                {"in": "d{1}e{2}f{3}", "out": "d{1}e{2}f{3}"},
+            ]
+        )
+        self.test_issue_173_2 = Mapping(
+            [
+                {"in": "x{1}y{2}z{3}", "out": "a{1}b{2}"},
+                {"in": "d{1}e{2}f{3}", "out": "d{1}e{2}f{3}"},
+            ]
+        )
+        self.test_issue_157_mapping = Mapping(
+            [
+                {"in": "a", "out": "d"},
+                {"in": "bc", "out": "e"},
+                {"in": "g{1}h{2}i{3}", "out": "G{2}H{1}I{3}J{1}"},
+                {"in": "m{1}n{2}", "out": "N{2}M{1}"},
+            ]
+        )
+        self.test_feeding_mapping_1 = Mapping(
+            [{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"}]
+        )
+        self.test_feeding_mapping_2 = Mapping(
+            [{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"}]
+        )
+        self.test_issue_173_3 = Mapping([{"in": "ab{1}c{2}", "out": "X{1}Y{2}"}])
+        self.test_issue_173_4 = Mapping([{"in": "a{1}bc{2}", "out": "xy{1}z{2}"}])
         self.trans_one = Transducer(self.test_mapping_one)
         self.trans_two = Transducer(self.test_mapping_two)
         self.trans_three = Transducer(self.test_mapping_three)
@@ -192,10 +258,73 @@ class IndicesTest(TestCase):
         self.trans_eight = Transducer(self.test_mapping_eight)
         self.trans_nine = Transducer(self.test_mapping_nine)
         self.trans_ten = Transducer(self.test_mapping_ten)
+        self.trans_eleven = Transducer(self.test_mapping_eleven)
         self.trans_combining = Transducer(self.test_mapping_combining)
         self.trans_wacky = Transducer(self.test_mapping_wacky)
         self.trans_wacky_lite = Transducer(self.test_mapping_wacky_lite)
         self.trans_circum = Transducer(self.test_mapping_circum)
+        self.trans_explicit_equal_1 = Transducer(self.test_mapping_explicit_equal_1)
+        self.trans_explicit_equal_2 = Transducer(self.test_mapping_explicit_equal_2)
+        self.trans_explicit_equal_3 = Transducer(self.test_mapping_explicit_equal_3)
+        self.trans_explicit_equal_4 = Transducer(self.test_mapping_explicit_equal_4)
+        self.trans_173_1 = Transducer(self.test_issue_173_1)
+        self.trans_173_2 = Transducer(self.test_issue_173_2)
+        self.trans_173_3 = Transducer(self.test_issue_173_3)
+        self.trans_173_4 = Transducer(self.test_issue_173_4)
+        self.trans_157 = Transducer(self.test_issue_157_mapping)
+        self.trans_feeding_1 = Transducer(self.test_feeding_mapping_1)
+        self.trans_feeding_2 = Transducer(self.test_feeding_mapping_2)
+
+    def test_feeding(self):
+        """Test feeding"""
+        transducer_1 = self.trans_feeding_1("ab")
+        self.assertEqual(transducer_1.output_string, "cd")
+        self.assertEqual(transducer_1.edges, [(0, 0), (0, 1), (1, 0), (1, 1)])
+        transducer_2 = self.trans_feeding_2("a")
+        self.assertEqual(transducer_2.output_string, "b")
+        self.assertEqual(transducer_2.edges, [(0, 0)])
+
+    def test_issue_157(self):
+        """Test explicit problem from Issue 157"""
+        transducer = self.trans_157("abcmn")
+        self.assertEqual(transducer.output_string, "deNM")
+        self.assertEqual(transducer.edges, [(0, 0), (1, 1), (2, 1), (3, 3), (4, 2)])
+
+    def test_issue_173(self):
+        """Test explicit problems from Issue 173"""
+        transducer_1 = self.trans_173_1("xyzmndef")
+        transducer_2 = self.trans_173_2("xyzmndef")
+        transducer_3 = self.trans_173_3("abc")
+        transducer_4 = self.trans_173_4("abc")
+        self.assertEqual(transducer_1.output_string, "abmndef")
+        self.assertEqual(transducer_2.output_string, "abmndef")
+        self.assertEqual(transducer_3.output_string, "XY")
+        self.assertEqual(transducer_4.output_string, "xyz")
+        self.assertEqual(
+            transducer_1.edges,
+            [(0, 1), (1, 0), (2, 0), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6)],
+        )
+        self.assertEqual(
+            transducer_2.edges,
+            [(0, 0), (1, 1), (2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6)],
+        )
+        self.assertEqual(transducer_3.edges, [(0, 0), (1, 0), (2, 1)])
+        self.assertEqual(transducer_4.edges, [(0, 0), (0, 1), (1, 2), (2, 2)])
+
+    def test_explicit_equal(self):
+        """Test synonymous syntax for explicit indices"""
+        explicit_1 = self.trans_explicit_equal_1("ab")
+        explicit_2 = self.trans_explicit_equal_2("ab")
+        explicit_3 = self.trans_explicit_equal_4("ab")
+        implicit = self.trans_explicit_equal_3("ab")
+        self.assertEqual(explicit_1.output_string, "cd")
+        self.assertEqual(explicit_2.output_string, "cd")
+        self.assertEqual(implicit.output_string, "cd")
+        self.assertEqual(explicit_3.output_string, "cd")
+        self.assertEqual(explicit_1.edges, [(0, 0), (1, 1)])
+        self.assertEqual(explicit_2.edges, [(0, 0), (1, 1)])
+        self.assertEqual(implicit.edges, [(0, 0), (1, 1)])
+        self.assertEqual(explicit_3.edges, [(0, 0), (1, 1)])
 
     def test_no_indices(self):
         """Test straightforward conversion without returning indices."""
@@ -248,7 +377,7 @@ class IndicesTest(TestCase):
     def test_case_two(self):
         transducer = self.trans_two("test")
         self.assertEqual(transducer.output_string, "tst")
-        self.assertEqual(transducer.edges, [(0, 0), (1, None), (2, 1), (3, 2)])
+        self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 1), (3, 2)])
 
     def test_case_three(self):
         transducer = self.trans_three("test")
@@ -292,6 +421,11 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.output_string, "a")
         self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 0)])
 
+    def test_case_eleven(self):
+        transducer = self.trans_eleven("a")
+        self.assertEqual(transducer.output_string, "aaaa")
+        self.assertEqual(transducer.edges, [(0, 0), (0, 1), (0, 2), (0, 3)])
+
     def test_case_acdc(self):
         transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
         tg = transducer("acdc")
@@ -304,33 +438,75 @@ class IndicesTest(TestCase):
             Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
         )
         tg = transducer("abcabc")
-        tg_default = transducer_default("abcabc")
         self.assertEqual(tg.output_string, "abab")
-        self.assertEqual(tg_default.output_string, "abab")
         self.assertEqual(
             tg.edges,
             [
-                (0, None),
-                (1, None),
+                (0, 0),
+                (1, 0),
                 (2, 0),
                 (2, 1),
-                (3, None),
-                (4, None),
+                (3, 1),
+                (4, 1),
                 (5, 2),
                 (5, 3),
             ],
         )
+        tg_default = transducer_default("abcabc")
+        self.assertEqual(tg_default.output_string, "abab")
         self.assertEqual(
             tg_default.edges,
             [
-                (0, None),
-                (1, None),
+                (0, 0),
+                (1, 0),
                 (2, 0),
                 (2, 1),
-                (3, None),
-                (4, None),
+                (3, 1),
+                (4, 1),
                 (5, 2),
                 (5, 3),
+            ],
+        )
+
+    def test_arpabet(self):
+        transducer = Transducer(
+            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFC", out_delimiter=" ")
+        )
+        transducer_nfd = Transducer(
+            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFD", out_delimiter=" ")
+        )
+        tg = transducer(normalize("NFC", "ĩĩ"))
+        tg_nfd = transducer_nfd(normalize("NFD", "ĩĩ"))
+        self.assertEqual(tg.output_string, "IY N IY N ")
+        self.assertEqual(tg_nfd.output_string, "IY N IY N ")
+        self.assertEqual(
+            tg.edges,
+            [
+                (0, 0),
+                (0, 1),
+                (0, 2),
+                (0, 3),
+                (0, 4),
+                (1, 5),
+                (1, 6),
+                (1, 7),
+                (1, 8),
+                (1, 9),
+            ],
+        )
+        self.assertEqual(
+            tg_nfd.edges,
+            [
+                (0, 0),
+                (1, 1),
+                (1, 2),
+                (1, 3),
+                (1, 4),
+                (2, 5),
+                (3, 6),
+                (3, 7),
+                (3, 8),
+                (3, 9),
             ],
         )
 
