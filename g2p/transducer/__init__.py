@@ -329,6 +329,7 @@ class Transducer:
         Args:
             tg (TransductionGraph): the current Transduction Graph
             index_to_delete (int): index of character to delete
+            ahh (int): current value of i in calling loop
         """
         # delete character
         tg.output_string = (
