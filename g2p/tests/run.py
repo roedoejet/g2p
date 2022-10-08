@@ -67,8 +67,15 @@ INTEGRATION_TESTS = [
     for test in [
         CliTest,
         ResourceIntegrationTest,
-        StudioTest,
         DoctorTest,
+    ]
+]
+
+# This test suite spawns a browser and takes a rather long time, so it should only be run on release
+RELEASE_ONLY_TESTS = [
+    LOADER.loadTestsFromTestCase(test)
+    for test in [
+        StudioTest,
     ]
 ]
 
@@ -100,6 +107,8 @@ def run_tests(suite):
         suite = TestSuite(INTEGRATION_TESTS)
     elif suite == "dev":
         suite = TestSuite(DEV_TESTS)
+    elif suite == "release-only":
+        suite = TestSuite(RELEASE_ONLY_TESTS)
     runner = TextTestRunner(verbosity=3)
     if isinstance(suite, str):
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")

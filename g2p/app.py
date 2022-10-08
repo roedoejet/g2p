@@ -161,20 +161,6 @@ def return_empty_mappings(n=DEFAULT_N):
     return mappings
 
 
-def hot_to_mappings(hot_data):
-    """Parse data from HandsOnTable to Mapping format"""
-    return [
-        {
-            "context_before": str(x[2] or ""),
-            "in": str(x[0] or ""),
-            "context_after": str(x[3] or ""),
-            "out": str(x[1] or ""),
-        }
-        for x in hot_data
-        if x[0] or x[1]
-    ]
-
-
 def return_descendant_nodes(node: str):
     """Return possible outputs for a given input"""
     return [x for x in descendants(LANGS_NETWORK, node)]
@@ -198,7 +184,7 @@ def convert(message):
     transducers = []
     for mapping in message["data"]["mappings"]:
         mappings_obj = Mapping(
-            hot_to_mappings(mapping["mapping"]),
+            mapping["mapping"],
             abbreviations=flatten_abbreviations(mapping["abbreviations"]),
             **mapping["kwargs"],
         )

@@ -27,14 +27,28 @@ label {
     overflow-x: hidden;
 }
 
-.mg-top, h4 {
+.mg-top,
+h4 {
     margin-top: 40px;
 }
 
-.hot-container, .settings, .abbs-container {
+.hot-container,
+.settings,
+.abbs-container {
     display: none;
 }
 
-.hot-container.active, .settings.active, .abbs-container.active {
+.hot-container.active,
+.settings.active,
+.abbs-container.active {
     display: inline;
+}
+
+table td {
+    text-align: center;
+    padding: 3px !important;
+}
+
+table th {
+    padding: 3px !important;
 }
