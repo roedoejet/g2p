@@ -69,7 +69,7 @@ function createSettings(index, data) {
     if (data['rule_ordering'] === 'as-written') {
         rule_ordering = 'as-written'
     } else {
-        rule_ordering = 'longest-first'
+        rule_ordering = 'apply-longest-first'
     }
     if (data['case_sensitive']) {
         case_sensitive = 'checked'
@@ -77,9 +77,10 @@ function createSettings(index, data) {
     if (data['escape_special']) {
         escape_special = 'checked'
     }
-    if (data['reverse']) {
-        reverse = 'checked'
-    }
+    // Don't reverse because reversed mappings already come reversed
+    // if (data['reverse']) {
+    //     reverse = 'checked'
+    // }
     if (data['prevent_feeding']) {
         prevent_feeding = 'checked'
     }
@@ -122,7 +123,7 @@ function createSettings(index, data) {
                 <div>
                     <label for='rule_ordering'>Rule Ordering Approach</label>
                     <select id='rule_ordering-${index}' name='rule_ordering'>
-                    <option ${rule_ordering === 'longest-first' ? "selected" : ""} value='longest-first'>Longest first</option>
+                    <option ${rule_ordering === 'apply-longest-first' ? "selected" : ""} value='apply-longest-first'>Longest first</option>
                     <option ${rule_ordering === 'as-written' ? "selected" : ""} value='as-written'>As written</option>
                     </select>
                 </div>
