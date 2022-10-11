@@ -19,7 +19,6 @@ from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkTest
-from g2p.tests.test_studio import StudioTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_transducer import TransducerTest
@@ -71,14 +70,6 @@ INTEGRATION_TESTS = [
     ]
 ]
 
-# This test suite spawns a browser and takes a rather long time, so it should only be run on release
-RELEASE_ONLY_TESTS = [
-    LOADER.loadTestsFromTestCase(test)
-    for test in [
-        StudioTest,
-    ]
-]
-
 # LocalConfigTest has to get run last, to avoid interactions with other test
 # cases, since it has side effects on the global database
 LAST_DEV_TEST = [
@@ -107,8 +98,6 @@ def run_tests(suite):
         suite = TestSuite(INTEGRATION_TESTS)
     elif suite == "dev":
         suite = TestSuite(DEV_TESTS)
-    elif suite == "release-only":
-        suite = TestSuite(RELEASE_ONLY_TESTS)
     runner = TextTestRunner(verbosity=3)
     if isinstance(suite, str):
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
