@@ -114,3 +114,12 @@ class InvalidLanguageCode(CommandLineError):
 
     def __str__(self):
         return self.render('No language called: "%(lang)s".')
+
+
+class RecursionError(CommandLineError):
+    def __init__(self, msg):
+        super().__init__(self)
+        self.msg = msg
+
+    def __str__(self):
+        return self.render(self.msg)

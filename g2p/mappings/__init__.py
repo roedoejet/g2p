@@ -24,6 +24,7 @@ from g2p.mappings.utils import (
     IndentDumper,
     create_fixed_width_lookbehind,
     escape_special_characters,
+    expand_abbreviations,
     find_mapping,
     is_dummy,
     is_ipa,
@@ -32,7 +33,6 @@ from g2p.mappings.utils import (
     load_from_file,
     load_mapping_from_path,
     normalize,
-    unicode_escape,
     validate,
 )
 
@@ -83,10 +83,10 @@ class Mapping:
 
     """
 
-    def __init__(
+    def __init__(  # noqa: C901
         self,
         mapping=None,
-        abbreviations: Union[str, DefaultDict[str, List[str]]] = False,
+        abbreviations: Union[str, DefaultDict[str, List[str]]] = None,
         **kwargs,
     ):
         # should these just be explicit instead of kwargs...
@@ -109,7 +109,7 @@ class Mapping:
         ]
         self.kwargs = OrderedDict(kwargs)
         self.processed = False
-        if isinstance(abbreviations, defaultdict) or not abbreviations:
+        if isinstance(abbreviations, defaultdict) or abbreviations is None:
             self.abbreviations = abbreviations
         else:
             self.abbreviations = load_abbreviations_from_file(abbreviations)
@@ -136,24 +136,21 @@ class Mapping:
                 self.mapping = []
             else:
                 raise exceptions.MalformedLookup()
-        if self.abbreviations:
-            for abb, stands_for in sorted(
-                self.abbreviations.items(), key=lambda x: len(x[0]), reverse=True
-            ):
-                abb_match = re.compile(abb)
-                abb_repl = "|".join(stands_for)
-                if self.mapping and "match_pattern" not in self.mapping[0]:
-                    for io in self.mapping:
-                        for key in io.keys():
-                            if key in [
-                                "in",
-                                "out",
-                                "context_before",
-                                "context_after",
-                            ] and re.search(abb_match, io[key]):
-                                io[key] = re.sub(
-                                    abb_match, unicode_escape(abb_repl), io[key]
-                                )
+        if (
+            self.abbreviations
+            and self.mapping
+            and "match_pattern" not in self.mapping[0]
+        ):
+            for io in self.mapping:
+                for key in io.keys():
+                    if key in [
+                        "in",
+                        "out",
+                        "context_before",
+                        "context_after",
+                    ]:
+                        io[key] = expand_abbreviations(io[key], self.abbreviations)
+
         if not self.processed:
             self.mapping = self.process_kwargs(self.mapping)
 
@@ -346,7 +343,7 @@ class Mapping:
         """
         return self.kwargs["rule_ordering"] == "apply-longest-first"
 
-    def rule_to_regex(self, rule: dict) -> Pattern:
+    def rule_to_regex(self, rule: dict) -> Union[Pattern, None]:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"
 
@@ -362,14 +359,14 @@ class Mapping:
 
         Returns:
             Pattern: returns a regex pattern (re.Pattern)
-            bool: returns False if input is null
+            None: if input is null
         """
         # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
         if not rule["in"]:
             LOGGER.warning(
                 f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.'
             )
-            return False
+            return None
         if "context_before" in rule and rule["context_before"]:
             before = rule["context_before"]
         else:

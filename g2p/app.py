@@ -17,7 +17,7 @@ from g2p.api import g2p_api
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.utils import expand_abbreviations, flatten_abbreviations
+from g2p.mappings.utils import expand_abbreviations_format, flatten_abbreviations_format
 from g2p.static import __file__ as static_file
 from g2p.transducer import (
     CompositeTransducer,
@@ -182,10 +182,11 @@ def docs():
 def convert(message):
     """Convert input text and return output"""
     transducers = []
+
     for mapping in message["data"]["mappings"]:
         mappings_obj = Mapping(
             mapping["mapping"],
-            abbreviations=flatten_abbreviations(mapping["abbreviations"]),
+            abbreviations=flatten_abbreviations_format(mapping["abbreviations"]),
             **mapping["kwargs"],
         )
         transducer = Transducer(mappings_obj)
@@ -225,7 +226,7 @@ def change_table(message):
         [
             {
                 "mappings": x.plain_mapping(),
-                "abbs": expand_abbreviations(x.abbreviations),
+                "abbs": expand_abbreviations_format(x.abbreviations),
                 "kwargs": x.kwargs,
             }
             for x in mappings

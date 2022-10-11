@@ -9,7 +9,7 @@ from unittest import TestCase, main
 
 import yaml
 
-from g2p.exceptions import IncorrectFileType, MalformedMapping
+from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
 from g2p.mappings import Mapping, utils
 from g2p.tests.public import PUBLIC_DIR
 
@@ -31,7 +31,27 @@ class UtilsTest(TestCase):
                 fresh_config, f, Dumper=utils.IndentDumper, default_flow_style=False
             )
 
-    def test_abb_flatten_and_expand(self):
+    def test_abb_expand(self):
+        test_dict = defaultdict(list)
+        bad_dict = defaultdict(list)
+        test_dict["VOWELS"].extend(["HIGH_VOWELS", "e", "o"])
+        test_dict["HIGH_VOWELS"].extend(["i", "u"])
+        bad_dict["VOWELS"].extend(["HIGH_VOWELS", "e", "o"])
+        bad_dict["HIGH_VOWELS"].extend(
+            ["HIGH_VOWELS", "u"]
+        )  # shouldn't allow self-referential abbreviations
+        expanded_plain = utils.expand_abbreviations("test", test_dict)
+        expanded_bad_plain = utils.expand_abbreviations("test", bad_dict)
+        with self.assertRaises(RecursionError):
+            utils.expand_abbreviations("HIGH_VOWELS", bad_dict)
+        expanded_non_recursive = utils.expand_abbreviations("HIGH_VOWELS", test_dict)
+        expanded_recursive = utils.expand_abbreviations("VOWELS", test_dict)
+        self.assertEqual("test", expanded_plain)
+        self.assertEqual("test", expanded_bad_plain)
+        self.assertEqual("i|u", expanded_non_recursive)
+        self.assertEqual("i|u|e|o", expanded_recursive)
+
+    def test_abb_flatten_and_expand_format(self):
         test_rows = [["VOWEL", "a", "e", "i", "o", "u"], ["OTHER", "t", "e", "s", "t"]]
         default_dict = defaultdict(list)
         default_dict["VOWEL"].extend(["a", "e", "i", "o", "u"])
@@ -39,9 +59,9 @@ class UtilsTest(TestCase):
         empty_rows = []
         while len(empty_rows) < 10:
             empty_rows.append(["", "", "", "", "", ""])
-        self.assertEqual(utils.flatten_abbreviations(test_rows), default_dict)
-        self.assertEqual(utils.expand_abbreviations(default_dict), test_rows)
-        self.assertEqual(utils.expand_abbreviations({}), empty_rows)
+        self.assertEqual(utils.flatten_abbreviations_format(test_rows), default_dict)
+        self.assertEqual(utils.expand_abbreviations_format(default_dict), test_rows)
+        self.assertEqual(utils.expand_abbreviations_format({}), empty_rows)
 
     def test_unicode_escape(self):
         """Should turn \u0331 declared in CSVs
