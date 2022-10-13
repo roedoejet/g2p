@@ -73,7 +73,7 @@ class StudioTest(IsolatedAsyncioTestCase):
         for block in range((len(langs_to_test) - 1) // block_size + 1):
             LOGGER.info("Lauching async_playwright")
             async with async_playwright() as p:
-                LOGGER.info("(Re)Launching browser")
+                LOGGER.info(("L" if block == 0 else "Rel") + "aunching browser")
                 browser = await p.chromium.launch(channel="chrome", headless=True)
                 LOGGER.info("Loading page")
                 page = await browser.new_page()
@@ -139,9 +139,9 @@ class StudioTest(IsolatedAsyncioTestCase):
                             )
                             continue
 
-                        # Type fill input, then trigger rendering with keyup events
-                        await input_el.fill(test[2])
-                        await input_el.type(" ", delay=100)
+                        # Type fill input, then trigger rendering with keyup event
+                        # optimization: make sure there is only 1 keyup event
+                        await input_el.fill(test[2] + " ")
                         await input_el.press("Backspace")
 
                         loop_time = 0
