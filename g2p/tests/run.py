@@ -19,7 +19,6 @@ from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkTest
-from g2p.tests.test_studio import StudioTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_transducer import TransducerTest
@@ -67,7 +66,6 @@ INTEGRATION_TESTS = [
     for test in [
         CliTest,
         ResourceIntegrationTest,
-        StudioTest,
         DoctorTest,
     ]
 ]

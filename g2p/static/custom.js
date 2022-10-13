@@ -51,7 +51,7 @@ $(window).on('resize', function() {
 
 function createSettings(index, data) {
     let include = 'checked';
-    let as_is = '';
+    let rule_ordering = '';
     let case_sensitive = '';
     let escape_special = '';
     let reverse = '';
@@ -67,7 +67,9 @@ function createSettings(index, data) {
         include = 'checked'
     }
     if (data['rule_ordering'] === 'as-written') {
-        as_is = 'checked'
+        rule_ordering = 'as-written'
+    } else {
+        rule_ordering = 'apply-longest-first'
     }
     if (data['case_sensitive']) {
         case_sensitive = 'checked'
@@ -75,9 +77,10 @@ function createSettings(index, data) {
     if (data['escape_special']) {
         escape_special = 'checked'
     }
-    if (data['reverse']) {
-        reverse = 'checked'
-    }
+    // Don't reverse because reversed mappings already come reversed
+    // if (data['reverse']) {
+    //     reverse = 'checked'
+    // }
     if (data['prevent_feeding']) {
         prevent_feeding = 'checked'
     }
@@ -99,10 +102,7 @@ function createSettings(index, data) {
                     <input ${include} class='include' id='include-${index}' type='checkbox' name='include' value='include'>
                     <label for='include'>Include rules in output</label>
                 </div>
-                <div>
-                    <input ${as_is} id='as_is-${index}' type='checkbox' name='as_is' value='as_is'>
-                    <label for='as_is'>Leave order as is</label>
-                </div>
+
                 <div>
                     <input  ${case_sensitive} id='case_sensitive-${index}' type='checkbox' name='case_sensitive'
                         value='case_sensitive'>
@@ -119,6 +119,13 @@ function createSettings(index, data) {
                 <div>
                     <input ${prevent_feeding} id='prevent_feeding-${index}' type='checkbox' name='prevent_feeding' value='prevent_feeding'>
                     <label for='prevent_feeding'>Prevent all rules from feeding</label>
+                </div>
+                <div>
+                    <label for='rule_ordering'>Rule Ordering Approach</label>
+                    <select id='rule_ordering-${index}' name='rule_ordering'>
+                    <option ${rule_ordering === 'apply-longest-first' ? "selected" : ""} value='apply-longest-first'>Longest first</option>
+                    <option ${rule_ordering === 'as-written' ? "selected" : ""} value='as-written'>As written</option>
+                    </select>
                 </div>
                 <div>
                     <label for='reverse'>Normalization</label>
@@ -138,13 +145,9 @@ function createSettings(index, data) {
         setKwargs(index, { include })
     })
 
-    document.getElementById(`as_is-${index}`).addEventListener('click', function(event) {
-        const as_is = event.target.checked
-        if (as_is) {
-            setKwargs(index, { rule_ordering: 'as-written' })
-        } else {
-            setKwargs(index, { rule_ordering: 'apply-longest-first' })
-        }
+    $(`#rule_ordering-${index}`).on('change', function(event) {
+        const rule_ordering = $(`#rule_ordering-${index}`).val()
+        setKwargs(index, { rule_ordering })
     })
 
     document.getElementById(`case_sensitive-${index}`).addEventListener('click', function(event) {
@@ -223,7 +226,7 @@ function createTable(index, data) {
     let headerLabels = headers.map(header => header.replace('_', ' ').split(' ').map(x => { return x.charAt(0).toUpperCase() + x.slice(1) }).join(' '))
     var hotSettings = {
         data: data,
-        columns: headers.map(x => { return { 'data': x, type: 'text' } }),
+        columns: headers.map(x => { if (x !== "prevent_feeding") { return { 'data': x, type: 'text' } } else { return { 'data': x, type: 'checkbox' } } }),
         stretchH: 'all',
         width: 880,
         autoWrapRow: true,
@@ -270,7 +273,8 @@ for (var j = 0; j < size; j++) {
         "in": '',
         "out": '',
         "context_before": '',
-        "context_after": ''
+        "context_after": '',
+        "prevent_feeding": false
     });
     if (j === 0) {
         varsObject.push(['Vowels', 'a', 'e', 'i', 'o', 'u'])
@@ -312,9 +316,10 @@ getIncludedMappings = function() {
     let indices = getIncludedIndices()
     let mappings = []
     if (TABLES.length === indices.length && ABBS.length === indices.length) {
+
         for (index of indices) {
             mapping = {}
-            mapping['mapping'] = TABLES[index].getData()
+            mapping['mapping'] = TABLES[index].getSourceData()
             mapping['abbreviations'] = ABBS[index].getData()
             mapping['kwargs'] = getKwargs(index)
             mappings.push(mapping)
@@ -324,7 +329,7 @@ getIncludedMappings = function() {
 }
 
 var getKwargs = function(index) {
-    const as_is = document.getElementById(`as_is-${index}`).checked
+    const rule_ordering = $(`#rule_ordering-${index}`).val()
     const case_sensitive = document.getElementById(`case_sensitive-${index}`).checked
     const escape_special = document.getElementById(`escape_special-${index}`).checked
     const reverse = document.getElementById(`reverse-${index}`).checked
@@ -333,12 +338,12 @@ var getKwargs = function(index) {
     const prevent_feeding = document.getElementById(`prevent_feeding-${index}`).checked
     const norm_form = document.getElementById(`norm_form-${index}`).value
     const type = document.getElementById(`type-${index}`).value
-    return { as_is, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding, type }
+    return { rule_ordering, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding, type }
 }
 
 var setKwargs = function(index, kwargs) {
-    if ('as_is' in kwargs) {
-        document.getElementById(`as_is-${index}`).checked = kwargs['as_is']
+    if ('rule_ordering' in kwargs) {
+        $(`#rule_ordering-${index}`).val(kwargs['rule_ordering'])
     }
     if ('case_sensitive' in kwargs) {
         document.getElementById(`case_sensitive-${index}`).checked = kwargs['case_sensitive']

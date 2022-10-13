@@ -30,7 +30,7 @@ def load_public_test_data():
         return loaded_langs_to_test
 
     langs_to_test = []
-    for fn in glob(os.path.join(DATA_DIR, "*.*sv")):
+    for fn in sorted(glob(os.path.join(DATA_DIR, "*.*sv"))):
         if fn.endswith("csv"):
             delimiter = ","
         elif fn.endswith("psv"):

@@ -23,16 +23,39 @@ GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
 
 
-def flatten_abbreviations(data):
+def expand_abbreviations(data: str, abbs: Dict[str, List[str]], recursion_depth=0):
+    """Given a string, expand any abbreviations in it recursively
+
+    Args:
+        data (str): a string that may or may not contain recursive 'abbreviations'
+    """
+    if recursion_depth > 10:
+        raise exceptions.RecursionError(
+            "Too many levels of recursion in your abbreviation expansion. Check your abbreviations for circular references."
+        )
+    for abb, stands_for in sorted(abbs.items(), key=lambda x: len(x[0]), reverse=True):
+        abb_match = re.compile(abb)
+        abb_repl = "|".join(stands_for)
+        if re.search(abb_match, data):
+            data = re.sub(abb_match, abb_repl, data)
+            recursion_depth += 1
+            data = expand_abbreviations(data, abbs, recursion_depth=recursion_depth)
+            break
+    return data
+
+
+def flatten_abbreviations_format(data):
     """Turn a CSV-sourced list of lists into a flattened DefaultDict"""
     default_dict = defaultdict(list)
     for line in data:
         if line[0]:
-            default_dict[line[0]].extend([l for l in line[1:] if l])
+            default_dict[line[0]].extend(
+                [definition for definition in line[1:] if definition]
+            )
     return default_dict
 
 
-def expand_abbreviations(data):
+def expand_abbreviations_format(data):
     """Expand a flattened DefaultDict into a CSV-formatted list of lists"""
     lines = []
     if data:
@@ -78,7 +101,8 @@ def compose_indices(
     E.g., [(0,1), (1,4)] composed with [(0,0), (1,2), (1,3), (4,2)] is
     [(0,2), (0,3), (1,2)]
     """
-    indices2_as_dict = defaultdict(dict)  # For O(1) lookup of arcs leaving indices2
+    # for O(1) lookup of arcs leaving indices2
+    indices2_as_dict = defaultdict(dict)  # type: ignore
     for a, b in indices2:
         indices2_as_dict[a][b] = True  # we're using dict as an ordered set...
 
@@ -164,6 +188,8 @@ def create_fixed_width_lookbehind(pattern):
 def pattern_to_fixed_width_lookbehinds(match):
     """Python must have fixed-width lookbehinds."""
     pattern = match.group()
+    if pattern.startswith("[") and pattern.endswith("]"):
+        pattern = pattern[1:-1]
     pattern = sorted(pattern.split("|"), key=len, reverse=True)
     current_len = len(pattern[0])
     all_lookbehinds = []
@@ -194,28 +220,26 @@ def load_from_workbook(language):
     for entry in work_sheet:
         new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
         for col in entry:
-            if col.column == "A" or col.column == 1:
+            if col.column in ["A", 1]:
                 value = col.value
                 if isinstance(value, (float, int)):
                     value = str(value)
                 new_io["in"] = value
-            if col.column == "B" or col.column == 2:
+            if col.column in ["B", 2]:
                 value = col.value
                 if isinstance(value, (float, int)):
                     value = str(value)
                 new_io["out"] = value
-            if col.column == "C" or col.column == 3:
-                if col.value is not None:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["context_before"] = value
-            if col.column == "D" or col.column == 4:
-                if col.value is not None:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["context_after"] = value
+            if col.column in ["C", 3] and col.value is not None:
+                value = col.value
+                if isinstance(value, (float, int)):
+                    value = str(value)
+                new_io["context_before"] = value
+            if col.column in ["D", 4] and col.value is not None:
+                value = col.value
+                if isinstance(value, (float, int)):
+                    value = str(value)
+                new_io["context_after"] = value
         mapping.append(new_io)
 
     return mapping
@@ -404,17 +428,17 @@ def load_abbreviations_from_file(path):
         abbs = []
         with open(path, encoding="utf8") as f:
             reader = csv.reader(f, delimiter=",")
-            abbs = flatten_abbreviations(reader)
+            abbs = flatten_abbreviations_format(reader)
     elif path.endswith("tsv"):
         abbs = []
         with open(path, encoding="utf8") as f:
             reader = csv.reader(f, delimiter="\t")
-            abbs = flatten_abbreviations(reader)
+            abbs = flatten_abbreviations_format(reader)
     elif path.endswith("psv"):
         abbs = []
         with open(path, encoding="utf8") as f:
             reader = csv.reader(f, delimiter="|")
-            abbs = flatten_abbreviations(reader)
+            abbs = flatten_abbreviations_format(reader)
     else:
         raise exceptions.IncorrectFileType(
             f"Sorry, abbreviations must be stored as CSV/TSV/PSV files. You provided the following: {path}"
