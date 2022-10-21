@@ -1,0 +1,3 @@
+# Make sure the same input in NFD and NFC both get handled correctly
+eng-ipa,eng-arpabet,ĩ,IY N
+eng-ipa,eng-arpabet,ĩ,IY N
