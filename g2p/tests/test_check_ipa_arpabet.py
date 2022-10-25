@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 """ Test Mapping langs utility functions and their use in g2p convert --check """
 
