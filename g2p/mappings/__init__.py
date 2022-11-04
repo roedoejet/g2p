@@ -468,7 +468,7 @@ class Mapping:
             + "."
             + file_type,
         )
-        with open(fn, "w", encoding="utf8") as f:
+        with open(fn, "w", encoding="utf8", newline="\n") as f:
             self.mapping_to_stream(f, file_type)
 
     def config_to_file(
