@@ -140,10 +140,10 @@ class Text(Resource):
 def update_docs():
     """Update the swagger documentation with all nodes from the network"""
     swagger_path = os.path.join(os.path.dirname(static_file), "swagger.json")
-    with open(swagger_path) as f:
+    with open(swagger_path, encoding="utf-8-sig") as f:
         data = json.load(f)
     data["components"]["schemas"]["Langs"]["enum"] = sorted(LANGS_NETWORK.nodes)
-    with open(swagger_path, "w", newline="\n") as f:
+    with open(swagger_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(data))
     LOGGER.info("Updated API documentation")
 
