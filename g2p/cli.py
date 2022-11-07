@@ -1,3 +1,6 @@
+"""
+Command line interface to the g2p system
+"""
 import json
 import os
 import pprint
@@ -314,7 +317,7 @@ def generate_mapping(  # noqa: C901
 
     if list_dummy:
         # --list-dummy mode
-        print("Dummy phone inventory: {}".format(DUMMY_INVENTORY))
+        print(f"Dummy phone inventory: {DUMMY_INVENTORY}")
 
     elif ipa or dummy:
         # --ipa and --dummy modes

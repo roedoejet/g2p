@@ -185,6 +185,7 @@ class Mapping:
 
     @staticmethod
     def mapping_type(name):
+        """Return the type of a mapping given its name"""
         if is_ipa(name):
             return "IPA"
         elif is_xsampa(name):
@@ -211,6 +212,7 @@ class Mapping:
         return intermediate_char * len(string)
 
     def index(self, item):
+        """Find the location of an item in self"""
         return self.mapping.index(item)
 
     def inventory(self, in_or_out: str = "in"):
@@ -259,7 +261,7 @@ class Mapping:
             for io in self.mapping
         ]
 
-    def process_kwargs(self, mapping):
+    def process_kwargs(self, mapping):  # noqa: C901
         """Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6"""
 
         if "as_is" in self.kwargs:
@@ -364,7 +366,8 @@ class Mapping:
         # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
         if not rule["in"]:
             LOGGER.warning(
-                f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. This is disallowed. Please check your mapping file for rules with null inputs.'
+                f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. '
+                "This is disallowed. Please check your mapping file for rules with null inputs."
             )
             return None
         if "context_before" in rule and rule["context_before"]:
@@ -459,7 +462,7 @@ class Mapping:
         """Write mapping to file"""
 
         if not os.path.isdir(output_path):
-            raise Exception("Path %s is not a directory", output_path)
+            raise Exception(f"Path {output_path} is not a directory")
         fn = os.path.join(
             output_path,
             self.kwargs.get("in_lang", "und")
@@ -468,7 +471,7 @@ class Mapping:
             + "."
             + file_type,
         )
-        with open(fn, "w", encoding="utf8") as f:
+        with open(fn, "w", encoding="utf8", newline="\n") as f:
             self.mapping_to_stream(f, file_type)
 
     def config_to_file(
