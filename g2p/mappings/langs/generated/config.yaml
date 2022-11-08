@@ -443,3 +443,16 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2022-11-08 08:51:45.399230
+    case_sensitive: true
+    display_name: nsy-ipa to eng-ipa
+    escape_special: false
+    in_lang: nsy-ipa
+    language_name: IPA
+    mapping: nsy-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
