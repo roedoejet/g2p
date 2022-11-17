@@ -3,7 +3,7 @@
 mappings:
   - display_name: nsyilxcən to IPA
     mapping: nsy_to_ipa.csv
-    in_lang: nsy
+    in_lang: nsy-equiv
     out_lang: nsy-ipa
     authors:
       - Craig Carpenter
@@ -11,4 +11,12 @@ mappings:
     prevent_feeding: true
     rule_ordering: apply-longest-first
     norm_form: NFC
+    <<: *shared
+  - display_name: Unicode Equivalencies
+    in_lang: nsy
+    out_lang: nsy-equiv
+    authors:
+      - Eric Joanis
+    mapping: nsy_equiv.csv
+    norm_form: NFD
     <<: *shared
