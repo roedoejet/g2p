@@ -4,7 +4,7 @@ on:
   - pull_request
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # #no-ci in the commit log flags commit we don't want CI-validated
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
