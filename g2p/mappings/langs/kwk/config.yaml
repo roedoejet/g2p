@@ -17,7 +17,7 @@ mappings:
     authors:
       - Patrick Littell
       - Fineen Davis
-    <<: *shared
+    language_name: Kwak'wala (NAPA orthography)
   - display_name: Kwak'wala (U'mista) to IPA
     mapping: kwk_umista_to_ipa.json
     in_lang: kwk-umista
@@ -33,7 +33,7 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Fineen Davis
-    <<: *shared
+    language_name: Kwak'wala (U'mista orthography)
   - display_name: Kwak'wala (NAPA) Equivalencies
     mapping: napa_equiv_ubc.csv
     in_lang: kwk-napa-ubc
@@ -58,4 +58,4 @@ mappings:
     prevent_feeding: true
     authors:
       - Fineen Davis
-    <<: *shared
+    language_name: Kwak'wala (Boas orthography)
