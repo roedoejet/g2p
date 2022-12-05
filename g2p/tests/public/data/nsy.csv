@@ -40,3 +40,22 @@ nsy,eng-arpabet,chaʔstim’,T S HH AE HH S T IY M
 nsy,nsy-ipa,supúlaʔxʷ,supˈulaʔxʷ
 nsy,eng-ipa,supúlaʔxʷ,supulæʔkw
 nsy,eng-arpabet,supúlaʔxʷ,S UW P UW L AE HH K W
+
+# These additional test words come from processing a whole document
+nsy,nsy-ipa,ťək̓ʷək̓ʷxix,tʼəkʼʷəkʼʷxix
+nsy,nsy-ipa,ksc̓íłnsəlx,kstsʼˈiɬnsəlx
+nsy,nsy-ipa,c̓x̌ił,tsʼχiɬ
+nsy,nsy-ipa,mnimłtət,mnimɬtət
+nsy,nsy-ipa,ksck̓łʔists,kstskʼɬʔists
+nsy,nsy-ipa,əcťixʷəlm,ətstʼixʷəlm
+nsy,nsy-ipa,meɬ,məɬ
+nsy,nsy-ipa,mispex̌pax̌t,mispəχpaχt
+nsy,nsy-ipa,ɬe,ɬə
+
+nsy,eng-arpabet,c̓x̌ił,T S SH IY S
+nsy,eng-arpabet,mnimłtət,M N IY M S T AH T
+nsy,eng-arpabet,ksck̓łʔists,K S T S K S HH IY S T S
+nsy,eng-arpabet,əcťixʷəlm,AH T S T IY K W AH L M
+nsy,eng-arpabet,meɬ,M AH S
+nsy,eng-arpabet,mispex̌pax̌t,M IY S P AH SH P AE SH T
+nsy,eng-arpabet,ɬe,S AH
