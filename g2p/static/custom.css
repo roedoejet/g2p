@@ -44,6 +44,12 @@ h4 {
     display: inline;
 }
 
+/* Pad the bottom of the page, otherwise it looks like you can't see the bottom
+ * of the abbreviations table. */
+.container {
+    padding-bottom: 40px;
+}
+
 table td {
     text-align: center;
     padding: 3px !important;
