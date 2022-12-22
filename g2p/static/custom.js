@@ -187,7 +187,7 @@ function createAbbs(index, data) {
         height: 287,
         maxRows: 150,
         rowHeaders: true,
-        colHeaders: true,
+        colHeaders: ["Abbreviation Name"],
         afterRowMove: (rows, target) => {
             convert()
         },
@@ -286,12 +286,6 @@ createTable(0, dataObject)
 createAbbs(0, varsObject)
 createSettings(0, settingsObject)
 
-document.getElementById("export-abbs").addEventListener("click", function(event) {
-    varhot.getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
-})
-
-// Kwargs
-
 document.getElementById('standard-radio').addEventListener('click', function(event) {
     if ($('#standard').is(":hidden")) {
         $('#input').val($('#indexInput').val())
@@ -319,8 +313,9 @@ getIncludedMappings = function() {
 
         for (index of indices) {
             mapping = {}
-            mapping['mapping'] = TABLES[index].getSourceData()
-            mapping['abbreviations'] = ABBS[index].getData()
+            // Extract only non-empty rules and abbreviations for processing
+            mapping['mapping'] = TABLES[index].getSourceData().filter(v => v.in)
+            mapping['abbreviations'] = ABBS[index].getData().filter(v => v[0])
             mapping['kwargs'] = getKwargs(index)
             mappings.push(mapping)
         }
@@ -542,11 +537,13 @@ $('#varhot-add-row').click(function(event) {
 $('#export-abbs').click(function(event) {
     let active = $('li.title.abbs.active')
     let index = $('li.title.abbs').index(active)
-    ABBS[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
+    // TODO: filter out lines where the first column (i.e., the abbreviation name) is empty
+    ABBS[index].getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
 })
 $('#export-rules').click(function(event) {
     let active = $('li.title.rules.active')
     let index = $('li.title.rules').index(active)
+    // TODO: filter out lines where .in is empty
     TABLES[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
 $('#langselect').change(function() {
