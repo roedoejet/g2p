@@ -443,3 +443,16 @@ mappings:
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
+  - authors:
+      - Generated 2023-01-13 11:12:51.451010
+    case_sensitive: true
+    display_name: oka-ipa to eng-ipa
+    escape_special: false
+    in_lang: oka-ipa
+    language_name: IPA
+    mapping: oka-ipa_to_eng-ipa.json
+    norm_form: NFC
+    out_lang: eng-ipa
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
