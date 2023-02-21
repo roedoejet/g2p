@@ -525,8 +525,10 @@ class Transducer:
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
-        converted = [unicodedata.normalize("NFKC", c) for c in to_convert]
-        converted = [text_unidecode.unidecode(c) for c in converted]
+        converted = [
+            text_unidecode.unidecode(unicodedata.normalize("NFKC", c))
+            for c in to_convert
+        ]
         converted = [
             c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in converted
         ]
