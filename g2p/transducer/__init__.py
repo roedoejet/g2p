@@ -525,7 +525,7 @@ class Transducer:
         # Conversion is done character by character using unidecode
         converted = [unicodedata.normalize("NFKC", c) for c in to_convert]
         converted = [text_unidecode.unidecode(c) for c in converted]
-        converted = [c if c.isalpha() else "" for c in converted]
+        converted = [c if c.isalpha() or c == " " else "" for c in converted]
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
