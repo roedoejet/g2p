@@ -1,9 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 """ Organize tests into Test Suites
+
+Run with "python run.py <suite>" where <suite> can be all, dev, or a few other
+options (see run_tests() for the full list).
+
+Add --describe to list the contents of the selected suite instead of running it.
 """
 
 import os
+import re
 import sys
 from unittest import TestLoader, TestSuite, TextTestRunner
 
@@ -84,29 +90,69 @@ DEV_TESTS = (
 )
 
 
-def run_tests(suite):
-    """Decide which Test Suite to run"""
+def list_tests(suite: TestSuite):
+    for subsuite in suite:
+        for match in re.finditer(r"tests=\[([^][]+)\]>", str(subsuite)):
+            for test_case in match[1].split(", "):
+                yield test_case.replace("g2p.tests.", "")
+
+
+def describe_suite(suite: TestSuite):
+    full_suite = LOADER.discover(os.path.dirname(__file__))
+    full_list = list(list_tests(full_suite))
+    requested_list = list(list_tests(suite))
+    requested_set = set(requested_list)
+    print("Test suite includes:", *sorted(requested_list), sep="\n"),
+    print(
+        "\nTest suite excludes:",
+        *sorted(test for test in full_list if test not in requested_set),
+        sep="\n"
+    )
+
+
+def run_tests(suite: str, describe: bool = False) -> bool:
+    """Run the test suite specified in suite.
+
+    Args:
+        suite: one of "all", "dev", etc specifying which suite to run
+        describe: if True, list all the test cases instead of running them.
+
+    Returns: Bool: True iff success
+    """
     if suite == "all":
-        suite = LOADER.discover(os.path.dirname(__file__))
+        test_suite = LOADER.discover(os.path.dirname(__file__))
     elif suite == "trans":
-        suite = TestSuite(TRANSDUCER_TESTS)
+        test_suite = TestSuite(TRANSDUCER_TESTS)
     elif suite == "langs":
-        suite = TestSuite(LANGS_TESTS)
+        test_suite = TestSuite(LANGS_TESTS)
     elif suite == "mappings":
-        suite = TestSuite(MAPPINGS_TESTS)
+        test_suite = TestSuite(MAPPINGS_TESTS)
     elif suite == "integ":
-        suite = TestSuite(INTEGRATION_TESTS)
+        test_suite = TestSuite(INTEGRATION_TESTS)
     elif suite == "dev":
-        suite = TestSuite(DEV_TESTS)
-    runner = TextTestRunner(verbosity=3)
-    if isinstance(suite, str):
-        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+        test_suite = TestSuite(DEV_TESTS)
     else:
-        return runner.run(suite)
+        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+        return False
+
+    if describe:
+        describe_suite(test_suite)
+        return True
+    else:
+        runner = TextTestRunner(verbosity=3)
+        return runner.run(test_suite).wasSuccessful()
 
 
 if __name__ == "__main__":
+    describe = "--describe" in sys.argv
+    if describe:
+        sys.argv.remove("--describe")
+
     try:
-        run_tests(sys.argv[1])
+        result = run_tests(sys.argv[1], describe)
+        if not result:
+            LOGGER.error("Some tests failed. Please see log above.")
+            sys.exit(1)
     except IndexError:
         LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+        sys.exit(1)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 from unittest import TestCase, main
 
@@ -40,6 +40,16 @@ class UnidecodeTransducerTest(TestCase):
         self.assertEqual(
             tg.output_string, "EY T EY  N UW N AA V UW T  N OW N AA F OW T "
         )
+
+    def test_unidecode_arabic_to_arpabet(self):
+        transducer = make_g2p("und", "eng-arpabet")
+        tg = transducer("السلام عليكم")
+        self.assertEqual(tg.output_string, "L S L M  L Y K M ")
+
+    def test_unidecode_arabic_presentation_to_arpabet(self):
+        transducer = make_g2p("und", "eng-arpabet")
+        tg = transducer("ﺷﻜﺮﺍﹰ")
+        self.assertEqual(tg.output_string, "S HH K D ")
 
 
 if __name__ == "__main__":

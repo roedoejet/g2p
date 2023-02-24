@@ -4,7 +4,7 @@ on:
   - pull_request
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     # #no-ci in the commit log flags commit we don't want CI-validated
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
@@ -16,11 +16,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip3 install -r requirements.txt
-          pip3 install -e .
-          pip3 install pip-licenses
+          pip install -r requirements.txt
+          pip install -e .
+          pip install pip-licenses
           if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
-          pip3 install coverage coveralls
+          pip install coverage coveralls
       - name: Run tests
         run: |
           gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
@@ -28,9 +28,10 @@ jobs:
           coverage run run_tests.py dev
           coverage xml
           if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: true # optional (default = false)
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false # too many upload errors to keep "true"
 
   test-on-windows:
     runs-on: windows-latest
@@ -44,6 +45,6 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip3 install -e .
+          pip install -e .
       - name: Run tests on Windows
         run: python run_tests.py dev

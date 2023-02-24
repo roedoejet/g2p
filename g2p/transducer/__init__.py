@@ -8,6 +8,7 @@ import copy
 import re
 from collections import defaultdict
 from typing import Dict, List
+import unicodedata
 
 import text_unidecode
 
@@ -34,11 +35,14 @@ copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r  # type: ignore
 Index = Dict
 
 # A ChangeLog is a list of changes (List[int])
-# The first item (int) in a change is the index of where the change occurs, and the second item (int) is the change offset
+# The first item (int) in a change is the index of where the change occurs, and
+# the second item (int) is the change offset
 # Example:
 # an insertion of length 1 at index 0 followed by a deletion of length one at index 2
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
+
+UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":", " "]
 
 
 class TransductionGraph:
@@ -187,7 +191,8 @@ class TransductionGraph:
 class Transducer:
     """This is the fundamental class for performing conversions in the g2p library.
 
-    Each Transducer must be initialized with a Mapping object. The Transducer object can then be called to apply the rules from Mapping on a given input.
+    Each Transducer must be initialized with a Mapping object. The Transducer
+    object can then be called to apply the rules from Mapping on a given input.
 
     Attributes:
         mapping (Mapping): Formatted input/output pairs using the g2p.mappings.Mapping class.
@@ -211,7 +216,9 @@ class Transducer:
             to_convert (str): The string to convert.
 
         Returns:
-            TransductionGraph: Returns an object with all the nodes representing input and output characters and their corresponding edges representing the indices of the transformation.
+            TransductionGraph: Returns an object with all the nodes representing input
+            and output characters and their corresponding edges representing the indices
+            of the transformation.
         """
         return self.apply_rules(to_convert)
 
@@ -272,13 +279,15 @@ class Transducer:
             inputs = {'1': [{'index': 0, 'string': 'a'}], '2': [{'index': 1, 'string': 'b'}] }
             outputs = {'1': [{'index': 0, 'string': 'b'}], '2': [{'index': 1, 'string': 'a'}] }
 
-            This allows input match groups to be iterated through in sequence regardless of their character sequence.
+            This allows input match groups to be iterated through in sequence regardless of their
+            character sequence.
 
         Args:
             tg (TransductionGraph): the graph holding information about the transduction
-            start_end (Tuple(int, int)): a tuple contianing the start and end of the input match
+            start_end (Tuple(int, int)): a tuple containing the start and end of the input match
             io (List): an input/output rule
-            diff_from_input (DefaultDict): A dictionary containing the single character distance from a given character index to its input
+            diff_from_input (DefaultDict): A dictionary containing the single character distance
+                                           from a given character index to its input
             out_string (str): the raw output string
             output_start (int): the diff-offset start of the match with respect to the output
 
@@ -382,7 +391,7 @@ class Transducer:
     def update_explicit_indices(
         self, tg, match, start_end, io, diff_from_input, diff_from_output, out_string
     ):
-        """Takes an arbitrary number of input & output strings and their corresponding index offsets.
+        r"""Takes an arbitrary number of input & output strings and their corresponding index offsets.
         It then zips them up according to the provided indexing notation.
 
         Example:
@@ -516,7 +525,13 @@ class Transducer:
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
-        converted = [text_unidecode.unidecode(c) for c in to_convert]
+        converted = [
+            text_unidecode.unidecode(unicodedata.normalize("NFKC", c))
+            for c in to_convert
+        ]
+        converted = [
+            c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in converted
+        ]
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
@@ -543,7 +558,7 @@ class Transducer:
 
         return tg
 
-    def apply_rules(self, to_convert: str):
+    def apply_rules(self, to_convert: str):  # noqa: C901
         if self.mapping.kwargs.get("type", "") == "unidecode":
             return self.apply_unidecode(to_convert)
 
@@ -665,7 +680,6 @@ class Transducer:
         tg.edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(tg.edges):
             if edge[1] is None:
-
                 # if previous exists, use that, otherwise use following, otherwise None
                 previous = [x for x in tg.edges[:i] if x[1] is not None]
                 try:
@@ -696,7 +710,8 @@ class Transducer:
             if display_warnings:
                 display_input = original_input or tg.input_string
                 LOGGER.warning(
-                    f'Transducer output "{tg.output_string}" for input "{display_input}" is not fully valid eng-arpabet as recognized by soundswallower.'
+                    f'Transducer output "{tg.output_string}" for input "{display_input}" '
+                    "is not fully valid eng-arpabet as recognized by soundswallower."
                 )
             return False
         elif is_ipa(out_lang):

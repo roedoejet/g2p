@@ -1,15 +1,12 @@
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+    rev: v4.4.0
     hooks:
     -   id: check-yaml
+    -   id: check-json
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
         exclude: \.svg$
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
-    hooks:
-    -   id: flake8
 -   repo: local
     # Using local repos because these won't work for me from remote repo -EJ
     # They're also more convenient because we install them via requirements.dev.txt
@@ -33,3 +30,8 @@ repos:
         language: system
         types: [python]
         stages: [commit]
+-   repo: https://github.com/pycqa/flake8
+    # do flake8 last to avoid duplicate reports
+    rev: 3.8.3
+    hooks:
+    -   id: flake8
