@@ -44,6 +44,8 @@ ChangeLog = List[List[int]]
 
 UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":", " "]
 
+def sanitize_unidecode_output(s: str) -> bool:
+    return "".join(c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in s)
 
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
@@ -529,9 +531,7 @@ class Transducer:
             text_unidecode.unidecode(unicodedata.normalize("NFKC", c))
             for c in to_convert
         ]
-        converted = [
-            c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in converted
-        ]
+        converted = [sanitize_unidecode_output(c) for c in converted]
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
