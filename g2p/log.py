@@ -15,10 +15,6 @@ FIELD_STYLES = dict(
 def setup_logger(name):
     """Create logger and configure with cool colors!"""
 
-    logging.basicConfig(
-        level=logging.INFO
-        # filename="logger.log"
-    )
     logger = logging.getLogger(name)
     coloredlogs.install(
         level="INFO",
