@@ -49,8 +49,12 @@ class UnidecodeTransducerTest(TestCase):
     def test_unidecode_arabic_presentation_to_arpabet(self):
         transducer = make_g2p("und", "eng-arpabet")
         tg = transducer("ﺷﻜﺮﺍﹰ")
-        self.assertEqual(tg.output_string, "S HH K D ")
+        self.assertEqual(tg.output_string, "S HH K D  AA N ")
 
+    def test_unidecode_kanji_to_arpabet(self):
+        transducer = make_g2p("und", "eng-arpabet")
+        tg = transducer("日本語")
+        self.assertEqual(tg.output_string, "D IY  B EY N  Y UW  ")
 
 if __name__ == "__main__":
     main()
