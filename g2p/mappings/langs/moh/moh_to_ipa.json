@@ -44,5 +44,9 @@
     {"in": "w", "out": "w"},
     {"in": "wh", "out": "f"},
     {"in": "y", "out": "j"},
-    {"in": "'", "out": "ʔ"}
+    {"in": "'", "out": "ʔ"},
+    {"in": "b", "out": "b", "comment": "occurs only in borrowed words" },
+    {"in": "m", "out": "m", "comment": "occurs only in borrowed words" },
+    {"in": "p", "out": "p", "comment": "occurs only in borrowed words" },
+    {"in": "u", "out": "u", "comment": "occurs only in borrowed words" }
 ]
