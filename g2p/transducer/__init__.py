@@ -45,6 +45,7 @@ ChangeLog = List[List[int]]
 UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
 
+
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
 
@@ -240,6 +241,16 @@ class Transducer:
             return intermediate_ord - 983040
         else:
             return -1
+
+    @property
+    def in_lang(self):
+        """Input language node name"""
+        return self.mapping.kwargs.get("in_lang", "und")
+
+    @property
+    def out_lang(self):
+        """Output language node name"""
+        return self.mapping.kwargs.get("out_lang", "und")
 
     def resolve_intermediate_chars(self, output_string):
         """Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
@@ -865,6 +876,21 @@ class CompositeTransducer:
     def __call__(self, to_convert: str):
         return self.apply_rules(to_convert)
 
+    @property
+    def transducers(self):
+        """Sequence of underlying Transducer objects"""
+        return self._transducers
+
+    @property
+    def in_lang(self):
+        """Input language node name"""
+        return self._transducers[0].in_lang
+
+    @property
+    def out_lang(self):
+        """Output language node name"""
+        return self._transducers[-1].out_lang
+
     def apply_rules(self, to_convert: str):
         tg_list = []
         for transducer in self._transducers:
@@ -937,6 +963,11 @@ class TokenizingTransducer:
                 non_word_tg = TransductionGraph(token["text"])
                 tg += non_word_tg
         return tg
+
+    @property
+    def transducer(self):
+        """Underlying Transducer object"""
+        return self._transducer
 
     def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         # The obvious implementation fails, because we need to check only the words, not
