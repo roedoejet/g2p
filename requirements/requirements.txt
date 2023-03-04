@@ -10,7 +10,7 @@ flask-talisman>=0.7.0
 flask-restful>=0.3.9
 networkx>=2.5,<=2.8.4
 panphon>=0.19
-python-engineio==3.14.2 
+python-engineio==3.14.2
 python-socketio==4.6.1
 pyyaml>=5.2
 regex
@@ -18,3 +18,4 @@ requests
 tqdm
 text_unidecode
 werkzeug==2.0.3
+fastapi
