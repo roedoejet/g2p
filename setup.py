@@ -19,14 +19,9 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf8") as f:
     long_description = f.read()
 
-with open(
-    path.join(this_directory, "requirements", "requirements.txt"), encoding="utf8"
-) as f:
-    REQS = f.read().splitlines()
-
 setup(
     name="g2p",
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     version=VERSION,
     author="Aidan Pine",
     author_email="hello@aidanpine.ca",
@@ -38,7 +33,10 @@ setup(
     platform=["any"],
     packages=find_packages(),
     include_package_data=True,
-    install_requires=REQS,
+    install_requires="""
+click networkx~=2.5 panphon fastapi fastapi-socketio websockets
+regex tqdm text-unidecode uvicorn jinja2 colored-logs
+""".strip().split(),
     entry_points={"console_scripts": ["g2p = g2p.cli:cli"]},
     zip_safe=False,
     classifiers=[
