@@ -13,6 +13,7 @@ MarkupSafe==2.1.2
 munkres==1.1.4
 networkx==2.8.8
 numpy==1.24.2
+openpyxl==3.1.1
 panphon==0.20.0
 pydantic==1.10.5
 python-engineio==4.3.4

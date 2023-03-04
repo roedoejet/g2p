@@ -35,7 +35,7 @@ setup(
     include_package_data=True,
     install_requires="""
 click networkx~=2.5 panphon fastapi fastapi-socketio websockets
-regex tqdm text-unidecode uvicorn jinja2 colored-logs
+regex tqdm text-unidecode uvicorn jinja2 colored-logs openpyxl
 """.strip().split(),
     entry_points={"console_scripts": ["g2p = g2p.cli:cli"]},
     zip_safe=False,
