@@ -2,7 +2,8 @@
 
 from unittest import TestCase, main
 
-from g2p.app import APP
+from click.testing import CliRunner
+
 from g2p.cli import doctor
 from g2p.log import LOGGER
 from g2p.mappings.langs.utils import check_ipa_known_segs
@@ -23,7 +24,7 @@ class ExpensiveDoctorTest(TestCase):
         # TODO: assert something more useful here...
         # This test simulates calling "g2p doctor" on the command line with no arguments,
         # which runs doctor on all mappings.
-        runner = APP.test_cli_runner()
+        runner = CliRunner()
         result = runner.invoke(doctor)
         self.assertEqual(result.exit_code, 0)
         self.assertGreaterEqual(len(result.stdout), 10000)

@@ -6,7 +6,8 @@ import shutil
 import tempfile
 from unittest import TestCase, main
 
-from g2p.app import APP
+from click.testing import CliRunner
+
 from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
 from g2p.log import LOGGER
 from g2p.mappings.langs import load_langs, load_network
@@ -17,7 +18,7 @@ class CliTest(TestCase):
     """Test suite for the g2p Command Line Interface"""
 
     def setUp(self):
-        self.runner = APP.test_cli_runner()
+        self.runner = CliRunner()
 
     def test_update(self):
         result = self.runner.invoke(update)

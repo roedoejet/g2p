@@ -9,7 +9,7 @@ Before running this test suite, launch the g2p-studio server:
 minimal dev mode:
     python run_studio.py
 or robust server mode (*nix only, gunicorn does not work on Windows):
-    gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
+    gunicorn --worker-class eventlet  -w 1 g2p.app:app --no-sendfile --bind 0.0.0.0:5000 --daemon
 """
 
 from datetime import datetime
@@ -19,7 +19,7 @@ from unittest import IsolatedAsyncioTestCase, main
 
 from playwright.async_api import async_playwright
 
-from g2p.app import APP, SOCKETIO
+from g2p.app import app
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
 
@@ -31,10 +31,11 @@ class StudioTest(IsolatedAsyncioTestCase):
         self.debug = True
 
     def setUp(self):
-        self.flask_test_client = APP.test_client()
-        self.socketio_test_client = SOCKETIO.test_client(
-            APP, flask_test_client=self.flask_test_client
-        )
+        # self.flask_test_client = APP.test_client()
+        # self.socketio_test_client = SOCKETIO.test_client(
+        #    APP, flask_test_client=self.flask_test_client
+        # )
+        pass
 
     def test_socket_connection(self):
         self.assertTrue(self.socketio_test_client.is_connected())

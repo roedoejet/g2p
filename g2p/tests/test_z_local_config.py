@@ -20,7 +20,8 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, main
 
-from g2p.app import APP
+from click.testing import CliRunner
+
 from g2p.cli import convert, generate_mapping
 from g2p.mappings.utils import normalize
 from g2p.tests.public import PUBLIC_DIR
@@ -28,7 +29,7 @@ from g2p.tests.public import PUBLIC_DIR
 
 class LocalConfigTest(TestCase):
     def setUp(self):
-        self.runner = APP.test_cli_runner()
+        self.runner = CliRunner()
         self.mappings_dir = Path(PUBLIC_DIR) / "mappings"
 
     def test_local_config(self):

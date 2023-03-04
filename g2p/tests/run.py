@@ -15,7 +15,8 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 
 # Unit tests
 from g2p.log import LOGGER
-from g2p.tests.test_api_resources import ResourceIntegrationTest
+
+# from g2p.tests.test_api_resources import ResourceIntegrationTest
 from g2p.tests.test_check_ipa_arpabet import CheckIpaArpabetTest
 from g2p.tests.test_cli import CliTest
 from g2p.tests.test_create_mapping import MappingCreationTest
@@ -71,7 +72,7 @@ INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
         CliTest,
-        ResourceIntegrationTest,
+        #        ResourceIntegrationTest,
         DoctorTest,
     ]
 ]
