@@ -6,7 +6,10 @@ Studio
 The g2p studio is intended to make the process of writing rules easier.
 
 You can either visit the `autobuilt version <https://g2p-studio.herokuapp.com/>`__ or spin it up on your machine
-using the :code:`run_studio.py` script in the root directory (:code:`python run_studio.py`)
+using `uvicorn <https://www.uvicorn.org/>`__::
+
+    uvicorn g2p.app:app --reload --port 5000
+
 
 Basic use
 ---------

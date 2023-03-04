@@ -168,8 +168,8 @@ Gen DB: this is the part of the textual database that is generated when running 
 Compiled DB: this contains the same info as Text DB + Gen DB, but in a format optimized for fast reading by the machine. This is what any program using `g2p` reads: `g2p convert`, `readalongs align`, `convertextract`, and also `g2p generate-mapping`. It consists of these files:
 * g2p/mappings/langs/langs.pkl
 * g2p/mappings/langs/network.pkl
-* g2p/mappings/langs/static/languages-network.json
-* g2p/mappings/langs/static/swagger.json
+* g2p/static/languages-network.json
+* g2p/static/swagger.json
 
 So, when you write a new g2p mapping for a language, say `lll`, and you want to be able to convert text from `lll` to `eng-ipa` or `eng-arpabet`, you need to do the following:
 1. Write the mapping from `lll` to `lll-ipa` in g2p/mappings/langs/lll/. You've just updated Text DB.
@@ -181,9 +181,9 @@ Once you have the Compiled DB, it is then possible to use the `g2p convert` comm
 
 ## Studio
 
-You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally using `python run_studio.py`.
+You can also run the `g2p Studio` which is a web interface for creating custom lookup tables to be used with g2p. To run the `g2p Studio` either visit https://g2p-studio.herokuapp.com/ or run it locally with:
 
-Alternatively, you can run the app from the command line: `g2p run`
+    uvicorn g2p.app:app --reload --port 5000
 
 ## Maintainers
 
