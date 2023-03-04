@@ -9,13 +9,11 @@ import sys
 
 import click
 import yaml
-from flask.cli import FlaskGroup
 from networkx import has_path
 
 from g2p import make_g2p
 from g2p._version import VERSION
-from g2p.api import update_docs
-from g2p.app import APP, network_to_echart
+from g2p.app import network_to_echart
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
@@ -40,11 +38,6 @@ from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normal
 from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
-
-
-def create_app():
-    """Return the flask app for g2p"""
-    return APP
 
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
@@ -115,7 +108,7 @@ def parse_from_or_to_lang_spec(lang_spec):
 
 
 @click.version_option(version=VERSION, prog_name="g2p")
-@click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     """Management script for G2P"""
 
@@ -155,7 +148,7 @@ def cli():
 )
 @click.argument("out_lang", required=False, default=None, type=str)
 @click.argument("in_lang", required=False, default=None, type=str)
-@cli.command(
+@cli.command(  # type: ignore
     context_settings=CONTEXT_SETTINGS,
     short_help="Generate English IPA or dummy mapping.",
 )
@@ -469,7 +462,7 @@ def generate_mapping(  # noqa: C901
 @click.argument("out_lang")
 @click.argument("in_lang")
 @click.argument("input_text", type=click.STRING)
-@cli.command(
+@cli.command(  # type: ignore
     context_settings=CONTEXT_SETTINGS,
     short_help="Convert text through a g2p mapping path.",
 )
@@ -574,7 +567,7 @@ def convert(  # noqa: C901
     multiple=True,
     help="Check specified IPA mapping(s) (default: check all IPA mappings).",
 )
-@cli.command(context_settings=CONTEXT_SETTINGS)
+@cli.command(context_settings=CONTEXT_SETTINGS)  # type: ignore
 def doctor(mapping, list_all, list_ipa):
     """Check for common errors in mappings.
 
@@ -635,7 +628,7 @@ def doctor(mapping, list_all, list_ipa):
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
     help=f"Output results in DIRECTORY instead of the installed directory ({LANGS_DIR}).",
 )
-@cli.command(context_settings=CONTEXT_SETTINGS)
+@cli.command(context_settings=CONTEXT_SETTINGS)  # type: ignore
 def update(in_dir, out_dir):
     """Update cached language files."""
     if in_dir is None:
@@ -647,13 +640,12 @@ def update(in_dir, out_dir):
         langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
     cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
-    update_docs()
     network_to_echart(write_to_file=True)
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
 @click.argument("lang")
-@cli.command(
+@cli.command(  # type: ignore
     context_settings=CONTEXT_SETTINGS,
     short_help="Scan a document for unknown characters.",
 )
@@ -707,7 +699,7 @@ def scan(lang, path):
 )
 @click.argument("lang2", required=False, default=None)
 @click.argument("lang1", required=False, default=None)
-@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Show cached mappings.")
+@cli.command(context_settings=CONTEXT_SETTINGS, short_help="Show cached mappings.")  # type: ignore
 def show_mappings(lang1, lang2, verbose, csv):
     """Show cached mappings, as last updated by "g2p update".
 
