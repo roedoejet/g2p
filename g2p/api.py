@@ -47,7 +47,7 @@ Lang = Enum("Lang", [(name, name) for name in LANGS])  # type: ignore
     operation_id="getAncestors",
     response_description="The valid ancestors of a node",
 )
-async def ancestors_(node: Lang = Query(description="language node name")) -> List[str]:
+def ancestors_(node: Lang = Query(description="language node name")) -> List[str]:
     """Get the valid ancestors in the network's path to a given node. These
     are all the mappings that you can convert from in order to get the
     given node."""
@@ -61,7 +61,7 @@ async def ancestors_(node: Lang = Query(description="language node name")) -> Li
     operation_id="getDescendants",
     response_description="The valid descendants of a node",
 )
-async def get_all_descendants_of_node(
+def get_all_descendants_of_node(
     node: Lang = Query(description="language node name"),
 ) -> List[str]:
     return sorted(descendants(LANGS_NETWORK, node.name))
@@ -74,7 +74,7 @@ async def get_all_descendants_of_node(
     operation_id="convertString",
     response_description="The converted text",
 )
-async def g2p(
+def g2p(
     in_lang: Lang = Query(alias="in-lang", description="input lang of string"),
     out_lang: Lang = Query(alias="out-lang", description="output lang of string"),
     text: str = Query(description="string to convert"),
@@ -109,6 +109,6 @@ async def g2p(
     operation_id="searchTable",
     response_description="search results matching criteria",
 )
-async def langs() -> List[str]:
+def langs() -> List[str]:
     """By passing in the appropriate options, you can find available mappings"""
     return LANGS
