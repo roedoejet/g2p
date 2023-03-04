@@ -10,12 +10,12 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.css">
     <link rel="stylesheet" type="text/css" href="https://handsontable.com/static/css/main.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='normalize.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='skeleton.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='skeleton.css') }}">
     <!-- <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"> -->
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='custom.css') }}">
 </head>
 
 <body>
@@ -163,10 +163,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/handsontable@latest/dist/handsontable.full.min.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.4.0/socket.io.slim.js"
-        integrity="sha256-w9DVlb/Yjkq3lOk0YpBPzeL+FZvaNALjmkJoZQYGc0I="
-        crossorigin="anonymous">
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.5.0/socket.io.slim.js"
+        integrity="sha512-amBAG1Px5aXOVTMnzRUuTDyThkWcPxdmsw7f5Ln/Q991R0v82YJTaxaBsAswW6z59MxQUjoalqo3vfFvSehizg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.2.1/echarts.min.js"
         integrity="sha256-XNiBJGZuErA+MsbKwxuTqNMimobZMsVS79SkTUroRz4="
@@ -180,9 +179,9 @@
 <script src="https://cdn.jsdelivr.net/npm/blockly@2.20190722.1/python.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
-<script src="{{ url_for('static', filename='blockly_main.js') }}"></script>
-<script src="{{ url_for('static', filename='echart_custom.js') }}"></script>
-<script src="{{ url_for('static', filename='custom.js') }}"></script>
-<script src="{{ url_for('static', filename='blocks.js') }}"></script>
+<script src="{{ url_for('static', path='blockly_main.js') }}"></script>
+<script src="{{ url_for('static', path='echart_custom.js') }}"></script>
+<script src="{{ url_for('static', path='custom.js') }}"></script>
+<script src="{{ url_for('static', path='blocks.js') }}"></script>
 
 </html>

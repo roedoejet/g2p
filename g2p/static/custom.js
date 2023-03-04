@@ -1,3 +1,5 @@
+localStorage.debug = '*';
+
 var TABLES = []
 var ABBS = []
 
@@ -367,9 +369,10 @@ var setKwargs = function(index, kwargs) {
     convert()
 }
 
-var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
-var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
-var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
+var socket = ({path: "/ws/socket.io"});
+var conversionSocket = io('/convert', {path: "/ws/socket.io"});
+var connectionSocket = io('/connect', {path: "/ws/socket.io"});
+var tableSocket = io('/table', {path: "/ws/socket.io"});
 
 var trackIndex = function() {
     return $('#animated-radio').is(":checked")
