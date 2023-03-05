@@ -197,9 +197,9 @@ class CliTest(TestCase):
     def test_convert_option_e(self):
         result = self.runner.invoke(convert, "-e est fra eng-arpabet")
         for s in [
-            "[['e', 'ɛ'], ['s', 'ɛ'], ['t', 'ɛ']]",
-            "[['ɛ', 'ɛ']]",
-            "[['ɛ', 'E'], ['ɛ', 'H'], ['ɛ', ' ']]",
+            "[('e', 'ɛ'), ('s', 'ɛ'), ('t', 'ɛ')]",
+            "[('ɛ', 'ɛ')]",
+            "[('ɛ', 'E'), ('ɛ', 'H'), ('ɛ', ' ')]",
         ]:
             self.assertIn(s, result.stdout)
 

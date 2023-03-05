@@ -220,7 +220,7 @@ class LocalConfigTest(TestCase):
         self.assertEqual(result.exit_code, 0)
         self.assertIn("[[(0, 0), (1, 0)], [(0, 0), (0, 1)]]", result.output)
         self.assertIn(
-            "[[['e', 'ò'], ['́', 'ò']], [['ò', 'u'], ['ò', '̀']]]", result.output
+            "[[('e', 'ò'), ('́', 'ò')], [('ò', 'u'), ('ò', '̀')]]", result.output
         )
 
         result = self.runner.invoke(
@@ -229,7 +229,7 @@ class LocalConfigTest(TestCase):
         )
         self.assertEqual(result.exit_code, 0)
         self.assertIn("[[(0, 0)], [(0, 0), (0, 1)]]", result.output)
-        self.assertIn("[[['é', 'ò']], [['ò', 'u'], ['ò', '̀']]]", result.output)
+        self.assertIn("[[('é', 'ò')], [('ò', 'u'), ('ò', '̀')]]", result.output)
 
 
 if __name__ == "__main__":

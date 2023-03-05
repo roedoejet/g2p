@@ -559,7 +559,7 @@ def convert(  # noqa: C901
     if pretty_edges:
         outputs += [tg.pretty_edges()]
     if debugger:
-        outputs += [tg.edges, tg.debugger]
+        outputs += [tg._edges, tg.debugger]
     if len(outputs) > 1:
         click.echo(pprint.pformat(outputs, indent=4))
     else:

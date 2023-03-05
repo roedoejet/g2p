@@ -70,21 +70,63 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tokenizing_transducer_edge_chain(self):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
-        edges = [x.edges for x in transducer("est est").tiers]
+        # .edges on a transducer is always a single array with the
+        # end-to-end mapping, for a composed transducer we can access
+        # the individual tiers with .tiers
         ref_edges = [
+            # FIXME: space after EH is included in output, which is kind of wrong
+            # "est est" -> "EH  EH "
+            # est -> EH
+            (0, 0),
+            (0, 1),
+            (0, 2),
+            (1, 0),
+            (1, 1),
+            (1, 2),
+            (2, 0),
+            (2, 1),
+            (2, 2),
+            # space -> space
+            (3, 3),
+            # est -> EH
+            (4, 4),
+            (4, 5),
+            (4, 6),
+            (5, 4),
+            (5, 5),
+            (5, 6),
+            (6, 4),
+            (6, 5),
+            (6, 6),
+        ]
+        self.assertEqual(transducer("est est").edges, ref_edges)
+        tier_edges = [x.edges for x in transducer("est est").tiers]
+        ref_tier_edges = [
             # "est est" -> "ɛ ɛ"
             [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)],
             # "ɛ ɛ" -> "ɛ ɛ"
             [(0, 0), (1, 1), (2, 2)],
+            # FIXME: space after EH is included in output, which is kind of wrong
             # "ɛ ɛ" -> "EH  EH "
             [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (2, 5), (2, 6)],
         ]
-        self.assertEqual(edges, ref_edges)
+        self.assertEqual(tier_edges, ref_tier_edges)
 
     def test_tokenizing_transducer_edge_spaces(self):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
-        edges = [x.edges for x in transducer("  a, ").tiers]
         ref_edges = [
+            # "  a, " -> "  AA , "
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (2, 3),
+            (2, 4),
+            (3, 5),
+            (4, 6),
+        ]
+        self.assertEqual(transducer("  a, ").edges, ref_edges)
+        tier_edges = [x.edges for x in transducer("  a, ").tiers]
+        ref_tier_edges = [
             # "  a, " -> "  a, "
             [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],
             # "  a, " -> "  ɑ, "
@@ -92,7 +134,7 @@ class TokenizeAndMapTest(TestCase):
             # "  ɑ, " -> "  AA , "
             [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],
         ]
-        self.assertEqual(edges, ref_edges)
+        self.assertEqual(tier_edges, ref_tier_edges)
 
 
 if __name__ == "__main__":

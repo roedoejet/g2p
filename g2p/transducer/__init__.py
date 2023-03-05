@@ -112,7 +112,7 @@ class TransductionGraph:
 
     @property
     def edges(self) -> List[Tuple[int, int]]:
-        """List[Tuple[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
+        """A list of edges for the transformation."""
         return self._edges
 
     @edges.setter
@@ -139,7 +139,8 @@ class TransductionGraph:
             f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
         )
 
-    def pretty_edges(self) -> List[Tuple[str, str]]:
+    def pretty_edges(self) -> List[List[Tuple[str, str]]]:
+        """List of edges expressed as strings"""
         edges = self._edges[:]
         edges.sort(key=lambda x: x[0])
         out_edges = []
@@ -153,7 +154,7 @@ class TransductionGraph:
                         self._output_nodes[edge[1]][1],
                     )
                 )
-        return out_edges
+        return [out_edges]
 
     def as_dict(self) -> dict:
         return {
@@ -824,7 +825,7 @@ class CompositeTransductionGraph(TransductionGraph):
 
     @property
     def edges(self) -> List[Tuple[int, int]]:
-        """List[Tuple[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
+        """Return list of edges (input node index, output node index) corresponding to the indices of the composed transformation"""
         composed = self.tiers[0].edges
         for tier in self.tiers[1:]:
             composed = compose_indices(composed, tier.edges)
@@ -836,20 +837,11 @@ class CompositeTransductionGraph(TransductionGraph):
             f"Sorry, you tried to change the edges to {value} but they cannot be changed"
         )
 
-    def pretty_edges(self):
+    def pretty_edges(self) -> List[List[Tuple[str, str]]]:
+        """List of edges expressed as strings"""
         pretty_edges = []
-        for tier_i, edges in enumerate(self._edges):
-            edges = copy.deepcopy(edges)
-            edges.sort(key=lambda x: x[0])
-            for i, edge in enumerate(edges):
-                if edge[1] is None:
-                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
-                else:
-                    edges[i] = [
-                        self.tiers[tier_i].input_nodes[edge[0]][1],
-                        self.tiers[tier_i].output_nodes[edge[1]][1],
-                    ]
-            pretty_edges.append(edges)
+        for tier in self._tiers:
+            pretty_edges.extend(tier.pretty_edges())
         return pretty_edges
 
     def as_dict(self):
