@@ -70,7 +70,7 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tokenizing_transducer_edge_chain(self):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
-        edges = transducer("est est").edges
+        edges = [x.edges for x in transducer("est est").tiers]
         ref_edges = [
             # "est est" -> "ɛ ɛ"
             [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)],
@@ -83,7 +83,7 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tokenizing_transducer_edge_spaces(self):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
-        edges = transducer("  a, ").edges
+        edges = [x.edges for x in transducer("  a, ").tiers]
         ref_edges = [
             # "  a, " -> "  a, "
             [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)],

@@ -253,6 +253,11 @@ class Transducer:
         """Output language node name"""
         return self.mapping.kwargs.get("out_lang", "und")
 
+    @property
+    def transducers(self) -> List["Transducer"]:  # noqa: F821
+        """Sequence of underlying Transducer objects"""
+        return [self]
+
     def resolve_intermediate_chars(self, output_string) -> str:
         """Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
         to their mapped equivalents.
@@ -816,6 +821,20 @@ class CompositeTransductionGraph(TransductionGraph):
     def tiers(self, value):
         raise ValueError(
             f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
+        )
+
+    @property
+    def edges(self) -> List[Tuple[int, int]]:
+        """List[Tuple[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
+        composed = self.tiers[0].edges
+        for tier in self.tiers[1:]:
+            composed = compose_indices(composed, tier.edges)
+        return composed
+
+    @edges.setter
+    def edges(self, value):
+        raise ValueError(
+            f"Sorry, you tried to change the edges to {value} but they cannot be changed"
         )
 
     def pretty_edges(self):

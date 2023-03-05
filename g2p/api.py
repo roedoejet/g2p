@@ -124,7 +124,9 @@ class Text(Resource):
             text = tg.output_string
             input_text = tg.input_string
             debugger = tg.debugger if debugger else debugger
-            index = tg.edges if index else index
+            # Preserve old behaviour of incompatible TransductionGraph
+            # and CompositeTransductionGraph outputs
+            index = tg._edges if index else index
             return {
                 "input-text": input_text,
                 "output-text": text,
