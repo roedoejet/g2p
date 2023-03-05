@@ -7,7 +7,7 @@ which are responsible for performing transductions in the g2p library.
 import copy
 import re
 import unicodedata
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Tuple, Union
 
 import text_unidecode
@@ -753,8 +753,7 @@ class Transducer:
                     tg.edges[i] = (edge[0], previous[-1][1])
                 elif following:
                     tg.edges[i] = (edge[0], following[0][1])
-        # FIXME: dict used as an ordered set here
-        tg.edges = list(dict.fromkeys((i, j) for i, j in tg.edges))
+        tg.edges = list(OrderedDict.fromkeys((i, j) for i, j in tg.edges))
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
@@ -957,7 +956,6 @@ class TokenizingTransducer:
     Attributes:
         transducer (Transducer): A Transducer object for the mapping part
         tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
-
     """
 
     def __init__(
