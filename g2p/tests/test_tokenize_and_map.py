@@ -57,11 +57,13 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tokenizing_transducer_edges(self):
         transducer = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")
-        edges = transducer("est est").edges
+        tg = transducer("est est")
         # est -> ɛ, so edges are (0, 0), (1, 0), (2, 0) for each "est", plus the
         # space to the space, and the second set of edges being offset
         ref_edges = [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)]
-        self.assertEqual(edges, ref_edges)
+        self.assertEqual(tg.edges, ref_edges)
+        ref_alignments = [("est", "ɛ"), (" ", " "), ("est", "ɛ")]
+        self.assertEqual(tg.alignments(), ref_alignments)
 
     def test_tokenizing_transducer_edges2(self):
         ref_edges = g2p.make_g2p("fra", "fra-ipa")("ça ça").edges
@@ -74,7 +76,6 @@ class TokenizeAndMapTest(TestCase):
         # end-to-end mapping, for a composed transducer we can access
         # the individual tiers with .tiers
         ref_edges = [
-            # FIXME: space after EH is included in output, which is kind of wrong
             # "est est" -> "EH  EH "
             # est -> EH
             (0, 0),
@@ -99,18 +100,28 @@ class TokenizeAndMapTest(TestCase):
             (6, 5),
             (6, 6),
         ]
-        self.assertEqual(transducer("est est").edges, ref_edges)
-        tier_edges = [x.edges for x in transducer("est est").tiers]
+        tg = transducer("est est")
+        self.assertEqual(tg.edges, ref_edges)
+        ref_alignments = [("est", "EH "), (" ", " "), ("est", "EH ")]
+        self.assertEqual(tg.alignments(), ref_alignments)
+
+        tier_edges = [x.edges for x in tg.tiers]
         ref_tier_edges = [
             # "est est" -> "ɛ ɛ"
             [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)],
             # "ɛ ɛ" -> "ɛ ɛ"
             [(0, 0), (1, 1), (2, 2)],
-            # FIXME: space after EH is included in output, which is kind of wrong
             # "ɛ ɛ" -> "EH  EH "
             [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (2, 5), (2, 6)],
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
+        tier_alignments = [x.alignments() for x in tg.tiers]
+        ref_tier_alignments = [
+            [("est", "ɛ"), (" ", " "), ("est", "ɛ")],
+            [("ɛ", "ɛ"), (" ", " "), ("ɛ", "ɛ")],
+            [("ɛ", "EH "), (" ", " "), ("ɛ", "EH ")],
+        ]
+        self.assertEqual(tier_alignments, ref_tier_alignments)
 
     def test_tokenizing_transducer_edge_spaces(self):
         transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")

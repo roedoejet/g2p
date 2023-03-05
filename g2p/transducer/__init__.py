@@ -57,10 +57,10 @@ class TransductionGraph:
         self._input_string = input_string
         self._output_string = input_string
         # Nodes
-        self._input_nodes = list(enumerate(input_string))
-        self._output_nodes = list(enumerate(input_string))
+        self._input_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
+        self._output_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         # Edges
-        self._edges = [(i, i) for i in range(len(input_string))]
+        self._edges: List[Tuple[int, int]] = [(i, i) for i in range(len(input_string))]
         # Debugger
         self._debugger = []  # type: ignore
 
@@ -140,12 +140,12 @@ class TransductionGraph:
         )
 
     def pretty_edges(self) -> List[List[Tuple[str, str]]]:
-        """List of edges expressed as strings"""
+        """List of edges for each tier (there is only one tier), expressed as strings"""
         edges = self._edges[:]
         edges.sort(key=lambda x: x[0])
         out_edges = []
         for edge in edges:
-            if edge[1] is None:
+            if edge[1] is None:  # FIXME: This should not happen???
                 out_edges.append((self._input_nodes[edge[0]][1], None))
             else:
                 out_edges.append(
@@ -155,6 +155,30 @@ class TransductionGraph:
                     )
                 )
         return [out_edges]
+
+    def alignments(self, edges=None) -> List[Tuple[str, str]]:
+        """Alignments of input to output substrings for this graph."""
+        if edges is None:
+            edges = self.edges
+        edges = sorted(edges)
+        output = []
+
+        def make_alignment(nodes: List[List[int]]) -> Tuple[str, str]:
+            in_text = "".join(self._input_string[idx] for idx in nodes[0])
+            out_text = "".join(self._output_string[idx] for idx in nodes[1])
+            return (in_text, out_text)
+
+        current: List[List[int]] = [[edges[0][0]], [edges[0][1]]]
+        for edge in edges[1:]:
+            if edge[0] not in current[0] and edge[1] not in current[1]:
+                output.append(make_alignment(current))
+                current = [[edge[0]], [edge[1]]]
+            elif edge[0] not in current[0]:
+                current[0].append(edge[0])
+            elif edge[1] not in current[1]:
+                current[1].append(edge[1])
+        output.append(make_alignment(current))
+        return output
 
     def as_dict(self) -> dict:
         return {
@@ -838,7 +862,7 @@ class CompositeTransductionGraph(TransductionGraph):
         )
 
     def pretty_edges(self) -> List[List[Tuple[str, str]]]:
-        """List of edges expressed as strings"""
+        """List of edges for each tier, expressed as strings"""
         pretty_edges = []
         for tier in self._tiers:
             pretty_edges.extend(tier.pretty_edges())
@@ -981,6 +1005,21 @@ class TokenizingTransducer:
     def transducer(self):
         """Underlying Transducer object"""
         return self._transducer
+
+    @property
+    def transducers(self) -> List[Transducer]:
+        """Sequence of underlying Transducer objects"""
+        return self._transducer.transducers
+
+    @property
+    def in_lang(self) -> str:
+        """Input language node name"""
+        return self._transducer.in_lang
+
+    @property
+    def out_lang(self) -> str:
+        """Output language node name"""
+        return self._transducer.out_lang
 
     def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         # The obvious implementation fails, because we need to check only the words, not
