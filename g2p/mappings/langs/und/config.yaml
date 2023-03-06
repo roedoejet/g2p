@@ -7,7 +7,6 @@ mappings:
     out_lang: und-ipa
     norm: NFD
     case_sensitive: false
-    escape_special: true
     authors:
       - Patrick Littell
     <<: *shared
