@@ -194,6 +194,8 @@ def convert(message):
         )
         transducer = Transducer(mappings_obj)
         transducers.append(transducer)
+    if len(transducers) == 0:
+        emit("conversion response", {"output_string": message["data"]["input_string"]})
     transducer = CompositeTransducer(transducers)
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
