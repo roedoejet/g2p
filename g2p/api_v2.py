@@ -32,6 +32,7 @@ from typing import Dict, List, Tuple, Union
 
 from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from networkx import shortest_path
 from networkx.algorithms.dag import ancestors, descendants
 from pydantic import BaseModel, Field
 
@@ -39,7 +40,11 @@ import g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.transducer import TransductionGraph
+from g2p.transducer import (
+    CompositeTransductionGraph,
+    TransductionGraph,
+    compose_indices,
+)
 
 # Create the v2 version of the API
 api = FastAPI(
@@ -101,8 +106,10 @@ class ConvertRequest(BaseModel):
         description="Name of output language", example="eng-arpabet"
     )
     text: str = Field(description="Text to convert", example="hɛloʊ")
-    compose: bool = Field(
-        False, description="Compose returned conversions into a single step"
+    compose_from: Union[str, None] = Field(
+        None,
+        description="Compose all conversions from a specific step onwards."
+        "  Useful if you wish to recover alignments for a specific intermediate step",
     )
 
 
@@ -178,12 +185,12 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
             "composed conversion": {
                 "summary": "Convert Finnish orthography directly to nearest ARPABET phones",
                 "description": "By default all the conversion steps are returned.  "
-                "You can get the direct mapping from input to output by setting compose: True",
+                "You can get the direct mapping from input to output by setting compose_from: in_lang",
                 "value": {
                     "in_lang": "fin",
                     "out_lang": "eng-arpabet",
                     "text": "hyvää huomenta",
-                    "compose": True,
+                    "compose_from": "fin",
                 },
             },
             "tokenized conversion": {
@@ -193,7 +200,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
                     "in_lang": "fin",
                     "out_lang": "eng-arpabet",
                     "text": "Varaus! Sieni, joka kasvaa korvessa, on myrkyllinen!",
-                    "compose": True,
+                    "compose_from": "fin-ipa",
                 },
             },
         }
@@ -203,7 +210,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     segment (non-token segments will have converted=False).  The final
     conversion comes first in the output, followed by prevoius
     conversions.  If you do not want the intermediate conversions, set
-    "compose" to True.
+    "compose_from" to in_lang.
 
     """
     in_lang = request.in_lang.name
@@ -233,14 +240,36 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
             )
         else:
             tg = transducer(token["text"])
-            if request.compose:
-                conversions.append(
-                    Conversion(
-                        in_lang=transducer.in_lang,
-                        out_lang=transducer.out_lang,
-                        alignments=tg.alignments(),
+            if request.compose_from:
+                composed: List[Tuple[int, int]] = []
+                composed_tiers: List[TransductionGraph] = []
+                for tr, tier in zip(transducer.transducers, tg.tiers):
+                    if composed:
+                        composed = compose_indices(composed, tier.edges)
+                        composed_tiers.append(tier)
+                    else:
+                        if tr.in_lang == request.compose_from:
+                            composed = tier.edges
+                            composed_tiers.append(tier)
+                        else:
+                            conversions.insert(
+                                0,
+                                Conversion(
+                                    in_lang=tr.in_lang,
+                                    out_lang=tr.out_lang,
+                                    alignments=tier.alignments(),
+                                ),
+                            )
+                if composed:
+                    composed_tg = CompositeTransductionGraph(composed_tiers)
+                    conversions.insert(
+                        0,
+                        Conversion(
+                            in_lang=request.compose_from,
+                            out_lang=transducer.out_lang,
+                            alignments=composed_tg.alignments(composed),
+                        ),
                     )
-                )
             else:
                 for tr, tier in zip(transducer.transducers, tg.tiers):
                     conversions.insert(
@@ -281,3 +310,20 @@ def inputs_for(
     into this output.
     """
     return sorted(ancestors(LANGS_NETWORK, lang.name))
+
+
+@api.get(
+    "/path/{in_lang}/{out_lang}",
+    response_description="Path from {in_lang} to {out_lang}",
+)
+def path(
+    in_lang: LanguageNode = Query(description="Input language name"),
+    out_lang: LanguageNode = Query(description="Output language name"),
+) -> List[str]:
+    """Get the sequence of intermediate forms used to convert from {in_lang} to {out_lang}."""
+    try:
+        return shortest_path(LANGS_NETWORK, in_lang.name, out_lang.name)
+    except NoPath:
+        raise HTTPException(
+            status_code=400, detail=f"No path from {in_lang} to {out_lang}"
+        )
