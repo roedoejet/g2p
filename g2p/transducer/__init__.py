@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import text_unidecode
 
@@ -568,14 +568,26 @@ class Transducer:
         if not self.case_sensitive:
             to_convert = to_convert.upper()
         alignment = self.mapping.alignments.get(to_convert, ())
-        converted = []
-        for x, y in alignment:
-            converted.extend(y)
-        tg.output_string = self.out_delimiter.join(converted)
-        if not tg.output_string:
+        if not alignment:
             tg.edges = []
+            tg.output_string = ""
         else:
-            edges: List[List[int]] = []
+            tg.output_string = ""
+            edges: List[Tuple[int, int]] = []
+            in_pos = 0
+            out_pos = 0
+            for x, y in alignment:
+                x = "".join(x)
+                y = self.out_delimiter.join(y)
+                for i in range(len(x)):
+                    for j in range(len(y)):
+                        edge = (in_pos + i, out_pos + j)
+                        edges.append(edge)
+                in_pos += len(x)
+                if len(y):
+                    out_pos += len(y) + len(self.out_delimiter)
+                    # Be bug-compatible with mappings and add an extra delimiter
+                    tg.output_string += "".join(y) + self.out_delimiter
             tg.edges = edges
         return tg
 
