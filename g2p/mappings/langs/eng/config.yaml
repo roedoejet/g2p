@@ -45,12 +45,11 @@ mappings:
     mapping: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
-  - display_name: English to ARPABET
+  - display_name: English to IPA
     type: lexicon
-    alignments: cmudict_SPHINX_40.aligned.txt
+    alignments: cmudict_SPHINX_40.ipa.aligned.txt
     in_lang: eng
-    out_lang: eng-arpabet
-    out_delimiter: " "
+    out_lang: eng-ipa
     case_sensitive: false
     norm_form: "NFC"
     authors:

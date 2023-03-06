@@ -30,7 +30,8 @@ class LexiconTransducerTest(TestCase):
         tg = t("you're")
         self.assertEqual(tg.output_string, "Y UH R ")
         self.assertEqual(
-            tg.edges, [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (4, 5), (5, 5)]
+            tg.edges,
+            [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (3, None), (4, 5), (5, 5)],
         )
 
     def test_eng_lexicon(self):
@@ -38,7 +39,7 @@ class LexiconTransducerTest(TestCase):
         self.assertEqual(m.kwargs["type"], "lexicon")
         t = Transducer(m)
         tg = t("hello")
-        self.assertEqual(tg.output_string, "HH EH L OW ")
+        self.assertEqual(tg.output_string, "HH AH L OW ")
         self.assertEqual(
             tg.edges, [(0, 0), (0, 1), (1, 3), (1, 4), (2, 6), (3, 6), (4, 8), (4, 9)]
         )
@@ -46,6 +47,39 @@ class LexiconTransducerTest(TestCase):
         self.assertEqual(tg.output_string, "Y UW R ")
         self.assertEqual(
             tg.edges, [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (4, 5), (5, 5)]
+        )
+        self.assertEqual(tg.output_string, "hʌloʊ")
+        tg = t("change")
+        self.assertEqual(tg.output_string, "tʃeɪndʒ")
+        self.assertEqual(tg.input_string, "change")
+        self.assertEqual(
+            tg.edges,
+            [
+                (0, 0),
+                (0, 1),
+                (1, None),
+                (2, 2),
+                (2, 3),
+                (3, 4),
+                (4, 5),
+                (4, 6),
+                (5, None),
+            ],
+        )
+        # Test insertions and deletions
+        tg = t("chain")
+        # These aligments are weird but they are the ones EM gave us
+        self.assertEqual(tg.output_string, "tʃeɪn")
+        self.assertEqual(tg.input_string, "chain")
+        self.assertEqual(tg.edges, [(0, 0), (0, 1), (1, None), (2, 2), (3, 3), (4, 4)])
+        tg = t("xtra")
+        self.assertEqual(tg.output_string, "ɛkstɹʌ")
+        self.assertEqual(tg.input_string, "xtra")
+        self.assertEqual(tg.edges, [(None, 0), (0, 1), (0, 2), (1, 3), (2, 4), (3, 5)])
+        pe = tg.pretty_edges()
+        self.assertEqual(
+            pe,
+            [[None, "ɛ"], ["x", "k"], ["x", "s"], ["t", "t"], ["r", "ɹ"], ["a", "ʌ"]],
         )
 
     def test_eng_transducer(self):

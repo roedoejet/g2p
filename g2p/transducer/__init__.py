@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import text_unidecode
 
@@ -140,9 +140,11 @@ class TransductionGraph:
 
     def pretty_edges(self):
         edges = copy.deepcopy(self._edges)
-        edges.sort(key=lambda x: x[0])
+        edges.sort(key=lambda x: -1 if x[0] is None else x[0])
         for i, edge in enumerate(edges):
-            if edge[1] is None:
+            if edge[0] is None:
+                edges[i] = [None, self._output_nodes[edge[1]][1]]
+            elif edge[1] is None:
                 edges[i] = [self._input_nodes[edge[0]][1], None]
             else:
                 edges[i] = [
@@ -151,7 +153,7 @@ class TransductionGraph:
                 ]
         return edges
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             "edges": self._edges,
             "input": self._input_string,
@@ -566,14 +568,14 @@ class Transducer:
     def apply_lexicon(self, to_convert: str):
         tg = TransductionGraph(to_convert)
         if not self.case_sensitive:
-            to_convert = to_convert.upper()
+            to_convert = to_convert.lower()
         alignment = self.mapping.alignments.get(to_convert, ())
         if not alignment:
             tg.edges = []
             tg.output_string = ""
         else:
             tg.output_string = ""
-            edges: List[Tuple[int, int]] = []
+            edges: List[Tuple[Optional[int], Optional[int]]] = []
             in_pos = 0
             out_pos = 0
             for x, y in alignment:
@@ -581,13 +583,19 @@ class Transducer:
                 y = self.out_delimiter.join(y)
                 for i in range(len(x)):
                     for j in range(len(y)):
-                        edge = (in_pos + i, out_pos + j)
-                        edges.append(edge)
+                        edges.append((in_pos + i, out_pos + j))
+                    if len(y) == 0:  # Deletions
+                        edges.append((in_pos + i, None))
+                if len(x) == 0:  # Insertions
+                    for j in range(len(y)):
+                        edges.append((None, out_pos + j))
+
                 in_pos += len(x)
-                if len(y):
+                if len(y) != 0:
                     out_pos += len(y) + len(self.out_delimiter)
                     # Be bug-compatible with mappings and add an extra delimiter
                     tg.output_string += "".join(y) + self.out_delimiter
+
             tg.edges = edges
         return tg
 
