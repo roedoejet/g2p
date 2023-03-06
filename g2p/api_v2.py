@@ -37,9 +37,9 @@ from networkx.algorithms.dag import ancestors, descendants
 from pydantic import BaseModel, Field
 
 import g2p
+import g2p.mappings.langs as g2p_langs
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
-from g2p.mappings.langs import LANGS_NETWORK
 from g2p.transducer import (
     CompositeTransductionGraph,
     TransductionGraph,
@@ -81,19 +81,50 @@ app.add_middleware(
     CORSMiddleware, allow_methods=["GET", "POST", "OPTIONS"], **middleware_args
 )
 
-
-# Get the langs
-LANGS = sorted(LANGS_NETWORK.nodes)
-LanguageNode = Enum("LanguageNode", [(name, name) for name in LANGS])  # type: ignore
+# All possible language codes
+LanguageNode = Enum("LanguageNode", [(name, name) for name in g2p_langs.LANGS_NETWORK.nodes])  # type: ignore
 
 
-@api.get("/langs", response_description="List of supported language code strings")
-def langs() -> List[str]:
-    """Return list of supported language codes.  Note that these are not
-    exactly *languages* but rather writing or phonetic systems
-    associated with a given language.
+class SupportedLanguage(BaseModel):
+    """Writing or phonetic system for conversion"""
+
+    code: str = Field(
+        description="Language, writing, or phonetic system code as passed to /convert",
+        example="eng",
+    )
+    name: Union[str, None] = Field(
+        description="Display name (not internationalized) for language, may be None",
+        example="English",
+    )
+
+
+@api.get(
+    "/langs",
+    response_description="Supported writing or phonetic systems for conversion",
+)
+def langs(
+    allnodes: bool = Query(
+        False,
+        description="Return all nodes in the conversion network rather than just top-level languages.",
+    )
+) -> List[SupportedLanguage]:
+    """Return a list of language codes and their names.  If `allnodes` is
+    given, return all nodes in the conversion network (which may or
+    may not correspond to languages).
     """
-    return LANGS
+    if allnodes:
+        return [
+            SupportedLanguage(
+                code=code, name=g2p_langs.LANGS.get(code, {}).get("language_name", None)
+            )
+            for code in sorted(g2p_langs.LANGS_NETWORK.nodes)
+        ]
+    else:
+        return [
+            SupportedLanguage(code=code, name=g2p_langs.LANGS[code]["language_name"])
+            for code in sorted(g2p_langs.LANGS.keys())
+            if "language_name" in g2p_langs.LANGS[code] and code != "generated"
+        ]
 
 
 class ConvertRequest(BaseModel):
@@ -295,7 +326,7 @@ def outputs_for(
     are all the phonetic or orthographic systems into which you can convert
     this input.
     """
-    return sorted(descendants(LANGS_NETWORK, lang.name))
+    return sorted(descendants(g2p_langs.LANGS_NETWORK, lang.name))
 
 
 @api.get(
@@ -309,7 +340,7 @@ def inputs_for(
     are all the phonetic or orthographic systems that you can convert
     into this output.
     """
-    return sorted(ancestors(LANGS_NETWORK, lang.name))
+    return sorted(ancestors(g2p_langs.LANGS_NETWORK, lang.name))
 
 
 @api.get(
@@ -322,7 +353,7 @@ def path(
 ) -> List[str]:
     """Get the sequence of intermediate forms used to convert from {in_lang} to {out_lang}."""
     try:
-        return shortest_path(LANGS_NETWORK, in_lang.name, out_lang.name)
+        return shortest_path(g2p_langs.LANGS_NETWORK, in_lang.name, out_lang.name)
     except NoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"

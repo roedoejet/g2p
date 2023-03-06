@@ -11,9 +11,22 @@ class TestAPIV2(unittest.TestCase):
     def test_langs(self):
         response = API_CLIENT.get("/langs")
         self.assertEqual(response.status_code, 200)
-        self.assertTrue("eng-arpabet" in response.json())
-        self.assertTrue("eng-ipa" in response.json())
-        self.assertTrue("atj" in response.json())
+        codes = {x["code"] for x in response.json()}
+        self.assertTrue("fin" in codes)
+        self.assertTrue("atj" in codes)
+        self.assertFalse("generated" in codes)
+        self.assertFalse("atj-ipa" in codes)
+        names = {x["name"] for x in response.json()}
+        self.assertTrue("Finnish" in names)
+
+    def test_langs_allcodes(self):
+        response = API_CLIENT.get("/langs?allnodes=true")
+        self.assertEqual(response.status_code, 200)
+        codes = {x["code"] for x in response.json()}
+        self.assertTrue("eng-arpabet" in codes)
+        self.assertTrue("eng-ipa" in codes)
+        self.assertTrue("atj" in codes)
+        self.assertFalse("generated" in codes)
 
     def test_outputs_for(self):
         response = API_CLIENT.get("/outputs_for/fin")
