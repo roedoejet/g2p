@@ -34,6 +34,7 @@ from fastapi import Body, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from networkx import shortest_path
 from networkx.algorithms.dag import ancestors, descendants
+from networkx.exception import NetworkXNoPath
 from pydantic import BaseModel, Field
 
 import g2p
@@ -62,7 +63,7 @@ api = FastAPI(
 app = FastAPI()
 app.mount("/api/v2", api)
 middleware_args: Dict[str, Union[str, List[str]]]
-if os.getenv("DEVELOPMENT", False):
+if os.getenv("DEVELOPMENT", False):  # pragma: no cover
     LOGGER.info(
         "Running in development mode, will allow requests from http://localhost:*"
     )
@@ -253,8 +254,8 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
         )
-    except InvalidLanguageCode:
-        # Actually should never happen!
+    except InvalidLanguageCode:  # pragma: nocover
+        # Will never happen due to FastAPI validation (will get 422 instead)
         raise HTTPException(
             status_code=404, detail="Unknown input or output language code"
         )
@@ -354,7 +355,7 @@ def path(
     """Get the sequence of intermediate forms used to convert from {in_lang} to {out_lang}."""
     try:
         return shortest_path(g2p_langs.LANGS_NETWORK, in_lang.name, out_lang.name)
-    except NoPath:
+    except NetworkXNoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
         )

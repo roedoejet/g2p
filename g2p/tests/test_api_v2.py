@@ -251,6 +251,40 @@ class TestAPIV2(unittest.TestCase):
             ],
         )
 
+    def test_convert_no_path(self):
+        response = API_CLIENT.post(
+            "/convert",
+            json={
+                "in_lang": "fin",
+                "out_lang": "fra",
+                "text": "hyvää yötä",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_convert_invalid(self):
+        response = API_CLIENT.post(
+            "/convert",
+            json={
+                "in_lang": "Finnish",
+                "out_lang": "eng-arpabet",
+                "text": "hyvää yötä",
+            },
+        )
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("not a valid enumeration", response.json()["detail"][0]["msg"])
+
+    def test_path(self):
+        response = API_CLIENT.get("/path/fin/eng-arpabet")
+        self.assertEqual(response.status_code, 200)
+        path = response.json()
+        self.assertEqual(path, ["fin", "fin-ipa", "eng-ipa", "eng-arpabet"])
+
+    def test_no_path(self):
+        response = API_CLIENT.get("/path/fin/fra")
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("No path", response.json()["detail"])
+
 
 if __name__ == "__main__":
     unittest.main()
