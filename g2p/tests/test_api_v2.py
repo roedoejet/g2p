@@ -130,6 +130,127 @@ class TestAPIV2(unittest.TestCase):
             ],
         )
 
+    def test_convert_composed(self):
+        response = API_CLIENT.post(
+            "/convert",
+            json={
+                "in_lang": "fin",
+                "out_lang": "eng-arpabet",
+                "text": "hyvää yötä",
+                "compose_from": "fin",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "conversions": [
+                        {
+                            "in_lang": "fin",
+                            "out_lang": "eng-arpabet",
+                            "alignments": [
+                                ["h", "HH "],
+                                ["y", "UW "],
+                                ["v", "W "],
+                                ["ää", "AE "],
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "conversions": [
+                        {"in_lang": None, "out_lang": None, "alignments": [[" ", " "]]}
+                    ]
+                },
+                {
+                    "conversions": [
+                        {
+                            "in_lang": "fin",
+                            "out_lang": "eng-arpabet",
+                            "alignments": [
+                                ["y", "UW "],
+                                ["ö", "AH "],
+                                ["t", "T "],
+                                ["ä", "AE "],
+                            ],
+                        },
+                    ]
+                },
+            ],
+        )
+
+    def test_convert_compose_from(self):
+        response = API_CLIENT.post(
+            "/convert",
+            json={
+                "in_lang": "fin",
+                "out_lang": "eng-arpabet",
+                "text": "hyvää yötä",
+                "compose_from": "fin-ipa",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "conversions": [
+                        {
+                            "in_lang": "fin-ipa",
+                            "out_lang": "eng-arpabet",
+                            "alignments": [
+                                ["h", "HH "],
+                                ["y", "UW "],
+                                ["ʋ", "W "],
+                                ["æː", "AE "],
+                            ],
+                        },
+                        {
+                            "in_lang": "fin",
+                            "out_lang": "fin-ipa",
+                            "alignments": [
+                                ["h", "h"],
+                                ["y", "y"],
+                                ["v", "ʋ"],
+                                ["ä", "æ"],
+                                ["ä", "ː"],
+                            ],
+                        },
+                    ],
+                },
+                {
+                    "conversions": [
+                        {"in_lang": None, "out_lang": None, "alignments": [[" ", " "]]}
+                    ]
+                },
+                {
+                    "conversions": [
+                        {
+                            "in_lang": "fin-ipa",
+                            "out_lang": "eng-arpabet",
+                            "alignments": [
+                                ["y", "UW "],
+                                ["ø", "AH "],
+                                ["t", "T "],
+                                ["æ", "AE "],
+                            ],
+                        },
+                        {
+                            "in_lang": "fin",
+                            "out_lang": "fin-ipa",
+                            "alignments": [
+                                ["y", "y"],
+                                ["ö", "ø"],
+                                ["t", "t"],
+                                ["ä", "æ"],
+                            ],
+                        },
+                    ]
+                },
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
