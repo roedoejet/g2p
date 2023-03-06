@@ -563,9 +563,27 @@ class Transducer:
 
         return tg
 
+    def apply_lexicon(self, to_convert: str):
+        tg = TransductionGraph(to_convert)
+        if not self.case_sensitive:
+            to_convert = to_convert.upper()
+        alignment = self.mapping.alignments.get(to_convert, ())
+        converted = []
+        for x, y in alignment:
+            converted.extend(y)
+        tg.output_string = self.out_delimiter.join(converted)
+        if not tg.output_string:
+            tg.edges = []
+        else:
+            edges: List[List[int]] = []
+            tg.edges = edges
+        return tg
+
     def apply_rules(self, to_convert: str):  # noqa: C901
         if self.mapping.kwargs.get("type", "") == "unidecode":
             return self.apply_unidecode(to_convert)
+        elif self.mapping.kwargs.get("type", "") == "lexicon":
+            return self.apply_lexicon(to_convert)
 
         # perform any normalization
         to_convert = unicode_escape(to_convert)

@@ -23,6 +23,7 @@ from g2p.tests.test_doctor import DoctorTest
 from g2p.tests.test_fallback import FallbackTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
+from g2p.tests.test_lexicon_transducer import LexiconTransducerTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
@@ -43,6 +44,7 @@ TRANSDUCER_TESTS = [
         IndicesTest,
         TransducerTest,
         UnidecodeTransducerTest,
+        LexiconTransducerTest,
     ]
 ]
 

@@ -307,7 +307,7 @@ def load_from_file(path: str) -> list:
     return validate(mapping, path)
 
 
-def load_mapping_from_path(path_to_mapping_config, index=0):
+def load_mapping_from_path(path_to_mapping_config, index=0):  # noqa: C901
     """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
     provided to the 'index' argument. Default is 0.
     """
@@ -356,6 +356,16 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         elif mapping.get("type", "") == "unidecode":
             # This mapping is not implemented as a regular mapping, but as custom software
             pass
+        elif mapping.get("type", "") == "lexicon":
+            # This mapping has a file of alignments
+            try:
+                mapping["alignment_data"] = load_alignments_from_file(
+                    os.path.join(path.parent, mapping["alignments"])
+                )
+            except OSError as e:
+                raise exceptions.MalformedMapping(
+                    f"Cannot load alignment data file specified in {path}: {e}"
+                ) from e
         else:
             # Is "mapping" key missing?
             raise exceptions.MalformedMapping(
@@ -444,6 +454,29 @@ def load_abbreviations_from_file(path):
             f"Sorry, abbreviations must be stored as CSV/TSV/PSV files. You provided the following: {path}"
         )
     return abbs
+
+
+def load_alignments_from_file(path):
+    """Load alignments in Phonetisaurus default format."""
+    LOGGER.info("Loading alignments from %s", path)
+    alignments = {}
+    with open(path, encoding="utf8") as f:
+        for spam in f:
+            spam = spam.strip()
+            if not spam:
+                continue
+            chars = []
+            mappings = []
+            for mapping in spam.split():
+                idx = mapping.rindex("}")
+                in_seq = tuple(tok for tok in mapping[:idx].split("|") if tok != "_")
+                out_seq = tuple(
+                    tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
+                )
+                chars.extend(in_seq)
+                mappings.append((in_seq, out_seq))
+            alignments["".join(chars)] = tuple(mappings)
+    return alignments
 
 
 def is_ipa(lang: str) -> bool:
