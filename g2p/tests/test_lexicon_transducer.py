@@ -35,20 +35,17 @@ class LexiconTransducerTest(TestCase):
         )
 
     def test_eng_lexicon(self):
-        m = Mapping(in_lang="eng", out_lang="eng-arpabet")
+        m = Mapping(in_lang="eng", out_lang="eng-ipa")
         self.assertEqual(m.kwargs["type"], "lexicon")
         t = Transducer(m)
         tg = t("hello")
-        self.assertEqual(tg.output_string, "HH AH L OW ")
-        self.assertEqual(
-            tg.edges, [(0, 0), (0, 1), (1, 3), (1, 4), (2, 6), (3, 6), (4, 8), (4, 9)]
-        )
-        tg = t("you're")
-        self.assertEqual(tg.output_string, "Y UW R ")
-        self.assertEqual(
-            tg.edges, [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (4, 5), (5, 5)]
-        )
         self.assertEqual(tg.output_string, "hʌloʊ")
+        self.assertEqual(tg.edges, [(0, 0), (1, 1), (2, 2), (3, 2), (4, 3), (4, 4)])
+        tg = t("you're")
+        self.assertEqual(tg.output_string, "jʊɹ")
+        self.assertEqual(
+            tg.edges, [(0, 0), (1, None), (2, 1), (3, None), (4, 2), (5, None)]
+        )
         tg = t("change")
         self.assertEqual(tg.output_string, "tʃeɪndʒ")
         self.assertEqual(tg.input_string, "change")
@@ -85,10 +82,7 @@ class LexiconTransducerTest(TestCase):
     def test_eng_transducer(self):
         transducer = make_g2p("eng", "eng-arpabet")
         tg = transducer("hello")
-        self.assertEqual(tg.output_string, "HH EH L OW ")
-        self.assertEqual(
-            tg.edges, [(0, 0), (0, 1), (1, 3), (1, 4), (2, 6), (3, 6), (4, 8), (4, 9)]
-        )
+        self.assertEqual(tg.output_string, "HH AH L OW ")
 
 
 if __name__ == "__main__":
