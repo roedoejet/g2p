@@ -6,9 +6,9 @@ which are responsible for performing transductions in the g2p library.
 
 import copy
 import re
+import unicodedata
 from collections import defaultdict
 from typing import Dict, List
-import unicodedata
 
 import text_unidecode
 
@@ -42,10 +42,12 @@ Index = Dict
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
 
-UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":", " "]
+UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
-def sanitize_unidecode_output(s: str) -> bool:
+
+def sanitize_unidecode_output(s: str) -> str:
     return "".join(c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in s)
+
 
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
