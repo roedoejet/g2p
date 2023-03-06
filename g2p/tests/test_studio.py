@@ -97,7 +97,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                     for attempt in range(1, 4):
                         if attempt > 1:
                             LOGGER.info(f"Attempt #{attempt}")
-                            await page.wait_for_timeout(1000)
+                            await page.wait_for_timeout(5000)
                         # Clear input and output
                         await input_el.fill("")
                         await output_el.fill("")
