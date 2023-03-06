@@ -1,2 +1,1 @@
 playwright>=1.26.1
-httpx
