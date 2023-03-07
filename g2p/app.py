@@ -10,11 +10,11 @@ from typing import Union
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
+from networkx import shortest_path
 from networkx.algorithms.dag import ancestors, descendants
 
 from g2p import make_g2p
 from g2p.api import g2p_api
-from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import expand_abbreviations_format, flatten_abbreviations_format
@@ -196,6 +196,7 @@ def convert(message):
         transducers.append(transducer)
     if len(transducers) == 0:
         emit("conversion response", {"output_string": message["data"]["input_string"]})
+        return
     transducer = CompositeTransducer(transducers)
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
@@ -219,13 +220,17 @@ def change_table(message):
     if message["in_lang"] == "custom" or message["out_lang"] == "custom":
         mappings = Mapping(return_empty_mappings())
     else:
-        transducer = make_g2p(message["in_lang"], message["out_lang"])
-    if isinstance(transducer, Transducer):
-        mappings = [transducer.mapping]
-    elif isinstance(transducer, CompositeTransducer):
-        mappings = [x.mapping for x in transducer._transducers]
-    else:
-        pass
+        # Do not create a composite transducer just to decompose it,
+        # because it is the individual ones which are cached by g2p
+        path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
+        if len(path) == 1:
+            transducer = make_g2p(message["in_lang"], message["out_lang"])
+            mappings = [transducer.mapping]
+        else:
+            mappings = []
+            for lang1, lang2 in zip(path[:-1], path[1:]):
+                transducer = make_g2p(lang1, lang2)
+                mappings.append(transducer.mapping)
     emit(
         "table response",
         [
