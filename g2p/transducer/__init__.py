@@ -42,7 +42,7 @@ Index = Dict
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
 
-UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":", " "]
+UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
 
 class TransductionGraph:
@@ -703,11 +703,18 @@ class Transducer:
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
-        converted = [
-            text_unidecode.unidecode(unicodedata.normalize("NFKC", c))
-            for c in to_convert
-        ]
-        converted = [sanitize_unidecode_output(c) for c in converted]
+        # We retain spaces in the input, but spaces from unidecode are removed
+        converted = []
+        for in_char in to_convert:
+            unidecode_str = text_unidecode.unidecode(
+                unicodedata.normalize("NFKC", in_char)
+            )
+            cc = [
+                c
+                for c in unidecode_str
+                if c.isalpha() or c in UNIDECODE_SPECIALS or in_char.isspace()
+            ]
+            converted.append("".join(cc))
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
@@ -903,8 +910,7 @@ class Transducer:
                     tg.edges[i] = (edge[0], previous[-1][1])
                 elif following:
                     tg.edges[i] = (edge[0], following[0][1])
-        # FIXME: dict used as an ordered set here
-        tg.edges = list(dict.fromkeys((i, j) for i, j in tg.edges))
+        tg.edges = list(OrderedDict.fromkeys((i, j) for i, j in tg.edges))
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
