@@ -157,28 +157,113 @@ class TransductionGraph:
         return [out_edges]
 
     def alignments(self, edges=None) -> List[Tuple[str, str]]:
-        """Alignments of input to output substrings for this graph."""
+        """Alignments of input to output substrings for this graph.
+
+        As opposed to `pretty_edges`, this method will return the
+        one-to-many or many-to-one alignments produced by a
+        conversion.  For example, assuming this input and output with
+        these edges::
+
+            ABCDEFF
+            aabbcdef
+            [(0, 0), (0, 1), (1, 2), (1, 3), (2, 4), (3, 5),
+             (4, 6), (5, 7), (6, 7)]
+
+        it should return::
+
+            [('A', 'aa'), ('B', 'bb'), ('C', c'), ('D', 'd'),
+             ('E', 'e'), ('FF', 'f')]
+
+        In the case of reorderings, the substrings returned correspond
+        to the minimal *monotonic* alignments, that is, the minimal
+        subsequences which preserve ordering between the input and
+        output.  So, for example given these edges::
+
+            ABCDEF
+            abefcd
+            [(0, 0), (1, 1), (2, 4), (3, 5), (4, 2), (5, 3)]
+
+        it should return::
+
+            [('A', 'a'), ('B', 'b'), ('CDEF', 'efcd')]
+
+        This means, that in the case of truly radical reorderings,
+        there is no "alignment" per se.  This is highly unlikely to
+        occur, given the constrained nature of g2p rules.
+
+        Note that in the case of multi-character outputs such as in
+        ARPABET, the output substrings *do not necessarily* correspond
+        to tokens, and spaces are treated as any other character in
+        the alignment (thus, alignments of (' ', ' ') are possible).
+        If you wish to reconstruct the input it is your resonsibility
+        to collect all the alignments corresponding to an output token
+        (this should not be too hard to do).
+
+        """
         if edges is None:
             edges = self.edges
-        edges = sorted(edges)
-        output = []
 
-        def make_alignment(nodes: List[List[int]]) -> Tuple[str, str]:
-            in_text = "".join(self._input_string[idx] for idx in nodes[0])
-            out_text = "".join(self._output_string[idx] for idx in nodes[1])
-            return (in_text, out_text)
-
-        current: List[List[int]] = [[edges[0][0]], [edges[0][1]]]
-        for edge in edges[1:]:
-            if edge[0] not in current[0] and edge[1] not in current[1]:
-                output.append(make_alignment(current))
-                current = [[edge[0]], [edge[1]]]
-            elif edge[0] not in current[0]:
-                current[0].append(edge[0])
-            elif edge[1] not in current[1]:
-                current[1].append(edge[1])
-        output.append(make_alignment(current))
-        return output
+        # Sort according to input and output
+        isort = sorted(edges)
+        osort = sorted(edges, key=lambda x: (x[1], x[0]))
+        print("isort:", isort)
+        print("osort:", osort)
+        # Construct areas of agreement
+        segments = []
+        istart = ostart = iend = oend = None
+        for iedge, oedge in zip(isort, osort):
+            if iedge == oedge:
+                if iend is not None:
+                    segments.append((istart, iend, ostart, oend))
+                    istart = ostart = iend = oend = None
+                # May be subsumed by larger chunks
+                ipos, opos = iedge
+                segments.append((ipos, ipos, opos, opos))
+            else:
+                if istart is None:
+                    # Smallest input index (by definition)
+                    istart = iedge[0]
+                    # Smallest output index (by definition)
+                    ostart = oedge[1]
+                    # Update these until the next point of agreement
+                    iend = oedge[0]
+                    oend = iedge[1]
+                else:
+                    iend = max(iend, oedge[0])
+                    oend = max(oend, iedge[1])
+        if istart is not None:
+            assert iend is not None
+        if iend is not None:
+            segments.append((istart, iend, ostart, oend))
+        print("segments:", segments)
+        # Merge overlapping segments
+        alignments = []
+        istart, iend, ostart, oend = segments[0]
+        for seg in segments[1:]:
+            # If *start* points are outside current segment, start a new one
+            if seg[0] > iend and seg[2] > oend:
+                print("cur:", (istart, iend, ostart, oend))
+                print("seg:", seg)
+                print("merged:", (istart, iend), (ostart, oend))
+                alignments.append(
+                    (
+                        self._input_string[istart : iend + 1],
+                        self._output_string[ostart : oend + 1],
+                    )
+                )
+                istart, iend, ostart, oend = seg
+            else:
+                # Update endpoints to include this segment
+                iend = seg[1]
+                oend = seg[3]
+        print("merged:", (istart, iend), (ostart, oend))
+        alignments.append(
+            (
+                self._input_string[istart : iend + 1],
+                self._output_string[ostart : oend + 1],
+            )
+        )
+        return alignments
 
     def as_dict(self) -> dict:
         return {

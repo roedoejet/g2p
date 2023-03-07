@@ -280,15 +280,21 @@ class IndicesTest(TestCase):
         transducer_1 = self.trans_feeding_1("ab")
         self.assertEqual(transducer_1.output_string, "cd")
         self.assertEqual(transducer_1.edges, [(0, 0), (0, 1), (1, 0), (1, 1)])
+        # because of "crossed" indices, we get one single monotonic alignment
+        self.assertEqual(transducer_1.alignments(), [("ab", "cd")])
         transducer_2 = self.trans_feeding_2("a")
         self.assertEqual(transducer_2.output_string, "b")
         self.assertEqual(transducer_2.edges, [(0, 0)])
+        self.assertEqual(transducer_2.alignments(), [("a", "b")])
 
     def test_issue_157(self):
         """Test explicit problem from Issue 157"""
         transducer = self.trans_157("abcmn")
         self.assertEqual(transducer.output_string, "deNM")
         self.assertEqual(transducer.edges, [(0, 0), (1, 1), (2, 1), (3, 3), (4, 2)])
+        self.assertEqual(
+            transducer.alignments(), [("a", "d"), ("bc", "e"), ("mn", "NM")]
+        )
 
     def test_issue_173(self):
         """Test explicit problems from Issue 173"""
@@ -305,11 +311,29 @@ class IndicesTest(TestCase):
             [(0, 1), (1, 0), (2, 0), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6)],
         )
         self.assertEqual(
+            transducer_1.alignments(),
+            [("xyz", "ab"), ("m", "m"), ("n", "n"), ("d", "d"), ("e", "e"), ("f", "f")],
+        )
+        self.assertEqual(
             transducer_2.edges,
             [(0, 0), (1, 1), (2, 1), (3, 2), (4, 3), (5, 4), (6, 5), (7, 6)],
         )
+        self.assertEqual(
+            transducer_2.alignments(),
+            [
+                ("x", "a"),
+                ("yz", "b"),
+                ("m", "m"),
+                ("n", "n"),
+                ("d", "d"),
+                ("e", "e"),
+                ("f", "f"),
+            ],
+        )
         self.assertEqual(transducer_3.edges, [(0, 0), (1, 0), (2, 1)])
+        self.assertEqual(transducer_3.alignments(), [("ab", "X"), ("c", "Y")])
         self.assertEqual(transducer_4.edges, [(0, 0), (0, 1), (1, 2), (2, 2)])
+        self.assertEqual(transducer_4.alignments(), [("a", "xy"), ("bc", "z")])
 
     def test_explicit_equal(self):
         """Test synonymous syntax for explicit indices"""
