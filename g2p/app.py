@@ -118,18 +118,6 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
     return nodes, edges
 
 
-def return_empty_mappings(n=DEFAULT_N):
-    """Return 'n' * empty mappings"""
-    y = 0
-    mappings = []
-    while y < n:
-        mappings.append(
-            {"in": "", "out": "", "context_before": "", "context_after": ""}
-        )
-        y += 1
-    return mappings
-
-
 def return_descendant_nodes(node: str):
     """Return possible outputs for a given input"""
     return [x for x in descendants(LANGS_NETWORK, node)]
@@ -184,7 +172,37 @@ def convert(message):
 def change_table(message):
     """Change the lookup table"""
     if message["in_lang"] == "custom" or message["out_lang"] == "custom":
-        mappings = Mapping(return_empty_mappings())
+        # These are only used to generate JSON to send to the client,
+        # so it's safe to create a list of references to the same thing.
+        mappings = [
+            {"in": "", "out": "", "context_before": "", "context_after": ""}
+        ] * DEFAULT_N
+        abbs = [[""] * 6] * DEFAULT_N
+        kwargs = {
+            "language_name": "Custom",
+            "display_name": "Custom",
+            "in_lang": "custom",
+            "out_lang": "custom",
+            "include": False,
+            "type": "mapping",
+            "case_sensitive": True,
+            "norm_form": "NFC",
+            "escape_special": False,
+            "prevent_feeding": False,
+            "reverse": False,
+            "rule_ordering": "as-written",
+            "out_delimiter": "",
+        }
+        emit(
+            "table response",
+            [
+                {
+                    "mappings": mappings,
+                    "abbs": abbs,
+                    "kwargs": kwargs,
+                }
+            ],
+        )
     else:
         # Do not create a composite transducer just to decompose it,
         # because it is the individual ones which are cached by g2p
@@ -197,17 +215,17 @@ def change_table(message):
             for lang1, lang2 in zip(path[:-1], path[1:]):
                 transducer = make_g2p(lang1, lang2)
                 mappings.append(transducer.mapping)
-    emit(
-        "table response",
-        [
-            {
-                "mappings": x.plain_mapping(),
-                "abbs": expand_abbreviations_format(x.abbreviations),
-                "kwargs": x.kwargs,
-            }
-            for x in mappings
-        ],
-    )
+        emit(
+            "table response",
+            [
+                {
+                    "mappings": x.plain_mapping(),
+                    "abbs": expand_abbreviations_format(x.abbreviations),
+                    "kwargs": x.kwargs,
+                }
+                for x in mappings
+            ],
+        )
 
 
 @SOCKETIO.on("connect", namespace="/connect")
