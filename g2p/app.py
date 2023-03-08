@@ -3,22 +3,19 @@
 Views and config to the g2p Studio web app
 
 """
-import json
-import os
 from typing import Union
 
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from networkx import shortest_path
-from networkx.algorithms.dag import ancestors, descendants
+from networkx.algorithms.dag import descendants
 
 from g2p import make_g2p
 from g2p.api import g2p_api
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import expand_abbreviations_format, flatten_abbreviations_format
-from g2p.static import __file__ as static_file
 from g2p.transducer import (
     CompositeTransducer,
     CompositeTransductionGraph,
@@ -54,37 +51,6 @@ def contrasting_text_color(hex_str):
         < 0.5
         else "#fff"
     )
-
-
-def network_to_echart(write_to_file: bool = False, layout: bool = False):
-    nodes = []
-    no_nodes = len(LANGS_NETWORK.nodes)
-    for node in LANGS_NETWORK.nodes:
-        lang_name = node.split("-")[0]
-        no_ancestors = len(ancestors(LANGS_NETWORK, node))
-        no_descendants = len(descendants(LANGS_NETWORK, node))
-        size = min(
-            20,
-            max(
-                2, ((no_ancestors / no_nodes) * 100 + (no_descendants / no_nodes) * 100)
-            ),
-        )
-        node = {"name": node, "symbolSize": size, "id": node, "category": lang_name}
-        nodes.append(node)
-    nodes.sort(key=lambda x: x["name"])
-    edges = []
-    for edge in LANGS_NETWORK.edges:
-        edges.append({"source": edge[0], "target": edge[1]})
-    if write_to_file:
-        with open(
-            os.path.join(os.path.dirname(static_file), "languages-network.json"),
-            "w",
-            encoding="utf-8",
-            newline="\n",
-        ) as f:
-            f.write(json.dumps({"nodes": nodes, "edges": edges}) + "\n")
-        LOGGER.info("Wrote network nodes and edges to static file.")
-    return nodes, edges
 
 
 def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph]):

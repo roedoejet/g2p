@@ -4,17 +4,20 @@ Utilities used by other classes
 
 """
 
+import json
 import pickle
 from pathlib import Path
 
 import yaml
 from networkx import DiGraph, write_gpickle
+from networkx.algorithms.dag import ancestors, descendants
 
 from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import (
     LANGS_DIR,
+    LANGS_NETWORK,
     LANGS_NWORK_PATH,
     LANGS_PKL,
     MAPPINGS_AVAILABLE,
@@ -188,3 +191,34 @@ def cache_langs(
         pickle.dump(langs, f, protocol=4)
 
     return langs
+
+
+def network_to_echart(outfile: str = None, layout: bool = False):
+    nodes = []
+    no_nodes = len(LANGS_NETWORK.nodes)
+    for node in LANGS_NETWORK.nodes:
+        lang_name = node.split("-")[0]
+        no_ancestors = len(ancestors(LANGS_NETWORK, node))
+        no_descendants = len(descendants(LANGS_NETWORK, node))
+        size = min(
+            20,
+            max(
+                2, ((no_ancestors / no_nodes) * 100 + (no_descendants / no_nodes) * 100)
+            ),
+        )
+        node = {"name": node, "symbolSize": size, "id": node, "category": lang_name}
+        nodes.append(node)
+    nodes.sort(key=lambda x: x["name"])
+    edges = []
+    for edge in LANGS_NETWORK.edges:
+        edges.append({"source": edge[0], "target": edge[1]})
+    if outfile:
+        with open(
+            outfile,
+            "w",
+            encoding="utf-8",
+            newline="\n",
+        ) as f:
+            f.write(json.dumps({"nodes": nodes, "edges": edges}) + "\n")
+        LOGGER.info("Wrote network nodes and edges to static file.")
+    return nodes, edges
