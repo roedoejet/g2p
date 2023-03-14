@@ -8,6 +8,7 @@ import copy
 import re
 from collections import defaultdict
 from typing import Dict, List
+import unicodedata
 
 import text_unidecode
 
@@ -41,6 +42,10 @@ Index = Dict
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
 
+UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":", " "]
+
+def sanitize_unidecode_output(s: str) -> bool:
+    return "".join(c if c.isalpha() or c in UNIDECODE_SPECIALS else "" for c in s)
 
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
@@ -522,7 +527,11 @@ class Transducer:
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
-        converted = [text_unidecode.unidecode(c) for c in to_convert]
+        converted = [
+            text_unidecode.unidecode(unicodedata.normalize("NFKC", c))
+            for c in to_convert
+        ]
+        converted = [sanitize_unidecode_output(c) for c in converted]
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
@@ -671,7 +680,6 @@ class Transducer:
         tg.edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(tg.edges):
             if edge[1] is None:
-
                 # if previous exists, use that, otherwise use following, otherwise None
                 previous = [x for x in tg.edges[:i] if x[1] is not None]
                 try:

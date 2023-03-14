@@ -10,4 +10,4 @@ This repo follows the `Contributor Covenant <http://contributor-covenant.org/ver
 Adding a new language/mapping
 -----------------------------
 
-In order to add a new mapping or language to be supported, please fill out a pull request with the `pull request template <https://github.com/roedoejet/g2p/blob/master/.github/pull_request_template.md>`__ provided.
+In order to add a new mapping or language to be supported, please fill out a pull request with the `pull request template <https://github.com/roedoejet/g2p/blob/main/.github/pull_request_template.md>`__ provided.
