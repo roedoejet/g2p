@@ -58,4 +58,7 @@ mappings:
     prevent_feeding: true
     authors:
       - Fineen Davis
-    language_name: Kwak'wala (Boas orthography)
+      - Olivia Chen
+      - Daisy Rosenblum
+      - Dante cerron
+    <<: *shared
