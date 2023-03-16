@@ -6,6 +6,7 @@ which are responsible for performing transductions in the g2p library.
 
 import copy
 import re
+import unicodedata
 from collections import defaultdict
 from typing import Dict, List
 
@@ -40,6 +41,8 @@ Index = Dict
 # an insertion of length 1 at index 0 followed by a deletion of length one at index 2
 # [[0,1],[2,-1]]
 ChangeLog = List[List[int]]
+
+UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
 
 class TransductionGraph:
@@ -522,7 +525,18 @@ class Transducer:
         tg = TransductionGraph(to_convert)
 
         # Conversion is done character by character using unidecode
-        converted = [text_unidecode.unidecode(c) for c in to_convert]
+        # We retain spaces in the input, but spaces from unidecode are removed
+        converted = []
+        for in_char in to_convert:
+            unidecode_str = text_unidecode.unidecode(
+                unicodedata.normalize("NFKC", in_char)
+            )
+            cc = [
+                c
+                for c in unidecode_str
+                if c.isalpha() or c in UNIDECODE_SPECIALS or in_char.isspace()
+            ]
+            converted.append("".join(cc))
         tg.output_string = "".join(converted)
 
         # Edges are calculated to follow the conversion step by step
@@ -671,7 +685,6 @@ class Transducer:
         tg.edges.sort(key=lambda x: x[0])
         for i, edge in enumerate(tg.edges):
             if edge[1] is None:
-
                 # if previous exists, use that, otherwise use following, otherwise None
                 previous = [x for x in tg.edges[:i] if x[1] is not None]
                 try:

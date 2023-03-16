@@ -1,17 +1,17 @@
 # Gᵢ2Pᵢ
 
-[![codecov](https://codecov.io/gh/roedoejet/g2p/branch/master/graph/badge.svg)](https://codecov.io/gh/roedoejet/g2p)
+[![codecov](https://codecov.io/gh/roedoejet/g2p/branch/main/graph/badge.svg)](https://codecov.io/gh/roedoejet/g2p)
 [![Documentation Status](https://readthedocs.org/projects/g2p/badge/?version=latest)](https://g2p.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://github.com/roedoejet/g2p/actions/workflows/tests.yml/badge.svg)](https://github.com/roedoejet/g2p/actions)
 [![PyPI package](https://img.shields.io/pypi/v/g2p.svg)](https://pypi.org/project/g2p/)
 [![license](https://img.shields.io/badge/Licence-MIT-green)](LICENSE)
-[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/roedoejet/g2p)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/roedoejet/g2p)
 
 > Grapheme-to-Phoneme transformations that preserve input and output indices!
 
 This library is for handling arbitrary conversions between input and output segments while preserving indices.
 
-![indices](https://raw.githubusercontent.com/roedoejet/g2p/master/g2p/static/assets/bonjour.png)
+![indices](https://raw.githubusercontent.com/roedoejet/g2p/main/g2p/static/assets/bonjour.png)
 
 ## Table of Contents
 - [Gᵢ2Pᵢ](#gᵢ2pᵢ)
@@ -225,7 +225,7 @@ Mappings are defined in either a CSV or json file. See [writing mapping files](#
 5. After installing your local version (`pip3 install -e .`), update with `g2p update`
 6. Add some tests in `g2p/testspublic/data/<YourIsoCode>.psv`. Each line in the file will run a test with the following structure: `<in_lang>|<out_lang>|<input_string>|<expected_output>`
 7. Run `python3 run_tests.py langs` to make sure your tests pass.
-8. Make sure you have [checked all the boxes](https://github.com/roedoejet/g2p/blob/master/.github/pull_request_template.md) and make a [pull request]((https://github.com/roedoejet/g2p/pulls)!
+8. Make sure you have [checked all the boxes](https://github.com/roedoejet/g2p/blob/main/.github/pull_request_template.md) and make a [pull request]((https://github.com/roedoejet/g2p/pulls)!
 
 ### Adding a new language for support with ReadAlongs
 

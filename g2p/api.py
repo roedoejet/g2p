@@ -144,7 +144,7 @@ def update_docs():
         data = json.load(f)
     data["components"]["schemas"]["Langs"]["enum"] = sorted(LANGS_NETWORK.nodes)
     with open(swagger_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(json.dumps(data))
+        f.write(json.dumps(data) + "\n")
     LOGGER.info("Updated API documentation")
 
 

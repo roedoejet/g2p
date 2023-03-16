@@ -27,7 +27,7 @@ mappings:
     authors:
       - Patrick Littell
     <<: *shared
-  - display_name: Undertermined Unicode to ASCII
+  - display_name: Undetermined Unicode to ASCII
     type: unidecode
     norm: NFD
     in_lang: und

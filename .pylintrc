@@ -1,4 +1,4 @@
-[MASTER]
+[MAIN]
 disable=
     # We use isort for sorting our imports, so nevermind what pylint thinks
     wrong-import-order,
