@@ -58,4 +58,7 @@ mappings:
     prevent_feeding: true
     authors:
       - Fineen Davis
+      - Olivia Chen
+      - Daisy Rosenblum
+      - Dante cerron
     <<: *shared
