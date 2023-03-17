@@ -61,4 +61,4 @@ mappings:
       - Olivia Chen
       - Daisy Rosenblum
       - Dante cerron
-    <<: *shared
+    language_name: Kwak'wala (Boas orthography)
