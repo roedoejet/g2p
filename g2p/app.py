@@ -9,7 +9,6 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from networkx import shortest_path
-from networkx.algorithms.dag import descendants
 
 from g2p import make_g2p
 from g2p.api import g2p_api
@@ -116,11 +115,6 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
         ]
         nodes += outputs
     return nodes, edges
-
-
-def return_descendant_nodes(node: str):
-    """Return possible outputs for a given input"""
-    return list(descendants(LANGS_NETWORK, node))
 
 
 @APP.route("/")
