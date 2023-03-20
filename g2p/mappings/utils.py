@@ -392,7 +392,7 @@ def find_mapping(in_lang: str, out_lang: str) -> list:
         map_in_lang = mapping.get("in_lang", "")
         map_out_lang = mapping.get("out_lang", "")
         if map_in_lang == in_lang and map_out_lang == out_lang:
-            if mapping.get("type", "mapping") == "lexicon":
+            if mapping.get("type") == "lexicon":
                 # do *not* deep copy this, because alignments are big!
                 return mapping.copy()
             else:
