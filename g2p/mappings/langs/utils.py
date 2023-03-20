@@ -58,7 +58,7 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     ]:
         if is_ipa(mapping["out_lang"]):
             reverse = mapping.get("reverse", False)
-            for rule in mapping["mapping_data"]:
+            for rule in mapping.get("mapping_data", ()):
                 output = rule["in"] if reverse else rule["out"]
                 if not is_panphon(output):
                     LOGGER.warning(
