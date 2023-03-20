@@ -578,23 +578,22 @@ class Transducer:
             edges: List[Tuple[Optional[int], Optional[int]]] = []
             in_pos = 0
             out_pos = 0
-            for x, y in alignment:
-                x = "".join(x)
-                y = self.out_delimiter.join(y)
-                for i in range(len(x)):
-                    for j in range(len(y)):
+            # Mappings are flat to save space
+            for n_inputs, outtxt in zip(alignment[::2], alignment[1::2]):
+                for i in range(n_inputs):
+                    for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
-                    if len(y) == 0:  # Deletions
+                    if len(outtxt) == 0:  # Deletions
                         edges.append((in_pos + i, None))
-                if len(x) == 0:  # Insertions
-                    for j in range(len(y)):
+                if n_inputs == 0:  # Insertions
+                    for j in range(len(outtxt)):
                         edges.append((None, out_pos + j))
 
-                in_pos += len(x)
-                if len(y) != 0:
-                    out_pos += len(y) + len(self.out_delimiter)
+                in_pos += n_inputs
+                if len(outtxt) != 0:
+                    out_pos += len(outtxt) + len(self.out_delimiter)
                     # Be bug-compatible with mappings and add an extra delimiter
-                    tg.output_string += "".join(y) + self.out_delimiter
+                    tg.output_string += outtxt + self.out_delimiter
 
             tg.edges = edges
         return tg

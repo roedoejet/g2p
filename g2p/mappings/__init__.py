@@ -140,7 +140,7 @@ class Mapping:
                 self.mapping = []
                 if "alignments" in self.kwargs:
                     self.alignments = load_alignments_from_file(
-                        self.kwargs["alignments"]
+                        self.kwargs["alignments"], self.kwargs["out_delimiter"]
                     )
             else:
                 raise exceptions.MalformedLookup()

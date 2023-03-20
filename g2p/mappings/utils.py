@@ -360,7 +360,8 @@ def load_mapping_from_path(path_to_mapping_config, index=0):  # noqa: C901
             # This mapping has a file of alignments
             try:
                 mapping["alignment_data"] = load_alignments_from_file(
-                    os.path.join(path.parent, mapping["alignments"])
+                    os.path.join(path.parent, mapping["alignments"]),
+                    mapping.get("out_delimiter", ""),
                 )
             except OSError as e:
                 raise exceptions.MalformedMapping(
@@ -460,7 +461,7 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
-def load_alignments_from_file(path):
+def load_alignments_from_file(path, delimiter=""):
     """Load alignments in Phonetisaurus default format."""
     LOGGER.info("Loading alignments from %s", path)
     alignments = {}
@@ -469,16 +470,19 @@ def load_alignments_from_file(path):
             spam = spam.strip()
             if not spam:
                 continue
-            chars = []
+            chars = ""
             mappings = []
             for mapping in spam.split():
                 idx = mapping.rindex("}")
-                in_seq = tuple(tok for tok in mapping[:idx].split("|") if tok != "_")
-                out_seq = tuple(
+                # Note that we care about *character* indices, so we join them together
+                in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
+                out_seq = delimiter.join(
                     tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
                 )
-                chars.extend(in_seq)
-                mappings.append((in_seq, out_seq))
+                chars += in_seq
+                # To save space, make the mappings flat and only store
+                # the number of input characters rather than the characters themselves
+                mappings.extend((len(in_seq), out_seq))
             alignments["".join(chars)] = tuple(mappings)
     return alignments
 
