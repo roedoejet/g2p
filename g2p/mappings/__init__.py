@@ -402,15 +402,20 @@ class Mapping:
             in_lang = self.kwargs.get("in_lang", "und")
             out_lang = self.kwargs.get("out_lang", "und")
             LOGGER.error(
-                f"Your regex in mapping between {in_lang} and {out_lang} is malformed."
-                f"Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
+                "Your regex in mapping between %s and %s is malformed.  "
+                "Do you have un-escaped regex characters in your input %s, contexts %s, %s?  "
                 "Error is: %s",
+                in_lang,
+                out_lang,
+                inp,
+                before,
+                after,
                 e.msg,
             )
             raise Exception(
-                f"Your regex in mapping between {in_lang} and {out_lang} is malformed. \
-                    Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
-            )
+                f"Your regex in mapping between {in_lang} and {out_lang} is malformed.  "
+                f"Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
+            ) from e
         return rule_regex
 
     def reverse_mappings(self, mapping):
