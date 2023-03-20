@@ -120,7 +120,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
 
 def return_descendant_nodes(node: str):
     """Return possible outputs for a given input"""
-    return [x for x in descendants(LANGS_NETWORK, node)]
+    return list(descendants(LANGS_NETWORK, node))
 
 
 @APP.route("/")

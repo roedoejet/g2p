@@ -47,7 +47,7 @@ mappings:
     <<: *shared
   - display_name: English to IPA
     type: lexicon
-    alignments: cmudict_SPHINX_40.ipa.aligned.txt
+    alignments: cmudict.ipa.aligned.txt
     in_lang: eng
     out_lang: eng-ipa
     case_sensitive: false
