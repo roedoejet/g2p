@@ -20,6 +20,7 @@ from g2p.tests.test_check_ipa_arpabet import CheckIpaArpabetTest
 from g2p.tests.test_cli import CliTest
 from g2p.tests.test_create_mapping import MappingCreationTest
 from g2p.tests.test_doctor import DoctorTest
+from g2p.tests.test_doctor_expensive import ExpensiveDoctorTest
 from g2p.tests.test_fallback import FallbackTest
 from g2p.tests.test_indices import IndicesTest
 from g2p.tests.test_langs import LangTest
@@ -32,9 +33,6 @@ from g2p.tests.test_transducer import TransducerTest
 from g2p.tests.test_unidecode_transducer import UnidecodeTransducerTest
 from g2p.tests.test_utils import UtilsTest
 from g2p.tests.test_z_local_config import LocalConfigTest
-
-# Deliberately left out:
-# from g2p.tests.test_doctor_expensive import ExpensiveDoctorTest
 
 LOADER = TestLoader()
 
@@ -75,6 +73,7 @@ INTEGRATION_TESTS = [
         CliTest,
         ResourceIntegrationTest,
         DoctorTest,
+        ExpensiveDoctorTest,
     ]
 ]
 
