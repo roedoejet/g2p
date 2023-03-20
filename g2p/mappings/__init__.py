@@ -412,7 +412,7 @@ class Mapping:
                 after,
                 e.msg,
             )
-            raise Exception(
+            raise exceptions.MalformedMapping(
                 f"Your regex in mapping between {in_lang} and {out_lang} is malformed.  "
                 f"Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
             ) from e

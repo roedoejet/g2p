@@ -253,6 +253,12 @@ class MappingTest(TestCase):
         transducer = Transducer(mapping)
         self.assertEqual(transducer("?").output_string, "ʔ")
 
+    def test_invalid_regex(self):
+        rules = [{"in": "fo(o", "out": "bar"}]
+        with self.assertRaises(exceptions.MalformedMapping) as cm:
+            _ = Mapping(rules)
+        self.assertIn("regex", cm.exception.message)
+
     def test_invalid_rules_json(self):
         rules = [{"in": "a"}, {"out": "c"}]
         self.assertRaises(exceptions.MalformedMapping, Mapping, rules)
