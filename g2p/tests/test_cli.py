@@ -90,7 +90,7 @@ class CliTest(TestCase):
                 ).stdout.strip()
                 if output_string != test[3].strip():
                     LOGGER.warning(
-                        f"test_cli.py: {test[0]}->{test[1]} mapping error: '{test[2]}' "
+                        f"test_cli.py for {test[-1]}: {test[0]}->{test[1]} mapping error: '{test[2]}' "
                         f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."
                     )
                     if error_count == 0:

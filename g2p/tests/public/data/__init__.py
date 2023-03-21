@@ -10,6 +10,7 @@ Each line in the test file consists of SOURCE,TARGET,INPUT,OUTPUT
 import csv
 import os
 from glob import glob
+from typing import List
 
 from g2p.log import LOGGER
 
@@ -20,10 +21,10 @@ DATA_DIR = os.path.dirname(__file__)
 loaded_langs_to_test = None
 
 
-def load_public_test_data():
+def load_public_test_data() -> List[List[str]]:
     """Load public/data/*.?sv for test data in various languages
 
-    Returns: List[List[in_lang, out_lang, in_text, out_text]]
+    Returns: List[List[in_lang, out_lang, in_text, out_text, filename:lineno]]
     """
     global loaded_langs_to_test
     if loaded_langs_to_test is not None:
@@ -57,6 +58,7 @@ def load_public_test_data():
                         f"Please check your data."
                     )
                 else:
+                    row.append(f"{fn}:{i+1}")
                     langs_to_test.append(row)
 
     loaded_langs_to_test = langs_to_test

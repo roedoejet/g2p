@@ -31,8 +31,8 @@ class LangTest(TestCase):
             output_string = transducer(test[2]).output_string.strip()
             if output_string != test[3].strip():
                 LOGGER.warning(
-                    "test_langs.py: mapping error: {} from {} to {} should be {}, got {}".format(
-                        test[2], test[0], test[1], test[3], output_string
+                    "test_langs.py: mapping error for {}: {} from {} to {} should be {}, got {}".format(
+                        test[-1], test[2], test[0], test[1], test[3], output_string
                     )
                 )
                 if error_count == 0:
