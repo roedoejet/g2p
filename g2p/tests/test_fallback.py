@@ -55,7 +55,7 @@ class FallbackTest(TestCase):
             in_lang="test",
             out_lang="test-ipa",
         )
-        test_in = align_to_dummy_fallback(mapping)
+        test_in = align_to_dummy_fallback(mapping, quiet=True)
         self.assertEqual(
             test_in.mapping,
             [
@@ -69,7 +69,7 @@ class FallbackTest(TestCase):
             ],
         )
 
-        test_out = align_to_dummy_fallback(mapping, "out")
+        test_out = align_to_dummy_fallback(mapping, "out", quiet=True)
         self.assertEqual(
             test_out.mapping,
             [
@@ -82,7 +82,7 @@ class FallbackTest(TestCase):
                 rule("ةُ", "ɑu", "", "", "ةُ"),
             ],
         )
-        test_ipa = align_to_dummy_fallback(ipa_mapping, "out")
+        test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
         self.assertEqual(
             test_ipa.mapping,
             [

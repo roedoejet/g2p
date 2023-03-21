@@ -4,6 +4,7 @@ from unittest import TestCase, main
 
 from g2p import make_g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.log import LOGGER
 from g2p.transducer import CompositeTransducer, Transducer
 
 
@@ -15,12 +16,14 @@ class NetworkTest(TestCase):
 
     def test_not_found(self):
         with self.assertRaises(InvalidLanguageCode):
-            make_g2p("foo", "eng-ipa")
+            with self.assertLogs(LOGGER, level="ERROR"):
+                make_g2p("foo", "eng-ipa")
         with self.assertRaises(InvalidLanguageCode):
-            make_g2p("git", "bar")
+            with self.assertLogs(LOGGER, level="ERROR"):
+                make_g2p("git", "bar")
 
     def test_no_path(self):
-        with self.assertRaises(NoPath):
+        with self.assertRaises(NoPath), self.assertLogs(LOGGER, level="ERROR"):
             make_g2p("hei", "git")
 
     def test_valid_composite(self):

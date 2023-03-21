@@ -5,6 +5,7 @@ from unittest import TestCase, main
 
 from g2p import make_g2p
 from g2p.exceptions import MalformedMapping
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
@@ -13,14 +14,15 @@ from g2p.transducer import Transducer
 class LexiconTransducerTest(TestCase):
     def test_lexicon_mapping(self):
         """Test loading a lexicon mapping directly in the constructor."""
-        m = Mapping(
-            type="lexicon",
-            case_sensitive=False,
-            out_delimiter=" ",
-            alignments=os.path.join(
-                os.path.dirname(public_data), "mappings", "hello.aligned.txt"
-            ),
-        )
+        with self.assertLogs(LOGGER, level="INFO"):
+            m = Mapping(
+                type="lexicon",
+                case_sensitive=False,
+                out_delimiter=" ",
+                alignments=os.path.join(
+                    os.path.dirname(public_data), "mappings", "hello.aligned.txt"
+                ),
+            )
         self.assertEqual(m.mapping, [])
         self.assertEqual(m.kwargs["type"], "lexicon")
         t = Transducer(m)
@@ -38,11 +40,12 @@ class LexiconTransducerTest(TestCase):
 
     def test_load_lexicon_mapping(self):
         """Test loading a lexicon mapping through a config file."""
-        m = Mapping(
-            os.path.join(
-                os.path.dirname(public_data), "mappings", "lexicon_config.yaml"
+        with self.assertLogs(LOGGER, level="INFO"):
+            m = Mapping(
+                os.path.join(
+                    os.path.dirname(public_data), "mappings", "lexicon_config.yaml"
+                )
             )
-        )
         self.assertEqual(m.mapping, [])
         self.assertEqual(m.kwargs["type"], "lexicon")
         t = Transducer(m)
@@ -54,7 +57,7 @@ class LexiconTransducerTest(TestCase):
 
     def test_bad_lexicon_mapping(self):
         """Test failure to load alignments."""
-        with self.assertRaises(MalformedMapping):
+        with self.assertRaises(MalformedMapping), self.assertLogs(LOGGER, level="INFO"):
             _ = Mapping(
                 os.path.join(
                     os.path.dirname(public_data), "mappings", "bad_lexicon_config.yaml"
