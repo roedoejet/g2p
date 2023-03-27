@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # Replace with actual path!
+# cmudict.dict is retrievable from https://github.com/cmusphinx/cmudict/blob/master/cmudict.dict
 CMUDICT=../../../../../cmudict/cmudict.dict
+# Instructions for installing Phonetisaurus are here: https://github.com/AdolfVonKleist/Phonetisaurus
 ALIGN=../../../../../Phonetisaurus/phonetisaurus-align
 
 python make_ipa_cmudict.py < $CMUDICT > tmp.txt
