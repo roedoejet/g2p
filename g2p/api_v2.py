@@ -138,6 +138,11 @@ class ConvertRequest(BaseModel):
         description="Name of output language", example="eng-arpabet"
     )
     text: str = Field(description="Text to convert", example="hɛloʊ")
+    tokenize: Union[bool, None] = Field(
+        True,
+        description="Tokenize input and return a list of segments.  This is "
+        "the default behaviour, set this to `False` to treat input as a single segment",
+    )
     compose_from: Union[str, None] = Field(
         None,
         description="Compose all conversions from a specific step onwards."
@@ -159,7 +164,7 @@ class Conversion(BaseModel):
         example="eng-arpabet",
     )
     alignments: List[Tuple[str, str]] = Field(
-        description="Alignments of input to output substrings",
+        description="Minimal montonic alignments from input to output substrings",
         example=[
             ["h", "HH "],
             ["ɛ", "EH "],
@@ -191,7 +196,7 @@ class Segment(BaseModel):
 
 
 @api.post("/convert")
-def convert(
+def convert(  # noqa: C901
     request: ConvertRequest = Body(
         examples={
             "eng-ipa to eng-arpabet": {
@@ -249,7 +254,11 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     out_lang = request.out_lang.name
     try:
         transducer = g2p.make_g2p(in_lang, out_lang)
-        tokenizer = g2p.make_tokenizer(in_lang)
+        if request.tokenize:
+            tokenizer = g2p.make_tokenizer(in_lang)
+            tokens = tokenizer.tokenize_text(request.text)
+        else:
+            tokens = [request.text]
     except NoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
@@ -261,7 +270,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
         )
 
     segments: List[Segment] = []
-    for token in tokenizer.tokenize_text(request.text):
+    for token in tokens:
         conversions: List[Conversion] = []
         if not token["is_word"]:
             tg = TransductionGraph(token["text"])
