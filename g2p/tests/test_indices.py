@@ -423,6 +423,10 @@ class IndicesTest(TestCase):
             transducer.substring_alignments(),
             [("t", "p"), ("e", "e"), ("s", "s"), ("t", "t")],
         )
+        transducer = self.trans_one("")
+        self.assertEqual(transducer.output_string, "")
+        self.assertEqual(transducer.edges, [])
+        self.assertEqual(transducer.substring_alignments(), [])
 
     def test_case_two(self):
         transducer = self.trans_two("test")

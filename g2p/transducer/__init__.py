@@ -265,6 +265,8 @@ class TransductionGraph:
         # print("segments:", segments)
 
         def merge_overlapping_segments(segments):
+            if len(segments) <= 1:
+                return segments
             istart, iend, ostart, oend = segments[0]
             output = []
             for seg in segments[1:]:
