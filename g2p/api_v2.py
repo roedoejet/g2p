@@ -30,7 +30,7 @@ import os
 from enum import Enum
 from typing import Dict, List, Tuple, Union
 
-from fastapi import Body, FastAPI, HTTPException, Query
+from fastapi import Body, FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 from networkx import shortest_path
 from networkx.algorithms.dag import ancestors, descendants
@@ -366,7 +366,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     response_description="List of language codes into which {lang} can be converted",
 )
 def outputs_for(
-    lang: LanguageNode = Query(description="Input language name"),
+    lang: LanguageNode = Path(description="Input language name"),
 ) -> List[str]:
     """Get the possible output languages for a given input language. These
     are all the phonetic or orthographic systems into which you can convert
@@ -380,7 +380,7 @@ def outputs_for(
     response_description="List of language codes which can be converted into {lang}",
 )
 def inputs_for(
-    lang: LanguageNode = Query(description="Output language name"),
+    lang: LanguageNode = Path(description="Output language name"),
 ) -> List[str]:
     """Get the possible input languages for a given output language. These
     are all the phonetic or orthographic systems that you can convert
@@ -394,8 +394,8 @@ def inputs_for(
     response_description="Path from {in_lang} to {out_lang}",
 )
 def path(
-    in_lang: LanguageNode = Query(description="Input language name"),
-    out_lang: LanguageNode = Query(description="Output language name"),
+    in_lang: LanguageNode = Path(description="Input language name"),
+    out_lang: LanguageNode = Path(description="Output language name"),
 ) -> List[str]:
     """Get the sequence of intermediate forms used to convert from {in_lang} to {out_lang}."""
     try:
