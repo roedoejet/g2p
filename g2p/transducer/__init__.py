@@ -110,8 +110,9 @@ class TransductionGraph:
         )
 
     @property
-    def edges(self) -> List[Tuple[int, int]]:
-        """A list of edges for the transformation."""
+    def edges(self) -> List:
+        """A list of edges for the transformation.  This is *not* the same
+        between TransductionGraph and CompositeTransductionGraph."""
         return self._edges
 
     @edges.setter
@@ -120,7 +121,9 @@ class TransductionGraph:
 
     @property
     def debugger(self):
-        """List[dict]: A list of lists of rules applied during the transformation. Useful for debugging."""
+        """List[dict]: A list of lists of rules applied during the
+        transformation. Useful for debugging.  Note that this is not the same
+        between TransductionGraph and CompositeTransductionGraph."""
         return self._debugger
 
     @debugger.setter
@@ -129,7 +132,8 @@ class TransductionGraph:
 
     @property
     def tiers(self) -> List["TransductionGraph"]:  # noqa: F821
-        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the graph"""
+        """List[TransductionGraph]: A list of TransductionGraph objects for
+        each tier in the graph (there is one tier)."""
         return [self]
 
     @tiers.setter
@@ -138,8 +142,10 @@ class TransductionGraph:
             f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
         )
 
-    def pretty_edges(self) -> List[List[Tuple[str, str]]]:
-        """List of edges for each tier (there is only one tier), expressed as strings"""
+    def pretty_edges(self):
+        """List of edges, expressed as strings.  Note that this
+        is unfortunately *not* the same output between TransductionGraph and
+        ComposedTransductionGraph."""
         edges = self._edges[:]
         edges.sort(key=lambda x: x[0])
         out_edges = []
@@ -154,15 +160,24 @@ class TransductionGraph:
                         self._output_nodes[edge[1]][1],
                     )
                 )
-        return [out_edges]
+        return out_edges
 
-    def alignments(self, edges=None) -> List[Tuple[str, str]]:  # noqa: C901
+    def alignments(self) -> List[Tuple[int, int]]:
+        """Return list of alignments (input node index, output node index) for
+        the full transduction.  This *is* the same between TransductionGraph
+        and CompositeTransductionGraph."""
+        return self._edges
+
+    def substring_alignments(  # noqa: C901
+        self, alignments=None
+    ) -> List[Tuple[str, str]]:
         """Alignments of input to output substrings for this graph.
 
         As opposed to `pretty_edges`, this method will return the
         one-to-many or many-to-one alignments produced by a
-        conversion.  For example, assuming this input and output with
-        these edges::
+        conversion.  It is also the same between TransductionGraph and
+        CompositeTransductionGraph.  For example, assuming this input
+        and output with these edges::
 
             ABCDEFF
             aabbcdef
@@ -200,17 +215,19 @@ class TransductionGraph:
         (this should not be too hard to do).
 
         """
-        if edges is None:
-            edges = self.edges
+        if alignments is None:
+            alignments = self.alignments()
 
-        def find_monotonic_segments(edges):
+        def find_monotonic_segments(alignments):
             segments = []
             # Sort according to input and output (None is not allowed on input)
-            isort = sorted(edges, key=lambda x: (x[0], x[0]) if x[1] is None else x)
-            osort = sorted(
-                edges, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
+            isort = sorted(
+                alignments, key=lambda x: (x[0], x[0]) if x[1] is None else x
             )
-            # Use -1 as flag value because None has a meaning in edges
+            osort = sorted(
+                alignments, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
+            )
+            # Use -1 as flag value because None has a meaning in alignments
             istart = ostart = iend = oend = -1
             for iedge, oedge in zip(isort, osort):
                 non_overlapping = (
@@ -244,7 +261,7 @@ class TransductionGraph:
             return segments
 
         # Construct areas of agreement
-        segments = find_monotonic_segments(edges)
+        segments = find_monotonic_segments(alignments)
         # print("segments:", segments)
 
         def merge_overlapping_segments(segments):
@@ -270,7 +287,7 @@ class TransductionGraph:
         segments = merge_overlapping_segments(segments)
         # print("merged:", segments)
         # Output string alignments
-        alignments = []
+        substrings = []
         for istart, iend, ostart, oend in segments:
             istr = self._input_string[istart : iend + 1]
             if ostart is None:
@@ -278,8 +295,8 @@ class TransductionGraph:
                 ostr = ""
             else:
                 ostr = self._output_string[ostart : oend + 1]
-            alignments.append((istr, ostr))
-        return alignments
+            substrings.append((istr, ostr))
+        return substrings
 
     def as_dict(self) -> dict:
         return {
@@ -949,12 +966,11 @@ class CompositeTransductionGraph(TransductionGraph):
         )
 
     @property
-    def edges(self) -> List[Tuple[int, int]]:
-        """Return list of edges (input node index, output node index) corresponding to the indices of the composed transformation"""
-        composed = self.tiers[0].edges
-        for tier in self.tiers[1:]:
-            composed = compose_indices(composed, tier.edges)
-        return composed
+    def edges(self):
+        """A list of edges for each tier in the transformation. Note that this
+        is unfortunately *not* the same between TransductionGraph and
+        ComposedTransductionGraph."""
+        return self._edges
 
     @edges.setter
     def edges(self, value):
@@ -962,12 +978,34 @@ class CompositeTransductionGraph(TransductionGraph):
             f"Sorry, you tried to change the edges to {value} but they cannot be changed"
         )
 
-    def pretty_edges(self) -> List[List[Tuple[str, str]]]:
-        """List of edges for each tier, expressed as strings"""
+    @property
+    def debugger(self):
+        """List[dict]: A list of lists of lists of rules applied during the
+        transformation. Useful for debugging.  Note that this is not the same
+        between TransductionGraph and CompositeTransductionGraph."""
+        return self._debugger
+
+    @debugger.setter
+    def debugger(self, value):
+        raise ValueError(
+            f"Sorry, you tried to change the debugger to {value} but they cannot be changed"
+        )
+
+    def pretty_edges(self):
+        """List of edges for each tier, expressed as strings.  Note that this
+        is unfortunately *not* the same output between TransductionGraph and
+        ComposedTransductionGraph."""
         pretty_edges = []
         for tier in self._tiers:
-            pretty_edges.extend(tier.pretty_edges())
+            pretty_edges.append(tier.pretty_edges())
         return pretty_edges
+
+    def alignments(self) -> List[Tuple[int, int]]:
+        """Return list of alignments (input node index, output node index) for the full transduction."""
+        composed = self.tiers[0].edges
+        for tier in self.tiers[1:]:
+            composed = compose_indices(composed, tier.edges)
+        return composed
 
     def as_dict(self):
         return {

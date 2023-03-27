@@ -95,7 +95,7 @@ class TransducerTest(TestCase):
         self.assertEqual([(0, "b"), (1, "b"), (2, "b"), (3, "b")], tg.output_nodes)
         self.assertEqual([(0, 0), (1, 1), (2, 2), (3, 3)], tg.edges)
         self.assertEqual(
-            [[("a", "b"), ("b", "b"), ("a", "b"), ("b", "b")]], tg.pretty_edges()
+            [("a", "b"), ("b", "b"), ("a", "b"), ("b", "b")], tg.pretty_edges()
         )
         self.assertEqual(1, len(tg.debugger))
         self.assertEqual(2, len(tg.debugger[0]))
@@ -127,7 +127,9 @@ class TransducerTest(TestCase):
         self.assertEqual(2, len(ctg.tiers))
         self.assertEqual([(0, "a"), (1, "b"), (2, "a")], ctg.input_nodes)
         self.assertEqual([(0, "a"), (1, "a"), (2, "a")], ctg.output_nodes)
-        self.assertEqual([(0, 0), (1, 1), (2, 2)], ctg.edges)
+        self.assertEqual(
+            [[(0, 0), (1, 1), (2, 2)], [(0, 0), (1, 1), (2, 2)]], ctg.edges
+        )
         self.assertEqual(
             [
                 [("a", "b"), ("b", "b"), ("a", "b")],
@@ -140,9 +142,8 @@ class TransducerTest(TestCase):
         self.assertEqual([(0, "b"), (1, "b"), (2, "b"), (3, "b")], ctg.input_nodes)
         ctg.output_string = "baba"
         self.assertEqual([(0, "b"), (1, "a"), (2, "b"), (3, "a")], ctg.output_nodes)
-        ctg.debugger = [["spam", "spam", "spam", "spam"]]
-        self.assertEqual(1, len(ctg.debugger))
-        self.assertEqual(4, len(ctg.debugger[0]))
+        with self.assertRaises(ValueError):
+            ctg.debugger = [["spam", "spam", "spam", "spam"]]
         with self.assertRaises(ValueError):
             ctg.edges = [(0, 1), (1, 0), (2, 3), (3, 2)]
         with self.assertRaises(ValueError):
@@ -204,7 +205,7 @@ class TransducerTest(TestCase):
     def test_deletion(self):
         tg = self.test_deletion_transducer("a")
         self.assertEqual(tg.output_string, "")
-        self.assertEqual(tg.pretty_edges(), [[("a", None)]])
+        self.assertEqual(tg.pretty_edges(), [("a", None)])
         self.assertEqual(self.test_deletion_transducer_csv("a").output_string, "")
         self.assertEqual(self.test_deletion_transducer_json("a").output_string, "")
 

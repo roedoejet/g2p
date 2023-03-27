@@ -66,7 +66,7 @@ class TokenizeAndMapTest(TestCase):
         ref_edges = [(0, 0), (1, 0), (2, 0), (3, 1), (4, 2), (5, 2), (6, 2)]
         self.assertEqual(tg.edges, ref_edges)
         ref_alignments = [("est", "ɛ"), (" ", " "), ("est", "ɛ")]
-        self.assertEqual(tg.alignments(), ref_alignments)
+        self.assertEqual(tg.substring_alignments(), ref_alignments)
 
     def test_tokenizing_transducer_edges2(self):
         ref_edges = g2p.make_g2p("fra", "fra-ipa")("ça ça").edges
@@ -104,9 +104,9 @@ class TokenizeAndMapTest(TestCase):
             (6, 6),
         ]
         tg = transducer("est est")
-        self.assertEqual(tg.edges, ref_edges)
+        self.assertEqual(tg.alignments(), ref_edges)
         ref_alignments = [("est", "EH "), (" ", " "), ("est", "EH ")]
-        self.assertEqual(tg.alignments(), ref_alignments)
+        self.assertEqual(tg.substring_alignments(), ref_alignments)
 
         tier_edges = [x.edges for x in tg.tiers]
         ref_tier_edges = [
@@ -118,7 +118,7 @@ class TokenizeAndMapTest(TestCase):
             [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (2, 5), (2, 6)],
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
-        tier_alignments = [x.alignments() for x in tg.tiers]
+        tier_alignments = [x.substring_alignments() for x in tg.tiers]
         ref_tier_alignments = [
             [("est", "ɛ"), (" ", " "), ("est", "ɛ")],
             [("ɛ", "ɛ"), (" ", " "), ("ɛ", "ɛ")],
@@ -138,7 +138,7 @@ class TokenizeAndMapTest(TestCase):
             (3, 5),
             (4, 6),
         ]
-        self.assertEqual(transducer("  a, ").edges, ref_edges)
+        self.assertEqual(transducer("  a, ").alignments(), ref_edges)
         tier_edges = [x.edges for x in transducer("  a, ").tiers]
         ref_tier_edges = [
             # "  a, " -> "  a, "
