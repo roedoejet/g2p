@@ -58,7 +58,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "eng-ipa",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "HH "],
                                 ["u", "UW "],
                                 ["w", "W "],
@@ -68,7 +71,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin-ipa",
                             "out_lang": "eng-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "h"],
                                 ["y", "u"],
                                 ["ʋ", "w"],
@@ -78,7 +84,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "fin-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "h"],
                                 ["y", "y"],
                                 ["v", "ʋ"],
@@ -90,7 +99,14 @@ class TestAPIV2(unittest.TestCase):
                 },
                 {
                     "conversions": [
-                        {"in_lang": None, "out_lang": None, "alignments": [[" ", " "]]}
+                        {
+                            "in_lang": None,
+                            "out_lang": None,
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [[" ", " "]],
+                        }
                     ]
                 },
                 {
@@ -98,7 +114,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "eng-ipa",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["u", "UW "],
                                 ["ə", "AH "],
                                 ["t", "T "],
@@ -108,7 +127,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin-ipa",
                             "out_lang": "eng-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["y", "u"],
                                 ["ø", "ə"],
                                 ["t", "t"],
@@ -118,7 +140,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "fin-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["y", "y"],
                                 ["ö", "ø"],
                                 ["t", "t"],
@@ -149,7 +174,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "HH "],
                                 ["y", "UW "],
                                 ["v", "W "],
@@ -160,7 +188,14 @@ class TestAPIV2(unittest.TestCase):
                 },
                 {
                     "conversions": [
-                        {"in_lang": None, "out_lang": None, "alignments": [[" ", " "]]}
+                        {
+                            "in_lang": None,
+                            "out_lang": None,
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [[" ", " "]],
+                        }
                     ]
                 },
                 {
@@ -168,7 +203,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["y", "UW "],
                                 ["ö", "AH "],
                                 ["t", "T "],
@@ -199,7 +237,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin-ipa",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "HH "],
                                 ["y", "UW "],
                                 ["ʋ", "W "],
@@ -209,7 +250,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "fin-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["h", "h"],
                                 ["y", "y"],
                                 ["v", "ʋ"],
@@ -221,7 +265,14 @@ class TestAPIV2(unittest.TestCase):
                 },
                 {
                     "conversions": [
-                        {"in_lang": None, "out_lang": None, "alignments": [[" ", " "]]}
+                        {
+                            "in_lang": None,
+                            "out_lang": None,
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [[" ", " "]],
+                        }
                     ]
                 },
                 {
@@ -229,7 +280,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin-ipa",
                             "out_lang": "eng-arpabet",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["y", "UW "],
                                 ["ø", "AH "],
                                 ["t", "T "],
@@ -239,7 +293,10 @@ class TestAPIV2(unittest.TestCase):
                         {
                             "in_lang": "fin",
                             "out_lang": "fin-ipa",
-                            "alignments": [
+                            "input_nodes": None,
+                            "output_nodes": None,
+                            "alignments": None,
+                            "substring_alignments": [
                                 ["y", "y"],
                                 ["ö", "ø"],
                                 ["t", "t"],
@@ -248,6 +305,70 @@ class TestAPIV2(unittest.TestCase):
                         },
                     ]
                 },
+            ],
+        )
+
+    def test_convert_surrogates(self):
+        response = API_CLIENT.post(
+            "/convert",
+            json={
+                "in_lang": "eng-ipa",
+                "out_lang": "eng-arpabet",
+                "text": "hi🙂hi",
+                "indices": True,
+                "tokenize": False,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "conversions": [
+                        {
+                            "in_lang": "eng-ipa",
+                            "out_lang": "eng-arpabet",
+                            "input_nodes": ["h", "i", "🙂", "h", "i"],
+                            "output_nodes": [
+                                "H",
+                                "H",
+                                " ",
+                                "I",
+                                "Y",
+                                " ",
+                                "🙂",
+                                "H",
+                                "H",
+                                " ",
+                                "I",
+                                "Y",
+                                " ",
+                            ],
+                            "alignments": [
+                                [0, 0],
+                                [0, 1],
+                                [0, 2],
+                                [1, 3],
+                                [1, 4],
+                                [1, 5],
+                                [2, 6],
+                                [3, 7],
+                                [3, 8],
+                                [3, 9],
+                                [4, 10],
+                                [4, 11],
+                                [4, 12],
+                            ],
+                            "substring_alignments": [
+                                ["h", "HH "],
+                                ["i", "IY "],
+                                ["🙂", "🙂"],
+                                ["h", "HH "],
+                                ["i", "IY "],
+                            ],
+                        }
+                    ]
+                }
             ],
         )
 

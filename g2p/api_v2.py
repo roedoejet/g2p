@@ -41,11 +41,7 @@ import g2p
 import g2p.mappings.langs as g2p_langs
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
-from g2p.transducer import (
-    CompositeTransductionGraph,
-    TransductionGraph,
-    compose_indices,
-)
+from g2p.transducer import CompositeTransductionGraph, TransductionGraph
 
 # Create the v2 version of the API
 api = FastAPI(
@@ -148,6 +144,12 @@ class ConvertRequest(BaseModel):
         description="Compose all conversions from a specific step onwards."
         "  Useful if you wish to recover alignments for a specific intermediate step",
     )
+    indices: Union[bool, None] = Field(
+        False,
+        description="Return lists of input and output characters and alignments "
+        "as indices into those lists.  These are guaranteed to be usable no matter "
+        "how your platform defines a 'character'.",
+    )
 
 
 class Conversion(BaseModel):
@@ -163,8 +165,38 @@ class Conversion(BaseModel):
         description="Name of output language, absent if no conversion was done",
         example="eng-arpabet",
     )
-    alignments: List[Tuple[str, str]] = Field(
-        description="Minimal montonic alignments from input to output substrings",
+    input_nodes: Union[None, List[str]] = Field(
+        None,
+        description="Characters in input, which can be safely indexed by alignments, "
+        "present only if `indices` was True in request.",
+        example=["h", "i", "🙂", "🙂", "🙂"],
+    )
+    output_nodes: Union[None, List[str]] = Field(
+        None,
+        description="Characters in output, which can be safely indexed by alignments, "
+        "present only if `indices` was True in request.",
+        example=["H", "H", " ", "I", "Y", " ", "🙂", "🙂", "🙂"],
+    )
+    alignments: Union[None, List[Tuple[int, int]]] = Field(
+        None,
+        description="Alignments from input to output indices, "
+        "present only if `indices` was True in request.",
+        example=[
+            [0, 0],
+            [0, 1],
+            [0, 2],
+            [1, 3],
+            [1, 4],
+            [1, 5],
+            [2, 6],
+            [2, 7],
+            [3, 8],
+            [3, 9],
+            [3, 10],
+        ],
+    )
+    substring_alignments: List[Tuple[str, str]] = Field(
+        description="Minimal montonic substring alignments from input to output substrings",
         example=[
             ["h", "HH "],
             ["ɛ", "EH "],
@@ -176,7 +208,7 @@ class Conversion(BaseModel):
 
 class Segment(BaseModel):
     """Result of G2P conversion of one segment of input, with
-    intermediate steps and alignments."""
+    intermediate steps and substring_alignments."""
 
     conversions: List[Conversion] = Field(
         description="Sequence of conversions in reverse order.",
@@ -184,7 +216,7 @@ class Segment(BaseModel):
             {
                 "in_lang": "eng-ipa",
                 "out_lang": "eng-arpabet",
-                "alignments": [
+                "substring_alignments": [
                     ["h", "HH "],
                     ["ɛ", "EH "],
                     ["l", "L "],
@@ -258,7 +290,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
             tokenizer = g2p.make_tokenizer(in_lang)
             tokens = tokenizer.tokenize_text(request.text)
         else:
-            tokens = [request.text]
+            tokens = [{"text": request.text, "is_word": True}]
     except NoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
@@ -272,55 +304,59 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     segments: List[Segment] = []
     for token in tokens:
         conversions: List[Conversion] = []
-        if not token["is_word"]:
+        if not token["is_word"]:  # non-word, has no in_lang/out_lang
             tg = TransductionGraph(token["text"])
-            conversions.append(
-                Conversion(
-                    alignments=tg.alignments(),
-                )
-            )
+            conv = Conversion(substring_alignments=tg.substring_alignments())
+            if request.indices:
+                conv.alignments = tg.alignments()
+                conv.input_nodes = list(tg.input_string)
+                conv.output_nodes = list(tg.output_string)
+            conversions.append(conv)
         else:
             tg = transducer(token["text"])
             if request.compose_from:
-                composed: List[Tuple[int, int]] = []
                 composed_tiers: List[TransductionGraph] = []
                 for tr, tier in zip(transducer.transducers, tg.tiers):
-                    if composed:
-                        composed = compose_indices(composed, tier.edges)
+                    if composed_tiers:
                         composed_tiers.append(tier)
                     else:
                         if tr.in_lang == request.compose_from:
-                            composed = tier.edges
                             composed_tiers.append(tier)
                         else:
-                            conversions.insert(
-                                0,
-                                Conversion(
-                                    in_lang=tr.in_lang,
-                                    out_lang=tr.out_lang,
-                                    alignments=tier.alignments(),
-                                ),
+                            conv = Conversion(
+                                in_lang=tr.in_lang,
+                                out_lang=tr.out_lang,
+                                substring_alignments=tier.substring_alignments(),
                             )
-                if composed:
+                            if request.indices:
+                                conv.input_nodes = list(tier.input_string)
+                                conv.output_nodes = list(tier.output_string)
+                                conv.alignments = tier.alignments()
+                            conversions.insert(0, conv)
+                if composed_tiers:
                     composed_tg = CompositeTransductionGraph(composed_tiers)
-                    conversions.insert(
-                        0,
-                        Conversion(
-                            in_lang=request.compose_from,
-                            out_lang=transducer.out_lang,
-                            alignments=composed_tg.alignments(composed),
-                        ),
+                    conv = Conversion(
+                        in_lang=request.compose_from,
+                        out_lang=transducer.out_lang,
+                        substring_alignments=composed_tg.substring_alignments(),
                     )
+                    if request.indices:
+                        conv.input_nodes = list(composed_tg.input_string)
+                        conv.output_nodes = list(composed_tg.output_string)
+                        conv.alignments = composed_tg.alignments()
+                    conversions.insert(0, conv)
             else:
                 for tr, tier in zip(transducer.transducers, tg.tiers):
-                    conversions.insert(
-                        0,
-                        Conversion(
-                            in_lang=tr.in_lang,
-                            out_lang=tr.out_lang,
-                            alignments=tier.alignments(),
-                        ),
+                    conv = Conversion(
+                        in_lang=tr.in_lang,
+                        out_lang=tr.out_lang,
+                        substring_alignments=tier.substring_alignments(),
                     )
+                    if request.indices:
+                        conv.input_nodes = list(tier.input_string)
+                        conv.output_nodes = list(tier.output_string)
+                        conv.alignments = tier.alignments()
+                    conversions.insert(0, conv)
         segments.append(Segment(conversions=conversions))
     return segments
 
