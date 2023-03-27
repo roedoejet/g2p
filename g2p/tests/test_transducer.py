@@ -14,8 +14,12 @@ class TransducerTest(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.test_mapping_moh = Mapping(in_lang="moh-equiv", out_lang="moh-ipa")
-        cls.test_mapping = Mapping([{"in": "a", "out": "b"}])
-        cls.test_mapping_rev = Mapping([{"in": "a", "out": "b"}], reverse=True)
+        cls.test_mapping = Mapping(
+            [{"in": "a", "out": "b"}], in_lang="spam", out_lang="eggs"
+        )
+        cls.test_mapping_rev = Mapping(
+            [{"in": "a", "out": "b"}], reverse=True, in_lang="eggs", out_lang="parrot"
+        )
         cls.test_mapping_ordered_feed = Mapping(
             [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}]
         )
@@ -69,10 +73,91 @@ class TransducerTest(TestCase):
             Mapping(os.path.join(PUBLIC_DIR, "mappings", "deletion_config_json.yaml"))
         )
 
+    def test_properties(self):
+        """Test all the basic properties of transducers."""
+        self.assertEqual("spam", self.test_trans.in_lang)
+        self.assertEqual("eggs", self.test_trans.out_lang)
+        self.assertEqual([self.test_trans], self.test_trans.transducers)
+        self.assertEqual(
+            [self.test_trans, self.test_trans_rev],
+            self.test_trans_composite.transducers,
+        )
+        self.assertEqual("spam", self.test_trans_composite.in_lang)
+        self.assertEqual("parrot", self.test_trans_composite.out_lang)
+
+    def test_graph_properties(self):
+        """Test all the basic properties of graphs."""
+        tg = self.test_trans("abab")
+        self.assertEqual("abab", tg.input_string)
+        self.assertEqual("bbbb", tg.output_string)
+        self.assertEqual(1, len(tg.tiers))
+        self.assertEqual([(0, "a"), (1, "b"), (2, "a"), (3, "b")], tg.input_nodes)
+        self.assertEqual([(0, "b"), (1, "b"), (2, "b"), (3, "b")], tg.output_nodes)
+        self.assertEqual([(0, 0), (1, 1), (2, 2), (3, 3)], tg.edges)
+        self.assertEqual(
+            [[("a", "b"), ("b", "b"), ("a", "b"), ("b", "b")]], tg.pretty_edges()
+        )
+        self.assertEqual(1, len(tg.debugger))
+        self.assertEqual(2, len(tg.debugger[0]))
+        tg.input_string = "bbbb"
+        self.assertEqual([(0, "b"), (1, "b"), (2, "b"), (3, "b")], tg.input_nodes)
+        tg.output_string = "baba"
+        self.assertEqual([(0, "b"), (1, "a"), (2, "b"), (3, "a")], tg.output_nodes)
+        tg.edges = [(0, 1), (1, 0), (2, 3), (3, 2)]
+        self.assertEqual([(0, 1), (1, 0), (2, 3), (3, 2)], tg.edges)
+        tg.debugger = [["spam", "spam", "spam", "spam"]]
+        self.assertEqual(1, len(tg.debugger))
+        self.assertEqual(4, len(tg.debugger[0]))
+        with self.assertRaises(ValueError):
+            tg.input_nodes = ("foo", "bar", "baz")
+        with self.assertRaises(ValueError):
+            tg.output_nodes = ("foo", "bar", "baz")
+        with self.assertRaises(ValueError):
+            tg.tiers = ["spam", "spam", "eggs", "spam"]
+        tg = self.test_trans("abab")
+        tg += tg
+        self.assertEqual("abababab", tg.input_string)
+        self.assertEqual("bbbbbbbb", tg.output_string)
+
+    def test_composite_graph_properties(self):
+        """Test all the basic properties of composite graphs."""
+        ctg = self.test_trans_composite("aba")
+        self.assertEqual("aba", ctg.input_string)
+        self.assertEqual("aaa", ctg.output_string)
+        self.assertEqual(2, len(ctg.tiers))
+        self.assertEqual([(0, "a"), (1, "b"), (2, "a")], ctg.input_nodes)
+        self.assertEqual([(0, "a"), (1, "a"), (2, "a")], ctg.output_nodes)
+        self.assertEqual([(0, 0), (1, 1), (2, 2)], ctg.edges)
+        self.assertEqual(
+            [
+                [("a", "b"), ("b", "b"), ("a", "b")],
+                [("b", "a"), ("b", "a"), ("b", "a")],
+            ],
+            ctg.pretty_edges(),
+        )
+        self.assertEqual(len(ctg.tiers), len(ctg.debugger))
+        ctg.input_string = "bbbb"
+        self.assertEqual([(0, "b"), (1, "b"), (2, "b"), (3, "b")], ctg.input_nodes)
+        ctg.output_string = "baba"
+        self.assertEqual([(0, "b"), (1, "a"), (2, "b"), (3, "a")], ctg.output_nodes)
+        ctg.debugger = [["spam", "spam", "spam", "spam"]]
+        self.assertEqual(1, len(ctg.debugger))
+        self.assertEqual(4, len(ctg.debugger[0]))
+        with self.assertRaises(ValueError):
+            ctg.edges = [(0, 1), (1, 0), (2, 3), (3, 2)]
+        with self.assertRaises(ValueError):
+            ctg.input_nodes = ("foo", "bar", "baz")
+        with self.assertRaises(ValueError):
+            ctg.output_nodes = ("foo", "bar", "baz")
+        with self.assertRaises(ValueError):
+            ctg.tiers = ["spam", "spam", "eggs", "spam"]
+        ctg = self.test_trans_composite("aba")
+        ctg += ctg
+        self.assertEqual("abaaba", ctg.input_string)
+        self.assertEqual("aaaaaa", ctg.output_string)
+
     def test_ordered(self):
-        transducer_i_feed = self.test_trans_ordered_feed("a")
         transducer_feed = self.test_trans_ordered_feed("a")
-        transducer_i_counter_feed = self.test_trans_ordered_counter_feed("a")
         transducer_counter_feed = self.test_trans_ordered_counter_feed("a")
         # These should feed b -> c
         self.assertEqual(transducer_feed.output_string, "c")
@@ -117,7 +202,9 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_regex_set_transducer("fa").output_string, "fb")
 
     def test_deletion(self):
-        self.assertEqual(self.test_deletion_transducer("a").output_string, "")
+        tg = self.test_deletion_transducer("a")
+        self.assertEqual(tg.output_string, "")
+        self.assertEqual(tg.pretty_edges(), [[("a", None)]])
         self.assertEqual(self.test_deletion_transducer_csv("a").output_string, "")
         self.assertEqual(self.test_deletion_transducer_json("a").output_string, "")
 

@@ -45,7 +45,6 @@ ChangeLog = List[List[int]]
 UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
 
-
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
 
@@ -145,7 +144,8 @@ class TransductionGraph:
         edges.sort(key=lambda x: x[0])
         out_edges = []
         for edge in edges:
-            if edge[1] is None:  # FIXME: This should not happen???
+            assert edge[0] is not None  # Empty inputs are not allowed
+            if edge[1] is None:
                 out_edges.append((self._input_nodes[edge[0]][1], None))
             else:
                 out_edges.append(
@@ -156,7 +156,7 @@ class TransductionGraph:
                 )
         return [out_edges]
 
-    def alignments(self, edges=None) -> List[Tuple[str, str]]:
+    def alignments(self, edges=None) -> List[Tuple[str, str]]:  # noqa: C901
         """Alignments of input to output substrings for this graph.
 
         As opposed to `pretty_edges`, this method will return the
@@ -203,66 +203,82 @@ class TransductionGraph:
         if edges is None:
             edges = self.edges
 
-        # Sort according to input and output
-        isort = sorted(edges)
-        osort = sorted(edges, key=lambda x: (x[1], x[0]))
-        print("isort:", isort)
-        print("osort:", osort)
-        # Construct areas of agreement
-        segments = []
-        istart = ostart = iend = oend = None
-        for iedge, oedge in zip(isort, osort):
-            if iedge == oedge:
-                if iend is not None:
-                    segments.append((istart, iend, ostart, oend))
-                    istart = ostart = iend = oend = None
-                # May be subsumed by larger chunks
-                ipos, opos = iedge
-                segments.append((ipos, ipos, opos, opos))
-            else:
-                if istart is None:
+        def find_monotonic_segments(edges):
+            segments = []
+            # Sort according to input and output (None is not allowed on input)
+            isort = sorted(edges, key=lambda x: (x[0], x[0]) if x[1] is None else x)
+            osort = sorted(
+                edges, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
+            )
+            # Use -1 as flag value because None has a meaning in edges
+            istart = ostart = iend = oend = -1
+            for iedge, oedge in zip(isort, osort):
+                non_overlapping = (
+                    -1 not in (iend, oend) and iedge[0] > iend and oedge[0] > oend
+                )
+                if iedge == oedge or non_overlapping:
+                    if iend != -1:
+                        segments.append((istart, iend, ostart, oend))
+                        istart = ostart = iend = oend = -1
+                    if iedge == oedge:
+                        ipos, opos = iedge
+                        segments.append((ipos, ipos, opos, opos))
+                        continue
+                if istart == -1:
                     # Smallest input index (by definition)
                     istart = iedge[0]
                     # Smallest output index (by definition)
                     ostart = oedge[1]
-                    # Update these until the next point of agreement
+                    # Update these until the next break point
                     iend = oedge[0]
                     oend = iedge[1]
                 else:
+                    assert oedge[0] is not None
                     iend = max(iend, oedge[0])
-                    oend = max(oend, iedge[1])
-        if istart is not None:
-            assert iend is not None
-        if iend is not None:
-            segments.append((istart, iend, ostart, oend))
-        print("segments:", segments)
+                    if iedge[1] is not None:
+                        oend = max(oend, iedge[1])
+            if istart != -1:
+                assert iend != -1
+            if iend != -1:
+                segments.append((istart, iend, ostart, oend))
+            return segments
+
+        # Construct areas of agreement
+        segments = find_monotonic_segments(edges)
+        # print("segments:", segments)
+
+        def merge_overlapping_segments(segments):
+            istart, iend, ostart, oend = segments[0]
+            output = []
+            for seg in segments[1:]:
+                # If *start* points are outside current segment, start a new one
+                if None in (seg[2], oend):  # handle only None in outputs
+                    output_outside = not (None, None) == (seg[2], oend)
+                else:
+                    output_outside = seg[2] > oend
+                if seg[0] > iend and output_outside:
+                    output.append((istart, iend, ostart, oend))
+                    istart, iend, ostart, oend = seg
+                else:
+                    # Update endpoints to include this segment
+                    iend = seg[1]
+                    oend = seg[3]
+            output.append((istart, iend, ostart, oend))
+            return output
+
         # Merge overlapping segments
+        segments = merge_overlapping_segments(segments)
+        # print("merged:", segments)
+        # Output string alignments
         alignments = []
-        istart, iend, ostart, oend = segments[0]
-        for seg in segments[1:]:
-            # If *start* points are outside current segment, start a new one
-            if seg[0] > iend and seg[2] > oend:
-                print("cur:", (istart, iend, ostart, oend))
-                print("seg:", seg)
-                print("merged:", (istart, iend), (ostart, oend))
-                alignments.append(
-                    (
-                        self._input_string[istart : iend + 1],
-                        self._output_string[ostart : oend + 1],
-                    )
-                )
-                istart, iend, ostart, oend = seg
+        for istart, iend, ostart, oend in segments:
+            istr = self._input_string[istart : iend + 1]
+            if ostart is None:
+                assert oend is None
+                ostr = ""
             else:
-                # Update endpoints to include this segment
-                iend = seg[1]
-                oend = seg[3]
-        print("merged:", (istart, iend), (ostart, oend))
-        alignments.append(
-            (
-                self._input_string[istart : iend + 1],
-                self._output_string[ostart : oend + 1],
-            )
-        )
+                ostr = self._output_string[ostart : oend + 1]
+            alignments.append((istr, ostr))
         return alignments
 
     def as_dict(self) -> dict:

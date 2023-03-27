@@ -106,7 +106,7 @@ class LexiconTransducerTest(TestCase):
         pe = tg.pretty_edges()
         self.assertEqual(
             pe,
-            [["x", "ɛ"], ["x", "k"], ["x", "s"], ["t", "t"], ["r", "ɹ"], ["a", "ʌ"]],
+            [("x", "ɛ"), ("x", "k"), ("x", "s"), ("t", "t"), ("r", "ɹ"), ("a", "ʌ")],
         )
 
     def test_eng_transducer(self):

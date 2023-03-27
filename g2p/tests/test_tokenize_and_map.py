@@ -38,6 +38,9 @@ class TokenizeAndMapTest(TestCase):
     def test_tokenizing_transducer(self):
         ref_word_ipa = g2p.make_g2p("mic", "mic-ipa")("sq").output_string
         transducer = g2p.make_g2p("mic", "mic-ipa", tok_lang="mic")
+        self.assertEqual(transducer.transducer.in_lang, transducer.in_lang)
+        self.assertEqual(transducer.transducer.out_lang, transducer.out_lang)
+        self.assertEqual(transducer.transducer, transducer.transducers[0])
         word_ipa = transducer("sq").output_string
         self.assertEqual(word_ipa, ref_word_ipa)
         string_ipa = transducer(self.contextualize("sq")).output_string

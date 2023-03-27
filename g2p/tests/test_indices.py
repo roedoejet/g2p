@@ -165,6 +165,11 @@ class IndicesTest(TestCase):
           ((1, 'b'), (0, '')),
           ((1, 'c'), (0, '')) ]
 
+    Test case # 11
+        # Sort of an insertion test (empty inputs are not allowed)
+
+    Test case # 12
+        # Verify that empty inputs are not allowed
     """
 
     def __init__(self, *args):
@@ -370,9 +375,13 @@ class IndicesTest(TestCase):
         self.assertEqual(
             transducer_lite.edges, [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)]
         )
+        self.assertEqual(transducer_lite.alignments(), [("abcc", "ccccc")])
         self.assertEqual(
             transducer_lite_extra.edges,
             [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3), (4, 5)],
+        )
+        self.assertEqual(
+            transducer_lite_extra.alignments(), [("abcc", "ccccc"), ("a", "a")]
         )
         transducer_no_i = self.trans_wacky("\U0001f600\U0001f603\U0001f604\U0001f604")
         self.assertEqual(
@@ -385,76 +394,132 @@ class IndicesTest(TestCase):
             "\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604",
         )
         self.assertEqual(transducer.edges, [(0, 4), (1, 0), (2, 1), (2, 2), (3, 3)])
+        self.assertEqual(
+            transducer.alignments(),
+            [
+                (
+                    "\U0001f600\U0001f603\U0001f604\U0001f604",
+                    "\U0001f604\U0001f604\U0001f604\U0001f604\U0001f604",
+                )
+            ],
+        )
 
     def test_circum(self):
         """Test circumfixing"""
         transducer = self.trans_circum("ac")
         self.assertEqual(transducer.output_string, "cac")
         self.assertEqual(transducer.edges, [(0, 1), (1, 0), (1, 2)])
+        self.assertEqual(transducer.alignments(), [("ac", "cac")])
 
     def test_case_one(self):
         """Test case one"""
         transducer = self.trans_one("test")
         self.assertEqual(transducer.output_string, "pest")
         self.assertEqual(transducer.edges, [(0, 0), (1, 1), (2, 2), (3, 3)])
+        self.assertEqual(
+            transducer.alignments(), [("t", "p"), ("e", "e"), ("s", "s"), ("t", "t")]
+        )
 
     def test_case_two(self):
         transducer = self.trans_two("test")
         self.assertEqual(transducer.output_string, "tst")
         self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 1), (3, 2)])
+        self.assertEqual(transducer.alignments(), [("te", "t"), ("s", "s"), ("t", "t")])
 
     def test_case_three(self):
         transducer = self.trans_three("test")
         self.assertEqual(transducer.output_string, "chest")
         self.assertEqual(transducer.edges, [(0, 0), (0, 1), (1, 2), (2, 3), (3, 4)])
+        self.assertEqual(
+            transducer.alignments(), [("t", "ch"), ("e", "e"), ("s", "s"), ("t", "t")]
+        )
 
     def test_case_four(self):
         transducer = self.trans_four("test")
         self.assertEqual(transducer.output_string, "pst")
         self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 1), (3, 2)])
+        self.assertEqual(transducer.alignments(), [("te", "p"), ("s", "s"), ("t", "t")])
 
     def test_case_six(self):
         transducer = self.trans_six("test")
         self.assertEqual(transducer.output_string, "tset")
         self.assertEqual(transducer.edges, [(0, 0), (1, 2), (2, 1), (3, 3)])
+        self.assertEqual(
+            transducer.alignments(), [("t", "t"), ("es", "se"), ("t", "t")]
+        )
 
     def test_case_long_six(self):
         transducer = self.trans_six("esesse")
         self.assertEqual(transducer.output_string, "sesese")
+        # Ensure that *minimal* monotonic segments are output
+        self.assertEqual(
+            transducer.alignments(),
+            [("es", "se"), ("es", "se"), ("s", "s"), ("e", "e")],
+        )
 
     def test_case_seven(self):
         transducer_as_written = self.test_seven_as_written("test")
         self.assertEqual(transducer_as_written.output_string, "test")
         self.assertEqual(transducer_as_written.edges, [(0, 0), (1, 1), (2, 2), (3, 3)])
+        self.assertEqual(
+            transducer_as_written.alignments(),
+            [("t", "t"), ("e", "e"), ("s", "s"), ("t", "t")],
+        )
         transducer = self.trans_seven("test")
         self.assertEqual(transducer.output_string, "tesht")
         self.assertEqual(transducer.edges, [(0, 0), (1, 1), (2, 2), (2, 3), (3, 4)])
+        self.assertEqual(
+            transducer.alignments(), [("t", "t"), ("e", "e"), ("s", "sh"), ("t", "t")]
+        )
 
     def test_case_eight(self):
         transducer = self.trans_eight("test")
         self.assertEqual(transducer.output_string, "chess")
         self.assertEqual(transducer.edges, [(0, 0), (1, 1), (1, 2), (2, 3), (3, 4)])
+        self.assertEqual(
+            transducer.alignments(), [("t", "c"), ("e", "he"), ("s", "s"), ("t", "s")]
+        )
 
     def test_case_nine(self):
         transducer = self.trans_nine("aa")
         self.assertEqual(transducer.output_string, "")
         self.assertEqual(transducer.edges, [(0, None), (1, None)])
+        # Support deletions in alignments
+        self.assertEqual(transducer.alignments(), [("aa", "")])
 
     def test_case_ten(self):
         transducer = self.trans_ten("abc")
         self.assertEqual(transducer.output_string, "a")
         self.assertEqual(transducer.edges, [(0, 0), (1, 0), (2, 0)])
+        self.assertEqual(transducer.alignments(), [("abc", "a")])
 
     def test_case_eleven(self):
         transducer = self.trans_eleven("a")
         self.assertEqual(transducer.output_string, "aaaa")
         self.assertEqual(transducer.edges, [(0, 0), (0, 1), (0, 2), (0, 3)])
+        self.assertEqual(transducer.alignments(), [("a", "aaaa")])
+
+    def test_case_twelve(self):
+        # Empty inputs are not allowed (should it actually throw an exception?)
+        with self.assertLogs() as cm:
+            self.test_mapping_twelve = Mapping(
+                [{"in": "", "out": "aa", "context_before": "b"}]
+            )
+            self.trans_twelve = Transducer(self.test_mapping_twelve)
+            transducer = self.trans_twelve("b")
+        self.assertIn(
+            "disallowed",
+            cm.output[0],
+            "it should warn that empty inputs are disallowed",
+        )
+        self.assertEqual(transducer.output_string, "b")
 
     def test_case_acdc(self):
         transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
         tg = transducer("acdc")
         self.assertEqual(tg.output_string, "cacdc")
         self.assertEqual(tg.edges, [(0, 1), (1, 0), (1, 2), (2, 3), (3, 4)])
+        self.assertEqual(tg.alignments(), [("ac", "cac"), ("d", "d"), ("c", "c")])
 
     def test_case_acac(self):
         transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
@@ -476,6 +541,7 @@ class IndicesTest(TestCase):
                 (5, 3),
             ],
         )
+        self.assertEqual(tg.alignments(), [("abcab", "ab"), ("c", "ab")])
         tg_default = transducer_default("abcabc")
         self.assertEqual(tg_default.output_string, "abab")
         self.assertEqual(
@@ -491,6 +557,7 @@ class IndicesTest(TestCase):
                 (5, 3),
             ],
         )
+        self.assertEqual(tg_default.alignments(), [("abcab", "ab"), ("c", "ab")])
 
     def test_arpabet(self):
         transducer = Transducer(
@@ -518,6 +585,7 @@ class IndicesTest(TestCase):
                 (1, 9),
             ],
         )
+        self.assertEqual(tg.alignments(), [("ĩ", "IY N "), ("ĩ", "IY N ")])
         self.assertEqual(
             tg_nfd.edges,
             [
@@ -532,6 +600,9 @@ class IndicesTest(TestCase):
                 (3, 8),
                 (3, 9),
             ],
+        )
+        self.assertEqual(
+            tg_nfd.alignments(), [("i", "I"), ("̃", "Y N "), ("i", "I"), ("̃", "Y N ")]
         )
 
 
