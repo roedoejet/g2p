@@ -82,6 +82,13 @@ class Mapping:
     @param prevent_feeding: bool = False
         Converts each rule into an intermediary form
 
+    @param type: str = None
+        Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
+        "lexicon" (lookup in an aligned lexicon).
+
+    @param alignments: str = None
+        A string specifying a file from which to load alignments when type = "lexicon".
+
     """
 
     def __init__(  # noqa: C901

@@ -10,7 +10,7 @@ import unicodedata as ud
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 
 import regex as re
 import yaml
@@ -461,8 +461,16 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
-def load_alignments_from_file(path, delimiter=""):
-    """Load alignments in Phonetisaurus default format."""
+def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
+    """Load alignments in Phonetisaurus default format.
+
+    Returns a mapping of input words to output alignments used to
+    create a lexicon mapping.  These are of the form (length,
+    outputs, length, outputs, ...) - that is, a sequence of pairs
+    specifying how much of the input to consume and what it maps
+    to.  This particular format is used to avoid redundancy with
+    the keys in the dictionary.
+    """
     LOGGER.info("Loading alignments from %s", path)
     alignments = {}
     with open(path, encoding="utf8") as f:
@@ -471,7 +479,7 @@ def load_alignments_from_file(path, delimiter=""):
             if not spam:
                 continue
             chars = ""
-            mappings = []
+            mappings: List[Union[int, str]] = []
             for mapping in spam.split():
                 idx = mapping.rindex("}")
                 # Note that we care about *character* indices, so we join them together

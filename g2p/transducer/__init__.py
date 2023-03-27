@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import text_unidecode
 
@@ -900,12 +900,20 @@ class CompositeTransducer:
 class TokenizingTransducer:
     """This class combines tokenization and transduction.
 
+    This is particularly useful for lexicon mappings, which cannot
+    handle more than a single word at a time.
+
     Attributes:
-        transducer (Transducer): A Tranducer object for the mapping part
+        transducer (Transducer): A Transducer object for the mapping part
         tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
+
     """
 
-    def __init__(self, transducer: Transducer, tokenizer: DefaultTokenizer):
+    def __init__(
+        self,
+        transducer: Union[Transducer, CompositeTransducer],
+        tokenizer: DefaultTokenizer,
+    ):
         self._transducer = transducer
         self._tokenizer = tokenizer
 

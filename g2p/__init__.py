@@ -17,6 +17,7 @@ Basic Usage:
 """
 import io
 import sys
+from typing import Dict, Optional, Tuple, Union
 
 from networkx import shortest_path
 from networkx.exception import NetworkXNoPath
@@ -41,23 +42,33 @@ if sys.version_info < (3, 6):
     )
 
 
-_g2p_cache = {}
+_g2p_cache: Dict[
+    Tuple[str, str, Optional[str]],
+    Union[Transducer, CompositeTransducer, TokenizingTransducer],
+] = {}
 
 
-def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
+def make_g2p(in_lang: str, out_lang: str, tok_lang: Optional[str] = None):
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
+
+    In general you should also add `tok_lang` to specify the language
+    for tokenization (probably the same as `in_lang`), because
+    transducers are not guaranteed to deal with whitespace,
+    punctuation, etc, properly.
 
     Args:
         in_lang (str): input language code
         out_lang (str): output language code
+        tok_lang (Optional[str]): language for tokenization
 
     Returns:
-        Transducer from in_lang to out_lang
+        Transducer from in_lang to out_lang, optionally with a tokenizer.
 
     Raises:
         InvalidLanguageCode: if in_lang or out_lang don't exist
         NoPath: if there is path between in_lang and out_lang
+
     """
     if (in_lang, out_lang, tok_lang) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tok_lang)]
@@ -97,6 +108,7 @@ def make_g2p(in_lang: str, out_lang: str, tok_lang=None):
         mappings_needed.append(mapping)
 
     # Either construct a Transducer or Composite Transducer
+    transducer: Union[Transducer, CompositeTransducer, TokenizingTransducer]
     if len(mappings_needed) == 1:
         transducer = Transducer(mappings_needed[0])
     else:
