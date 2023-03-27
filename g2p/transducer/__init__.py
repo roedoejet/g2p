@@ -585,9 +585,11 @@ class Transducer:
                         edges.append((in_pos + i, out_pos + j))
                     if len(outtxt) == 0:  # Deletions
                         edges.append((in_pos + i, None))
-                if n_inputs == 0:  # Insertions
+                if n_inputs == 0:
+                    # Insertions are treated differently because many
+                    # parts of the code assume that they cannot exist
                     for j in range(len(outtxt)):
-                        edges.append((None, out_pos + j))
+                        edges.append((in_pos, out_pos + j))
 
                 in_pos += n_inputs
                 if len(outtxt) != 0:

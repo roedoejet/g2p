@@ -102,11 +102,11 @@ class LexiconTransducerTest(TestCase):
         tg = t("xtra")
         self.assertEqual(tg.output_string, "ɛkstɹʌ")
         self.assertEqual(tg.input_string, "xtra")
-        self.assertEqual(tg.edges, [(None, 0), (0, 1), (0, 2), (1, 3), (2, 4), (3, 5)])
+        self.assertEqual(tg.edges, [(0, 0), (0, 1), (0, 2), (1, 3), (2, 4), (3, 5)])
         pe = tg.pretty_edges()
         self.assertEqual(
             pe,
-            [[None, "ɛ"], ["x", "k"], ["x", "s"], ["t", "t"], ["r", "ɹ"], ["a", "ʌ"]],
+            [["x", "ɛ"], ["x", "k"], ["x", "s"], ["t", "t"], ["r", "ɹ"], ["a", "ʌ"]],
         )
 
     def test_eng_transducer(self):
