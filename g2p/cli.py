@@ -429,6 +429,13 @@ def generate_mapping(  # noqa: C901
 
 
 @click.option(
+    "--substring-alignments",
+    "-a",
+    default=False,
+    is_flag=True,
+    help="Show the minimal monotonic substring alignments.",
+)
+@click.option(
     "--pretty-edges",
     "-e",
     default=False,
@@ -489,6 +496,7 @@ def convert(  # noqa: C901
     pretty_edges,
     tok_lang,
     config,
+    substring_alignments,
 ):
     """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
@@ -556,6 +564,8 @@ def convert(  # noqa: C901
     if check:
         transducer.check(tg, display_warnings=True)
     outputs = [tg.output_string]
+    if substring_alignments:
+        outputs += [tg.substring_alignments()]
     if pretty_edges:
         outputs += [tg.pretty_edges()]
     if debugger:

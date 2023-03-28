@@ -194,6 +194,12 @@ class CliTest(TestCase):
         mapped_lower = "s"
         self.assertNotIn(mapped_lower, returned_set)
 
+    def test_convert_option_a(self):
+        result = self.runner.invoke(convert, "-a hello eng eng-arpabet")
+        self.assertIn(
+            "[('h', 'HH '), ('e', 'AH '), ('ll', 'L '), ('o', 'OW ')]", result.stdout
+        )
+
     def test_convert_option_e(self):
         result = self.runner.invoke(convert, "-e est fra eng-arpabet")
         for s in [
