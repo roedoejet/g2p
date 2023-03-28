@@ -10,6 +10,7 @@ from unittest import TestCase, main
 import yaml
 
 from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
+from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
 from g2p.tests.public import PUBLIC_DIR
 
@@ -111,7 +112,7 @@ class UtilsTest(TestCase):
         pass
 
     def test_escape_special(self):
-        self.assertEqual(utils.escape_special_characters({"in": "?"}), {"in": "\?"})
+        self.assertEqual(utils.escape_special_characters({"in": "?"}), {"in": "\\?"})
 
     def test_load_abbs(self):
         with self.assertRaises(IncorrectFileType):
@@ -134,10 +135,14 @@ class UtilsTest(TestCase):
         # config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
         config["mapping"] = [{"in": "a", "out": "b"}]
         mapping = Mapping(**config)
-        mapping.config_to_file(os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml"))
-        mapping.config_to_file(
-            os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
-        )
+        with self.assertLogs(LOGGER, level="WARNING"):
+            mapping.config_to_file(
+                os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+            )
+        with self.assertLogs(LOGGER, level="WARNING"):
+            mapping.config_to_file(
+                os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
+            )
         mapping.mapping_to_file(os.path.join(PUBLIC_DIR, "mappings"))
         test_config = utils.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")

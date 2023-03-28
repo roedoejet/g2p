@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple, Union
 
 import text_unidecode
 
@@ -140,9 +140,11 @@ class TransductionGraph:
 
     def pretty_edges(self):
         edges = copy.deepcopy(self._edges)
-        edges.sort(key=lambda x: x[0])
+        edges.sort(key=lambda x: -1 if x[0] is None else x[0])
         for i, edge in enumerate(edges):
-            if edge[1] is None:
+            if edge[0] is None:
+                edges[i] = [None, self._output_nodes[edge[1]][1]]
+            elif edge[1] is None:
                 edges[i] = [self._input_nodes[edge[0]][1], None]
             else:
                 edges[i] = [
@@ -151,7 +153,7 @@ class TransductionGraph:
                 ]
         return edges
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             "edges": self._edges,
             "input": self._input_string,
@@ -563,9 +565,46 @@ class Transducer:
 
         return tg
 
+    def apply_lexicon(self, to_convert: str):
+        tg = TransductionGraph(to_convert)
+        if not self.case_sensitive:
+            to_convert = to_convert.lower()
+        alignment = self.mapping.alignments.get(to_convert, ())
+        if not alignment:
+            tg.edges = []
+            tg.output_string = ""
+        else:
+            tg.output_string = ""
+            edges: List[Tuple[Optional[int], Optional[int]]] = []
+            in_pos = 0
+            out_pos = 0
+            # Mappings are flat to save space
+            for n_inputs, outtxt in zip(alignment[::2], alignment[1::2]):
+                for i in range(n_inputs):
+                    for j in range(len(outtxt)):
+                        edges.append((in_pos + i, out_pos + j))
+                    if len(outtxt) == 0:  # Deletions
+                        edges.append((in_pos + i, None))
+                if n_inputs == 0:
+                    # Insertions are treated differently because many
+                    # parts of the code assume that they cannot exist
+                    for j in range(len(outtxt)):
+                        edges.append((in_pos, out_pos + j))
+
+                in_pos += n_inputs
+                if len(outtxt) != 0:
+                    out_pos += len(outtxt) + len(self.out_delimiter)
+                    # Be bug-compatible with mappings and add an extra delimiter
+                    tg.output_string += outtxt + self.out_delimiter
+
+            tg.edges = edges
+        return tg
+
     def apply_rules(self, to_convert: str):  # noqa: C901
         if self.mapping.kwargs.get("type", "") == "unidecode":
             return self.apply_unidecode(to_convert)
+        elif self.mapping.kwargs.get("type", "") == "lexicon":
+            return self.apply_lexicon(to_convert)
 
         # perform any normalization
         to_convert = unicode_escape(to_convert)
@@ -863,12 +902,20 @@ class CompositeTransducer:
 class TokenizingTransducer:
     """This class combines tokenization and transduction.
 
+    This is particularly useful for lexicon mappings, which cannot
+    handle more than a single word at a time.
+
     Attributes:
-        transducer (Transducer): A Tranducer object for the mapping part
+        transducer (Transducer): A Transducer object for the mapping part
         tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
+
     """
 
-    def __init__(self, transducer: Transducer, tokenizer: DefaultTokenizer):
+    def __init__(
+        self,
+        transducer: Union[Transducer, CompositeTransducer],
+        tokenizer: DefaultTokenizer,
+    ):
         self._transducer = transducer
         self._tokenizer = tokenizer
 

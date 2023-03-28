@@ -24,12 +24,16 @@ class ExpensiveDoctorTest(TestCase):
         # This test simulates calling "g2p doctor" on the command line with no arguments,
         # which runs doctor on all mappings.
         runner = APP.test_cli_runner()
-        result = runner.invoke(doctor)
+        with self.assertLogs(LOGGER, level="WARNING") as cm:
+            result = runner.invoke(doctor)
         self.assertEqual(result.exit_code, 0)
-        self.assertGreaterEqual(len(result.stdout), 10000)
+        self.assertGreaterEqual(len(cm.output), 100)
 
     # Migrated here from test_doctor.py
-    def test_ipa_known_segs_all(self):
+    # And skip this test, because test_doctor_cli() indirectly does the
+    # expensive call to check_ipa_know_segs already so there is no value in
+    # doing it a second time here.
+    def not_test_ipa_known_segs_all(self):
         # This test simulates the innards of having called "g2p doctor" on the command
         # line with no arguments, again running the innards of doctor on all mappings.
         with self.assertLogs(LOGGER, level="WARNING") as cm:

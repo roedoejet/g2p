@@ -60,6 +60,8 @@ function createSettings(index, data) {
     let prevent_feeding = '';
     let norm_form = 'NFC';
     let type = 'mapping';
+    let in_lang = '';
+    let out_lang = '';
     if (index === 0) {
         active = 'active'
     }
@@ -92,6 +94,11 @@ function createSettings(index, data) {
     }
     if (data['type']) {
         type = data['type']
+    }
+    // For lexicon mappings, we can only use the built-in mapping
+    if (type == ['lexicon']) {
+        in_lang = data['in_lang']
+        out_lang = data['out_lang']
     }
     let settings_template = `
     <div class='${active} settings'>
@@ -136,6 +143,8 @@ function createSettings(index, data) {
                     <input id='out_delimiter-${index}' type='text' name='out_delimiter' value='${out_delimiter}' placeholder='delimiter' maxlength='1'>
                 </div>
                 <input id='type-${index}' type='hidden' name='type' value='${type}' maxlength='20' minlength='0'>
+                <input id='in_lang-${index}' type='hidden' name='in_lang' value='${in_lang}' maxlength='20' minlength='0'>
+                <input id='out_lang-${index}' type='hidden' name='out_lang' value='${out_lang}' maxlength='20' minlength='0'>
             </fieldset>
         </form>
     </div>`
@@ -313,8 +322,12 @@ getIncludedMappings = function() {
 
         for (index of indices) {
             mapping = {}
+            let kwargs = getKwargs(index)
+            if (kwargs["type"] == "lexicon")
+                mapping['mapping'] = null;
+            else
+                mapping['mapping'] = TABLES[index].getSourceData().filter(v => v.in)
             // Extract only non-empty rules and abbreviations for processing
-            mapping['mapping'] = TABLES[index].getSourceData().filter(v => v.in)
             mapping['abbreviations'] = ABBS[index].getData().filter(v => v[0])
             mapping['kwargs'] = getKwargs(index)
             mappings.push(mapping)
@@ -333,7 +346,15 @@ var getKwargs = function(index) {
     const prevent_feeding = document.getElementById(`prevent_feeding-${index}`).checked
     const norm_form = document.getElementById(`norm_form-${index}`).value
     const type = document.getElementById(`type-${index}`).value
-    return { rule_ordering, case_sensitive, escape_special, reverse, include, out_delimiter, norm_form, prevent_feeding, type }
+    if (type === "lexicon") {
+        const in_lang = document.getElementById(`in_lang-${index}`).value
+        const out_lang = document.getElementById(`out_lang-${index}`).value
+        // Lexicon G2P cannot be customized (FIXME: likewise for unidecode actually)
+        return { type, in_lang, out_lang }
+    }
+    else
+        return { rule_ordering, case_sensitive, escape_special, reverse, include,
+                 out_delimiter, norm_form, prevent_feeding, type }
 }
 
 var setKwargs = function(index, kwargs) {
@@ -363,6 +384,12 @@ var setKwargs = function(index, kwargs) {
     }
     if ('type' in kwargs) {
         document.getElementById(`type-${index}`).value = kwargs['type']
+    }
+    if ('in_lang' in kwargs) {
+        document.getElementById(`in_lang-${index}`).value = kwargs['in_lang']
+    }
+    if ('out_lang' in kwargs) {
+        document.getElementById(`out_lang-${index}`).value = kwargs['out_lang']
     }
     convert()
 }

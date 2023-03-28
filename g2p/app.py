@@ -3,22 +3,18 @@
 Views and config to the g2p Studio web app
 
 """
-import json
-import os
 from typing import Union
 
 from flask import Flask, render_template
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
-from networkx.algorithms.dag import ancestors, descendants
+from networkx import shortest_path
 
 from g2p import make_g2p
 from g2p.api import g2p_api
-from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import expand_abbreviations_format, flatten_abbreviations_format
-from g2p.static import __file__ as static_file
 from g2p.transducer import (
     CompositeTransducer,
     CompositeTransductionGraph,
@@ -54,37 +50,6 @@ def contrasting_text_color(hex_str):
         < 0.5
         else "#fff"
     )
-
-
-def network_to_echart(write_to_file: bool = False, layout: bool = False):
-    nodes = []
-    no_nodes = len(LANGS_NETWORK.nodes)
-    for node in LANGS_NETWORK.nodes:
-        lang_name = node.split("-")[0]
-        no_ancestors = len(ancestors(LANGS_NETWORK, node))
-        no_descendants = len(descendants(LANGS_NETWORK, node))
-        size = min(
-            20,
-            max(
-                2, ((no_ancestors / no_nodes) * 100 + (no_descendants / no_nodes) * 100)
-            ),
-        )
-        node = {"name": node, "symbolSize": size, "id": node, "category": lang_name}
-        nodes.append(node)
-    nodes.sort(key=lambda x: x["name"])
-    edges = []
-    for edge in LANGS_NETWORK.edges:
-        edges.append({"source": edge[0], "target": edge[1]})
-    if write_to_file:
-        with open(
-            os.path.join(os.path.dirname(static_file), "languages-network.json"),
-            "w",
-            encoding="utf-8",
-            newline="\n",
-        ) as f:
-            f.write(json.dumps({"nodes": nodes, "edges": edges}) + "\n")
-        LOGGER.info("Wrote network nodes and edges to static file.")
-    return nodes, edges
 
 
 def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph]):
@@ -152,23 +117,6 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
     return nodes, edges
 
 
-def return_empty_mappings(n=DEFAULT_N):
-    """Return 'n' * empty mappings"""
-    y = 0
-    mappings = []
-    while y < n:
-        mappings.append(
-            {"in": "", "out": "", "context_before": "", "context_after": ""}
-        )
-        y += 1
-    return mappings
-
-
-def return_descendant_nodes(node: str):
-    """Return possible outputs for a given input"""
-    return [x for x in descendants(LANGS_NETWORK, node)]
-
-
 @APP.route("/")
 def home():
     """Return homepage of g2p studio"""
@@ -194,6 +142,9 @@ def convert(message):
         )
         transducer = Transducer(mappings_obj)
         transducers.append(transducer)
+    if len(transducers) == 0:
+        emit("conversion response", {"output_string": message["data"]["input_string"]})
+        return
     transducer = CompositeTransducer(transducers)
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
@@ -215,26 +166,60 @@ def convert(message):
 def change_table(message):
     """Change the lookup table"""
     if message["in_lang"] == "custom" or message["out_lang"] == "custom":
-        mappings = Mapping(return_empty_mappings())
+        # These are only used to generate JSON to send to the client,
+        # so it's safe to create a list of references to the same thing.
+        mappings = [
+            {"in": "", "out": "", "context_before": "", "context_after": ""}
+        ] * DEFAULT_N
+        abbs = [[""] * 6] * DEFAULT_N
+        kwargs = {
+            "language_name": "Custom",
+            "display_name": "Custom",
+            "in_lang": "custom",
+            "out_lang": "custom",
+            "include": False,
+            "type": "mapping",
+            "case_sensitive": True,
+            "norm_form": "NFC",
+            "escape_special": False,
+            "prevent_feeding": False,
+            "reverse": False,
+            "rule_ordering": "as-written",
+            "out_delimiter": "",
+        }
+        emit(
+            "table response",
+            [
+                {
+                    "mappings": mappings,
+                    "abbs": abbs,
+                    "kwargs": kwargs,
+                }
+            ],
+        )
     else:
-        transducer = make_g2p(message["in_lang"], message["out_lang"])
-    if isinstance(transducer, Transducer):
-        mappings = [transducer.mapping]
-    elif isinstance(transducer, CompositeTransducer):
-        mappings = [x.mapping for x in transducer._transducers]
-    else:
-        pass
-    emit(
-        "table response",
-        [
-            {
-                "mappings": x.plain_mapping(),
-                "abbs": expand_abbreviations_format(x.abbreviations),
-                "kwargs": x.kwargs,
-            }
-            for x in mappings
-        ],
-    )
+        # Do not create a composite transducer just to decompose it,
+        # because it is the individual ones which are cached by g2p
+        path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
+        if len(path) == 1:
+            transducer = make_g2p(message["in_lang"], message["out_lang"])
+            mappings = [transducer.mapping]
+        else:
+            mappings = []
+            for lang1, lang2 in zip(path[:-1], path[1:]):
+                transducer = make_g2p(lang1, lang2)
+                mappings.append(transducer.mapping)
+        emit(
+            "table response",
+            [
+                {
+                    "mappings": x.plain_mapping(),
+                    "abbs": expand_abbreviations_format(x.abbreviations),
+                    "kwargs": x.kwargs,
+                }
+                for x in mappings
+            ],
+        )
 
 
 @SOCKETIO.on("connect", namespace="/connect")

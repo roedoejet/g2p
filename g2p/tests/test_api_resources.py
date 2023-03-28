@@ -64,7 +64,7 @@ class ResourceIntegrationTest(TestCase):
                 r = self.client().get(rt)
                 self.assertEqual(r.status_code, 200)
                 LOGGER.debug("Route " + rt + " returned " + str(r.status_code))
-            except:
+            except Exception:
                 LOGGER.error("Couldn't connect. Is flask running?")
 
     def test_response_code_with_args(self):
@@ -77,7 +77,7 @@ class ResourceIntegrationTest(TestCase):
                 try:
                     r = self.client().get(rt)
                     self.assertEqual(r.status_code, 200)
-                except:
+                except Exception:
                     LOGGER.error("Couldn't connect. Is flask running?")
             LOGGER.debug(
                 "Successfully tested "
@@ -127,15 +127,20 @@ class ResourceIntegrationTest(TestCase):
         data["index"] = False
         self.assertEqual(minimal_response.status_code, 200)
         self.assertEqual(minimal_response.get_json(), data)
-        bad_response = self.client().get(self.conversion_route, query_string=bad_params)
-        same_response = self.client().get(
-            self.conversion_route, query_string=same_params
-        )
+        with self.assertLogs(LOGGER, level="ERROR"):
+            bad_response = self.client().get(
+                self.conversion_route, query_string=bad_params
+            )
+        with self.assertLogs(LOGGER, level="ERROR"):
+            same_response = self.client().get(
+                self.conversion_route, query_string=same_params
+            )
         self.assertEqual(bad_response.status_code, 400)
         self.assertEqual(same_response.status_code, 400)
-        missing_response = self.client().get(
-            self.conversion_route, query_string=missing_params
-        )
+        with self.assertLogs(LOGGER, level="ERROR"):
+            missing_response = self.client().get(
+                self.conversion_route, query_string=missing_params
+            )
         self.assertEqual(missing_response.status_code, 404)
 
 
