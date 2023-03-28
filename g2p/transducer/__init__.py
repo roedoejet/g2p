@@ -68,7 +68,7 @@ class TransductionGraph:
 
     @property
     def input_string(self) -> str:
-        """str: The input string that initialized the TransductionGraph."""
+        """The input string that initialized the TransductionGraph."""
         return self._input_string
 
     @input_string.setter
@@ -89,7 +89,7 @@ class TransductionGraph:
 
     @property
     def input_nodes(self) -> List[Tuple[int, str]]:
-        """List[Tuple[int, str]]: A list of nodes (index and character string) corresponding to the input"""
+        """List of nodes (index and character string) corresponding to the input"""
         return self._input_nodes
 
     @input_nodes.setter
@@ -100,7 +100,7 @@ class TransductionGraph:
 
     @property
     def output_nodes(self) -> List[Tuple[int, str]]:
-        """List[Tuple[int, str]]: A list of nodes (index and character string) corresponding to the output"""
+        """List of nodes (index and character string) corresponding to the output"""
         return self._output_nodes
 
     @output_nodes.setter
@@ -111,8 +111,11 @@ class TransductionGraph:
 
     @property
     def edges(self) -> List:
-        """A list of edges for the transformation.  This is *not* the same
-        between TransductionGraph and CompositeTransductionGraph."""
+        """List[Tuple[int, int]] of edges for the transformation.
+
+        Note that currently this is *not* the same between
+        TransductionGraph and CompositeTransductionGraph.
+        """
         return self._edges
 
     @edges.setter
@@ -120,10 +123,14 @@ class TransductionGraph:
         self._edges = value
 
     @property
-    def debugger(self):
-        """List[dict]: A list of lists of rules applied during the
-        transformation. Useful for debugging.  Note that this is not the same
-        between TransductionGraph and CompositeTransductionGraph."""
+    def debugger(self) -> List[list]:
+        """List[List[dict]]: A list of lists of rules applied during the
+        transformation. Useful for debugging.
+
+        Note that currently this is *not* the same between TransductionGraph
+        and CompositeTransductionGraph.
+
+        """
         return self._debugger
 
     @debugger.setter
@@ -132,8 +139,8 @@ class TransductionGraph:
 
     @property
     def tiers(self) -> List["TransductionGraph"]:  # noqa: F821
-        """List[TransductionGraph]: A list of TransductionGraph objects for
-        each tier in the graph (there is one tier)."""
+        """A list of TransductionGraph objects for each tier in the graph
+        (there is one tier)."""
         return [self]
 
     @tiers.setter
@@ -143,9 +150,11 @@ class TransductionGraph:
         )
 
     def pretty_edges(self):
-        """List of edges, expressed as strings.  Note that this
-        is unfortunately *not* the same output between TransductionGraph and
-        ComposedTransductionGraph."""
+        """List[Tuple[str, str]] of edges resolved to the string nodes.
+
+        Note that this currently *not* the same output between
+        TransductionGraph and ComposedTransductionGraph.
+        """
         edges = self._edges[:]
         edges.sort(key=lambda x: x[0])
         out_edges = []
@@ -163,9 +172,12 @@ class TransductionGraph:
         return out_edges
 
     def alignments(self) -> List[Tuple[int, int]]:
-        """Return list of alignments (input node index, output node index) for
-        the full transduction.  This *is* the same between TransductionGraph
-        and CompositeTransductionGraph."""
+        """Alignments (input node index, output node index) for the full
+        (possibly composed) transduction.
+
+        Note that this *is* the same between TransductionGraph and
+        CompositeTransductionGraph.
+        """
         return self._edges
 
     def substring_alignments(  # noqa: C901
@@ -957,8 +969,8 @@ class CompositeTransductionGraph(TransductionGraph):
         self._tiers = tg_list
 
     @property
-    def tiers(self):
-        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the CompositeTransducer"""
+    def tiers(self) -> List[TransductionGraph]:
+        """A list of TransductionGraph objects for each tier in the CompositeTransducer"""
         return self._tiers
 
     @tiers.setter
@@ -968,10 +980,13 @@ class CompositeTransductionGraph(TransductionGraph):
         )
 
     @property
-    def edges(self):
-        """A list of edges for each tier in the transformation. Note that this
-        is unfortunately *not* the same between TransductionGraph and
-        ComposedTransductionGraph."""
+    def edges(self) -> List:
+        """List[List[Tuple[int, int]]] of edges for each tier in the
+        transformation.
+
+        Note that this is unfortunately *not* the same between
+        TransductionGraph and ComposedTransductionGraph.
+        """
         return self._edges
 
     @edges.setter
@@ -981,10 +996,13 @@ class CompositeTransductionGraph(TransductionGraph):
         )
 
     @property
-    def debugger(self):
-        """List[dict]: A list of lists of lists of rules applied during the
-        transformation. Useful for debugging.  Note that this is not the same
-        between TransductionGraph and CompositeTransductionGraph."""
+    def debugger(self) -> List[list]:
+        """List[List[List[dict]]]: A list of lists of lists of rules applied
+        during the transformation. Useful for debugging.  Note that
+        this is not the same between TransductionGraph and
+        CompositeTransductionGraph.
+
+        """
         return self._debugger
 
     @debugger.setter
@@ -994,16 +1012,25 @@ class CompositeTransductionGraph(TransductionGraph):
         )
 
     def pretty_edges(self):
-        """List of edges for each tier, expressed as strings.  Note that this
-        is unfortunately *not* the same output between TransductionGraph and
-        ComposedTransductionGraph."""
+        """List[List[Tuple[str, str]]] of edges for each tier, expressed as
+        strings.
+
+        Note that this is unfortunately *not* the same output between
+        TransductionGraph and ComposedTransductionGraph.
+
+        """
         pretty_edges = []
         for tier in self._tiers:
             pretty_edges.append(tier.pretty_edges())
         return pretty_edges
 
     def alignments(self) -> List[Tuple[int, int]]:
-        """Return list of alignments (input node index, output node index) for the full transduction."""
+        """Return list of alignments (input node index, output node index) for
+        the full transduction.
+
+        Note that this *is* the same between TransductionGraph and
+        CompositeTransductionGraph.
+        """
         composed = self.tiers[0].edges
         for tier in self.tiers[1:]:
             composed = compose_indices(composed, tier.edges)
