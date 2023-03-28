@@ -7,7 +7,7 @@ which are responsible for performing transductions in the g2p library.
 import copy
 import re
 import unicodedata
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 from typing import Dict, List, Optional, Tuple, Union
 
 import text_unidecode
@@ -56,10 +56,10 @@ class TransductionGraph:
         self._input_string = input_string
         self._output_string = input_string
         # Nodes
-        self._input_nodes = [[i, x] for i, x in enumerate(input_string)]
-        self._output_nodes = [[i, x] for i, x in enumerate(input_string)]
+        self._input_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
+        self._output_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         # Edges
-        self._edges = [[i, i] for i, x in enumerate(input_string)]
+        self._edges: List[Tuple[int, int]] = [(i, i) for i in range(len(input_string))]
         # Debugger
         self._debugger = []  # type: ignore
 
@@ -67,29 +67,29 @@ class TransductionGraph:
         return self._output_string
 
     @property
-    def input_string(self):
-        """str: The input string that initialized the TransductionGraph."""
+    def input_string(self) -> str:
+        """The input string that initialized the TransductionGraph."""
         return self._input_string
 
     @input_string.setter
     def input_string(self, value):
         # Only modify this if you're also adjusting the edges at the same time!
         self._input_string = value
-        self._input_nodes = [[i, x] for i, x in enumerate(value)]
+        self._input_nodes = list(enumerate(value))
 
     @property
-    def output_string(self):
+    def output_string(self) -> str:
         """str: The output string."""
         return self._output_string
 
     @output_string.setter
     def output_string(self, value):
         self._output_string = value
-        self._output_nodes = [[i, x] for i, x in enumerate(value)]
+        self._output_nodes = list(enumerate(value))
 
     @property
-    def input_nodes(self):
-        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the input"""
+    def input_nodes(self) -> List[Tuple[int, str]]:
+        """List of nodes (index and character string) corresponding to the input"""
         return self._input_nodes
 
     @input_nodes.setter
@@ -99,8 +99,8 @@ class TransductionGraph:
         )
 
     @property
-    def output_nodes(self):
-        """List[List[int, str]]: A list of nodes (index and character string) corresponding to the output"""
+    def output_nodes(self) -> List[Tuple[int, str]]:
+        """List of nodes (index and character string) corresponding to the output"""
         return self._output_nodes
 
     @output_nodes.setter
@@ -110,8 +110,12 @@ class TransductionGraph:
         )
 
     @property
-    def edges(self):
-        """List[List[int, int]]: A list of edges (input node index, output node index) corresponding to the indices of the transformation"""
+    def edges(self) -> List:
+        """List[Tuple[int, int]] of edges for the transformation.
+
+        Note that currently this is *not* the same between
+        TransductionGraph and CompositeTransductionGraph.
+        """
         return self._edges
 
     @edges.setter
@@ -119,8 +123,14 @@ class TransductionGraph:
         self._edges = value
 
     @property
-    def debugger(self):
-        """List[dict]: A list of lists of rules applied during the transformation. Useful for debugging."""
+    def debugger(self) -> List[list]:
+        """List[List[dict]]: A list of lists of rules applied during the
+        transformation. Useful for debugging.
+
+        Note that currently this is *not* the same between TransductionGraph
+        and CompositeTransductionGraph.
+
+        """
         return self._debugger
 
     @debugger.setter
@@ -128,9 +138,10 @@ class TransductionGraph:
         self._debugger = value
 
     @property
-    def tiers(self):
-        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the graph"""
-        return self
+    def tiers(self) -> List["TransductionGraph"]:  # noqa: F821
+        """A list of TransductionGraph objects for each tier in the graph
+        (there is one tier)."""
+        return [self]
 
     @tiers.setter
     def tiers(self, value):
@@ -139,19 +150,167 @@ class TransductionGraph:
         )
 
     def pretty_edges(self):
-        edges = copy.deepcopy(self._edges)
-        edges.sort(key=lambda x: -1 if x[0] is None else x[0])
-        for i, edge in enumerate(edges):
-            if edge[0] is None:
-                edges[i] = [None, self._output_nodes[edge[1]][1]]
-            elif edge[1] is None:
-                edges[i] = [self._input_nodes[edge[0]][1], None]
+        """List[Tuple[str, str]] of edges resolved to the string nodes.
+
+        Note that this currently *not* the same output between
+        TransductionGraph and ComposedTransductionGraph.
+        """
+        edges = self._edges[:]
+        edges.sort(key=lambda x: x[0])
+        out_edges = []
+        for edge in edges:
+            assert edge[0] is not None  # Empty inputs are not allowed
+            if edge[1] is None:
+                out_edges.append((self._input_nodes[edge[0]][1], None))
             else:
-                edges[i] = [
-                    self._input_nodes[edge[0]][1],
-                    self._output_nodes[edge[1]][1],
-                ]
-        return edges
+                out_edges.append(
+                    (
+                        self._input_nodes[edge[0]][1],
+                        self._output_nodes[edge[1]][1],
+                    )
+                )
+        return out_edges
+
+    def alignments(self) -> List[Tuple[int, int]]:
+        """Alignments (input node index, output node index) for the full
+        (possibly composed) transduction.
+
+        Note that this *is* the same between TransductionGraph and
+        CompositeTransductionGraph.
+        """
+        return self._edges
+
+    def substring_alignments(  # noqa: C901
+        self, alignments=None
+    ) -> List[Tuple[str, str]]:
+        """Alignments of input to output substrings for this graph.
+
+        As opposed to `pretty_edges`, this method will return the
+        one-to-many or many-to-one alignments produced by a
+        conversion.  It is also the same between TransductionGraph and
+        CompositeTransductionGraph.  For example, assuming this input
+        and output with these edges::
+
+            ABCDEFF
+            aabbcdef
+            [(0, 0), (0, 1), (1, 2), (1, 3), (2, 4), (3, 5),
+             (4, 6), (5, 7), (6, 7)]
+
+        it should return::
+
+            [('A', 'aa'), ('B', 'bb'), ('C', c'), ('D', 'd'),
+             ('E', 'e'), ('FF', 'f')]
+
+        In the case of reorderings, the substrings returned correspond
+        to the minimal *monotonic* alignments, that is, the minimal
+        subsequences which preserve ordering between the input and
+        output.  So, for example given these edges::
+
+            ABCDEF
+            abefcd
+            [(0, 0), (1, 1), (2, 4), (3, 5), (4, 2), (5, 3)]
+
+        it should return::
+
+            [('A', 'a'), ('B', 'b'), ('CDEF', 'efcd')]
+
+        This means, that in the case of truly radical reorderings,
+        there is no "alignment" per se.  This is highly unlikely to
+        occur, given the constrained nature of g2p rules.
+
+        Note that in the case of multi-character outputs such as in
+        ARPABET, the output substrings *do not necessarily* correspond
+        to tokens, and spaces are treated as any other character in
+        the alignment (thus, alignments of (' ', ' ') are possible).
+        If you wish to reconstruct the input it is your resonsibility
+        to collect all the alignments corresponding to an output token
+        (this should not be too hard to do).
+
+        """
+        if alignments is None:
+            alignments = self.alignments()
+
+        def find_monotonic_segments(alignments):
+            segments = []
+            # Sort according to input and output (None is not allowed on input)
+            isort = sorted(
+                alignments, key=lambda x: (x[0], x[0]) if x[1] is None else x
+            )
+            osort = sorted(
+                alignments, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
+            )
+            # Use -1 as flag value because None has a meaning in alignments
+            istart = ostart = iend = oend = -1
+            for iedge, oedge in zip(isort, osort):
+                non_overlapping = (
+                    -1 not in (iend, oend) and iedge[0] > iend and oedge[0] > oend
+                )
+                if iedge == oedge or non_overlapping:
+                    if iend != -1:
+                        segments.append((istart, iend, ostart, oend))
+                        istart = ostart = iend = oend = -1
+                    if iedge == oedge:
+                        ipos, opos = iedge
+                        segments.append((ipos, ipos, opos, opos))
+                        continue
+                if istart == -1:
+                    # Smallest input index (by definition)
+                    istart = iedge[0]
+                    # Smallest output index (by definition)
+                    ostart = oedge[1]
+                    # Update these until the next break point
+                    iend = oedge[0]
+                    oend = iedge[1]
+                else:
+                    assert oedge[0] is not None
+                    iend = max(iend, oedge[0])
+                    if iedge[1] is not None:
+                        oend = max(oend, iedge[1])
+            if istart != -1:
+                assert iend != -1
+            if iend != -1:
+                segments.append((istart, iend, ostart, oend))
+            return segments
+
+        # Construct areas of agreement
+        segments = find_monotonic_segments(alignments)
+        # print("segments:", segments)
+
+        def merge_overlapping_segments(segments):
+            if len(segments) <= 1:
+                return segments
+            istart, iend, ostart, oend = segments[0]
+            output = []
+            for seg in segments[1:]:
+                # If *start* points are outside current segment, start a new one
+                if None in (seg[2], oend):  # handle only None in outputs
+                    output_outside = not (None, None) == (seg[2], oend)
+                else:
+                    output_outside = seg[2] > oend
+                if seg[0] > iend and output_outside:
+                    output.append((istart, iend, ostart, oend))
+                    istart, iend, ostart, oend = seg
+                else:
+                    # Update endpoints to include this segment
+                    iend = seg[1]
+                    oend = seg[3]
+            output.append((istart, iend, ostart, oend))
+            return output
+
+        # Merge overlapping segments
+        segments = merge_overlapping_segments(segments)
+        # print("merged:", segments)
+        # Output string alignments
+        substrings = []
+        for istart, iend, ostart, oend in segments:
+            istr = self._input_string[istart : iend + 1]
+            if ostart is None:
+                assert oend is None
+                ostr = ""
+            else:
+                ostr = self._output_string[ostart : oend + 1]
+            substrings.append((istr, ostr))
+        return substrings
 
     def as_dict(self) -> dict:
         return {
@@ -241,11 +400,26 @@ class Transducer:
         else:
             return -1
 
-    def resolve_intermediate_chars(self, output_string):
+    @property
+    def in_lang(self) -> str:
+        """Input language node name"""
+        return self.mapping.kwargs.get("in_lang", "und")
+
+    @property
+    def out_lang(self) -> str:
+        """Output language node name"""
+        return self.mapping.kwargs.get("out_lang", "und")
+
+    @property
+    def transducers(self) -> List["Transducer"]:  # noqa: F821
+        """Sequence of underlying Transducer objects"""
+        return [self]
+
+    def resolve_intermediate_chars(self, output_string) -> str:
         """Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
         to their mapped equivalents.
         """
-        indices_seen = defaultdict(int)
+        indices_seen: Dict[int, int] = defaultdict(int)
         for i, char in enumerate(output_string):
             intermediate_index = self._pua_to_index(char)
             # if not Private Supplementary Use character
@@ -271,7 +445,7 @@ class Transducer:
 
     def get_match_groups(
         self, tg, start_end, io, diff_from_input, out_string, output_start
-    ):
+    ) -> Tuple[dict, dict]:
         """Take the inputs to explicit indices matching and create groups of
             Input and Output matches that are grouped by their explicit indices.
 
@@ -303,7 +477,7 @@ class Transducer:
         input_match_indices = [
             x.group() for x in self._index_match_pattern.finditer(io["in"])
         ]
-        inputs = {}
+        inputs: Dict[str, List[dict]] = {}
         index = 0
 
         input_start = (
@@ -323,7 +497,7 @@ class Transducer:
         output_match_indices = [
             x.group() for x in self._index_match_pattern.finditer(out_string)
         ]
-        outputs = {}
+        outputs: Dict[str, List[dict]] = {}
         index = 0
         for i, m in enumerate(output_match_indices):
             for char in output_char_matches[i]:
@@ -353,9 +527,9 @@ class Transducer:
                 and (ahh == 0 or tg.edges[k - 1][1] is None)
                 and edge[1] == index_to_delete
             ):
-                tg.edges[k][1] = None
+                tg.edges[k] = (edge[0], None)
             elif edge[1] is not None and edge[1] >= index_to_delete:
-                tg.edges[k][1] -= 1
+                tg.edges[k] = (edge[0], edge[1] - 1)
 
     def insert_character(self, tg, character_to_insert, index_to_insert_character):
         """Insert character at `index_to_insert_character` in TransductionGraph output
@@ -373,7 +547,7 @@ class Transducer:
         )
         for j, edge in enumerate(tg.edges):
             if edge[1] is not None and edge[1] >= index_to_insert_character:
-                tg.edges[j][1] += 1
+                tg.edges[j] = (edge[0], edge[1] + 1)
 
     def change_character(self, tg, character, index_to_change):
         """Change character at `index_to_change` in TransductionGraph output to `character`
@@ -457,7 +631,9 @@ class Transducer:
     def get_input_from_output(self, tg, output_node):
         return max(x[0] for x in tg.edges if x[1] == output_node)
 
-    def get_longest_and_shortest(self, in_string_or_matches, out_string_or_matches):
+    def get_longest_and_shortest(
+        self, in_string_or_matches, out_string_or_matches
+    ) -> Tuple[str, Union[str, list], Union[str, list]]:
         """Given two strings or match lists determine the longest and shortest. If
            the input is longer than the output, the process is to delete,
            if the output is longer than the input, the process is to insert.
@@ -515,7 +691,7 @@ class Transducer:
                 self.delete_character(tg, index_to_delete, i)
                 deleted += 1
 
-    def apply_unidecode(self, to_convert: str):
+    def apply_unidecode(self, to_convert: str) -> TransductionGraph:
         to_convert = unicode_escape(to_convert)
         saved_to_convert = to_convert
         if self.norm_form:
@@ -731,10 +907,10 @@ class Transducer:
                 except IndexError:
                     following = None
                 if previous:
-                    edge[1] = previous[-1][1]
+                    tg.edges[i] = (edge[0], previous[-1][1])
                 elif following:
-                    edge[1] = following[0][1]
-        tg.edges = list(dict.fromkeys([tuple(x) for x in tg.edges]))
+                    tg.edges[i] = (edge[0], following[0][1])
+        tg.edges = list(OrderedDict.fromkeys((i, j) for i, j in tg.edges))
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
@@ -746,7 +922,7 @@ class Transducer:
         shallow=False,
         display_warnings=False,
         original_input=None,
-    ):
+    ) -> bool:
         out_lang = self.mapping.kwargs["out_lang"]
         if "eng-arpabet" in out_lang:
             if is_arpabet(tg.output_string):
@@ -793,8 +969,8 @@ class CompositeTransductionGraph(TransductionGraph):
         self._tiers = tg_list
 
     @property
-    def tiers(self):
-        """List[TransductionGraph]: A list of TransductionGraph objects for each tier in the CompositeTransducer"""
+    def tiers(self) -> List[TransductionGraph]:
+        """A list of TransductionGraph objects for each tier in the CompositeTransducer"""
         return self._tiers
 
     @tiers.setter
@@ -803,21 +979,62 @@ class CompositeTransductionGraph(TransductionGraph):
             f"Sorry, you tried to change the tiers to {value} but they cannot be changed"
         )
 
+    @property
+    def edges(self) -> List:
+        """List[List[Tuple[int, int]]] of edges for each tier in the
+        transformation.
+
+        Note that this is unfortunately *not* the same between
+        TransductionGraph and ComposedTransductionGraph.
+        """
+        return self._edges
+
+    @edges.setter
+    def edges(self, value):
+        raise ValueError(
+            f"Sorry, you tried to change the edges to {value} but they cannot be changed"
+        )
+
+    @property
+    def debugger(self) -> List[list]:
+        """List[List[List[dict]]]: A list of lists of lists of rules applied
+        during the transformation. Useful for debugging.  Note that
+        this is not the same between TransductionGraph and
+        CompositeTransductionGraph.
+
+        """
+        return self._debugger
+
+    @debugger.setter
+    def debugger(self, value):
+        raise ValueError(
+            f"Sorry, you tried to change the debugger to {value} but they cannot be changed"
+        )
+
     def pretty_edges(self):
+        """List[List[Tuple[str, str]]] of edges for each tier, expressed as
+        strings.
+
+        Note that this is unfortunately *not* the same output between
+        TransductionGraph and ComposedTransductionGraph.
+
+        """
         pretty_edges = []
-        for tier_i, edges in enumerate(self._edges):
-            edges = copy.deepcopy(edges)
-            edges.sort(key=lambda x: x[0])
-            for i, edge in enumerate(edges):
-                if edge[1] is None:
-                    edges[i] = [self.tiers[tier_i].input_nodes[edge[0]][1], None]
-                else:
-                    edges[i] = [
-                        self.tiers[tier_i].input_nodes[edge[0]][1],
-                        self.tiers[tier_i].output_nodes[edge[1]][1],
-                    ]
-            pretty_edges.append(edges)
+        for tier in self._tiers:
+            pretty_edges.append(tier.pretty_edges())
         return pretty_edges
+
+    def alignments(self) -> List[Tuple[int, int]]:
+        """Return list of alignments (input node index, output node index) for
+        the full transduction.
+
+        Note that this *is* the same between TransductionGraph and
+        CompositeTransductionGraph.
+        """
+        composed = self.tiers[0].edges
+        for tier in self.tiers[1:]:
+            composed = compose_indices(composed, tier.edges)
+        return composed
 
     def as_dict(self):
         return {
@@ -865,6 +1082,21 @@ class CompositeTransducer:
     def __call__(self, to_convert: str):
         return self.apply_rules(to_convert)
 
+    @property
+    def transducers(self):
+        """Sequence of underlying Transducer objects"""
+        return self._transducers
+
+    @property
+    def in_lang(self):
+        """Input language node name"""
+        return self._transducers[0].in_lang
+
+    @property
+    def out_lang(self):
+        """Output language node name"""
+        return self._transducers[-1].out_lang
+
     def apply_rules(self, to_convert: str):
         tg_list = []
         for transducer in self._transducers:
@@ -908,7 +1140,6 @@ class TokenizingTransducer:
     Attributes:
         transducer (Transducer): A Transducer object for the mapping part
         tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
-
     """
 
     def __init__(
@@ -937,6 +1168,26 @@ class TokenizingTransducer:
                 non_word_tg = TransductionGraph(token["text"])
                 tg += non_word_tg
         return tg
+
+    @property
+    def transducer(self):
+        """Underlying Transducer object"""
+        return self._transducer
+
+    @property
+    def transducers(self) -> List[Transducer]:
+        """Sequence of underlying Transducer objects"""
+        return self._transducer.transducers
+
+    @property
+    def in_lang(self) -> str:
+        """Input language node name"""
+        return self._transducer.in_lang
+
+    @property
+    def out_lang(self) -> str:
+        """Output language node name"""
+        return self._transducer.out_lang
 
     def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
         # The obvious implementation fails, because we need to check only the words, not
