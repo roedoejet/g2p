@@ -37,6 +37,16 @@ class LexiconTransducerTest(TestCase):
             tg.edges,
             [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (3, 5), (4, 5), (5, 5)],
         )
+        tg = t("bogus")
+        self.assertEqual(tg.output_string, "")
+        self.assertEqual(
+            tg.edges,
+            [(0, None), (1, None), (2, None), (3, None), (4, None)],
+        )
+        self.assertEqual(
+            tg.substring_alignments(),
+            [("bogus", "")],
+        )
 
     def test_load_lexicon_mapping(self):
         """Test loading a lexicon mapping through a config file."""
