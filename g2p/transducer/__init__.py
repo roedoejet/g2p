@@ -766,8 +766,9 @@ class Transducer:
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
                     if len(outtxt) == 0:
-                        # Attach deletions to the next input (we will
-                        # fix this below if it does not exist)
+                        # Attach deletions to the next input and the
+                        # previous output (fixed below if it does not
+                        # exist)
                         edges.append((in_pos + i, out_pos))
                 if n_inputs == 0:
                     # Attach insertions to the previous input
