@@ -35,7 +35,7 @@ class LexiconTransducerTest(TestCase):
         self.assertEqual(tg.output_string, "Y UH R ")
         self.assertEqual(
             tg.edges,
-            [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (3, None), (4, 5), (5, 5)],
+            [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (3, 5), (4, 5), (5, 5)],
         )
 
     def test_load_lexicon_mapping(self):
@@ -74,9 +74,7 @@ class LexiconTransducerTest(TestCase):
         self.assertEqual(tg.edges, [(0, 0), (1, 1), (2, 2), (3, 2), (4, 3), (4, 4)])
         tg = t("you're")
         self.assertEqual(tg.output_string, "jʊɹ")
-        self.assertEqual(
-            tg.edges, [(0, 0), (1, None), (2, 1), (3, None), (4, 2), (5, None)]
-        )
+        self.assertEqual(tg.edges, [(0, 0), (1, 1), (2, 1), (3, 2), (4, 2), (5, 2)])
         tg = t("change")
         self.assertEqual(tg.output_string, "tʃeɪndʒ")
         self.assertEqual(tg.input_string, "change")
@@ -85,20 +83,20 @@ class LexiconTransducerTest(TestCase):
             [
                 (0, 0),
                 (0, 1),
-                (1, None),
+                (1, 2),
                 (2, 2),
                 (2, 3),
                 (3, 4),
                 (4, 5),
                 (4, 6),
-                (5, None),
+                (5, 6),
             ],
         )
         tg = t("chain")
         # These aligments are weird but they are the ones EM gave us
         self.assertEqual(tg.output_string, "tʃeɪn")
         self.assertEqual(tg.input_string, "chain")
-        self.assertEqual(tg.edges, [(0, 0), (0, 1), (1, None), (2, 2), (3, 3), (4, 4)])
+        self.assertEqual(tg.edges, [(0, 0), (0, 1), (1, 2), (2, 2), (3, 3), (4, 4)])
         tg = t("xtra")
         self.assertEqual(tg.output_string, "ɛkstɹʌ")
         self.assertEqual(tg.input_string, "xtra")

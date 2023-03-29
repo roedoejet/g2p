@@ -239,6 +239,8 @@ class TransductionGraph:
             osort = sorted(
                 alignments, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
             )
+            # print("isort:", isort)
+            # print("osort:", osort)
             # Use -1 as flag value because None has a meaning in alignments
             istart = ostart = iend = oend = -1
             for iedge, oedge in zip(isort, osort):
@@ -264,7 +266,10 @@ class TransductionGraph:
                 else:
                     assert oedge[0] is not None
                     iend = max(iend, oedge[0])
-                    if iedge[1] is not None:
+                    # Replace None with not-None
+                    if oend is None:
+                        oend = iedge[1]
+                    elif iedge[1] is not None:
                         oend = max(oend, iedge[1])
             if istart != -1:
                 assert iend != -1
@@ -755,15 +760,28 @@ class Transducer:
             in_pos = 0
             out_pos = 0
             # Mappings are flat to save space
-            for n_inputs, outtxt in zip(alignment[::2], alignment[1::2]):
+            for idx in range(0, len(alignment), 2):
+                (n_inputs, outtxt) = alignment[idx : idx + 2]
                 for i in range(n_inputs):
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
-                    if len(outtxt) == 0:  # Deletions
-                        edges.append((in_pos + i, None))
+                    if len(outtxt) == 0:
+                        # Match the (dubious) behaviour of rule-based
+                        # mappings which will always attach deletions
+                        # to an adjacent output unless the output is
+                        # empty, in which case the output index is None
+                        if idx == len(alignment) - 2:
+                            # Previous output at end
+                            edges.append(
+                                (in_pos + i, None if out_pos == 0 else out_pos - 1)
+                            )
+                        else:
+                            # Otherwise next output... this is very
+                            # ad-hoc but so is the behaviour of
+                            # rule-based mappings ;-(
+                            edges.append((in_pos + i, out_pos))
                 if n_inputs == 0:
-                    # Insertions are treated differently because many
-                    # parts of the code assume that they cannot exist
+                    # Attach insertions to the previous input
                     for j in range(len(outtxt)):
                         edges.append((in_pos, out_pos + j))
 
