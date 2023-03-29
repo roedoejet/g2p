@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import text_unidecode
 
@@ -59,7 +59,9 @@ class TransductionGraph:
         self._input_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         self._output_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         # Edges
-        self._edges: List[Tuple[int, int]] = [(i, i) for i in range(len(input_string))]
+        self._edges: List[Tuple[int, Optional[int]]] = [
+            (i, i) for i in range(len(input_string))
+        ]
         # Debugger
         self._debugger = []  # type: ignore
 
@@ -111,7 +113,7 @@ class TransductionGraph:
 
     @property
     def edges(self) -> List:
-        """List[Tuple[int, int]] of edges for the transformation.
+        """List[Tuple[int, Optional[int]]] of edges for the transformation.
 
         Note that currently this is *not* the same between
         TransductionGraph and CompositeTransductionGraph.
@@ -171,12 +173,21 @@ class TransductionGraph:
                 )
         return out_edges
 
-    def alignments(self) -> List[Tuple[int, int]]:
+    def alignments(self) -> List[Tuple[int, Optional[int]]]:
         """Alignments (input node index, output node index) for the full
         (possibly composed) transduction.
 
-        Note that this *is* the same between TransductionGraph and
-        CompositeTransductionGraph.
+        Insertions are not allowed in rules, but deletions are.  In
+        most cases they will *not* be represented as `None` in the
+        output node index, except in the case where there is a
+        deletion and the output string is empty.
+
+        Nonetheless code must be robust to the possibility of `None`
+        occurring as the output of an alignment.
+
+        Note that this method *is* compatible between TransductionGraph
+        and CompositeTransductionGraph.
+
         """
         return self._edges
 
@@ -341,11 +352,12 @@ class TransductionGraph:
         # append nodes
         self._input_nodes += [(i + in_offset, x) for (i, x) in tg._input_nodes]
         self._output_nodes += [(i + out_offset, x) for (i, x) in tg._output_nodes]
-        # append edges
-        self._edges += [
-            (i + in_offset, None if j is None else j + out_offset)
-            for (i, j) in tg._edges
-        ]
+        # append edges, resolving None to some if possible
+        prev_some_out = self._edges[-1][1] if len(self._edges) else None
+        for i, j in tg._edges[:]:  # copy it to avoid infinite loop
+            if j is not None:
+                prev_some_out = j + out_offset
+            self._edges.append((i + in_offset, prev_some_out))
         # append debuggers
         self._debugger += tg._debugger
 
@@ -766,10 +778,11 @@ class Transducer:
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
                     if len(outtxt) == 0:
-                        # Attach deletions to the next input and the
-                        # previous output (fixed below if it does not
-                        # exist)
-                        edges.append((in_pos + i, out_pos))
+                        # Attach deletions to the previous output if
+                        # possible, otherwise the next output.  This
+                        # will be modified to None below if the output
+                        # string is empty.
+                        edges.append((in_pos + i, max(0, out_pos - 1)))
                 if n_inputs == 0:
                     # Attach insertions to the previous input
                     for j in range(len(outtxt)):
@@ -783,6 +796,7 @@ class Transducer:
             out_len = len(tg.output_string)
             tg.edges = []
             for in_pos, out_pos in edges:
+                assert in_pos is not None
                 if out_pos >= out_len:
                     tg.edges.append((in_pos, None if out_len == 0 else out_len - 1))
                 else:
@@ -994,7 +1008,7 @@ class CompositeTransductionGraph(TransductionGraph):
 
     @property
     def edges(self) -> List:
-        """List[List[Tuple[int, int]]] of edges for each tier in the
+        """List[List[Tuple[int, Optional[int]]]] of edges for each tier in the
         transformation.
 
         Note that this is unfortunately *not* the same between
@@ -1037,7 +1051,7 @@ class CompositeTransductionGraph(TransductionGraph):
             pretty_edges.append(tier.pretty_edges())
         return pretty_edges
 
-    def alignments(self) -> List[Tuple[int, int]]:
+    def alignments(self) -> List[Tuple[int, Optional[int]]]:
         """Return list of alignments (input node index, output node index) for
         the full transduction.
 
