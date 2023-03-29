@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import text_unidecode
 
@@ -239,6 +239,8 @@ class TransductionGraph:
             osort = sorted(
                 alignments, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
             )
+            # print("isort:", isort)
+            # print("osort:", osort)
             # Use -1 as flag value because None has a meaning in alignments
             istart = ostart = iend = oend = -1
             for iedge, oedge in zip(isort, osort):
@@ -264,7 +266,10 @@ class TransductionGraph:
                 else:
                     assert oedge[0] is not None
                     iend = max(iend, oedge[0])
-                    if iedge[1] is not None:
+                    # Replace None with not-None
+                    if oend is None:
+                        oend = iedge[1]
+                    elif iedge[1] is not None:
                         oend = max(oend, iedge[1])
             if istart != -1:
                 assert iend != -1
@@ -751,29 +756,37 @@ class Transducer:
             tg.output_string = ""
         else:
             tg.output_string = ""
-            edges: List[Tuple[Optional[int], Optional[int]]] = []
+            edges: List[Tuple[int, int]] = []
             in_pos = 0
             out_pos = 0
-            # Mappings are flat to save space
-            for n_inputs, outtxt in zip(alignment[::2], alignment[1::2]):
+            # Mappings are flattened to save space
+            for idx in range(0, len(alignment), 2):
+                (n_inputs, outtxt) = alignment[idx : idx + 2]
                 for i in range(n_inputs):
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
-                    if len(outtxt) == 0:  # Deletions
-                        edges.append((in_pos + i, None))
+                    if len(outtxt) == 0:
+                        # Attach deletions to the next input and the
+                        # previous output (fixed below if it does not
+                        # exist)
+                        edges.append((in_pos + i, out_pos))
                 if n_inputs == 0:
-                    # Insertions are treated differently because many
-                    # parts of the code assume that they cannot exist
+                    # Attach insertions to the previous input
                     for j in range(len(outtxt)):
                         edges.append((in_pos, out_pos + j))
-
                 in_pos += n_inputs
                 if len(outtxt) != 0:
                     out_pos += len(outtxt) + len(self.out_delimiter)
                     # Be bug-compatible with mappings and add an extra delimiter
                     tg.output_string += outtxt + self.out_delimiter
-
-            tg.edges = edges
+            # Fix up bogus indices here
+            out_len = len(tg.output_string)
+            tg.edges = []
+            for in_pos, out_pos in edges:
+                if out_pos >= out_len:
+                    tg.edges.append((in_pos, None if out_len == 0 else out_len - 1))
+                else:
+                    tg.edges.append((in_pos, out_pos))
         return tg
 
     def apply_rules(self, to_convert: str):  # noqa: C901
