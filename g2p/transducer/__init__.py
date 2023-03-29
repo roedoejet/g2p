@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 import text_unidecode
 
@@ -756,42 +756,37 @@ class Transducer:
             tg.output_string = ""
         else:
             tg.output_string = ""
-            edges: List[Tuple[Optional[int], Optional[int]]] = []
+            edges: List[Tuple[int, int]] = []
             in_pos = 0
             out_pos = 0
-            # Mappings are flat to save space
+            # Mappings are flattened to save space
             for idx in range(0, len(alignment), 2):
                 (n_inputs, outtxt) = alignment[idx : idx + 2]
                 for i in range(n_inputs):
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
                     if len(outtxt) == 0:
-                        # Match the (dubious) behaviour of rule-based
-                        # mappings which will always attach deletions
-                        # to an adjacent output unless the output is
-                        # empty, in which case the output index is None
-                        if idx == len(alignment) - 2:
-                            # Previous output at end
-                            edges.append(
-                                (in_pos + i, None if out_pos == 0 else out_pos - 1)
-                            )
-                        else:
-                            # Otherwise next output... this is very
-                            # ad-hoc but so is the behaviour of
-                            # rule-based mappings ;-(
-                            edges.append((in_pos + i, out_pos))
+                        # Attach deletions to the next input and the
+                        # previous output (fixed below if it does not
+                        # exist)
+                        edges.append((in_pos + i, out_pos))
                 if n_inputs == 0:
                     # Attach insertions to the previous input
                     for j in range(len(outtxt)):
                         edges.append((in_pos, out_pos + j))
-
                 in_pos += n_inputs
                 if len(outtxt) != 0:
                     out_pos += len(outtxt) + len(self.out_delimiter)
                     # Be bug-compatible with mappings and add an extra delimiter
                     tg.output_string += outtxt + self.out_delimiter
-
-            tg.edges = edges
+            # Fix up bogus indices here
+            out_len = len(tg.output_string)
+            tg.edges = []
+            for in_pos, out_pos in edges:
+                if out_pos >= out_len:
+                    tg.edges.append((in_pos, None if out_len == 0 else out_len - 1))
+                else:
+                    tg.edges.append((in_pos, out_pos))
         return tg
 
     def apply_rules(self, to_convert: str):  # noqa: C901
