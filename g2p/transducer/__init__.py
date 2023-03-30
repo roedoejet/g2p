@@ -229,9 +229,7 @@ class TransductionGraph:
         """
         return self._edges
 
-    def substring_alignments(  # noqa: C901
-        self, alignments=None
-    ) -> List[Tuple[str, str]]:
+    def substring_alignments(self) -> List[Tuple[str, str]]:  # noqa: C901
         """Alignments of input to output substrings for this graph.
 
         As opposed to `pretty_edges`, this method will return the
@@ -276,8 +274,7 @@ class TransductionGraph:
         (this should not be too hard to do).
 
         """
-        if alignments is None:
-            alignments = self.alignments()
+        alignments = self.alignments()
 
         def find_monotonic_segments(alignments):
             segments = []
@@ -293,35 +290,39 @@ class TransductionGraph:
             # Use -1 as flag value because None has a meaning in alignments
             istart = ostart = iend = oend = -1
             for iedge, oedge in zip(isort, osort):
+                # Create a new segment if the sorting orders agree, or
+                # if the subsequent alignments cannot overlap with the
+                # current segment
                 non_overlapping = (
                     -1 not in (iend, oend) and iedge[0] > iend and oedge[0] > oend
                 )
                 if iedge == oedge or non_overlapping:
+                    # Output an existing segment if we have one
                     if iend != -1:
                         segments.append((istart, iend, ostart, oend))
                         istart = ostart = iend = oend = -1
+                    # And if we have entered an agreement region output that
                     if iedge == oedge:
                         ipos, opos = iedge
                         segments.append((ipos, ipos, opos, opos))
+                        istart = ostart = iend = oend = -1
                         continue
-                if istart == -1:
+                if istart == -1:  # Start a new segment
                     # Smallest input index (by definition)
                     istart = iedge[0]
                     # Smallest output index (by definition)
                     ostart = oedge[1]
-                    # Update these until the next break point
+                    # These are updated below
                     iend = oedge[0]
                     oend = iedge[1]
-                else:
+                else:  # Expand an existing segment
                     assert oedge[0] is not None
+                    assert iedge[1] is not None
                     iend = max(iend, oedge[0])
-                    # Replace None with not-None
-                    if oend is None:
-                        oend = iedge[1]
-                    elif iedge[1] is not None:
-                        oend = max(oend, iedge[1])
+                    oend = max(oend, iedge[1])
             if istart != -1:
                 assert iend != -1
+            # Output a final segment if one exists
             if iend != -1:
                 segments.append((istart, iend, ostart, oend))
             return segments
