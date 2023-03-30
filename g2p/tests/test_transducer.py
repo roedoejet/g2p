@@ -244,6 +244,8 @@ class TransducerTest(TestCase):
         bad_edges = [(0, None), (1, None), (2, 1)]
         self.assertEqual(normalize_edges(bad_edges), [(0, 1), (1, 1), (2, 1)])
         # Otherwise leave it as None
+        bad_edges = []
+        self.assertEqual(normalize_edges(bad_edges), bad_edges)
         bad_edges = [(0, None)]
         self.assertEqual(normalize_edges(bad_edges), bad_edges)
         bad_edges = [(0, None), (1, None)]

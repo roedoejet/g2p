@@ -71,10 +71,8 @@ def normalize_edges(
         if edge[1] is None:
             # if previous exists, use that, otherwise use following, otherwise None
             previous = [x for x in edges[:i] if x[1] is not None]
-            try:
-                following = [x for x in edges[i + 1 :] if x[1] is not None]
-            except IndexError:
-                following = None
+            # Note: if len(edges) == 1, edges[1:] is empty, not an IndexError
+            following = [x for x in edges[i + 1 :] if x[1] is not None]
             if previous:
                 edges[i] = (edge[0], previous[-1][1])
             elif following:
