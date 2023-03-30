@@ -10,7 +10,7 @@ import unicodedata as ud
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, TypeVar, Union
 
 import regex as re
 import yaml
@@ -21,6 +21,7 @@ from g2p.mappings import langs
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
+IntOrNone = TypeVar("IntOrNone", bound=Union[int, None])
 
 
 def expand_abbreviations(data: str, abbs: Dict[str, List[str]], recursion_depth=0):
@@ -93,8 +94,8 @@ def normalize(inp: str, norm_form: str):
 
 
 def compose_indices(
-    indices1: List[Tuple[int, int]], indices2: List[Tuple[int, int]]
-) -> List[Tuple[int, int]]:
+    indices1: List[Tuple[int, int]], indices2: List[Tuple[int, IntOrNone]]
+) -> List[Tuple[int, IntOrNone]]:
     """Compose indices1 + indices2 into direct arcs from the inputs of indices1
     to the outputs of indices 2.
 
