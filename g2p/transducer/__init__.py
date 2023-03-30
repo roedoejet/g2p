@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode
 
@@ -45,6 +45,42 @@ ChangeLog = List[List[int]]
 UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
 
 
+def normalize_edges(
+    edges: List[Tuple[int, Optional[int]]]
+) -> List[Tuple[int, Optional[int]]]:
+    """Normalize and sort a list of edges.
+
+    Specifically, this:
+
+    - Removes any non-deletion edges with the same input index as a deletion
+    - Resolves all deletions to map the outputs to the previous index if possible,
+      the following index if possible, or otherwise None (in practice this means
+      that None only occurs if the output is empty)
+    - Sorts edges based on the input and suppresses duplicates
+    """
+    to_remove: Set[int] = set()
+    for i, edge in enumerate(edges):
+        if edge[1] is None:
+            for j, other_edge in enumerate(edges):
+                if other_edge != edge and other_edge[0] == edge[0]:
+                    to_remove.add(j)
+    edges = [edge for i, edge in enumerate(edges) if i not in to_remove]
+    # sort based on inputs
+    edges.sort(key=lambda x: x[0])
+    for i, edge in enumerate(edges):
+        if edge[1] is None:
+            # if previous exists, use that, otherwise use following, otherwise None
+            previous = [x for x in edges[:i] if x[1] is not None]
+            # Note: if len(edges) == 1, edges[1:] is empty, not an IndexError
+            following = [x for x in edges[i + 1 :] if x[1] is not None]
+            if previous:
+                edges[i] = (edge[0], previous[-1][1])
+            elif following:
+                edges[i] = (edge[0], following[0][1])
+    # uniquify preserving order
+    return list(OrderedDict.fromkeys((i, j) for i, j in edges))
+
+
 class TransductionGraph:
     """This is the object returned after performing a transduction using a Transducer.
 
@@ -59,7 +95,9 @@ class TransductionGraph:
         self._input_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         self._output_nodes: List[Tuple[int, str]] = list(enumerate(input_string))
         # Edges
-        self._edges: List[Tuple[int, int]] = [(i, i) for i in range(len(input_string))]
+        self._edges: List[Tuple[int, Optional[int]]] = [
+            (i, i) for i in range(len(input_string))
+        ]
         # Debugger
         self._debugger = []  # type: ignore
 
@@ -111,7 +149,7 @@ class TransductionGraph:
 
     @property
     def edges(self) -> List:
-        """List[Tuple[int, int]] of edges for the transformation.
+        """List[Tuple[int, Optional[int]]] of edges for the transformation.
 
         Note that currently this is *not* the same between
         TransductionGraph and CompositeTransductionGraph.
@@ -171,18 +209,25 @@ class TransductionGraph:
                 )
         return out_edges
 
-    def alignments(self) -> List[Tuple[int, int]]:
+    def alignments(self) -> List[Tuple[int, Optional[int]]]:
         """Alignments (input node index, output node index) for the full
         (possibly composed) transduction.
 
-        Note that this *is* the same between TransductionGraph and
-        CompositeTransductionGraph.
+        Insertions are not allowed in rules, but deletions are.  In
+        most cases they will *not* be represented as `None` in the
+        output node index, except in the case where there is a
+        deletion and the output string is empty.
+
+        Nonetheless code must be robust to the possibility of `None`
+        occurring as the output of an alignment.
+
+        Note that this method *is* compatible between TransductionGraph
+        and CompositeTransductionGraph.
+
         """
         return self._edges
 
-    def substring_alignments(  # noqa: C901
-        self, alignments=None
-    ) -> List[Tuple[str, str]]:
+    def substring_alignments(self) -> List[Tuple[str, str]]:  # noqa: C901
         """Alignments of input to output substrings for this graph.
 
         As opposed to `pretty_edges`, this method will return the
@@ -227,8 +272,7 @@ class TransductionGraph:
         (this should not be too hard to do).
 
         """
-        if alignments is None:
-            alignments = self.alignments()
+        alignments = self.alignments()
 
         def find_monotonic_segments(alignments):
             segments = []
@@ -239,35 +283,44 @@ class TransductionGraph:
             osort = sorted(
                 alignments, key=lambda x: (x[0], x[0]) if x[1] is None else (x[1], x[0])
             )
+            # print("isort:", isort)
+            # print("osort:", osort)
             # Use -1 as flag value because None has a meaning in alignments
             istart = ostart = iend = oend = -1
             for iedge, oedge in zip(isort, osort):
+                # Create a new segment if the sorting orders agree, or
+                # if the subsequent alignments cannot overlap with the
+                # current segment
                 non_overlapping = (
                     -1 not in (iend, oend) and iedge[0] > iend and oedge[0] > oend
                 )
                 if iedge == oedge or non_overlapping:
+                    # Output an existing segment if we have one
                     if iend != -1:
                         segments.append((istart, iend, ostart, oend))
                         istart = ostart = iend = oend = -1
+                    # And if we have entered an agreement region output that
                     if iedge == oedge:
                         ipos, opos = iedge
                         segments.append((ipos, ipos, opos, opos))
+                        istart = ostart = iend = oend = -1
                         continue
-                if istart == -1:
+                if istart == -1:  # Start a new segment
                     # Smallest input index (by definition)
                     istart = iedge[0]
                     # Smallest output index (by definition)
                     ostart = oedge[1]
-                    # Update these until the next break point
+                    # These are updated below
                     iend = oedge[0]
                     oend = iedge[1]
-                else:
+                else:  # Expand an existing segment
                     assert oedge[0] is not None
+                    assert iedge[1] is not None
                     iend = max(iend, oedge[0])
-                    if iedge[1] is not None:
-                        oend = max(oend, iedge[1])
+                    oend = max(oend, iedge[1])
             if istart != -1:
                 assert iend != -1
+            # Output a final segment if one exists
             if iend != -1:
                 segments.append((istart, iend, ostart, oend))
             return segments
@@ -336,11 +389,14 @@ class TransductionGraph:
         # append nodes
         self._input_nodes += [(i + in_offset, x) for (i, x) in tg._input_nodes]
         self._output_nodes += [(i + out_offset, x) for (i, x) in tg._output_nodes]
-        # append edges
-        self._edges += [
-            (i + in_offset, None if j is None else j + out_offset)
-            for (i, j) in tg._edges
-        ]
+        # append edges and normalize
+        self._edges = normalize_edges(
+            self._edges
+            + [
+                (i + in_offset, None if j is None else j + out_offset)
+                for i, j in tg.edges
+            ]
+        )
         # append debuggers
         self._debugger += tg._debugger
 
@@ -751,29 +807,39 @@ class Transducer:
             tg.output_string = ""
         else:
             tg.output_string = ""
-            edges: List[Tuple[Optional[int], Optional[int]]] = []
+            edges: List[Tuple[int, int]] = []
             in_pos = 0
             out_pos = 0
-            # Mappings are flat to save space
-            for n_inputs, outtxt in zip(alignment[::2], alignment[1::2]):
+            # Mappings are flattened to save space
+            for idx in range(0, len(alignment), 2):
+                (n_inputs, outtxt) = alignment[idx : idx + 2]
                 for i in range(n_inputs):
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
-                    if len(outtxt) == 0:  # Deletions
-                        edges.append((in_pos + i, None))
+                    if len(outtxt) == 0:
+                        # Attach deletions to the previous output if
+                        # possible, otherwise the next output.  This
+                        # will be modified to None below if the output
+                        # string is empty.
+                        edges.append((in_pos + i, max(0, out_pos - 1)))
                 if n_inputs == 0:
-                    # Insertions are treated differently because many
-                    # parts of the code assume that they cannot exist
+                    # Attach insertions to the previous input
                     for j in range(len(outtxt)):
                         edges.append((in_pos, out_pos + j))
-
                 in_pos += n_inputs
                 if len(outtxt) != 0:
                     out_pos += len(outtxt) + len(self.out_delimiter)
                     # Be bug-compatible with mappings and add an extra delimiter
                     tg.output_string += outtxt + self.out_delimiter
-
-            tg.edges = edges
+            # Fix up bogus indices here
+            out_len = len(tg.output_string)
+            tg.edges = []
+            for in_pos, out_pos in edges:
+                assert in_pos is not None
+                if out_pos >= out_len:
+                    tg.edges.append((in_pos, None if out_len == 0 else out_len - 1))
+                else:
+                    tg.edges.append((in_pos, out_pos))
         return tg
 
     def apply_rules(self, to_convert: str):  # noqa: C901
@@ -884,33 +950,8 @@ class Transducer:
         if intermediate_forms:
             tg.output_string = self.resolve_intermediate_chars(tg.output_string)
 
-        # fix None
-        to_remove = []  # type: ignore
-        for i, edge in enumerate(tg.edges):
-            if edge[1] is None:
-                to_remove.extend(
-                    i
-                    for other_edge in tg.edges
-                    if other_edge != edge and other_edge[0] == edge[0]
-                )
-
-        for i in set(to_remove):
-            del tg.edges[i]
-        # sort based on inputs
-        tg.edges.sort(key=lambda x: x[0])
-        for i, edge in enumerate(tg.edges):
-            if edge[1] is None:
-                # if previous exists, use that, otherwise use following, otherwise None
-                previous = [x for x in tg.edges[:i] if x[1] is not None]
-                try:
-                    following = [x for x in tg.edges[i + 1 :] if x[1] is not None]
-                except IndexError:
-                    following = None
-                if previous:
-                    tg.edges[i] = (edge[0], previous[-1][1])
-                elif following:
-                    tg.edges[i] = (edge[0], following[0][1])
-        tg.edges = list(OrderedDict.fromkeys((i, j) for i, j in tg.edges))
+        # sort and fix None
+        tg.edges = normalize_edges(tg.edges)
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert
@@ -981,7 +1022,7 @@ class CompositeTransductionGraph(TransductionGraph):
 
     @property
     def edges(self) -> List:
-        """List[List[Tuple[int, int]]] of edges for each tier in the
+        """List[List[Tuple[int, Optional[int]]]] of edges for each tier in the
         transformation.
 
         Note that this is unfortunately *not* the same between
@@ -1024,7 +1065,7 @@ class CompositeTransductionGraph(TransductionGraph):
             pretty_edges.append(tier.pretty_edges())
         return pretty_edges
 
-    def alignments(self) -> List[Tuple[int, int]]:
+    def alignments(self) -> List[Tuple[int, Optional[int]]]:
         """Return list of alignments (input node index, output node index) for
         the full transduction.
 

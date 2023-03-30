@@ -501,6 +501,19 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.edges, [(0, None), (1, None)])
         # Support deletions in substring_alignments
         self.assertEqual(transducer.substring_alignments(), [("aa", "")])
+        transducer = self.trans_nine("aabbaab")
+        self.assertEqual(transducer.output_string, "bbb")
+        self.assertEqual(
+            transducer.edges,
+            [(0, 0), (1, 0), (2, 0), (3, 1), (4, 1), (5, 1), (6, 2)],
+        )
+        # Support deletions in substring_alignments.  NOTE: these
+        # alignments are quite bogus due to the ad-hoc treatment of
+        # deletions by rule-based mappings
+        self.assertEqual(
+            transducer.substring_alignments(),
+            [("aab", "b"), ("baa", "b"), ("b", "b")],
+        )
 
     def test_case_ten(self):
         transducer = self.trans_ten("abc")
