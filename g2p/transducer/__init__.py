@@ -8,7 +8,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode
 
@@ -43,6 +43,44 @@ Index = Dict
 ChangeLog = List[List[int]]
 
 UNIDECODE_SPECIALS = ["@", "?", "'", ",", ":"]
+
+
+def normalize_edges(
+    edges: List[Tuple[int, Optional[int]]]
+) -> List[Tuple[int, Optional[int]]]:
+    """Normalize and sort a list of edges.
+
+    Specifically, this:
+
+    - Removes any non-deletion edges with the same input index as a deletion
+    - Resolves all deletions to map the outputs to the previous index if possible,
+      the following index if possible, or otherwise None (in practice this means
+      that None only occurs if the output is empty)
+    - Sorts edges based on the input and suppresses duplicates
+    """
+    to_remove: Set[int] = set()
+    for i, edge in enumerate(edges):
+        if edge[1] is None:
+            for j, other_edge in enumerate(edges):
+                if other_edge != edge and other_edge[0] == edge[0]:
+                    to_remove.add(j)
+    edges = [edge for i, edge in enumerate(edges) if i not in to_remove]
+    # sort based on inputs
+    edges.sort(key=lambda x: x[0])
+    for i, edge in enumerate(edges):
+        if edge[1] is None:
+            # if previous exists, use that, otherwise use following, otherwise None
+            previous = [x for x in edges[:i] if x[1] is not None]
+            try:
+                following = [x for x in edges[i + 1 :] if x[1] is not None]
+            except IndexError:
+                following = None
+            if previous:
+                edges[i] = (edge[0], previous[-1][1])
+            elif following:
+                edges[i] = (edge[0], following[0][1])
+    # uniquify preserving order
+    return list(OrderedDict.fromkeys((i, j) for i, j in edges))
 
 
 class TransductionGraph:
@@ -352,12 +390,14 @@ class TransductionGraph:
         # append nodes
         self._input_nodes += [(i + in_offset, x) for (i, x) in tg._input_nodes]
         self._output_nodes += [(i + out_offset, x) for (i, x) in tg._output_nodes]
-        # append edges, resolving None to some if possible
-        prev_some_out = self._edges[-1][1] if len(self._edges) else None
-        for i, j in tg._edges[:]:  # copy it to avoid infinite loop
-            if j is not None:
-                prev_some_out = j + out_offset
-            self._edges.append((i + in_offset, prev_some_out))
+        # append edges and normalize
+        self._edges = normalize_edges(
+            self._edges
+            + [
+                (i + in_offset, None if j is None else j + out_offset)
+                for i, j in tg.edges
+            ]
+        )
         # append debuggers
         self._debugger += tg._debugger
 
@@ -911,33 +951,8 @@ class Transducer:
         if intermediate_forms:
             tg.output_string = self.resolve_intermediate_chars(tg.output_string)
 
-        # fix None
-        to_remove = []  # type: ignore
-        for i, edge in enumerate(tg.edges):
-            if edge[1] is None:
-                to_remove.extend(
-                    i
-                    for other_edge in tg.edges
-                    if other_edge != edge and other_edge[0] == edge[0]
-                )
-
-        for i in set(to_remove):
-            del tg.edges[i]
-        # sort based on inputs
-        tg.edges.sort(key=lambda x: x[0])
-        for i, edge in enumerate(tg.edges):
-            if edge[1] is None:
-                # if previous exists, use that, otherwise use following, otherwise None
-                previous = [x for x in tg.edges[:i] if x[1] is not None]
-                try:
-                    following = [x for x in tg.edges[i + 1 :] if x[1] is not None]
-                except IndexError:
-                    following = None
-                if previous:
-                    tg.edges[i] = (edge[0], previous[-1][1])
-                elif following:
-                    tg.edges[i] = (edge[0], following[0][1])
-        tg.edges = list(OrderedDict.fromkeys((i, j) for i, j in tg.edges))
+        # sort and fix None
+        tg.edges = normalize_edges(tg.edges)
         if norm_indices is not None:
             tg.edges = compose_indices(norm_indices, tg.edges)
             tg.input_string = saved_to_convert

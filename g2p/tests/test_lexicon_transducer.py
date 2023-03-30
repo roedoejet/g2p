@@ -37,7 +37,9 @@ class LexiconTransducerTest(TestCase):
             tg.edges,
             [(0, 0), (1, 2), (1, 3), (2, 2), (2, 3), (3, 4), (4, 5), (5, 5)],
         )
+        # These alignments are somewhat bogus, hence the name
         tg = t("bogus")
+        self.assertEqual(tg.input_string, "bogus")
         self.assertEqual(tg.output_string, "")
         self.assertEqual(
             tg.edges,
@@ -47,11 +49,37 @@ class LexiconTransducerTest(TestCase):
             tg.substring_alignments(),
             [("bogus", "")],
         )
-        # These alignments are somewhat bogus, hence the name
+        tg = t("bogus")
+        tg += t("hello")
+        self.assertEqual(tg.input_string, "bogushello")
+        self.assertEqual(tg.output_string, "HH EH L OW ")
+        self.assertEqual(
+            tg.edges,
+            [
+                (0, 0),
+                (1, 0),
+                (2, 0),
+                (3, 0),
+                (4, 0),
+                (5, 0),
+                (5, 1),
+                (6, 3),
+                (6, 4),
+                (7, 6),
+                (8, 6),
+                (9, 8),
+                (9, 9),
+            ],
+        )
+        self.assertEqual(
+            tg.substring_alignments(),
+            [("bogush", "HH"), ("e", "EH"), ("ll", "L"), ("o", "OW")],
+        )
         tg = t("hello")
         tg += t("bogus")
         tg += t("you're")
         tg += t("bogus")
+        self.assertEqual(tg.input_string, "hellobogusyou'rebogus")
         self.assertEqual(
             tg.edges,
             [
