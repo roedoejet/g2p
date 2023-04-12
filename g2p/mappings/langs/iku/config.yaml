@@ -9,7 +9,7 @@ mappings:
     authors:
       - Patrick Littell
     mapping: iku_to_iku_equiv.json
-    <<: *shared
+    language_name: Inuktitut Syllabics
   - display_name: Inuktitut to IPA
     in_lang: iku-equiv
     out_lang: iku-ipa
@@ -29,4 +29,4 @@ mappings:
     authors:
       - Patrick Littell
     mapping: iku_sro_to_ipa.json
-    <<: *shared
+    language_name: Inuktitut Romanized

@@ -43,6 +43,8 @@ class StudioTest(IsolatedAsyncioTestCase):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
+            await page.goto(f"http://localhost:{self.port}/docs")
+            await page.wait_for_timeout(1000)
             await page.goto(f"http://localhost:{self.port}")
             await page.wait_for_timeout(1000)
             input_el = page.locator("#input")
@@ -55,6 +57,30 @@ class StudioTest(IsolatedAsyncioTestCase):
             self.assertEqual(input_text, "hello world")
             await input_el.fill("")
             await output_el.fill("")
+            await page.type("#input", "hello world")
+            await page.wait_for_timeout(1000)
+            radio_el = page.locator("#animated-radio")
+            await radio_el.click()
+            await page.wait_for_timeout(1000)
+
+    async def test_switch_langs(self):
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(channel="chrome", headless=True)
+            page = await browser.new_page()
+            await page.goto(f"http://localhost:{self.port}")
+            await page.wait_for_timeout(1000)
+            in_lang_selector = page.locator("#input-langselect")
+            # Switch to a language
+            await in_lang_selector.select_option(value="alq")
+            await page.wait_for_timeout(1000)
+            settings_title = await page.text_content("#link-0")
+            self.assertEqual(settings_title, "Algonquin to IPA")
+            # Switch back to custom
+            await in_lang_selector.select_option(value="Custom")
+            await page.wait_for_timeout(1000)
+            settings_title = await page.text_content("#link-0")
+            self.assertEqual(settings_title, "Custom")
+            # FIXME: Test that the table works somewhere, somehow
 
     async def test_langs(self):
 

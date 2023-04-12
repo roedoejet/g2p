@@ -15,7 +15,7 @@ from networkx import has_path
 from g2p import make_g2p
 from g2p._version import VERSION
 from g2p.api import update_docs
-from g2p.app import APP, network_to_echart
+from g2p.app import APP
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
@@ -35,8 +35,13 @@ from g2p.mappings.langs import (
     MAPPINGS_AVAILABLE,
     NETWORK_PKL_NAME,
 )
-from g2p.mappings.langs.utils import cache_langs, check_ipa_known_segs
+from g2p.mappings.langs.utils import (
+    cache_langs,
+    check_ipa_known_segs,
+    network_to_echart,
+)
 from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
+from g2p.static import __file__ as static_file
 from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
@@ -424,6 +429,13 @@ def generate_mapping(  # noqa: C901
 
 
 @click.option(
+    "--substring-alignments",
+    "-a",
+    default=False,
+    is_flag=True,
+    help="Show the minimal monotonic substring alignments.",
+)
+@click.option(
     "--pretty-edges",
     "-e",
     default=False,
@@ -484,6 +496,7 @@ def convert(  # noqa: C901
     pretty_edges,
     tok_lang,
     config,
+    substring_alignments,
 ):
     """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
@@ -551,6 +564,8 @@ def convert(  # noqa: C901
     if check:
         transducer.check(tg, display_warnings=True)
     outputs = [tg.output_string]
+    if substring_alignments:
+        outputs += [tg.substring_alignments()]
     if pretty_edges:
         outputs += [tg.pretty_edges()]
     if debugger:
@@ -648,7 +663,9 @@ def update(in_dir, out_dir):
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
     cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
     update_docs()
-    network_to_echart(write_to_file=True)
+    network_to_echart(
+        outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
+    )
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))

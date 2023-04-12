@@ -45,5 +45,13 @@ mappings:
     mapping: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
-    # TODO: Need lexicon mapping
-
+  - display_name: English to IPA
+    type: lexicon
+    alignments: cmudict.ipa.aligned.txt
+    in_lang: eng
+    out_lang: eng-ipa
+    case_sensitive: false
+    norm_form: "NFC"
+    authors:
+      - David Huggins-Daines
+    <<: *shared

@@ -24,4 +24,4 @@ mappings:
     rule_ordering: as-written
     case_sensitive: false
     norm_form: NFC
-    <<: *shared
+    language_name: Ojibwe Syllabics

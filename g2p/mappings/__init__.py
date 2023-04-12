@@ -30,6 +30,7 @@ from g2p.mappings.utils import (
     is_ipa,
     is_xsampa,
     load_abbreviations_from_file,
+    load_alignments_from_file,
     load_from_file,
     load_mapping_from_path,
     normalize,
@@ -81,6 +82,13 @@ class Mapping:
     @param prevent_feeding: bool = False
         Converts each rule into an intermediary form
 
+    @param type: str = None
+        Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
+        "lexicon" (lookup in an aligned lexicon).
+
+    @param alignments: str = None
+        A string specifying a file from which to load alignments when type = "lexicon".
+
     """
 
     def __init__(  # noqa: C901
@@ -95,6 +103,7 @@ class Mapping:
             "language_name",
             "display_name",
             "mapping",
+            "alignments",
             "in_lang",
             "out_lang",
             "out_delimiter",
@@ -134,6 +143,12 @@ class Mapping:
                 self.process_loaded_config(loaded_config)
             elif self.kwargs.get("type", "") == "unidecode":
                 self.mapping = []
+            elif self.kwargs.get("type", "") == "lexicon":
+                self.mapping = []
+                if "alignments" in self.kwargs:
+                    self.alignments = load_alignments_from_file(
+                        self.kwargs["alignments"], self.kwargs["out_delimiter"]
+                    )
             else:
                 raise exceptions.MalformedLookup()
         if (
@@ -225,6 +240,9 @@ class Mapping:
         """
         if config.get("type", "") == "unidecode":
             self.mapping = []
+        elif config.get("type", "") == "lexicon":
+            self.mapping = []
+            self.alignments = config["alignment_data"]
         else:
             self.mapping = config["mapping_data"]
             self.abbreviations = config.get("abbreviations_data", None)
@@ -387,17 +405,24 @@ class Mapping:
                 rule_regex = re.compile(inp, re.I)
             else:
                 rule_regex = re.compile(inp)
-        except:
+        except re.error as e:
             in_lang = self.kwargs.get("in_lang", "und")
             out_lang = self.kwargs.get("out_lang", "und")
             LOGGER.error(
-                f"Your regex in mapping between {in_lang} and {out_lang} is malformed. \
-                    Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
+                "Your regex in mapping between %s and %s is malformed.  "
+                "Do you have un-escaped regex characters in your input %s, contexts %s, %s?  "
+                "Error is: %s",
+                in_lang,
+                out_lang,
+                inp,
+                before,
+                after,
+                e.msg,
             )
-            raise Exception(
-                f"Your regex in mapping between {in_lang} and {out_lang} is malformed. \
-                    Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
-            )
+            raise exceptions.MalformedMapping(
+                f"Your regex in mapping between {in_lang} and {out_lang} is malformed.  "
+                f"Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
+            ) from e
         return rule_regex
 
     def reverse_mappings(self, mapping):

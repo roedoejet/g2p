@@ -77,14 +77,16 @@ class TokenizerTest(TestCase):
     def test_tokenize_tce_equiv(self):
         input = "ts'e ts`e ts‘e ts’"
         self.assertEqual(len(tok.make_tokenizer("fra").tokenize_text(input)), 14)
-        tce_tokens = tok.make_tokenizer("tce").tokenize_text(input)
+        # tce_tokens = tok.make_tokenizer("tce").tokenize_text(input)
         # LOGGER.warning([x["text"] for x in tce_tokens])
         self.assertEqual(len(tok.make_tokenizer("tce").tokenize_text(input)), 7)
 
     def test_tokenizer_identity_tce(self):
         self.assertNotEqual(tok.make_tokenizer("eng"), tok.make_tokenizer("fra"))
         self.assertNotEqual(tok.make_tokenizer("eng"), tok.make_tokenizer("tce"))
-        self.assertEqual(tok.make_tokenizer("eng"), tok.make_tokenizer())
+        self.assertEqual(tok.make_tokenizer("tce"), tok.make_tokenizer("tce"))
+        self.assertNotEqual(tok.make_tokenizer("tce"), tok.make_tokenizer())
+        self.assertEqual(tok.make_tokenizer("foo"), tok.make_tokenizer())
 
     def test_tokenize_kwk(self):
         """kwk is easier than tce: we just need to use kwk-umista -> kwk-ipa, but that's not
@@ -113,9 +115,10 @@ class TokenizerTest(TestCase):
 
     def test_tokenize_lang_does_not_exit(self):
         self.assertEqual(tok.make_tokenizer("not_a_language"), tok.make_tokenizer())
-        self.assertEqual(
-            tok.make_tokenizer("fra", "not_a_language"), tok.make_tokenizer()
-        )
+        with self.assertLogs():
+            self.assertEqual(
+                tok.make_tokenizer("fra", "not_a_language"), tok.make_tokenizer()
+            )
 
     def test_make_tokenizer_error(self):
         with self.assertRaises(ValueError):

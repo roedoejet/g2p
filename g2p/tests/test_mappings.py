@@ -10,6 +10,7 @@ from typing import List
 from unittest import TestCase, main
 
 from g2p import exceptions
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
@@ -243,7 +244,8 @@ class MappingTest(TestCase):
         self.assertTrue(mapping.kwargs["reverse"])
 
     def test_null_input(self):
-        mapping = Mapping([{"in": "", "out": "a"}])
+        with self.assertLogs(LOGGER, level="WARNING"):
+            mapping = Mapping([{"in": "", "out": "a"}])
         self.assertFalse(mapping())
 
     def test_no_escape(self):
@@ -252,6 +254,13 @@ class MappingTest(TestCase):
         )
         transducer = Transducer(mapping)
         self.assertEqual(transducer("?").output_string, "ʔ")
+
+    def test_invalid_regex(self):
+        rules = [{"in": "fo(o", "out": "bar"}]
+        with self.assertLogs(LOGGER, level="ERROR"):
+            with self.assertRaises(exceptions.MalformedMapping) as cm:
+                _ = Mapping(rules)
+        self.assertIn("regex", cm.exception.message)
 
     def test_invalid_rules_json(self):
         rules = [{"in": "a"}, {"out": "c"}]
@@ -282,16 +291,17 @@ class MappingTest(TestCase):
             rules_from_strings("a:b", "c:d", "g:h", "a:x", "c:d", "e:f")
         )
         mapping1.extend(mapping2)
-        self.assertEquals(mapping1.mapping, extend_ref.mapping)
+        self.assertEqual(mapping1.mapping, extend_ref.mapping)
         dedup_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
         mapping1.deduplicate()
-        self.assertEquals(mapping1.mapping, dedup_ref.mapping)
+        self.assertEqual(mapping1.mapping, dedup_ref.mapping)
 
     def test_g2p_studio_csv(self):
         # Ensure that a single CSV file from Studio works properly
-        mapping = Mapping(
-            os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv")
-        )
+        with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
+            mapping = Mapping(
+                os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv")
+            )
         transducer = Transducer(mapping)
         self.assertEqual(
             transducer("Jouni haluaa juoda kahvia").output_string,
@@ -318,7 +328,8 @@ class MappingTest(TestCase):
         ) as fh:
             tf.write(fh.read())
         tf.close()
-        mapping = Mapping(tf.name)
+        with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
+            mapping = Mapping(tf.name)
         transducer = Transducer(mapping)
         self.assertEqual(
             transducer("tee on herkullista").output_string, "teː on herkullistɑ"

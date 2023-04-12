@@ -10,7 +10,7 @@ import unicodedata as ud
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, TypeVar, Union
 
 import regex as re
 import yaml
@@ -92,9 +92,15 @@ def normalize(inp: str, norm_form: str):
         return normalized
 
 
+# compose_indices is generic because we would like to propagate the
+# type of its second input, in the case where we *know* there will not
+# be None (NFC and NFD conversions)
+IntOrOptionalInt = TypeVar("IntOrOptionalInt", bound=Union[int, None])
+
+
 def compose_indices(
-    indices1: List[Tuple[int, int]], indices2: List[Tuple[int, int]]
-) -> List[Tuple[int, int]]:
+    indices1: List[Tuple[int, int]], indices2: List[Tuple[int, IntOrOptionalInt]]
+) -> List[Tuple[int, IntOrOptionalInt]]:
     """Compose indices1 + indices2 into direct arcs from the inputs of indices1
     to the outputs of indices 2.
 
@@ -307,7 +313,7 @@ def load_from_file(path: str) -> list:
     return validate(mapping, path)
 
 
-def load_mapping_from_path(path_to_mapping_config, index=0):
+def load_mapping_from_path(path_to_mapping_config, index=0):  # noqa: C901
     """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
     provided to the 'index' argument. Default is 0.
     """
@@ -356,6 +362,17 @@ def load_mapping_from_path(path_to_mapping_config, index=0):
         elif mapping.get("type", "") == "unidecode":
             # This mapping is not implemented as a regular mapping, but as custom software
             pass
+        elif mapping.get("type", "") == "lexicon":
+            # This mapping has a file of alignments
+            try:
+                mapping["alignment_data"] = load_alignments_from_file(
+                    os.path.join(path.parent, mapping["alignments"]),
+                    mapping.get("out_delimiter", ""),
+                )
+            except OSError as e:
+                raise exceptions.MalformedMapping(
+                    f"Cannot load alignment data file specified in {path}: {e}"
+                ) from e
         else:
             # Is "mapping" key missing?
             raise exceptions.MalformedMapping(
@@ -382,7 +399,11 @@ def find_mapping(in_lang: str, out_lang: str) -> list:
         map_in_lang = mapping.get("in_lang", "")
         map_out_lang = mapping.get("out_lang", "")
         if map_in_lang == in_lang and map_out_lang == out_lang:
-            return deepcopy(mapping)
+            if mapping.get("type") == "lexicon":
+                # do *not* deep copy this, because alignments are big!
+                return mapping.copy()
+            else:
+                return deepcopy(mapping)
     raise exceptions.MappingMissing(in_lang, out_lang)
 
 
@@ -444,6 +465,40 @@ def load_abbreviations_from_file(path):
             f"Sorry, abbreviations must be stored as CSV/TSV/PSV files. You provided the following: {path}"
         )
     return abbs
+
+
+def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
+    """Load alignments in Phonetisaurus default format.
+
+    Returns a mapping of input words to output alignments used to
+    create a lexicon mapping.  These are of the form (length,
+    outputs, length, outputs, ...) - that is, a sequence of pairs
+    specifying how much of the input to consume and what it maps
+    to.  This particular format is used to avoid redundancy with
+    the keys in the dictionary.
+    """
+    LOGGER.info("Loading alignments from %s", path)
+    alignments = {}
+    with open(path, encoding="utf8") as f:
+        for spam in f:
+            spam = spam.strip()
+            if not spam:
+                continue
+            chars = ""
+            mappings: List[Union[int, str]] = []
+            for mapping in spam.split():
+                idx = mapping.rindex("}")
+                # Note that we care about *character* indices, so we join them together
+                in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
+                out_seq = delimiter.join(
+                    tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
+                )
+                chars += in_seq
+                # To save space, make the mappings flat and only store
+                # the number of input characters rather than the characters themselves
+                mappings.extend((len(in_seq), out_seq))
+            alignments["".join(chars)] = tuple(mappings)
+    return alignments
 
 
 def is_ipa(lang: str) -> bool:
