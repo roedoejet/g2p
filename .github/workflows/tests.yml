@@ -56,4 +56,4 @@ jobs:
         run: |
           # Warning: This is PowerShell syntax, not bash!
           g2p convert est fra fra-ipa > out
-          diff (echo ɛ) (cat out)
+          if (diff (echo ɛ) (cat out)) { throw "Output did not match reference" }

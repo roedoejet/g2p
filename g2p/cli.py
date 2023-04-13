@@ -1,6 +1,7 @@
 """
 Command line interface to the g2p system
 """
+import io
 import json
 import os
 import pprint
@@ -45,6 +46,12 @@ from g2p.static import __file__ as static_file
 from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
+
+if "pytest" not in sys.modules:
+    if sys.stdout.encoding != "utf8" and hasattr(sys.stdout, "buffer"):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
+    if sys.stderr.encoding != "utf8" and hasattr(sys.stderr, "buffer"):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 
 def create_app():
