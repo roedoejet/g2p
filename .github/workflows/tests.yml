@@ -52,3 +52,8 @@ jobs:
           pip install -e .
       - name: Run tests on Windows
         run: python run_tests.py dev
+      - name: Make sure the CLI outputs utf8 on Windows
+        run: |
+          # Warning: This is PowerShell syntax, not bash!
+          g2p convert est fra fra-ipa > out
+          diff (echo ɛ) (cat out)
