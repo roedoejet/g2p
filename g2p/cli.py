@@ -47,7 +47,7 @@ from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
 
-if "pytest" not in sys.modules:
+if "pytest" not in sys.modules:  # pragma: no cover
     if sys.stdout.encoding != "utf8" and hasattr(sys.stdout, "buffer"):
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf8")
     if sys.stderr.encoding != "utf8" and hasattr(sys.stderr, "buffer"):
