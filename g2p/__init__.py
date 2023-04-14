@@ -190,9 +190,6 @@ def get_langs():
             and has_path(LANGS_NETWORK, x, "eng-arpabet")
         ]
 
-        # Hack to allow old English LexiconG2P
-        if "eng" not in _langs_cache:
-            _langs_cache += ["eng"]
         # Sort LANGS so the -h messages list them alphabetically
         _langs_cache = sorted(_langs_cache)
 
