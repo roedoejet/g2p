@@ -46,6 +46,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         custom_tag: ${{ steps.determine_tag.outputs.TAG_VERSION }}
+        create_annotated_tag: true
     - name: Create a GitHub release
       uses: ncipollo/release-action@v1
       with:
