@@ -2,7 +2,10 @@
 
 Basic init file for g2p module
 
-The main entry points for the g2p module are make_g2p() and make_tokenizer()
+The main entry points for the g2p module are:
+ - make_g2p() to create a mapper from and lang to another
+ - make_tokenizer() to create a tokenizeer for a given language
+ - get_langs() to get the list of languages with a path to eng-arpabet
 
 Basic Usage:
     from g2p import make_g2p
@@ -14,17 +17,19 @@ Basic Usage:
     tokenizer = make_tokenizer(lang)
     list_of_tokens = tokenizer.tokenize_text(input_text)
 
+    from g2p import get_langs
+    LANGS, LANG_NAMES = get_langs()
 """
 import sys
 from typing import Dict, Optional, Tuple, Union
 
-from networkx import shortest_path
+from networkx import has_path, shortest_path
 from networkx.exception import NetworkXNoPath
 
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
-from g2p.mappings.langs import LANGS_NETWORK
+from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.mappings.tokenizer import make_tokenizer
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
@@ -127,3 +132,70 @@ def tokenize_and_map(tokenizer, transducer, input: str):
         else:
             result += token["text"]
     return result
+
+
+_langs_cache = None
+_lang_names_cache = None
+
+
+def get_langs():
+    """Get the list of language codes and names supported by the g2p library
+    for mapping to ARPABET.
+
+    Example uses can be found in https://github.com/ReadAlongs/Studio and
+    https://github.com/roedoejet/EveryVoice
+
+    Returns:
+        LANGS (List[str]), LANG_NAMES (Dict[str,str]):
+            LANGS is the sorted list of valid language codes supported
+            LANG_NAMES maps each code to its full language name and is ordered by codes
+    """
+
+    global _langs_cache
+    global _lang_names_cache
+
+    if _langs_cache is not None and _lang_names_cache is not None:
+        # Cache the results so we only calculate this information once.
+        return _langs_cache, _lang_names_cache
+    else:
+        # langs_available in g2p lists langs inferred by the directory structure of
+        # g2p/mappings/langs, but in ReadAlongs, we need all input languages to any mappings.
+        # E.g., for Michif, we need to allow crg-dv and crg-tmd, but not crg, which is what
+        # langs_available contains. So we define our own list of languages here.
+        langs_available = []
+
+        # this will be the set of all langs in g2p, which we need temporarily
+        full_lang_names = {}
+
+        for _, v in LANGS.items():
+            for mapping in v["mappings"]:
+                # add mapping to names hash table
+                full_lang_names[mapping["in_lang"]] = mapping["language_name"]
+                # add input id to all available langs list
+                if mapping["in_lang"] not in langs_available:
+                    langs_available.append(mapping["in_lang"])
+
+        # get the key from all networks in g2p module that have a path to 'eng-arpabet',
+        # which is needed for the readalongs
+        # Filter out <lang>-ipa: we only want "normal" input languages.
+        # Filter out *-norm and crk-no-symbols, these are just intermediate representations.
+        _langs_cache = [
+            x
+            for x in langs_available
+            if not x.endswith("-ipa")
+            and not x.endswith("-equiv")
+            and not x.endswith("-no-symbols")
+            and x not in ["und-ascii", "moh-festival"]
+            and LANGS_NETWORK.has_node(x)
+            and has_path(LANGS_NETWORK, x, "eng-arpabet")
+        ]
+
+        # Sort LANGS so the -h messages list them alphabetically
+        _langs_cache = sorted(_langs_cache)
+
+        # Set up _lang_names_cache hash table for studio UI to properly name the dropdown options
+        _lang_names_cache = {
+            lang_code: full_lang_names[lang_code] for lang_code in _langs_cache
+        }
+
+        return _langs_cache, _lang_names_cache

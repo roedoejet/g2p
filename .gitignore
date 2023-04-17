@@ -28,3 +28,6 @@ docs/_build/
 
 # coverage annotation output
 *,cover
+
+# vim temp files
+*~
