@@ -5,7 +5,7 @@ Basic init file for g2p module
 The main entry points for the g2p module are:
  - make_g2p() to create a mapper from and lang to another
  - make_tokenizer() to create a tokenizeer for a given language
- - get_langs() to get the list of languages with a path to eng-arpabet
+ - get_arpabet_langs() to get the list of languages with a path to eng-arpabet
 
 Basic Usage:
     from g2p import make_g2p
@@ -17,8 +17,8 @@ Basic Usage:
     tokenizer = make_tokenizer(lang)
     list_of_tokens = tokenizer.tokenize_text(input_text)
 
-    from g2p import get_langs
-    LANGS, LANG_NAMES = get_langs()
+    from g2p import get_arpabet_langs
+    LANGS, LANG_NAMES = get_arpabet_langs()
 """
 import sys
 from typing import Dict, Optional, Tuple, Union
@@ -138,7 +138,7 @@ _langs_cache = None
 _lang_names_cache = None
 
 
-def get_langs():
+def get_arpabet_langs():
     """Get the list of language codes and names supported by the g2p library
     for mapping to ARPABET.
 

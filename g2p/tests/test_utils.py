@@ -9,7 +9,7 @@ from unittest import TestCase, main
 
 import yaml
 
-from g2p import get_langs
+from g2p import get_arpabet_langs
 from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
@@ -247,15 +247,15 @@ class UtilsTest(TestCase):
             (e_acute_nfd, [(0, 0), (0, 1)]),
         )
 
-    def test_get_langs(self):
-        LANGS, LANG_NAMES = get_langs()
+    def test_get_arpabet_langs(self):
+        LANGS, LANG_NAMES = get_arpabet_langs()
         self.assertEqual(LANGS, sorted(LANGS))
         self.assertEqual(list(LANG_NAMES.keys()), sorted(LANG_NAMES.keys()))
         self.assertEqual(LANGS, list(LANG_NAMES.keys()))
         self.assertTrue("kwk-umista" in LANG_NAMES)
         self.assertTrue("str" in LANG_NAMES)
         self.assertGreater(len(LANGS), 40)
-        LANGS2, LANG_NAMES2 = get_langs()
+        LANGS2, LANG_NAMES2 = get_arpabet_langs()
         self.assertIs(LANGS2, LANGS)
         self.assertIs(LANG_NAMES2, LANG_NAMES)
 
