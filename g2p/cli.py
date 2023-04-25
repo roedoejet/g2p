@@ -35,6 +35,7 @@ from g2p.mappings.langs import (
     LANGS_PKL_NAME,
     MAPPINGS_AVAILABLE,
     NETWORK_PKL_NAME,
+    reload_db,
 )
 from g2p.mappings.langs.utils import (
     cache_langs,
@@ -669,10 +670,14 @@ def update(in_dir, out_dir):
         langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
     cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
-    update_docs()
-    network_to_echart(
-        outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
-    )
+
+    if in_dir == LANGS_DIR and out_dir is None:
+        # We only update the documentation when updating using the default directories
+        reload_db()
+        update_docs()  # updates g2p/static/swagger.json
+        network_to_echart(
+            outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
+        )  # updates g2p/status/languages-network.json
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
