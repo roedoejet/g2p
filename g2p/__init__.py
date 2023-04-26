@@ -33,7 +33,7 @@ from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.mappings.tokenizer import make_tokenizer
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
-if sys.version_info < (3, 6):
+if sys.version_info < (3, 6):  # pragma: no cover
     sys.exit(
         f"Python 3.6 or more recent is required. You are using {sys.version}.\n"
         "Please use a newer version of Python."
