@@ -3,6 +3,7 @@
 from unittest import TestCase, main
 
 import g2p
+from g2p.log import LOGGER
 
 
 class TokenizeAndMapTest(TestCase):
@@ -149,6 +150,49 @@ class TokenizeAndMapTest(TestCase):
             [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
+
+    def test_deprecated_tok_langs(self):
+        if g2p.VERSION < "2.0":
+            with self.assertLogs(LOGGER, "WARNING"):
+                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
+        else:
+            with self.assertRaises(TypeError):
+                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
+
+    def test_removed_tok_langs_in_v2(self):
+        # monkey patch to make sure we always exercise the TypeError pathway
+        saved_version = g2p._version.VERSION
+        g2p.VERSION = "2.0"
+        with self.assertRaises(TypeError):
+            _ = g2p.make_g2p("ikt-sro", "eng-ipa", "path")
+        g2p.VERSION = saved_version
+
+    def test_make_g2p_cache(self):
+        self.assertIs(
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("fra", "fra-ipa", tokenize=True),
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+        )
+        my_tokenizer = g2p.make_tokenizer("oji")
+        self.assertIs(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+        )
+        self.assertIs(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=g2p.make_tokenizer("oji")),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=g2p.make_tokenizer("ikt")),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", tokenize=True),
+        )
 
 
 if __name__ == "__main__":
