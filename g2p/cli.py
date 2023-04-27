@@ -474,7 +474,7 @@ def generate_mapping(  # noqa: C901
     "-t",
     default=None,  # three-way var: None=not set, True/False=set to True/False
     is_flag=True,
-    help="Tokenize INPUT_TEXT before converting.",
+    help="Tokenize INPUT_TEXT before converting. Default is --tok, specify --no-tok to turn off.",
 )
 @click.option(
     "--config",
@@ -555,6 +555,8 @@ def convert(  # noqa: C901
     # Determine which tokenizer to use, if any
     if tok is not None and not tok and tok_lang is not None:
         raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
+    if tok is None:
+        tok = True  # Tokenize by default
     custom_tokenizer = make_tokenizer(tok_lang) if tok_lang else None
     # Transduce!!!
     assert in_lang and out_lang

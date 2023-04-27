@@ -23,7 +23,7 @@ def align_to_dummy_fallback(
             mapping.inventory(io), DUMMY_INVENTORY, distance=distance, quiet=quiet
         )
     else:
-        und_g2p = make_g2p("und", "und-ipa")
+        und_g2p = make_g2p("und", "und-ipa", tokenize=False)
         mapping = [
             {
                 "in": unicode_escape(x),
