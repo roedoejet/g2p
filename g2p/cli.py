@@ -477,11 +477,6 @@ def generate_mapping(  # noqa: C901
     help="Tokenize INPUT_TEXT before converting.",
 )
 @click.option(
-    "--path",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False),
-    help="Read text to convert from FILE.",
-)
-@click.option(
     "--config",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
     help="A path to a mapping configuration file to use",
@@ -564,10 +559,8 @@ def convert(  # noqa: C901
     if tok and tok_lang is None:
         tok_lang = "path"
     # Transduce!!!
-    if in_lang and out_lang:
-        transducer = make_g2p(in_lang, out_lang, tok_lang=tok_lang)
-    elif path:
-        transducer = Transducer(Mapping(path))
+    assert in_lang and out_lang
+    transducer = make_g2p(in_lang, out_lang, tok_lang=tok_lang)
     tg = transducer(input_text)
     if check:
         transducer.check(tg, display_warnings=True)
