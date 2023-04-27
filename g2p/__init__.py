@@ -20,41 +20,18 @@ Basic Usage:
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
 """
-import sys
 from typing import Dict, Optional, Tuple, Union
 
 from networkx import has_path, shortest_path
 from networkx.exception import NetworkXNoPath
 
+import g2p.deprecation
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.mappings.tokenizer import Tokenizer, make_tokenizer
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
-from g2p._version import VERSION
-
-if sys.version_info < (3, 6):  # pragma: no cover
-    sys.exit(
-        f"Python 3.6 or more recent is required. You are using {sys.version}.\n"
-        "Please use a newer version of Python."
-    )
-
-
-def _handle_tok_lang_deprecation(tok_lang):
-    """Warn or raise about using the deprecated tok_lang arg to make_g2p"""
-    if tok_lang:
-        if VERSION < "2.0":
-            LOGGER.warning(
-                "Deprecation warning: the tok_lang argument to make_g2p is deprecated, "
-                "and will be removed in g2p version 2.0 "
-                "Use tokenize=True or create a custom_tokenizer using make_tokenizer() instead."
-            )
-        else:
-            raise TypeError(
-                "Deprecation error: the tok_lang argument to make_g2p has been removed. "
-                "Use tokenize=True or create a custom_tokenizer using make_tokenizer() instead."
-            )
 
 
 _g2p_cache: Dict[
@@ -97,7 +74,7 @@ def make_g2p(  # noqa: C901
     if (in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))]
 
-    _handle_tok_lang_deprecation(tok_lang)
+    g2p.deprecation.handle_tok_lang_deprecation(tok_lang)
 
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:

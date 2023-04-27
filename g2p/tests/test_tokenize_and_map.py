@@ -152,7 +152,7 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(tier_edges, ref_tier_edges)
 
     def test_deprecated_tok_langs(self):
-        if g2p.VERSION < "2.0":
+        if g2p._version.VERSION < "2.0":
             with self.assertLogs(LOGGER, "WARNING"):
                 _ = g2p.make_g2p("fin", "eng-arpabet", "path")
         else:
@@ -162,10 +162,10 @@ class TokenizeAndMapTest(TestCase):
     def test_removed_tok_langs_in_v2(self):
         # monkey patch to make sure we always exercise the TypeError pathway
         saved_version = g2p._version.VERSION
-        g2p.VERSION = "2.0"
+        g2p._version.VERSION = "2.0"
         with self.assertRaises(TypeError):
             _ = g2p.make_g2p("ikt-sro", "eng-ipa", "path")
-        g2p.VERSION = saved_version
+        g2p._version.VERSION = saved_version
 
     def test_make_g2p_cache(self):
         self.assertIs(
