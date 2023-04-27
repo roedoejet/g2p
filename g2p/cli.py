@@ -13,7 +13,7 @@ import yaml
 from flask.cli import FlaskGroup
 from networkx import has_path
 
-from g2p import make_g2p
+from g2p import make_g2p, make_tokenizer
 from g2p._version import VERSION
 from g2p.api import update_docs
 from g2p.app import APP
@@ -492,7 +492,6 @@ def convert(  # noqa: C901
     in_lang,
     out_lang,
     input_text,
-    path,
     tok,
     check,
     debugger,
@@ -556,11 +555,12 @@ def convert(  # noqa: C901
     # Determine which tokenizer to use, if any
     if tok is not None and not tok and tok_lang is not None:
         raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
-    if tok and tok_lang is None:
-        tok_lang = "path"
+    custom_tokenizer = make_tokenizer(tok_lang) if tok_lang else None
     # Transduce!!!
     assert in_lang and out_lang
-    transducer = make_g2p(in_lang, out_lang, tok_lang=tok_lang)
+    transducer = make_g2p(
+        in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
+    )
     tg = transducer(input_text)
     if check:
         transducer.check(tg, display_warnings=True)
@@ -740,7 +740,7 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     if lang1 is not None and lang2 is not None:
         try:
-            transducer = make_g2p(lang1, lang2)
+            transducer = make_g2p(lang1, lang2, tokenize=False)
         except (NoPath, InvalidLanguageCode) as e:
             raise click.UsageError(
                 f'Cannot find mapping from "{lang1}" to "{lang2}": {e}'

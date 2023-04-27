@@ -203,6 +203,11 @@ class LexiconTransducerTest(TestCase):
         tg = transducer("hello")
         self.assertEqual(tg.output_string, "HH AH L OW ")
 
+        # since we tokenize by default now, this works:
+        self.assertEqual(
+            transducer("hello my friend").output_string, "HH AH L OW  M AY  F R EH N D "
+        )
+
 
 if __name__ == "__main__":
     main()

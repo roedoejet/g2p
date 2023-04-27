@@ -119,7 +119,7 @@ class Text(Resource):
         index = args["index"]
         debugger = args["debugger"]
         try:
-            transducer = make_g2p(in_lang, out_lang)
+            transducer = make_g2p(in_lang, out_lang, tokenize=False)
             tg = transducer(text)
             text = tg.output_string
             input_text = tg.input_string

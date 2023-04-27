@@ -4,12 +4,12 @@ Basic init file for g2p module
 
 The main entry points for the g2p module are:
  - make_g2p() to create a mapper from and lang to another
- - make_tokenizer() to create a tokenizeer for a given language
+ - make_tokenizer() to create a tokenizer for a given language
  - get_arpabet_langs() to get the list of languages with a path to eng-arpabet
 
 Basic Usage:
     from g2p import make_g2p
-    converter = make_g2p(in_lang, out_lang, tok_lang)
+    converter = make_g2p(in_lang, out_lang)
     transduction_graph = converter(input_text_in_in_alang)
     converted_text_in_out_lang = transduction_graph.output_string
 
@@ -51,17 +51,17 @@ def make_g2p(  # noqa: C901
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
 
-    In general you should also add `tok_lang` to specify the language
-    for tokenization (probably the same as `in_lang`), because
-    transducers are not guaranteed to deal with whitespace,
+    By default, the input is tokenized using the path of mappings from in_lang
+    to out_lang, because transducers are not guaranteed to deal with whitespace,
     punctuation, etc, properly.
 
     Args:
         in_lang (str): input language code
         out_lang (str): output language code
         tok_lang (Optional[str]): DEPRECATED language for tokenization
-        tokenize (bool): whether tokenization should happen (default: yes)
-        custom_tokenizer (Tokenizer): the tokenizer to use (default: a tokenizer built on the)
+        tokenize (bool): whether tokenization should happen (default: True)
+        custom_tokenizer (Tokenizer): the tokenizer to use (default: a tokenizer
+                                      built on the path from in_lang and out_lang)
 
     Returns:
         Transducer from in_lang to out_lang, optionally with a tokenizer.
@@ -69,8 +69,8 @@ def make_g2p(  # noqa: C901
     Raises:
         InvalidLanguageCode: if in_lang or out_lang don't exist
         NoPath: if there is path between in_lang and out_lang
-
     """
+
     if (in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))]
 
