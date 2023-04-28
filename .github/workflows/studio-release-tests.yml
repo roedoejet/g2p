@@ -17,7 +17,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements/requirements.test.txt
           pip install -e .
-          pip install coverage coveralls
+          pip install coverage
       - name: Ensure browser is installed
         run: python -m playwright install --with-deps chromium
       - name: Run tests

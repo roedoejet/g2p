@@ -1,7 +1,7 @@
 [run]
 branch = True
 source_pkgs = g2p
-omit = *g2p/tests/*
+omit = g2p/tests/*
 
 [report]
 precision = 2
