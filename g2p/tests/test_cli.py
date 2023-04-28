@@ -194,6 +194,13 @@ class CliTest(TestCase):
         mapped_lower = "s"
         self.assertNotIn(mapped_lower, returned_set)
 
+    def test_scan_err(self):
+        results = self.runner.invoke(
+            scan, ["bad_lang", os.path.join(DATA_DIR, "fra_simple.txt")]
+        )
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("is not a valid value for 'LANG'", results.output)
+
     def test_convert_option_a(self):
         result = self.runner.invoke(convert, "-a hello eng eng-arpabet")
         self.assertIn(
@@ -266,6 +273,10 @@ class CliTest(TestCase):
         self.assertEqual(results.exit_code, 0)  # this one not an error
         self.assertIn("Dummy phone inventory", results.output)
 
+        results = self.runner.invoke(generate_mapping, "--list-dummy fra")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("IN_LANG is not allowed with --list-dummy", results.output)
+
         results = self.runner.invoke(generate_mapping, "--ipa --dummy fra")
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Error: Multiple modes selected", results.output)
@@ -303,6 +314,22 @@ class CliTest(TestCase):
         results = self.runner.invoke(generate_mapping, "--from fra_to_eng --to eng")
         self.assertNotEqual(results.exit_code, 0)
         self.assertIn("Cannot find mapping", results.output)
+
+        results = self.runner.invoke(generate_mapping, "--merge --from fra --to eng")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn(
+            "--merge is only compatible with --ipa and --dummy", results.output
+        )
+
+        results = self.runner.invoke(generate_mapping, "--merge --ipa fra")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("OUT_LANG is required with --merge", results.output)
+
+        results = self.runner.invoke(
+            generate_mapping, "--ipa --out-dir foo_bar_baz fra"
+        )
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Invalid value for '--out-dir': Directory", results.output)
 
     def test_show_mappings(self):
         # One arg = all mappings to or from that language
@@ -364,6 +391,36 @@ class CliTest(TestCase):
         # No path
         results = self.runner.invoke(show_mappings, ["fra", "moe"])
         self.assertNotEqual(results.exit_code, 0)
+
+    def test_convert_from_file(self):
+        results = self.runner.invoke(
+            convert, [os.path.join(DATA_DIR, "fra_simple.txt"), "fra", "fra-ipa"]
+        )
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("fʁɑ̃sɛ", results.output)
+
+    def test_convert_errors(self):
+        """Exercise code handling error situations in g2p convert"""
+        results = self.runner.invoke(convert, "asdf bad_in_lang eng-ipa")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("not a valid value for 'IN_LANG'", results.output)
+
+        results = self.runner.invoke(convert, "asdf fra bad_out_lang")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("not a valid value for 'OUT_LANG'", results.output)
+
+        results = self.runner.invoke(convert, "asdf fra dan")
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("Path between", results.output)
+        self.assertIn("does not exist", results.output)
+
+        results = self.runner.invoke(
+            convert, "--no-tok --tok-lang fra asdf fra fra-ipa"
+        )
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn(
+            "Specified conflicting --no-tok and --tok-lang options", results.output
+        )
 
 
 if __name__ == "__main__":
