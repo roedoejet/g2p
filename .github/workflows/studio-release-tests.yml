@@ -1,9 +1,7 @@
 name: Run Tests for Studio
 on:
-  pull_request:
-    branches: [release, main]
-  push:
-    branches: [release, main]
+  - push
+  - pull_request
 jobs:
   test-studio:
     runs-on: ubuntu-latest

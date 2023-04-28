@@ -13,6 +13,7 @@ or robust server mode (*nix only, gunicorn does not work on Windows):
 """
 
 from datetime import datetime
+from random import sample
 
 # flake8: noqa: C901
 from unittest import IsolatedAsyncioTestCase, main
@@ -85,6 +86,16 @@ class StudioTest(IsolatedAsyncioTestCase):
     async def test_langs(self):
 
         langs_to_test = load_public_test_data()
+        # Doing the whole test set takes a long time, so let's use a 10% random sample,
+        # knowing that all cases always get exercised in test_cli.py and test_langs.py.
+        # 10% is enough to catch a sudden drift where the studio might stop being campatible.
+        langs_to_test = [
+            langs_to_test[i]
+            for i in sorted(
+                sample(range(len(langs_to_test)), k=len(langs_to_test) // 10)
+            )
+        ]
+
         error_count = 0
 
         # The current g2p-studio app leaks memory, so that if we try to run all the test
