@@ -30,6 +30,7 @@ class StudioTest(IsolatedAsyncioTestCase):
         super().__init__(*args)
         self.port = 5000
         self.debug = True
+        self.timeout_delay = 500
 
     def setUp(self):
         self.flask_test_client = APP.test_client()
@@ -45,13 +46,13 @@ class StudioTest(IsolatedAsyncioTestCase):
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
             await page.goto(f"http://localhost:{self.port}/docs")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             await page.goto(f"http://localhost:{self.port}")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             input_el = page.locator("#input")
             output_el = page.locator("#output")
             await page.type("#input", "hello world")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             input_text = await input_el.input_value()
             output_text = await output_el.input_value()
             self.assertEqual(input_text, output_text)
@@ -59,29 +60,33 @@ class StudioTest(IsolatedAsyncioTestCase):
             await input_el.fill("")
             await output_el.fill("")
             await page.type("#input", "hello world")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             radio_el = page.locator("#animated-radio")
             await radio_el.click()
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
 
     async def test_switch_langs(self):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
             await page.goto(f"http://localhost:{self.port}")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             in_lang_selector = page.locator("#input-langselect")
             # Switch to a language
             await in_lang_selector.select_option(value="alq")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             settings_title = await page.text_content("#link-0")
             self.assertEqual(settings_title, "Algonquin to IPA")
             # Switch back to custom
             await in_lang_selector.select_option(value="Custom")
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(self.timeout_delay)
             settings_title = await page.text_content("#link-0")
             self.assertEqual(settings_title, "Custom")
             # FIXME: Test that the table works somewhere, somehow
+            # Switch to in_lang = eng-arpabet, which means there is no possible outlang
+            await in_lang_selector.select_option(value="eng-arpabet")
+            await page.wait_for_timeout(self.timeout_delay)
+            self.assertEqual(await page.locator("#link-0").count(), 0)
 
     async def test_langs(self):
 
@@ -134,7 +139,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                     for attempt in range(1, 4):
                         if attempt > 1:
                             LOGGER.info(f"Attempt #{attempt}")
-                            await page.wait_for_timeout(1000)
+                            await page.wait_for_timeout(self.timeout_delay)
                         # Clear input and output
                         await input_el.fill("")
                         await output_el.fill("")

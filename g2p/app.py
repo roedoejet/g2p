@@ -165,7 +165,9 @@ def convert(message):
 @SOCKETIO.on("table event", namespace="/table")
 def change_table(message):
     """Change the lookup table"""
-    if message["in_lang"] == "custom" or message["out_lang"] == "custom":
+    if "in_lang" not in message or "out_lang" not in message:
+        emit("table response", [])
+    elif message["in_lang"] == "custom" or message["out_lang"] == "custom":
         # These are only used to generate JSON to send to the client,
         # so it's safe to create a list of references to the same thing.
         mappings = [
@@ -198,19 +200,11 @@ def change_table(message):
             ],
         )
     else:
-        # Do not create a composite transducer just to decompose it,
-        # because it is the individual ones which are cached by g2p
         path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
-        if len(path) == 1:
-            transducer = make_g2p(
-                message["in_lang"], message["out_lang"], tokenize=False
-            )
-            mappings = [transducer.mapping]
-        else:
-            mappings = []
-            for lang1, lang2 in zip(path[:-1], path[1:]):
-                transducer = make_g2p(lang1, lang2, tokenize=False)
-                mappings.append(transducer.mapping)
+        mappings = []
+        for lang1, lang2 in zip(path[:-1], path[1:]):
+            transducer = make_g2p(lang1, lang2, tokenize=False)
+            mappings.append(transducer.mapping)
         emit(
             "table response",
             [
