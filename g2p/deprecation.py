@@ -5,8 +5,8 @@ version validated. Other functions can be added and invoked as needed.
 """
 
 import sys
+import warnings
 
-from g2p.log import LOGGER
 import g2p._version
 
 if sys.version_info < (3, 6):  # pragma: no cover
@@ -20,10 +20,15 @@ def handle_tok_lang_deprecation(tok_lang):
     """Warn or raise about using the deprecated tok_lang arg to make_g2p"""
     if tok_lang:
         if g2p._version.VERSION < "2.0":
-            LOGGER.warning(
+            warnings.filterwarnings(
+                "default", category=DeprecationWarning, message=".*make_g2p.*"
+            )
+            warnings.warn(
                 "Deprecation warning: the tok_lang argument to make_g2p is deprecated, "
                 "and will be removed in g2p version 2.0 "
-                "Use tokenize=True or create a custom_tokenizer using make_tokenizer() instead."
+                "Use tokenize=True or create a custom_tokenizer using make_tokenizer() instead.",
+                DeprecationWarning,
+                stacklevel=3,
             )
         else:
             raise TypeError(

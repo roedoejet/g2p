@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
+import warnings
 from unittest import TestCase, main
 
 import g2p
-from g2p.log import LOGGER
 
 
 class TokenizeAndMapTest(TestCase):
@@ -155,8 +155,10 @@ class TokenizeAndMapTest(TestCase):
 
     def test_deprecated_tok_langs(self):
         if g2p._version.VERSION < "2.0":
-            with self.assertLogs(LOGGER, "WARNING"):
+            with warnings.catch_warnings(record=True) as w:
                 _ = g2p.make_g2p("fin", "eng-arpabet", "path")
+                self.assertEqual(len(w), 1)
+                self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
         else:
             with self.assertRaises(TypeError):
                 _ = g2p.make_g2p("fin", "eng-arpabet", "path")
@@ -166,7 +168,7 @@ class TokenizeAndMapTest(TestCase):
         saved_version = g2p._version.VERSION
         g2p._version.VERSION = "2.0"
         with self.assertRaises(TypeError):
-            _ = g2p.make_g2p("ikt-sro", "eng-ipa", "path")
+            _ = g2p.make_g2p("iku-sro", "eng-ipa", "path")
         g2p._version.VERSION = saved_version
 
     def test_make_g2p_cache(self):
