@@ -110,6 +110,15 @@ class Text(Resource):
             required=False,
             help="Debugging information about the transduction process",
         )
+        self.parser.add_argument(
+            "tokenize",
+            dest="tokenize",
+            type=inputs.boolean,
+            location="args",
+            default=False,
+            required=False,
+            help="Tokenize before transducing",
+        )
 
     def get(self):
         args = self.parser.parse_args()
@@ -118,8 +127,9 @@ class Text(Resource):
         text = args["text"]
         index = args["index"]
         debugger = args["debugger"]
+        tokenize = args["tokenize"]
         try:
-            transducer = make_g2p(in_lang, out_lang, tokenize=False)
+            transducer = make_g2p(in_lang, out_lang, tokenize=tokenize)
             tg = transducer(text)
             text = tg.output_string
             input_text = tg.input_string
