@@ -143,6 +143,38 @@ class ResourceIntegrationTest(TestCase):
             )
         self.assertEqual(missing_response.status_code, 404)
 
+    def test_g2p_conversion_with_tok(self):
+        params_with_tok = {
+            "in-lang": "fra",
+            "out-lang": "eng-arpabet",
+            "text": "ceci, celà",
+            "debugger": True,
+            "index": True,
+            "tokenize": True,
+        }
+        response = self.client().get(
+            self.conversion_route, query_string=params_with_tok
+        )
+        self.assertEqual(response.status_code, 200)
+        res_json_tok = response.get_json()
+        self.assertEqual(res_json_tok["debugger"][0][0][0]["input"], "ceci")
+
+        params_no_tok = {
+            "in-lang": "fra",
+            "out-lang": "eng-arpabet",
+            "text": "ceci, celà",
+            "debugger": True,
+            "index": True,
+            "tokenize": False,
+        }
+        response = self.client().get(self.conversion_route, query_string=params_no_tok)
+        self.assertEqual(response.status_code, 200)
+        res_json_no_tok = response.get_json()
+        self.assertNotEqual(res_json_tok, res_json_no_tok)
+        self.assertEqual(res_json_no_tok["debugger"][0][0][0]["input"], "ceci, celà")
+
+        self.assertNotEqual(res_json_tok["debugger"], res_json_no_tok["debugger"])
+
 
 if __name__ == "__main__":
     main()
