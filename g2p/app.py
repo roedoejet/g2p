@@ -202,12 +202,14 @@ def change_table(message):
         # because it is the individual ones which are cached by g2p
         path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
         if len(path) == 1:
-            transducer = make_g2p(message["in_lang"], message["out_lang"])
+            transducer = make_g2p(
+                message["in_lang"], message["out_lang"], tokenize=False
+            )
             mappings = [transducer.mapping]
         else:
             mappings = []
             for lang1, lang2 in zip(path[:-1], path[1:]):
-                transducer = make_g2p(lang1, lang2)
+                transducer = make_g2p(lang1, lang2, tokenize=False)
                 mappings.append(transducer.mapping)
         emit(
             "table response",

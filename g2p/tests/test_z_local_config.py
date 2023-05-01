@@ -215,7 +215,16 @@ class LocalConfigTest(TestCase):
         config_path = self.mappings_dir / "compose.yaml"
         result = self.runner.invoke(
             convert,
-            [normalize("é", "NFD"), "c1", "c3", "--config", config_path, "-d", "-e"],
+            [
+                normalize("é", "NFD"),
+                "c1",
+                "c3",
+                "--no-tok",
+                "--config",
+                config_path,
+                "-d",
+                "-e",
+            ],
         )
         self.assertEqual(result.exit_code, 0)
         self.assertIn("[[(0, 0), (1, 0)], [(0, 0), (0, 1)]]", result.output)
@@ -225,7 +234,16 @@ class LocalConfigTest(TestCase):
 
         result = self.runner.invoke(
             convert,
-            [normalize("é", "NFC"), "c1", "c3", "--config", config_path, "-d", "-e"],
+            [
+                normalize("é", "NFC"),
+                "c1",
+                "c3",
+                "--no-tok",
+                "--config",
+                config_path,
+                "-d",
+                "-e",
+            ],
         )
         self.assertEqual(result.exit_code, 0)
         self.assertIn("[[(0, 0)], [(0, 0), (0, 1)]]", result.output)

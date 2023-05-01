@@ -27,12 +27,12 @@ class NetworkTest(TestCase):
             make_g2p("hei", "git")
 
     def test_valid_composite(self):
-        transducer = make_g2p("atj", "eng-ipa")
+        transducer = make_g2p("atj", "eng-ipa", tokenize=False)
         self.assertTrue(isinstance(transducer, CompositeTransducer))
         self.assertEqual("niɡiɡw", transducer("nikikw").output_string)
 
     def test_valid_transducer(self):
-        transducer = make_g2p("atj", "atj-ipa")
+        transducer = make_g2p("atj", "atj-ipa", tokenize=False)
         self.assertTrue(isinstance(transducer, Transducer))
         self.assertEqual("niɡiɡw", transducer("nikikw").output_string)
 

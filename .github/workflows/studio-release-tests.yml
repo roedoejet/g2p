@@ -1,9 +1,7 @@
 name: Run Tests for Studio
 on:
-  pull_request:
-    branches: [release, main]
-  push:
-    branches: [release, main]
+  - push
+  - pull_request
 jobs:
   test-studio:
     runs-on: ubuntu-latest
@@ -19,7 +17,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements/requirements.test.txt
           pip install -e .
-          pip install coverage coveralls
+          pip install coverage
       - name: Ensure browser is installed
         run: python -m playwright install --with-deps chromium
       - name: Run tests

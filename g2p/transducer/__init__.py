@@ -15,7 +15,7 @@ import text_unidecode
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
-from g2p.mappings.tokenizer import DefaultTokenizer
+from g2p.mappings.tokenizer import Tokenizer
 from g2p.mappings.utils import (
     compose_indices,
     is_ipa,
@@ -1180,13 +1180,13 @@ class TokenizingTransducer:
 
     Attributes:
         transducer (Transducer): A Transducer object for the mapping part
-        tokenizer (DefaultTokenizer): A Tokenizer object to split the string before mapping
+        tokenizer (Tokenizer): A Tokenizer object to split the string before mapping
     """
 
     def __init__(
         self,
         transducer: Union[Transducer, CompositeTransducer],
-        tokenizer: DefaultTokenizer,
+        tokenizer: Tokenizer,
     ):
         self._transducer = transducer
         self._tokenizer = tokenizer

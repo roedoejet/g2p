@@ -16,7 +16,13 @@ from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
 
 
-class DefaultTokenizer:
+class Tokenizer:
+    """Base class for all g2p tokenizers; implements the default tokenizing behaviour.
+
+    By default, a token is defined as a sequence of letters, numbers and
+    diacritics, as defined in the Unicode Standard.
+    """
+
     def __init__(self):
         self.inventory = []
         self.delim = ""
@@ -54,7 +60,7 @@ class DefaultTokenizer:
         return units
 
 
-class Tokenizer(DefaultTokenizer):
+class SpecializedTokenizer(Tokenizer):
     def __init__(self, mapping: Mapping):
         self.inventory = mapping.inventory("in")
         self.lang = mapping.kwargs.get("language_name", "")
@@ -91,7 +97,7 @@ class Tokenizer(DefaultTokenizer):
         return self.regex.findall(text)
 
 
-class MultiHopTokenizer(Tokenizer):
+class MultiHopTokenizer(SpecializedTokenizer):
     def __init__(self, mappings: list):
         assert mappings
         self.inventory = sum([m.inventory("in") for m in mappings], [])
@@ -111,7 +117,7 @@ class TokenizerLibrary:
     """
 
     def __init__(self):
-        self.tokenizers = {None: DefaultTokenizer()}
+        self.tokenizers = {None: Tokenizer()}
 
     def make_tokenizer_key(self, in_lang, out_lang=None, tok_path=None):
         if not in_lang:
@@ -122,7 +128,9 @@ class TokenizerLibrary:
             out_lang = in_lang + "-ipa"
         return in_lang + "-to-" + out_lang
 
-    def make_tokenizer(self, in_lang, out_lang=None, tok_path=None):  # noqa C901
+    def make_tokenizer(  # noqa C901
+        self, in_lang, out_lang=None, tok_path=None
+    ) -> Tokenizer:
         tokenizer_key = self.make_tokenizer_key(in_lang, out_lang, tok_path)
         if not self.tokenizers.get(tokenizer_key):
             # This tokenizer was not created yet, initialize it now.
@@ -189,7 +197,7 @@ class TokenizerLibrary:
                 # Build a one-hop tokenizer
                 try:
                     mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
-                    self.tokenizers[tokenizer_key] = Tokenizer(mapping)
+                    self.tokenizers[tokenizer_key] = SpecializedTokenizer(mapping)
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]
                     LOGGER.warning(
@@ -206,7 +214,7 @@ class TokenizerLibrary:
 _the_tokenizer_library = TokenizerLibrary()
 
 
-def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+def make_tokenizer(in_lang=None, out_lang=None, tok_path=None) -> Tokenizer:
     """Make the tokenizer for input in language in_lang
 
     Logic used when only in_lang is provided:

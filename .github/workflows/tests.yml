@@ -20,7 +20,7 @@ jobs:
           pip install -e .
           pip install pip-licenses
           if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
-          pip install coverage coveralls
+          pip install coverage
       - name: Run tests
         run: |
           coverage run --omit g2p/app.py --omit 'g2p/tests/*' --parallel-mode \

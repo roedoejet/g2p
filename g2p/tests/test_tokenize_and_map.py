@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import warnings
 from unittest import TestCase, main
 
 import g2p
@@ -16,7 +17,7 @@ class TokenizeAndMapTest(TestCase):
 
     def test_tok_and_map_fra(self):
         """Chaining tests: tokenize and map a string"""
-        transducer = g2p.make_g2p("fra", "fra-ipa")
+        transducer = g2p.make_g2p("fra", "fra-ipa", tokenize=False)
         tokenizer = g2p.make_tokenizer("fra")
         # "teste" in isolation is at string and word end and beginning
         word_ipa = transducer("teste").output_string
@@ -27,7 +28,7 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(string_ipa, self.contextualize(word_ipa))
 
     def test_tok_and_map_mic(self):
-        transducer = g2p.make_g2p("mic", "mic-ipa")
+        transducer = g2p.make_g2p("mic", "mic-ipa", tokenize=False)
         tokenizer = g2p.make_tokenizer("mic")
         word_ipa = transducer("sq").output_string
         string_ipa = g2p.tokenize_and_map(
@@ -36,8 +37,10 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(string_ipa, self.contextualize(word_ipa))
 
     def test_tokenizing_transducer(self):
-        ref_word_ipa = g2p.make_g2p("mic", "mic-ipa")("sq").output_string
-        transducer = g2p.make_g2p("mic", "mic-ipa", tok_lang="mic")
+        ref_word_ipa = g2p.make_g2p("mic", "mic-ipa", tokenize=False)(
+            "sq"
+        ).output_string
+        transducer = g2p.make_g2p("mic", "mic-ipa")  # tokenizes on "mic" via "path"
         self.assertEqual(transducer.transducer.in_lang, transducer.in_lang)
         self.assertEqual(transducer.transducer.out_lang, transducer.out_lang)
         self.assertEqual(transducer.transducer, transducer.transducers[0])
@@ -47,19 +50,19 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(string_ipa, self.contextualize(ref_word_ipa))
 
     def test_tokenizing_transducer_chain(self):
-        transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
+        transducer = g2p.make_g2p("fra", "eng-arpabet")
         self.assertEqual(
             self.contextualize(transducer("teste").output_string),
             transducer(self.contextualize("teste")).output_string,
         )
 
     def test_tokenizing_transducer_debugger(self):
-        transducer = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")
+        transducer = g2p.make_g2p("fra", "fra-ipa")
         debugger = transducer("ceci est un test.").debugger
         self.assertEqual(len(debugger), 4)
 
     def test_tokenizing_transducer_edges(self):
-        transducer = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")
+        transducer = g2p.make_g2p("fra", "fra-ipa")
         tg = transducer("est est")
         # est -> ɛ, so edges are (0, 0), (1, 0), (2, 0) for each "est", plus the
         # space to the space, and the second set of edges being offset
@@ -69,12 +72,12 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(tg.substring_alignments(), ref_alignments)
 
     def test_tokenizing_transducer_edges2(self):
-        ref_edges = g2p.make_g2p("fra", "fra-ipa")("ça ça").edges
-        edges = g2p.make_g2p("fra", "fra-ipa", tok_lang="fra")("ça ça").edges
+        ref_edges = g2p.make_g2p("fra", "fra-ipa", tokenize=False)("ça ça").edges
+        edges = g2p.make_g2p("fra", "fra-ipa")("ça ça").edges
         self.assertEqual(edges, ref_edges)
 
     def test_tokenizing_transducer_edge_chain(self):
-        transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
+        transducer = g2p.make_g2p("fra", "eng-arpabet")
         # .edges on a transducer is always a single array with the
         # end-to-end mapping, for a composed transducer we can access
         # the individual tiers with .tiers
@@ -127,7 +130,7 @@ class TokenizeAndMapTest(TestCase):
         self.assertEqual(tier_alignments, ref_tier_alignments)
 
     def test_tokenizing_transducer_edge_spaces(self):
-        transducer = g2p.make_g2p("fra", "eng-arpabet", tok_lang="fra")
+        transducer = g2p.make_g2p("fra", "eng-arpabet")
         ref_edges = [
             # "  a, " -> "  AA , "
             (0, 0),
@@ -149,6 +152,51 @@ class TokenizeAndMapTest(TestCase):
             [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
+
+    def test_deprecated_tok_langs(self):
+        if g2p._version.VERSION < "2.0":
+            with warnings.catch_warnings(record=True) as w:
+                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
+                self.assertEqual(len(w), 1)
+                self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
+        else:
+            with self.assertRaises(TypeError):
+                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
+
+    def test_removed_tok_langs_in_v2(self):
+        # monkey patch to make sure we always exercise the TypeError pathway
+        saved_version = g2p._version.VERSION
+        g2p._version.VERSION = "2.0"
+        with self.assertRaises(TypeError):
+            _ = g2p.make_g2p("iku-sro", "eng-ipa", "path")
+        g2p._version.VERSION = saved_version
+
+    def test_make_g2p_cache(self):
+        self.assertIs(
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("fra", "fra-ipa", tokenize=True),
+            g2p.make_g2p("fra", "fra-ipa", tokenize=False),
+        )
+        my_tokenizer = g2p.make_tokenizer("oji")
+        self.assertIs(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+        )
+        self.assertIs(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=g2p.make_tokenizer("oji")),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=g2p.make_tokenizer("ikt")),
+        )
+        self.assertIsNot(
+            g2p.make_g2p("oji", "eng-ipa", custom_tokenizer=my_tokenizer),
+            g2p.make_g2p("oji", "eng-ipa", tokenize=True),
+        )
 
 
 if __name__ == "__main__":
