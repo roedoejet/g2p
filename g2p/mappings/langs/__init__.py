@@ -13,6 +13,10 @@ LANGS_PKL_NAME = "langs.pkl"
 LANGS_PKL = os.path.join(LANGS_DIR, LANGS_PKL_NAME)
 NETWORK_PKL_NAME = "network.pkl"
 LANGS_NWORK_PATH = os.path.join(LANGS_DIR, NETWORK_PKL_NAME)
+# Nodes contains information about individual nodes in the network
+# including character inventories
+NODES_PKL_NAME = "nodes.pkl"
+NODES_PKL = os.path.join(LANGS_DIR, NODES_PKL_NAME)
 
 
 def load_langs(path: str = LANGS_PKL):
@@ -23,6 +27,13 @@ def load_langs(path: str = LANGS_PKL):
         LOGGER.warning(f"Failed to read language cache from {path}: {e}")
         return {}
 
+def load_nodes(path: str = NODES_PKL):
+    try:
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    except Exception as e:
+        LOGGER.warning(f"Failed to read network nodes cache from {path}: {e}")
+        return {}
 
 def load_network(path: str = LANGS_NWORK_PATH):
     try:
@@ -48,18 +59,23 @@ def get_available_languages(langs: dict) -> list:
 
 def get_available_mappings(langs: dict) -> list:
     mappings_available = []
-    for k, v in langs.items():
+    for v in langs.values():
         if "mappings" in v:
             mappings_available.extend(v["mappings"])
         else:
             mappings_available.append(v)
     return mappings_available
 
+def get_available_nodes(langs: dict) -> dict:
+    return langs
+
 
 LANGS = load_langs()
+NODES = load_nodes()
 LANGS_NETWORK = load_network()
 LANGS_AVAILABLE = get_available_languages(LANGS)
 MAPPINGS_AVAILABLE = get_available_mappings(LANGS)
+NODES_AVAILABLE = get_available_nodes(NODES)
 
 
 def reload_db():
@@ -71,6 +87,10 @@ def reload_db():
     global LANGS
     LANGS.clear()
     LANGS.update(load_langs())
+
+    global NODES
+    NODES.clear()
+    NODES.update(load_nodes())
 
     global LANGS_NETWORK
     LANGS_NETWORK.clear()
@@ -84,3 +104,7 @@ def reload_db():
     global MAPPINGS_AVAILABLE
     MAPPINGS_AVAILABLE.clear()
     MAPPINGS_AVAILABLE.extend(get_available_mappings(LANGS))
+
+    global NODES_AVAILABLE
+    NODES_AVAILABLE.clear()
+    NODES_AVAILABLE.update(get_available_nodes(NODES))

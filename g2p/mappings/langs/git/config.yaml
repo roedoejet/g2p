@@ -32,3 +32,52 @@ mappings:
       - Aidan Pine
     mapping: git_ipa_to_eng_ipa.json
     <<: *shared
+nodes:
+  git:
+    normalized_inventory:
+      - a
+      - aa
+      - b
+      - d
+      - e
+      - ee
+      - g
+      - gw
+      - g\u0332
+      - h
+      - hl
+      - i
+      - ii
+      - j
+      - k
+      - k'
+      - kw
+      - kw'
+      - k\u0332
+      - k\u0332'
+      - l
+      - "'l"
+      - m
+      - "'m"
+      - "n"
+      - "'n"
+      - o
+      - oo
+      - p
+      - p'
+      - s
+      - t
+      - t'
+      - tl'
+      - ts
+      - ts'
+      - u
+      - uu
+      - w
+      - "'w"
+      - x
+      - xw
+      - x\u0332
+      - "y"
+      - "'y"
+      - "'"

@@ -21,3 +21,49 @@ mappings:
     authors:
       - Aidan Pine
     <<: *shared
+nodes:
+  str:
+    normalized_inventory:
+      - A
+      - Á
+      - Ⱥ
+      - B
+      - C
+      - Ć
+      - Ȼ
+      - D
+      - E
+      - H
+      - I
+      - Í
+      - J
+      - K
+      - ₭
+      - K\u0301
+      - K\u0331
+      - L
+      - Ƚ
+      - M
+      - "N"
+      - N\u0331
+      - O
+      - P
+      - Q
+      - S
+      - Ś
+      - T
+      - Ⱦ
+      - Ṯ
+      - Ŧ
+      - U
+      - W
+      - W\u0331
+      - X\u0331
+      - "Y"
+      - Z
+      - "s"
+      - "¸"
+
+
+
+

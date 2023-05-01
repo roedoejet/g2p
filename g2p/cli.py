@@ -35,6 +35,7 @@ from g2p.mappings.langs import (
     LANGS_PKL_NAME,
     MAPPINGS_AVAILABLE,
     NETWORK_PKL_NAME,
+    NODES_PKL_NAME,
     reload_db,
 )
 from g2p.mappings.langs.utils import (
@@ -661,10 +662,12 @@ def update(in_dir, out_dir):
     if out_dir is None:
         langs_path = os.path.join(in_dir, LANGS_PKL_NAME)
         network_path = os.path.join(in_dir, NETWORK_PKL_NAME)
+        nodes_path = os.path.join(in_dir, NODES_PKL_NAME)
     else:
         langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
-    cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
+        nodes_path = os.path.join(out_dir, NODES_PKL_NAME)
+    cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path, nodes_path=nodes_path)
 
     if in_dir == LANGS_DIR and out_dir is None:
         # We only update the documentation when updating using the default directories

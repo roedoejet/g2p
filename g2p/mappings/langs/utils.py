@@ -21,6 +21,7 @@ from g2p.mappings.langs import (
     LANGS_NWORK_PATH,
     LANGS_PKL,
     MAPPINGS_AVAILABLE,
+    NODES_PKL
 )
 from g2p.mappings.utils import is_ipa, load_mapping_from_path
 
@@ -140,6 +141,7 @@ def cache_langs(
     dir_path: str = LANGS_DIR,
     langs_path: str = LANGS_PKL,
     network_path: str = LANGS_NWORK_PATH,
+    nodes_path: str = NODES_PKL
 ):
     """Read in all files and save as pickle.
 
@@ -152,7 +154,7 @@ def cache_langs(
                      installed g2p/mappings/langs/network.pkl.
     """
     langs = {}
-
+    nodes = {}
     # Sort by language code
     paths = sorted(Path(dir_path).glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
     mappings_legal_pairs = []
@@ -179,7 +181,8 @@ def cache_langs(
             if "language_name" not in data:
                 raise MalformedMapping(f"language_name missing in {path}")
         langs[code] = data
-
+        if 'nodes' in data:
+            nodes |= data['nodes']
     # Save as a Directional Graph
     lang_network = DiGraph()
     lang_network.add_edges_from(mappings_legal_pairs)
@@ -189,6 +192,9 @@ def cache_langs(
 
     with open(langs_path, "wb") as f:
         pickle.dump(langs, f, protocol=4)
+
+    with open(nodes_path, "wb") as f:
+        pickle.dump(nodes, f, protocol=4)
 
     return langs
 

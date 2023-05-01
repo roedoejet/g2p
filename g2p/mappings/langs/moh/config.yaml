@@ -57,3 +57,45 @@ mappings:
       - Aidan Pine
     notes: This is for use in Festival which requires only ASCII characters. I tried to write something that is still readable but doesn't have ambiguous sequences (like my previous attempt).
     <<: *shared
+nodes:
+  moh:
+    normalized_inventory:
+      - "òn:"
+      - "èn:"
+      - "ón:"
+      - "én:"
+      - "òn"
+      - "èn"
+      - "ón"
+      - "én"
+      - "on"
+      - "en"
+      - "à:"
+      - "è:"
+      - "ì:"
+      - "ò:"
+      - "í:"
+      - "é:"
+      - "á:"
+      - "ó:"
+      - "à"
+      - "è"
+      - "ì"
+      - "ò"
+      - "í"
+      - "é"
+      - "á"
+      - "ó"
+      - "i"
+      - "e"
+      - "a"
+      - "o"
+      - h
+      - k
+      - "n"
+      - r
+      - s
+      - t
+      - w
+      - "y"
+
