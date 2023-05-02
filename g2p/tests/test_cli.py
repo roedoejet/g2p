@@ -422,6 +422,14 @@ class CliTest(TestCase):
             "Specified conflicting --no-tok and --tok-lang options", results.output
         )
 
+    def test_short_dash_h(self):
+        results_short = self.runner.invoke(convert, "-h")
+        self.assertEqual(results_short.exit_code, 0)
+        self.assertIn("Show this message and exit", results_short.output)
+        results_long = self.runner.invoke(convert, "--help")
+        self.assertEqual(results_long.exit_code, 0)
+        self.assertEqual(results_short.output, results_long.output)
+
 
 if __name__ == "__main__":
     main()
