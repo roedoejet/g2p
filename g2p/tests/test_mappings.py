@@ -166,12 +166,19 @@ class MappingTest(TestCase):
     def test_escape_special(self):
         mapping = Mapping([{"in": r"\d", "out": "digit"}])
         mapping_escaped = Mapping([{"in": r"\d", "out": "b"}], escape_special=True)
+        mapping_input_and_output_special_escaped = Mapping([{"in": "&", "out": "&"}], escape_special=True)
+        mapping_specific_from_fpcc = Mapping([{"in": r"^", "out": "A"}, {"in": "o", "out": r"."}], rule_ordering="apply-longest-first", escape_special=True)
         transducer = Transducer(mapping)
         transducer_escaped = Transducer(mapping_escaped)
+        transducer_escaped_input_output = Transducer(mapping_input_and_output_special_escaped)
+        transducer_fpcc = Transducer(mapping_specific_from_fpcc)
         self.assertEqual(transducer("1").output_string, "digit")
         self.assertEqual(transducer(r"\d").output_string, r"\d")
         self.assertEqual(transducer_escaped("1").output_string, "1")
         self.assertEqual(transducer_escaped(r"\d").output_string, "b")
+        self.assertEqual(transducer_escaped_input_output('&').output_string, "&")
+        self.assertEqual(transducer_fpcc("^o").output_string, "A.")
+        
 
     def test_norm_form(self):
         mapping_nfc = Mapping([{"in": "a\u0301", "out": "a"}])  # Defaults to NFC

@@ -429,17 +429,16 @@ def validate(mapping, path):
 
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
-    for k, v in to_escape.items():
-        if isinstance(v, str):
-            escaped = re.escape(v)
-        else:
-            escaped = v
-        if escaped != v:
+    for key in ['in', 'context_before', 'context_after']:
+        if key not in to_escape or not isinstance(to_escape[key], str):
+            continue
+        escaped = re.escape(to_escape[key])
+        if to_escape[key] != escaped:
             LOGGER.debug(
-                f"Escaped special characters in '{v}' with '{escaped}''. Set 'escape_special' "
+                f"Escaped special characters in '{to_escape[key]}' with '{escaped}'. Set 'escape_special' "
                 "to False in your Mapping configuration to disable this."
             )
-        to_escape[k] = escaped
+        to_escape[key] = escaped
     return to_escape
 
 
