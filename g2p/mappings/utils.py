@@ -7,6 +7,7 @@ import csv
 import json
 import os
 import unicodedata as ud
+from bisect import bisect_left
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -525,7 +526,20 @@ def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
     return ("".join(chars), tuple(mappings))
 
 
-def load_alignments_from_file(path, delimiter="") -> Dict[str, str]:
+_JOINER = "\0"
+
+
+def find_alignment(alignments: List[str], word: str) -> Tuple:
+    """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
+    i = bisect_left(alignments, word, key=lambda x: x.split(_JOINER, maxsplit=1)[0])
+    if i != len(alignments):
+        k, v = alignments[i].split(_JOINER, maxsplit=1)
+        if k == word:
+            return get_alignment_output_tuple(v)
+    return ()
+
+
+def load_alignments_from_file(path, delimiter="") -> List[str]:
     """Load alignments in Phonetisaurus default format.
 
     Returns a mapping of input words to output alignments used to
@@ -536,15 +550,15 @@ def load_alignments_from_file(path, delimiter="") -> Dict[str, str]:
     the keys in the dictionary.
     """
     LOGGER.info("Loading alignments from %s", path)
-    alignments = {}
+    alignments = []
     with open(path, encoding="utf8") as f:
         for spam in f:
             spam = spam.strip()
             if not spam:
                 continue
             word = get_alignment_input_string(spam)
-            alignments[word] = spam
-    return alignments
+            alignments.append(word + _JOINER + spam)
+    return sorted(alignments)
 
 
 def is_ipa(lang: str) -> bool:

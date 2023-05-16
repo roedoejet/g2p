@@ -18,7 +18,7 @@ from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import Tokenizer
 from g2p.mappings.utils import (
     compose_indices,
-    get_alignment_output_tuple,
+    find_alignment,
     is_ipa,
     normalize,
     normalize_with_indices,
@@ -802,12 +802,11 @@ class Transducer:
         tg = TransductionGraph(to_convert)
         if not self.case_sensitive:
             to_convert = to_convert.lower()
-        alignment_str = self.mapping.alignments.get(to_convert, ())
-        if not alignment_str:
+        alignment = find_alignment(self.mapping.alignments, to_convert)
+        if not alignment:
             tg.edges = []
             tg.output_string = ""
         else:
-            alignment = get_alignment_output_tuple(alignment_str, self.out_delimiter)
             tg.output_string = ""
             edges: List[Tuple[int, int]] = []
             in_pos = 0
