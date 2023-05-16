@@ -526,12 +526,14 @@ def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
     return ("".join(chars), tuple(mappings))
 
 
+# The joiner between key and value must be 0 so that it sorts before all
+# characters and thus won't break bisect_left()
 _JOINER = "\0"
 
 
 def find_alignment(alignments: List[str], word: str) -> Tuple:
     """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
-    i = bisect_left(alignments, word, key=lambda x: x.split(_JOINER, maxsplit=1)[0])
+    i = bisect_left(alignments, word)
     if i != len(alignments):
         k, v = alignments[i].split(_JOINER, maxsplit=1)
         if k == word:
