@@ -466,6 +466,40 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
+def get_alignment_input_string(alignment: str) -> str:
+    """Parse one alignment of the format in *.aligned.txt and return just the input"""
+    chars = ""
+    return "".join(
+        [
+            tok
+            for mapping in alignment.split()
+            for tok in mapping[: mapping.rindex("}")].split("|")
+            if tok != "_"
+        ]
+    )
+    for mapping in alignment.split():
+        idx = mapping.rindex("}")
+        in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
+        chars += in_seq
+    return "".join(chars)
+
+
+def get_alignment_output_tuple(alignment: str, delimiter="") -> Tuple:
+    """Parse one alignment of the format in *.aligned.txt and return just the output seq"""
+    mappings: List[Union[int, str]] = []
+    for mapping in alignment.split():
+        idx = mapping.rindex("}")
+        # Note that we care about *character* indices, so we join them together
+        in_len = sum(len(tok) for tok in mapping[:idx].split("|") if tok != "_")
+        out_seq = delimiter.join(
+            tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
+        )
+        # To save space, make the mappings flat and only store
+        # the number of input characters rather than the characters themselves
+        mappings.extend((in_len, out_seq))
+    return tuple(mappings)
+
+
 def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
     """Parse one alignment of the format in *.aligned.txt
 
@@ -491,7 +525,7 @@ def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
     return ("".join(chars), tuple(mappings))
 
 
-def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
+def load_alignments_from_file(path, delimiter="") -> Dict[str, str]:
     """Load alignments in Phonetisaurus default format.
 
     Returns a mapping of input words to output alignments used to
@@ -508,7 +542,7 @@ def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
             spam = spam.strip()
             if not spam:
                 continue
-            (word, mappings) = parse_alignment(spam, delimiter)
+            word = get_alignment_input_string(spam)
             alignments[word] = spam
     return alignments
 

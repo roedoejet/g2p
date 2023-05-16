@@ -18,10 +18,10 @@ from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import Tokenizer
 from g2p.mappings.utils import (
     compose_indices,
+    get_alignment_output_tuple,
     is_ipa,
     normalize,
     normalize_with_indices,
-    parse_alignment,
     unicode_escape,
 )
 
@@ -807,8 +807,7 @@ class Transducer:
             tg.edges = []
             tg.output_string = ""
         else:
-            (word, alignment) = parse_alignment(alignment_str, self.out_delimiter)
-            assert word == to_convert
+            alignment = get_alignment_output_tuple(alignment_str, self.out_delimiter)
             tg.output_string = ""
             edges: List[Tuple[int, int]] = []
             in_pos = 0
