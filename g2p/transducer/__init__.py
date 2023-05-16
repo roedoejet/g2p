@@ -21,6 +21,7 @@ from g2p.mappings.utils import (
     is_ipa,
     normalize,
     normalize_with_indices,
+    parse_alignment,
     unicode_escape,
 )
 
@@ -801,11 +802,13 @@ class Transducer:
         tg = TransductionGraph(to_convert)
         if not self.case_sensitive:
             to_convert = to_convert.lower()
-        alignment = self.mapping.alignments.get(to_convert, ())
-        if not alignment:
+        alignment_str = self.mapping.alignments.get(to_convert, ())
+        if not alignment_str:
             tg.edges = []
             tg.output_string = ""
         else:
+            (word, alignment) = parse_alignment(alignment_str, self.out_delimiter)
+            assert word == to_convert
             tg.output_string = ""
             edges: List[Tuple[int, int]] = []
             in_pos = 0

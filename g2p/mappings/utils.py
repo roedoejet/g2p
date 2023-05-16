@@ -429,7 +429,7 @@ def validate(mapping, path):
 
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
-    for key in ['in', 'context_before', 'context_after']:
+    for key in ["in", "context_before", "context_after"]:
         if key not in to_escape or not isinstance(to_escape[key], str):
             continue
         escaped = re.escape(to_escape[key])
@@ -466,6 +466,31 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
+def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
+    """Parse one alignment of the format in *.aligned.txt
+
+    E.g.: '}_ f}f r}ɹ i}ɪ s}s c}k o}o|ʊ
+
+    E.g., For English, this parses one line from the cmudict.ipa.aligned.txt
+
+    Returns: (input word, (output elements))
+    """
+    chars = ""
+    mappings: List[Union[int, str]] = []
+    for mapping in alignment.split():
+        idx = mapping.rindex("}")
+        # Note that we care about *character* indices, so we join them together
+        in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
+        out_seq = delimiter.join(
+            tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
+        )
+        chars += in_seq
+        # To save space, make the mappings flat and only store
+        # the number of input characters rather than the characters themselves
+        mappings.extend((len(in_seq), out_seq))
+    return ("".join(chars), tuple(mappings))
+
+
 def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
     """Load alignments in Phonetisaurus default format.
 
@@ -483,20 +508,8 @@ def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
             spam = spam.strip()
             if not spam:
                 continue
-            chars = ""
-            mappings: List[Union[int, str]] = []
-            for mapping in spam.split():
-                idx = mapping.rindex("}")
-                # Note that we care about *character* indices, so we join them together
-                in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
-                out_seq = delimiter.join(
-                    tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
-                )
-                chars += in_seq
-                # To save space, make the mappings flat and only store
-                # the number of input characters rather than the characters themselves
-                mappings.extend((len(in_seq), out_seq))
-            alignments["".join(chars)] = tuple(mappings)
+            (word, mappings) = parse_alignment(spam, delimiter)
+            alignments[word] = spam
     return alignments
 
 
