@@ -7,6 +7,7 @@ import csv
 import json
 import os
 import unicodedata as ud
+from bisect import bisect_left
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -429,7 +430,7 @@ def validate(mapping, path):
 
 
 def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
-    for key in ['in', 'context_before', 'context_after']:
+    for key in ["in", "context_before", "context_after"]:
         if key not in to_escape or not isinstance(to_escape[key], str):
             continue
         escaped = re.escape(to_escape[key])
@@ -466,7 +467,58 @@ def load_abbreviations_from_file(path):
     return abbs
 
 
-def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
+def get_alignment_input_string(alignment: str) -> str:
+    """Parse one alignment of the format in *.aligned.txt and return just the input"""
+    return "".join(
+        [
+            tok
+            for mapping in alignment.split()
+            for tok in mapping[: mapping.rindex("}")].split("|")
+            if tok != "_"
+        ]
+    )
+
+
+def get_alignment_sequence(alignment: str, delimiter="") -> List[Tuple[int, str]]:
+    """Parse one alignment of the format in *.aligned.txt and return just the output seq.
+
+    E.g.: a}ʌ b}b a}æ s|h}ʃ e|d}t (from cmudict.ipa.aligned.txt)
+    means "abashed" is pronounced /ʌbæʃt/ with the grapheme-phoneme alignment being
+    [(1, "ʌ"), (1, "b"), (1, "æ"), (2, "ʃ"), (2, "t")]
+
+    Returns: the alignment as a List[Tuple[int, str]] where the int is the number
+             of input characters consumed and the str are the output phoneme(s).
+    """
+    mappings: List[Tuple[int, str]] = []
+    for mapping in alignment.split():
+        idx = mapping.rindex("}")
+        # Note that we care about *character* indices, so we join them together
+        in_len = sum(len(tok) for tok in mapping[:idx].split("|") if tok != "_")
+        out_seq = delimiter.join(
+            tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
+        )
+        # To save space, make the mappings flat and only store
+        # the number of input characters rather than the characters themselves
+        mappings.append((in_len, out_seq))
+    return mappings
+
+
+# The joiner between key and value must be 0 so that it sorts before all
+# characters and thus won't break bisect_left()
+_JOINER = "\0"
+
+
+def find_alignment(alignments: List[str], word: str) -> List[Tuple[int, str]]:
+    """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
+    i = bisect_left(alignments, word)
+    if i != len(alignments):
+        k, v = alignments[i].split(_JOINER, maxsplit=1)
+        if k == word:
+            return get_alignment_sequence(v)
+    return []
+
+
+def load_alignments_from_file(path, delimiter="") -> List[str]:
     """Load alignments in Phonetisaurus default format.
 
     Returns a mapping of input words to output alignments used to
@@ -477,27 +529,15 @@ def load_alignments_from_file(path, delimiter="") -> Dict[str, Tuple]:
     the keys in the dictionary.
     """
     LOGGER.info("Loading alignments from %s", path)
-    alignments = {}
+    alignments = []
     with open(path, encoding="utf8") as f:
         for spam in f:
             spam = spam.strip()
             if not spam:
                 continue
-            chars = ""
-            mappings: List[Union[int, str]] = []
-            for mapping in spam.split():
-                idx = mapping.rindex("}")
-                # Note that we care about *character* indices, so we join them together
-                in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
-                out_seq = delimiter.join(
-                    tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
-                )
-                chars += in_seq
-                # To save space, make the mappings flat and only store
-                # the number of input characters rather than the characters themselves
-                mappings.extend((len(in_seq), out_seq))
-            alignments["".join(chars)] = tuple(mappings)
-    return alignments
+            word = get_alignment_input_string(spam)
+            alignments.append(word + _JOINER + spam)
+    return sorted(alignments)
 
 
 def is_ipa(lang: str) -> bool:
