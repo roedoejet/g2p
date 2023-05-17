@@ -469,7 +469,6 @@ def load_abbreviations_from_file(path):
 
 def get_alignment_input_string(alignment: str) -> str:
     """Parse one alignment of the format in *.aligned.txt and return just the input"""
-    chars = ""
     return "".join(
         [
             tok
@@ -478,16 +477,19 @@ def get_alignment_input_string(alignment: str) -> str:
             if tok != "_"
         ]
     )
-    for mapping in alignment.split():
-        idx = mapping.rindex("}")
-        in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
-        chars += in_seq
-    return "".join(chars)
 
 
-def get_alignment_output_tuple(alignment: str, delimiter="") -> Tuple:
-    """Parse one alignment of the format in *.aligned.txt and return just the output seq"""
-    mappings: List[Union[int, str]] = []
+def get_alignment_sequence(alignment: str, delimiter="") -> List[Tuple[int, str]]:
+    """Parse one alignment of the format in *.aligned.txt and return just the output seq.
+
+    E.g.: a}ʌ b}b a}æ s|h}ʃ e|d}t (from cmudict.ipa.aligned.txt)
+    means "abashed" is pronounced /ʌbæʃt/ with the grapheme-phoneme alignment being
+    [(1, "ʌ"), (1, "b"), (1, "æ"), (2, "ʃ"), (2, "t")]
+
+    Returns: the alignment as a List[Tuple[int, str]] where the int is the number
+             of input characters consumed and the str are the output phoneme(s).
+    """
+    mappings: List[Tuple[int, str]] = []
     for mapping in alignment.split():
         idx = mapping.rindex("}")
         # Note that we care about *character* indices, so we join them together
@@ -497,33 +499,8 @@ def get_alignment_output_tuple(alignment: str, delimiter="") -> Tuple:
         )
         # To save space, make the mappings flat and only store
         # the number of input characters rather than the characters themselves
-        mappings.extend((in_len, out_seq))
-    return tuple(mappings)
-
-
-def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
-    """Parse one alignment of the format in *.aligned.txt
-
-    E.g.: '}_ f}f r}ɹ i}ɪ s}s c}k o}o|ʊ
-
-    E.g., For English, this parses one line from the cmudict.ipa.aligned.txt
-
-    Returns: (input word, (output elements))
-    """
-    chars = ""
-    mappings: List[Union[int, str]] = []
-    for mapping in alignment.split():
-        idx = mapping.rindex("}")
-        # Note that we care about *character* indices, so we join them together
-        in_seq = "".join(tok for tok in mapping[:idx].split("|") if tok != "_")
-        out_seq = delimiter.join(
-            tok for tok in mapping[idx + 1 :].split("|") if tok != "_"
-        )
-        chars += in_seq
-        # To save space, make the mappings flat and only store
-        # the number of input characters rather than the characters themselves
-        mappings.extend((len(in_seq), out_seq))
-    return ("".join(chars), tuple(mappings))
+        mappings.append((in_len, out_seq))
+    return mappings
 
 
 # The joiner between key and value must be 0 so that it sorts before all
@@ -531,14 +508,14 @@ def parse_alignment(alignment: str, delimiter="") -> Tuple[str, Tuple]:
 _JOINER = "\0"
 
 
-def find_alignment(alignments: List[str], word: str) -> Tuple:
+def find_alignment(alignments: List[str], word: str) -> List[Tuple[int, str]]:
     """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
     i = bisect_left(alignments, word)
     if i != len(alignments):
         k, v = alignments[i].split(_JOINER, maxsplit=1)
         if k == word:
-            return get_alignment_output_tuple(v)
-    return ()
+            return get_alignment_sequence(v)
+    return []
 
 
 def load_alignments_from_file(path, delimiter="") -> List[str]:

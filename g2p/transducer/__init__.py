@@ -811,9 +811,7 @@ class Transducer:
             edges: List[Tuple[int, int]] = []
             in_pos = 0
             out_pos = 0
-            # Mappings are flattened to save space
-            for idx in range(0, len(alignment), 2):
-                (n_inputs, outtxt) = alignment[idx : idx + 2]
+            for n_inputs, outtxt in alignment:
                 for i in range(n_inputs):
                     for j in range(len(outtxt)):
                         edges.append((in_pos + i, out_pos + j))
