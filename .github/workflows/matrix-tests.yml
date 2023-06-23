@@ -1,7 +1,5 @@
 name: Run full matrix Tests before Releases
 on:
-  push:
-    branches: [ main ]
   pull_request:
     branches: [ release ]
 jobs:
