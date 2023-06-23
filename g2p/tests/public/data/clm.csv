@@ -1,0 +1,42 @@
+# Ten real words
+clm,clm-ipa,x̣áyk̕ʷs,χˈajkʼʷs
+clm,clm-ipa,sx̣cáʔəy̕,sχtsˈaʔəj̰
+clm,clm-ipa,čúxʷəŋ̕,tʃˈuxʷəɴ̰
+clm,clm-ipa,ɬə́č̕šən,ɬˈʌtʃʼʃən
+clm,clm-ipa,ʔəsyác̕ɬ,ʔəsjˈatsʼɬ
+clm,clm-ipa,q̕ʷəyíyəš,qʼʷəjˈijəʃ
+clm,clm-ipa,sqʷə́m̕x̣ʷ,sqʷˈʌm̰χʷ
+clm,clm-ipa,sq̕ʷə́ŋəs,sqʼʷˈʌɴəs
+clm,clm-ipa,sƛ̕ə́mk̕ʷ,stɬʼˈʌmkʼʷ
+clm,clm-ipa,sx̣ʷáx̣ʷc̕,sχʷˈaχʷtsʼ
+
+clm,eng-ipa,x̣áyk̕ʷs,ʃæjkws
+clm,eng-ipa,sx̣cáʔəy̕,sʃtsæʔəj
+clm,eng-ipa,čúxʷəŋ̕,t͡ʃukwəŋ
+clm,eng-ipa,ɬə́č̕šən,sʌtʃʃən
+clm,eng-ipa,ʔəsyác̕ɬ,ʔəsjætss
+clm,eng-ipa,q̕ʷəyíyəš,kwəjijəʃ
+clm,eng-ipa,sqʷə́m̕x̣ʷ,skwʌmʃw
+clm,eng-ipa,sq̕ʷə́ŋəs,skwʌŋəs
+clm,eng-ipa,sƛ̕ə́mk̕ʷ,stsʌmkw
+clm,eng-ipa,sx̣ʷáx̣ʷc̕,sʃwæʃwts
+
+clm,eng-arpabet,x̣áyk̕ʷs,SH AE Y K W S
+clm,eng-arpabet,sx̣cáʔəy̕,S SH T S AE HH AH Y
+clm,eng-arpabet,čúxʷəŋ̕,CH UW K W AH NG
+clm,eng-arpabet,ɬə́č̕šən,S AH CH SH AH N
+clm,eng-arpabet,ʔəsyác̕ɬ,HH AH S Y AE T S S
+clm,eng-arpabet,q̕ʷəyíyəš,K W AH Y IY Y AH SH
+clm,eng-arpabet,sqʷə́m̕x̣ʷ,S K W AH M SH W
+clm,eng-arpabet,sq̕ʷə́ŋəs,S K W AH NG AH S
+clm,eng-arpabet,sƛ̕ə́mk̕ʷ,S T S AH M K W
+clm,eng-arpabet,sx̣ʷáx̣ʷc̕,S SH W AE SH W T S
+
+# Artificial test data
+clm,clm-ipa,uʔúhuy̕,ɔʔˈɔhɔj̰
+clm,clm-ipa,utúluk,utˈuluk
+clm,clm-ipa,ə,ə
+clm,clm-ipa,ə́,ˈʌ
+clm,clm-ipa,šəč̕əš,ʃɨtʃʼɨʃ
+clm,clm-ipa,čəšəč,tʃɨʃɨtʃ
+clm,clm-ipa,ə́x̣ʷəx̣ʷ,ˈʌχʷʊχʷ
