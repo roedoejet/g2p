@@ -473,6 +473,7 @@ class Mapping:
                 ensure_ascii=False,
                 cls=CompactJSONMappingEncoder,
             )
+            print("\n", end="", file=out_stream)
         elif file_type == "csv":
             fieldnames = ["in", "out", "context_before", "context_after"]
             writer = csv.DictWriter(
@@ -569,7 +570,7 @@ class Mapping:
             if not updated:
                 existing_data["mappings"].append(template["mappings"][0])
             template = existing_data
-        with open(fn, "w", encoding="utf8") as f:
+        with open(fn, "w", encoding="utf8", newline="\n") as f:
             yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
 
 
