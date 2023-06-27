@@ -1,12 +1,54 @@
-name: Run Tests
+name: Run all tests
 on:
   - push
   - pull_request
 jobs:
-  test:
+  test-all-on-linux:
+    # This is our main test job, exercising everything and uploading to coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements/requirements.test.txt
+          pip install -e .
+          pip install pip-licenses
+          if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
+          pip install coverage
+      - name: Ensure browser is installed
+        run: python -m playwright install --with-deps chromium
+      - name: Launch the API
+        run: |
+          coverage run --parallel-mode \
+              -m gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
+          sleep 5
+      - name: Run dev suite
+        run: coverage run --parallel-mode run_tests.py dev
+      - name: Run test-studio
+        run: coverage run --parallel-mode g2p/tests/test_studio.py
+      - name: Post test analyses
+        run: |
+          pkill coverage
+          sleep 5
+          coverage combine
+          coverage xml
+          if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
+      - name: Upload coverage information
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false # too many upload errors to keep "true"
+
+  test-36:
+    # This test job exercises only the g2p library code with Python 3.6, which
+    # is what we still keep compatible with 3.6
     runs-on: ubuntu-20.04
-    # #no-ci in the commit log flags commit we don't want CI-validated
-    if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -18,26 +60,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -e .
-          pip install pip-licenses
-          if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
-          pip install coverage
       - name: Run tests
         run: |
-          coverage run --omit g2p/app.py --omit 'g2p/tests/*' --parallel-mode \
-              -m gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
-          sleep 5
-          coverage run --omit g2p/app.py --omit 'g2p/tests/*' --parallel-mode run_tests.py dev
-          pkill coverage
-          sleep 5
-          coverage combine
-          coverage xml
-          if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
-      - uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: false # too many upload errors to keep "true"
+          ./run_tests.py dev
 
   test-on-windows:
+    # Make sure stuff stays compatible with Windows by testing there too.
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
