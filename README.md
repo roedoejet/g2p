@@ -175,7 +175,7 @@ So, when you write a new g2p mapping for a language, say `lll`, and you want to 
 1. Write the mapping from `lll` to `lll-ipa` in g2p/mappings/langs/lll/. You've just updated Text DB.
 2. Run `g2p update` to regenerate Compiled DB from the current Text DB and Gen DB, i.e., to incorporate your new mapping rules.
 3. Run `g2p generate-mapping --ipa lll` to generate g2p/mappings/langs/generated/lll-ipa\_to\_eng-ipa.json. This is not based on what you wrote directly, but rather on what's in Generated DB.
-4. Run `g2p udpate` again. `g2p generate-mapping` updates Gen DB only, so what gets written there will only be reflected in Compiled DB when you run `g2p update` once more.
+4. Run `g2p update` again. `g2p generate-mapping` updates Gen DB only, so what gets written there will only be reflected in Compiled DB when you run `g2p update` once more.
 
 Once you have the Compiled DB, it is then possible to use the `g2p convert` command, create time-aligned audiobooks with [readalongs align](https://github.com/ReadAlongs/Studio), or convert files with the [convertextract](https://github.com/roedoejet/convertextract) library.
 
