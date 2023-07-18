@@ -56,6 +56,8 @@ mappings:
     out_lang: kwk-umista
     rule_ordering: apply-longest-first
     prevent_feeding: true
+    case_sensitive: false
+    preserve_case: true
     authors:
       - Fineen Davis
       - Olivia Chen

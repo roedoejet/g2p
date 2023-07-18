@@ -661,7 +661,13 @@ class _MappingModelDefinition(BaseModel):
     """Deprecated: Please use rule_ordering='as_written' """
 
     case_sensitive: bool = True
-    """Lower all rules and conversion input"""
+    """When false, lowercase all rules and conversion input"""
+
+    case_equivalencies: dict = {}
+    """List of case equivalencies for preserve_case that are not already in the Unicode standard"""
+
+    preserve_case: bool = False
+    """Preserve source case in output"""
 
     escape_special: bool = False
     """Escape special characters in rules"""
@@ -753,6 +759,18 @@ class _MappingModelDefinition(BaseModel):
     def validate_norm_form(cls, v):
         if not v or v is None:
             v = "none"
+        return v
+
+    @field_validator("case_equivalencies", mode="before")
+    @classmethod
+    def validate_case_equivalencies(cls, v):
+        if not v or v is None:
+            v = {}
+        for lower_case, upper_case in v.items():
+            if len(lower_case) != len(upper_case):
+                raise exceptions.MalformedMapping(
+                    f"Sorry, the case equivalency between {lower_case} and {upper_case} is not valid because it is not the same length, please write rules such that any case equivalent is of equal length."
+                )
         return v
 
     # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
