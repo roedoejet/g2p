@@ -1,1 +1,1 @@
-gunicorn @ git+https://github.com/benoitc/gunicorn@add8a4c951f02a67ca1f81264e5c107fa68e6496
+gunicorn>=21.1.0
