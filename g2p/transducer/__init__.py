@@ -428,7 +428,7 @@ class Transducer:
     def __repr__(self):
         return f"{self.__class__} between {self.mapping.in_lang} and {self.mapping.out_lang}"
 
-    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
+    def __call__(self, to_convert: str):
         """The basic method to transduce an input. A proxy for self.apply_rules.
 
         Args:
