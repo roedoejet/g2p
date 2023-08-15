@@ -182,7 +182,7 @@ def create_fixed_width_lookbehind(pattern):
         re.compile(
             r"""
     (?<=\(?)              # lookbehind
-    [\\\[\]\p{L}\p{M}|.:^$]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
+    [\\\[\]\p{L}\p{M}|.:'^$]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
     (?=\)?)               # lookahead
     """,
             re.U | re.VERBOSE,
