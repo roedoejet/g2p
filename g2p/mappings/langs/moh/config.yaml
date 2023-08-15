@@ -1,7 +1,7 @@
 <<: &shared
-  language_name: Mohawk
+  language_name: Kanien'kéha
 mappings:
-  - display_name: Mohawk to IPA
+  - display_name: Kanien'kéha to IPA
     mapping: moh_to_ipa.json
     in_lang: moh-equiv
     out_lang: moh-ipa
@@ -13,7 +13,7 @@ mappings:
       - Aidan Pine
       - Akwiratékha' Martin
     <<: *shared
-  - display_name: IPA to Mohawk
+  - display_name: IPA to Kanien'kéha
     mapping: moh_to_ipa.json
     in_lang: moh-ipa
     reverse: true
@@ -26,7 +26,7 @@ mappings:
       - Aidan Pine
       - Akwiratékha' Martin
     <<: *shared
-  - display_name: Mohawk Equivalencies
+  - display_name: Kanien'kéha Equivalencies
     mapping: moh_equiv.json
     in_lang: moh
     out_lang: moh-equiv
