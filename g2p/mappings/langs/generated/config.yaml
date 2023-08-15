@@ -261,7 +261,7 @@ mappings:
     reverse: false
     rule_ordering: as-written
   - authors:
-      - Generated 2022-04-12 11:42:52.894700
+      - Generated 2023-08-15 12:26:00.528774
     case_sensitive: false
     display_name: moh-ipa IPA to eng-ipa IPA
     escape_special: false
