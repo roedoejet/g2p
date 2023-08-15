@@ -182,7 +182,7 @@ def create_fixed_width_lookbehind(pattern):
         re.compile(
             r"""
     (?<=\(?)              # lookbehind
-    [\\\[\]\p{L}\p{M}|.]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
+    [\\\[\]\p{L}\p{M}|.:^$]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
     (?=\)?)               # lookahead
     """,
             re.U | re.VERBOSE,
@@ -198,14 +198,18 @@ def pattern_to_fixed_width_lookbehinds(match):
     if pattern.startswith("[") and pattern.endswith("]"):
         pattern = pattern[1:-1]
     pattern = sorted(pattern.split("|"), key=len, reverse=True)
-    current_len = len(pattern[0])
+    # in python ^ and $ have null length so must be ordered differently for proper
+    # fixed-width lookbehinds
+    null_length_characters = ["^", "$"]
+    current_len = 0 if pattern[0] in null_length_characters else len(pattern[0])
     all_lookbehinds = []
     current_list = []
     for item in pattern:
-        if len(item) == current_len:
+        item_length = 0 if item in null_length_characters else len(item)
+        if item_length == current_len:
             current_list.append(item)
         else:
-            current_len = len(item)
+            current_len = item_length
             all_lookbehinds.append(current_list)
             current_list = [item]
         if pattern.index(item) == len(pattern) - 1:
