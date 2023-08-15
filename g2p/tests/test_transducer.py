@@ -174,7 +174,7 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_trans_rev("a").output_string, "a")
 
     def test_lang_import(self):
-        self.assertEqual(self.test_trans_moh("kawenón:nis").output_string, "ɡawenṹːnis")
+        self.assertEqual(self.test_trans_moh("kawenón:nis").output_string, "ɡɑwenṹːnis")
 
     def test_composite(self):
         self.assertEqual(self.test_trans_composite("aba").output_string, "aaa")
