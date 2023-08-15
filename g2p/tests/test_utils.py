@@ -4,6 +4,7 @@
 """
 
 import os
+import re
 from collections import defaultdict
 from unittest import TestCase, main
 
@@ -74,11 +75,33 @@ class UtilsTest(TestCase):
         self.assertEqual("\u26F0", utils.unicode_escape("\\u26F0"))
 
     def test_fixed_width(self):
-        # TODO: Test utils.create_fixed_width_lookbehind and utils.pattern_to_fixed_width_lookbehinds
-        pass
-
-    def test_pattern(self):
-        pass
+        test_dict = defaultdict(list)
+        test_dict["VOWELS"].extend(["e", "o", "ee"])
+        lookbehind_pattern = re.compile(r"\(\?\<\=[^)]*\)")
+        patterns = [
+            (utils.create_fixed_width_lookbehind("a|b"), 1),
+            (utils.create_fixed_width_lookbehind("a|b|cc"), 2),
+            (utils.create_fixed_width_lookbehind("a|'|b|cc|ddd|$"), 4),
+            (utils.create_fixed_width_lookbehind("a|^|$"), 2),
+            (utils.create_fixed_width_lookbehind("[abcd]"), 1),
+            (utils.create_fixed_width_lookbehind(r"[x'kgh\.𝚐̲𝚔̲𝚡̲̲]"), 1),
+            (
+                utils.create_fixed_width_lookbehind(
+                    utils.expand_abbreviations("VOWELS", test_dict)
+                ),
+                2,
+            ),
+            (
+                utils.create_fixed_width_lookbehind(
+                    utils.expand_abbreviations("(VOWELS|eee)", test_dict)
+                ),
+                3,
+            ),
+        ]
+        for pattern in patterns:
+            self.assertEqual(
+                len(re.split(lookbehind_pattern, pattern[0])) - 1, pattern[1]
+            )
 
     def test_load_mapping(self):
         with self.assertRaises(MalformedMapping):

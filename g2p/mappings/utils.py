@@ -195,8 +195,6 @@ def create_fixed_width_lookbehind(pattern):
 def pattern_to_fixed_width_lookbehinds(match):
     """Python must have fixed-width lookbehinds."""
     pattern = match.group()
-    if pattern.startswith("[") and pattern.endswith("]"):
-        pattern = pattern[1:-1]
     pattern = sorted(pattern.split("|"), key=len, reverse=True)
     # in python ^ and $ have null length so must be ordered differently for proper
     # fixed-width lookbehinds
