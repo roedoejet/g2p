@@ -130,6 +130,7 @@ mappings:
     rule_ordering: as-written
   - authors:
       - Generated 2020-09-16 17:14:33.602655
+      - Eric Joanis manual fixes 2023-08-25
     case_sensitive: false
     display_name: crg-ipa IPA to eng-ipa IPA
     escape_special: false
