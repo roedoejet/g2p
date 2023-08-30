@@ -55,3 +55,12 @@ mappings:
     authors:
       - David Huggins-Daines
     <<: *shared
+  - display_name: English ARPABET to IPA
+    type: mapping
+    mapping: eng_arpabet_to_ipa.json
+    in_lang: eng-arpabet
+    out_lang: eng-ipa
+    rule_ordering: apply-longest-first
+    authors:
+      - David Huggins-Daines
+    <<: *shared
