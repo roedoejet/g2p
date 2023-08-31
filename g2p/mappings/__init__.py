@@ -111,7 +111,12 @@ class Mapping(_MappingModelDefinition):
             str: The resulting string
         """
         intermediate_char = chr(983040 + offset)
-        return intermediate_char * len(string)
+        prev_end = 0
+        result = ""
+        for match in re.finditer(r"{\d+}|$", string):
+            result += intermediate_char * (match.start() - prev_end) + match.group()
+            prev_end = match.end()
+        return result
 
     def index(self, item):
         """Find the location of an item in self"""

@@ -482,6 +482,10 @@ class Transducer:
         """Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
         to their mapped equivalents.
         """
+
+        def strip_index_notation(string: str) -> str:
+            return re.sub(r"{\d+}", "", string)
+
         indices_seen: Dict[int, int] = defaultdict(int)
         for i, char in enumerate(output_string):
             intermediate_index = self._pua_to_index(char)
@@ -492,9 +496,9 @@ class Transducer:
             try:
                 output_string = (
                     output_string[:i]
-                    + self.mapping.rules[intermediate_index].rule_output[
-                        output_char_index
-                    ]
+                    + strip_index_notation(
+                        self.mapping.rules[intermediate_index].rule_output
+                    )[output_char_index]
                     + output_string[i + 1 :]
                 )
             except IndexError:
@@ -502,9 +506,9 @@ class Transducer:
                 output_char_index = 0
                 output_string = (
                     output_string[:i]
-                    + self.mapping.rules[intermediate_index].rule_output[
-                        output_char_index
-                    ]
+                    + strip_index_notation(
+                        self.mapping.rules[intermediate_index].rule_output
+                    )[output_char_index]
                     + output_string[i + 1 :]
                 )
             indices_seen[intermediate_index] += 1
