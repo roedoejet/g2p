@@ -7,6 +7,7 @@ import os
 import pprint
 import re
 import sys
+from typing import List, Tuple
 
 import click
 import yaml
@@ -118,9 +119,9 @@ def parse_from_or_to_lang_spec(lang_spec):
             out_lang = in_lang + "-ipa"
             # check_ipa_known_segs([out_lang])  # this outputs a lot of spurious noise...
             mappings = [
-                (Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"]), "out")
+                (Mapping(in_lang=m.in_lang, out_lang=m.out_lang), "out")
                 for m in MAPPINGS_AVAILABLE
-                if m["out_lang"] == out_lang and not is_ipa(m["in_lang"])
+                if m.out_lang == out_lang and not is_ipa(m.in_lang)
             ]
             if not mappings:
                 raise click.BadParameter(f'No IPA mappings found for "{lang_spec}".')
@@ -399,10 +400,10 @@ def generate_mapping(  # noqa: C901
         # --from/--to mode
         assert to_langs is not None
 
-        from_mappings = []
+        from_mappings: List[Tuple[Mapping, str]] = []
         for from_lang in re.split(r"[:,]", from_langs):
             from_mappings.extend(parse_from_or_to_lang_spec(from_lang))
-        to_mappings = []
+        to_mappings: List[Tuple[Mapping, str]] = []
         for to_lang in re.split(r"[:,]", to_langs):
             to_mappings.extend(parse_from_or_to_lang_spec(to_lang))
 
@@ -417,11 +418,11 @@ def generate_mapping(  # noqa: C901
 
         for from_mapping, in_or_out in from_mappings:
             LOGGER.info(
-                f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]}[{in_or_out}]'
+                f"From mapping: {from_mapping.mapping_config.in_lang}_to_{from_mapping.mapping_config.out_lang}[{in_or_out}]"
             )
         for to_mapping, in_or_out in to_mappings:
             LOGGER.info(
-                f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]}[{in_or_out}]'
+                f"To mapping: {to_mapping.mapping_config.in_lang}_to_{to_mapping.mapping_config.out_lang}[{in_or_out}]"
             )
 
         new_mapping = create_multi_mapping(
@@ -529,7 +530,7 @@ def convert(  # noqa: C901
         else:
             mapping = load_mapping_from_path(config)
             data["mappings"] = [mapping]
-            mappings_legal_pairs.append((mapping["in_lang"], mapping["out_lang"]))
+            mappings_legal_pairs.append((mapping.in_lang, mapping.out_lang))
         for pair in mappings_legal_pairs:
             if pair[0] in LANGS_NETWORK.nodes:
                 LOGGER.warning(
@@ -604,7 +605,7 @@ def doctor(mapping, list_all, list_ipa):
     http://g2p-studio.herokuapp.com/api/v1/langs .
     """
     if list_all or list_ipa:
-        out_langs = sorted({x["out_lang"] for x in MAPPINGS_AVAILABLE})
+        out_langs = sorted({x.out_lang for x in MAPPINGS_AVAILABLE})
         if list_ipa:
             out_langs = [x for x in out_langs if is_ipa(x)]
         LOGGER.info(
@@ -614,16 +615,14 @@ def doctor(mapping, list_all, list_ipa):
             print(f"{m}: ", end="")
             print(
                 ("\n" + " " * len(m) + "  ").join(
-                    sorted(
-                        x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m
-                    )
+                    sorted(x.in_lang for x in MAPPINGS_AVAILABLE if x.out_lang == m)
                 )
             )
             print("")
         return
 
     for m in mapping:
-        if m not in [x["out_lang"] for x in MAPPINGS_AVAILABLE]:
+        if m not in [x.out_lang for x in MAPPINGS_AVAILABLE]:
             raise click.UsageError(
                 f"No known mappings into '{m}'. "
                 "Use --list-all or --list-ipa to list valid options."
@@ -695,16 +694,16 @@ def scan(lang, path):
     case_sensitive = True
     mappings = []
     for mapping in MAPPINGS_AVAILABLE:
-        mapping_name = mapping["in_lang"]
+        mapping_name = mapping.in_lang
         # Exclude mappings for converting between IPAs
         if mapping_name.startswith(lang) and "ipa" not in mapping_name:
-            case_sensitive = case_sensitive and mapping.get("case_sensitive", True)
+            case_sensitive = case_sensitive and mapping.case_sensitive
             mappings.append(mapping)
 
     # Get input chars in mapping
     mapped_chars = set()
     for lang_mapping in mappings:
-        for x in lang_mapping["mapping_data"]:
+        for x in lang_mapping.mapping:
             mapped_chars.add(normalize(x["in"], "NFD"))
     # Find unmapped chars
     filter_chars = " \n"
@@ -755,9 +754,9 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     elif lang1 is not None:
         mappings = [
-            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+            Mapping(in_lang=m.in_lang, out_lang=m.out_lang)
             for m in MAPPINGS_AVAILABLE
-            if m["in_lang"] == lang1 or m["out_lang"] == lang1
+            if m.in_lang == lang1 or m.out_lang == lang1
         ]
         if not mappings:
             raise click.BadParameter(
@@ -766,18 +765,22 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     else:
         mappings = (
-            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
-            for m in MAPPINGS_AVAILABLE
+            Mapping(in_lang=m.in_lang, out_lang=m.out_lang) for m in MAPPINGS_AVAILABLE
         )
 
     file_type = "csv" if csv else "json"
     if verbose:
         for m in mappings:
-            json.dump(m.kwargs, sys.stdout, indent=4, ensure_ascii=False)
+            json.dump(
+                json.loads(m.mapping_config.json()),
+                sys.stdout,
+                indent=4,
+                ensure_ascii=False,
+            )
             print()
             m.mapping_to_stream(sys.stdout, file_type=file_type)
             print()
             print()
     else:
         for i, m in enumerate(mappings):
-            print(f"{i+1}: {m.kwargs['in_lang']} → {m.kwargs['out_lang']}")
+            print(f"{i+1}: {m.mapping_config.in_lang} → {m.mapping_config.out_lang}")

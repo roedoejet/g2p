@@ -133,14 +133,14 @@ class MappingCreationTest(TestCase):
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         # print("mapping", mapping, list(mapping), "distance", "default")
         self.assertTrue(isinstance(mapping, Mapping))
-        set_of_mappings = {tuple(m["out"] for m in mapping)}
+        set_of_mappings = {tuple(rule.out_char for rule in mapping.mapping)}
         for distance in DISTANCE_METRICS:
             mapping = create_mapping(
                 src_mapping, self.target_mapping, distance=distance, quiet=True
             )
             # print("mapping", mapping, list(mapping), "distance", distance)
             self.assertTrue(isinstance(mapping, Mapping))
-            set_of_mappings.add(tuple(m["out"] for m in mapping))
+            set_of_mappings.add(tuple(rule.out_char for rule in mapping.mapping))
 
             mapping = create_multi_mapping(
                 [(src_mapping, "out")],
@@ -149,7 +149,7 @@ class MappingCreationTest(TestCase):
                 quiet=True,
             )
             self.assertTrue(isinstance(mapping, Mapping))
-            set_of_mappings.add(tuple(m["out"] for m in mapping))
+            set_of_mappings.add(tuple(rule.out_char for rule in mapping.mapping))
         self.assertGreater(len(set_of_mappings), 3)
 
 

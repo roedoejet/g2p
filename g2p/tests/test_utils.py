@@ -14,6 +14,7 @@ from g2p import get_arpabet_langs
 from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
+from g2p.mappings.utils import Rule
 from g2p.tests.public import PUBLIC_DIR
 
 
@@ -105,6 +106,7 @@ class UtilsTest(TestCase):
 
     def test_load_mapping(self):
         with self.assertRaises(MalformedMapping):
+
             utils.load_mapping_from_path(
                 os.path.join(PUBLIC_DIR, "mappings", "malformed_config.yaml")
             )
@@ -126,17 +128,20 @@ class UtilsTest(TestCase):
         xlsx = utils.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 4
         )
-        self.assertEqual(minimal["mapping_data"], csv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], tsv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], psv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], json["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], xlsx["mapping_data"])
+        self.assertEqual(minimal.mapping, csv.mapping)
+        self.assertEqual(minimal.mapping, tsv.mapping)
+        self.assertEqual(minimal.mapping, psv.mapping)
+        self.assertEqual(minimal.mapping, json.mapping)
+        self.assertEqual(minimal.mapping, xlsx.mapping)
 
     def test_validate(self):
         pass
 
     def test_escape_special(self):
-        self.assertEqual(utils.escape_special_characters({"in": "?"}), {"in": "\\?"})
+        self.assertEqual(
+            utils.escape_special_characters(Rule(in_char="?", out_char="")).in_char,
+            "\\?",
+        )
 
     def test_load_abbs(self):
         with self.assertRaises(IncorrectFileType):
@@ -175,22 +180,22 @@ class UtilsTest(TestCase):
             os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
         )
         self.assertEqual(
-            test_config["mapping_data"],
+            test_config.mapping,
             [{"in": "a", "out": "b", "context_before": "", "context_after": ""}],
         )
-        self.assertEqual(test_config["in_lang"], "test")
-        self.assertEqual(test_config["out_lang"], "test-out")
-        self.assertEqual(test_config["language_name"], "test")
-        self.assertEqual(test_config["display_name"], "test custom to test-out custom")
+        self.assertEqual(test_config.in_lang, "test")
+        self.assertEqual(test_config.out_lang, "test-out")
+        self.assertEqual(test_config.language_name, "test")
+        self.assertEqual(test_config.display_name, "test custom to test-out custom")
         self.assertEqual(
-            test_config_added["mapping_data"],
+            test_config_added.mapping,
             [{"in": "a", "out": "b", "context_before": "", "context_after": ""}],
         )
-        self.assertEqual(test_config_added["in_lang"], "test")
-        self.assertEqual(test_config_added["out_lang"], "test-out")
-        self.assertEqual(test_config_added["language_name"], "test")
+        self.assertEqual(test_config_added.in_lang, "test")
+        self.assertEqual(test_config_added.out_lang, "test-out")
+        self.assertEqual(test_config_added.language_name, "test")
         self.assertEqual(
-            test_config_added["display_name"], "test custom to test-out custom"
+            test_config_added.display_name, "test custom to test-out custom"
         )
 
     def test_normalize_to_NFD_with_indices(self):

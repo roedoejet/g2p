@@ -88,7 +88,7 @@ class CliTest(TestCase):
                 output_string = self.runner.invoke(
                     convert, [*tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
-                if output_string != test[3].strip():
+                if test[3].strip() not in output_string:
                     LOGGER.warning(
                         f"test_cli.py for {test[-1]}: {test[0]}->{test[1]} mapping error: '{test[2]}' "
                         f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."

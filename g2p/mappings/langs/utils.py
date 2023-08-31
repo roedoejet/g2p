@@ -22,7 +22,7 @@ from g2p.mappings.langs import (
     LANGS_PKL,
     MAPPINGS_AVAILABLE,
 )
-from g2p.mappings.utils import is_ipa, load_mapping_from_path
+from g2p.mappings.utils import MAPPING_TYPE, is_ipa, load_mapping_from_path
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -51,19 +51,18 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     Returns True iff not errors were found.
     """
     if not mappings_to_check:
-        mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
+        mappings_to_check = [x.out_lang for x in MAPPINGS_AVAILABLE]
     found_error = False
-    for mapping in [
-        x for x in MAPPINGS_AVAILABLE if x["out_lang"] in mappings_to_check
-    ]:
-        if is_ipa(mapping["out_lang"]):
-            reverse = mapping.get("reverse", False)
-            for rule in mapping.get("mapping_data", ()):
+
+    for mapping in [x for x in MAPPINGS_AVAILABLE if x.out_lang in mappings_to_check]:
+        if is_ipa(mapping.out_lang) and mapping.type == MAPPING_TYPE.mapping:
+            reverse = mapping.reverse
+            for rule in mapping.mapping:
                 output = rule["in"] if reverse else rule["out"]
                 if not is_panphon(output):
                     LOGGER.warning(
-                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} "
-                        f"and {mapping['out_lang']} is not recognized as valid IPA by panphon."
+                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping.in_lang} "
+                        f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
                     )
                     found_error = True
     if found_error:

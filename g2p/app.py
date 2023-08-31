@@ -3,7 +3,8 @@
 Views and config to the g2p Studio web app
 
 """
-from typing import Union
+import json
+from typing import List, Union
 
 from flask import Flask, render_template
 from flask_cors import CORS
@@ -14,7 +15,11 @@ from g2p import make_g2p
 from g2p.api import g2p_api
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.utils import expand_abbreviations_format, flatten_abbreviations_format
+from g2p.mappings.utils import (
+    _MappingModelDefinition,
+    expand_abbreviations_format,
+    flatten_abbreviations_format,
+)
 from g2p.transducer import (
     CompositeTransducer,
     CompositeTransductionGraph,
@@ -133,13 +138,13 @@ def docs():
 def convert(message):
     """Convert input text and return output"""
     transducers = []
-
     for mapping in message["data"]["mappings"]:
-        mappings_obj = Mapping(
-            mapping["mapping"],
-            abbreviations=flatten_abbreviations_format(mapping["abbreviations"]),
-            **mapping["kwargs"],
+        mapping_args = {**mapping["kwargs"]}
+        mapping_args["abbreviations"] = flatten_abbreviations_format(
+            mapping["abbreviations"]
         )
+        mapping_args["mapping"] = mapping["mapping"]
+        mappings_obj = Mapping(**mapping_args)
         transducer = Transducer(mappings_obj)
         transducers.append(transducer)
     if len(transducers) == 0:
@@ -174,21 +179,16 @@ def change_table(message):
             {"in": "", "out": "", "context_before": "", "context_after": ""}
         ] * DEFAULT_N
         abbs = [[""] * 6] * DEFAULT_N
-        kwargs = {
-            "language_name": "Custom",
-            "display_name": "Custom",
-            "in_lang": "custom",
-            "out_lang": "custom",
-            "include": False,
-            "type": "mapping",
-            "case_sensitive": True,
-            "norm_form": "NFC",
-            "escape_special": False,
-            "prevent_feeding": False,
-            "reverse": False,
-            "rule_ordering": "as-written",
-            "out_delimiter": "",
-        }
+
+        kwargs = _MappingModelDefinition(
+            language_name="Custom",
+            display_name="Custom",
+            in_lang="custom",
+            out_lang="custom",
+            type="mapping",
+            norm_form="NFC",
+        ).dict()
+        kwargs["include"] = False
         emit(
             "table response",
             [
@@ -201,7 +201,7 @@ def change_table(message):
         )
     else:
         path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
-        mappings = []
+        mappings: List[Mapping] = []
         for lang1, lang2 in zip(path[:-1], path[1:]):
             transducer = make_g2p(lang1, lang2, tokenize=False)
             mappings.append(transducer.mapping)
@@ -211,7 +211,7 @@ def change_table(message):
                 {
                     "mappings": x.plain_mapping(),
                     "abbs": expand_abbreviations_format(x.abbreviations),
-                    "kwargs": x.kwargs,
+                    "kwargs": json.loads(x.mapping_config.json()),
                 }
                 for x in mappings
             ],

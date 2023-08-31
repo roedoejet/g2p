@@ -327,7 +327,7 @@ getIncludedMappings = function() {
                 mapping['mapping'] = null;
             else
                 mapping['mapping'] = TABLES[index].getSourceData().filter(v => v.in)
-            // Extract only non-empty rules and abbreviations for processing
+                // Extract only non-empty rules and abbreviations for processing
             mapping['abbreviations'] = ABBS[index].getData().filter(v => v[0])
             mapping['kwargs'] = getKwargs(index)
             mappings.push(mapping)
@@ -349,12 +349,20 @@ var getKwargs = function(index) {
     if (type === "lexicon") {
         const in_lang = document.getElementById(`in_lang-${index}`).value
         const out_lang = document.getElementById(`out_lang-${index}`).value
-        // Lexicon G2P cannot be customized (FIXME: likewise for unidecode actually)
+            // Lexicon G2P cannot be customized (FIXME: likewise for unidecode actually)
         return { type, in_lang, out_lang }
-    }
-    else
-        return { rule_ordering, case_sensitive, escape_special, reverse, include,
-                 out_delimiter, norm_form, prevent_feeding, type }
+    } else
+        return {
+            rule_ordering,
+            case_sensitive,
+            escape_special,
+            reverse,
+            include,
+            out_delimiter,
+            norm_form,
+            prevent_feeding,
+            type
+        }
 }
 
 var setKwargs = function(index, kwargs) {
@@ -564,13 +572,13 @@ $('#varhot-add-row').click(function(event) {
 $('#export-abbs').click(function(event) {
     let active = $('li.title.abbs.active')
     let index = $('li.title.abbs').index(active)
-    // TODO: filter out lines where the first column (i.e., the abbreviation name) is empty
+        // TODO: filter out lines where the first column (i.e., the abbreviation name) is empty
     ABBS[index].getPlugin("exportFile").downloadFile("csv", { filename: "abbreviations" });
 })
 $('#export-rules').click(function(event) {
     let active = $('li.title.rules.active')
     let index = $('li.title.rules').index(active)
-    // TODO: filter out lines where .in is empty
+        // TODO: filter out lines where .in is empty
     TABLES[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
 $('#langselect').change(function() {

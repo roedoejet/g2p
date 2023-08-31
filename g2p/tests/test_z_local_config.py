@@ -123,7 +123,7 @@ class LocalConfigTest(TestCase):
             )
             self.assertNotEqual(results.exit_code, 0)
             self.assertIn(
-                "Cannot load mapping data file", results.output + str(results.exception)
+                "No such file or directory", results.output + str(results.exception)
             )
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -138,7 +138,7 @@ class LocalConfigTest(TestCase):
             )
             self.assertNotEqual(results.exit_code, 0)
             self.assertIn(
-                "Cannot load abbreviations data file",
+                "No such file or directory",
                 results.output + str(results.exception),
             )
 

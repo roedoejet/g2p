@@ -34,17 +34,11 @@ class Descendants(Resource):
 
 class Langs(Resource):
     def __init__(self):
-        self.AVAILABLE_MAPPINGS = sorted(
-            [
-                {
-                    k: v
-                    for k, v in x.items()
-                    if k not in ["mapping_data", "abbreviations_data"]
-                }
-                for x in MAPPINGS_AVAILABLE
-            ],
-            key=lambda x: x["in_lang"],
-        )
+        # TODO: exclude parent dir and maybe null values too
+        self.AVAILABLE_MAPPINGS = [
+            json.loads(mapping.json())
+            for mapping in sorted(MAPPINGS_AVAILABLE, key=lambda x: x.in_lang)
+        ]
         self.parser = reqparse.RequestParser()
         self.parser.add_argument(
             "verbose",

@@ -5,13 +5,12 @@ Module for all things related to lookup tables
 """
 
 import csv
-import datetime as dt
 import json
 import os
 import re
-from collections import OrderedDict, defaultdict
 from copy import deepcopy
-from typing import DefaultDict, List, Pattern, Union
+from pathlib import Path
+from typing import List, Pattern, Union
 
 import yaml
 
@@ -20,154 +19,94 @@ from g2p.log import LOGGER
 from g2p.mappings.langs import MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
 from g2p.mappings.utils import (
+    MAPPING_TYPE,
+    NORM_FORM_ENUM,
+    RULE_ORDERING_ENUM,
     CompactJSONMappingEncoder,
     IndentDumper,
+    Rule,
+    _MappingModelDefinition,
     create_fixed_width_lookbehind,
     escape_special_characters,
     expand_abbreviations,
     find_mapping,
-    is_dummy,
-    is_ipa,
-    is_xsampa,
-    load_abbreviations_from_file,
-    load_alignments_from_file,
-    load_from_file,
-    load_mapping_from_path,
     normalize,
-    validate,
 )
 
 GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 
 
 class Mapping:
-    """Class for lookup tables
-
-    @param as_is: bool = True
-        Affects whether or not rules are sorted or left as is.
-        Please use ``rule_ordering`` instead.
-        If True, Evaluate g2p rules in mapping in the order they are written.
-        If False, rules will be reverse sorted by length.
-
-        .. deprecated:: 0.6
-            use ``rule_ordering`` instead
-
-    @param case_sensitive: bool = True
-        Lower all rules and conversion input
-
-    @param escape_special: bool = False
-        Escape special characters in rules
-
-    @param norm_form: str = "NFD"
-        Normalization standard to follow. NFC | NKFC | NFD | NKFD | none
-
-    @param out_delimiter: str = ""
-        Separate output transformations with a delimiter
-
-    @param reverse: bool = False
-        Reverse all mappings
-
-    @param rule_ordering: str = "as-written"
-        Affects in what order the rules are applied.
-
-        If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
-        are written in the source file
-        (previously this was accomplished with ``as_is=True``).
-
-        If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
-        input are applied first. Sorting the rules like this prevents shorter rules
-        from taking part in feeding relations
-        (previously this was accomplished with ``as_is=False``).
-
-    @param prevent_feeding: bool = False
-        Converts each rule into an intermediary form
-
-    @param type: str = None
-        Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
-        "lexicon" (lookup in an aligned lexicon).
-
-    @param alignments: str = None
-        A string specifying a file from which to load alignments when type = "lexicon".
-
-    """
+    """Class for lookup tables"""
 
     def __init__(  # noqa: C901
         self,
-        mapping=None,
-        abbreviations: Union[str, DefaultDict[str, List[str]]] = None,
+        mapping: Union[List[str], List[Rule], Union[Path, str], None] = None,
         **kwargs,
     ):
-        # should these just be explicit instead of kwargs...
-        # yes, they should
-        self.allowable_kwargs = [
-            "language_name",
-            "display_name",
-            "mapping",
-            "alignments",
-            "in_lang",
-            "out_lang",
-            "out_delimiter",
-            "as_is",
-            "case_sensitive",
-            "rule_ordering",
-            "escape_special",
-            "norm_form",
-            "prevent_feeding",
-            "reverse",
-            "type",
-        ]
-        self.kwargs = OrderedDict(kwargs)
         self.processed = False
-        if isinstance(abbreviations, defaultdict) or abbreviations is None:
-            self.abbreviations = abbreviations
-        else:
-            self.abbreviations = load_abbreviations_from_file(abbreviations)
-        # Handle user-supplied list
-        if isinstance(mapping, list):
-            self.mapping = validate(mapping, path="user-supplied mapping")
+        # Sometimes raw data gets passed instead of a path to a config... ugh
+        # This block determines the mapping configuration
+        if mapping is not None and (
+            isinstance(mapping, list)
+            or (
+                isinstance(mapping, str)
+                and not mapping.endswith("yaml")
+                and not mapping.endswith("yml")
+            )
+        ):
+            kwargs["mapping"] = mapping
+            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
+                **kwargs
+            )
+        elif kwargs.get("in_lang", False) and kwargs.get("out_lang", False):
+            loaded_config = find_mapping(
+                kwargs.get("in_lang", ""), kwargs.get("out_lang", "")
+            )
+            if isinstance(loaded_config, _MappingModelDefinition):
+                self.mapping_config: _MappingModelDefinition = loaded_config
+            else:
+                self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
+                    **loaded_config
+                )
+        elif kwargs.get("id", False):
+            loaded_config = self.find_mapping_by_id(kwargs.get("id"))
+            if isinstance(loaded_config, _MappingModelDefinition):
+                self.mapping_config: _MappingModelDefinition = loaded_config
+            else:
+                self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
+                    **loaded_config
+                )
         elif isinstance(mapping, str) and (
             mapping.endswith("yaml") or mapping.endswith("yml")
         ):
-            loaded_config = load_mapping_from_path(mapping)
-            self.process_loaded_config(loaded_config)
-        elif isinstance(mapping, str):
-            self.mapping = validate(load_from_file(mapping), path=mapping)
+            # This is for if the config.yaml file gets passed
+            parent_dir = Path(mapping).parent
+            with open(mapping, encoding="utf8") as f:
+                loaded_config = yaml.safe_load(f)
+            loaded_config["parent_dir"] = parent_dir
+            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
+                **loaded_config
+            )
+        elif not mapping and kwargs.get("type", False) in [
+            MAPPING_TYPE.lexicon.value,
+            MAPPING_TYPE.unidecode.value,
+        ]:
+            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
+                **kwargs
+            )
         else:
-            if "in_lang" in self.kwargs and "out_lang" in self.kwargs:
-                loaded_config = find_mapping(
-                    self.kwargs["in_lang"], self.kwargs["out_lang"]
-                )
-                self.process_loaded_config(loaded_config)
-            elif "id" in self.kwargs:
-                loaded_config = self.find_mapping_by_id(self.kwargs["id"])
-                self.process_loaded_config(loaded_config)
-            elif self.kwargs.get("type", "") == "unidecode":
-                self.mapping = []
-            elif self.kwargs.get("type", "") == "lexicon":
-                self.mapping = []
-                if "alignments" in self.kwargs:
-                    self.alignments = load_alignments_from_file(
-                        self.kwargs["alignments"], self.kwargs["out_delimiter"]
-                    )
-            else:
-                raise exceptions.MalformedLookup()
-        if (
-            self.abbreviations
-            and self.mapping
-            and "match_pattern" not in self.mapping[0]
-        ):
-            for io in self.mapping:
-                for key in io.keys():
-                    if key in [
-                        "in",
-                        "out",
-                        "context_before",
-                        "context_after",
-                    ]:
-                        io[key] = expand_abbreviations(io[key], self.abbreviations)
-
+            raise Exception(f"Sorry we can't process {mapping}")
+        # Process the loaded configuration
+        self.process_loaded_config()
+        if self.mapping_config.type == MAPPING_TYPE.unidecode:
+            self.mapping_config.mapping = []
+        elif self.mapping_config.type == MAPPING_TYPE.lexicon:
+            self.mapping_config.mapping = []
+        self.in_lang = self.mapping_config.in_lang
+        self.out_lang = self.mapping_config.out_lang
         if not self.processed:
-            self.mapping = self.process_kwargs(self.mapping)
+            self.mapping = self.process_model_specs()
 
     def __len__(self):
         return len(self.mapping)
@@ -195,20 +134,10 @@ class Mapping:
     def find_mapping_by_id(map_id: str):
         """Find the mapping with a given ID"""
         for mapping in MAPPINGS_AVAILABLE:
-            if mapping.get("id", "") == map_id:
+            if (isinstance(mapping, dict) and mapping.get("id", "") == map_id) or (
+                isinstance(mapping, _MappingModelDefinition) and mapping.id == map_id
+            ):
                 return deepcopy(mapping)
-
-    @staticmethod
-    def mapping_type(name):
-        """Return the type of a mapping given its name"""
-        if is_ipa(name):
-            return "IPA"
-        elif is_xsampa(name):
-            return "XSAMPA"
-        elif is_dummy(name):
-            return "dummy"
-        else:
-            return "custom"
 
     @staticmethod
     def _string_to_pua(string: str, offset: int) -> str:
@@ -232,138 +161,114 @@ class Mapping:
 
     def inventory(self, in_or_out: str = "in"):
         """Return just inputs or outputs as inventory of mapping"""
-        return [x[in_or_out] for x in self.mapping]
+        if in_or_out == "in":
+            in_or_out = "in_char"
+        if in_or_out == "out":
+            in_or_out = "out_char"
+        return [getattr(x, in_or_out) for x in self.mapping]
 
-    def process_loaded_config(self, config):
+    def process_loaded_config(self):
         """For a mapping loaded from a file, take the keyword arguments and supply them to the
         Mapping, and get any abbreviations data.
         """
-        if config.get("type", "") == "unidecode":
+        if self.mapping_config.type == MAPPING_TYPE.unidecode:
             self.mapping = []
-        elif config.get("type", "") == "lexicon":
+        elif self.mapping_config.type == MAPPING_TYPE.lexicon:
             self.mapping = []
-            self.alignments = config["alignment_data"]
+            self.alignments = self.mapping_config.alignments
         else:
-            self.mapping = config["mapping_data"]
-            self.abbreviations = config.get("abbreviations_data", None)
-        mapping_kwargs = OrderedDict(
-            {k: v for k, v in config.items() if k in self.allowable_kwargs}
-        )
-        # Merge kwargs, but prioritize kwargs that initialized the Mapping
-        self.kwargs = {**mapping_kwargs, **self.kwargs}
+            self.mapping = self.mapping_config.mapping
+            self.abbreviations = self.mapping_config.abbreviations
 
-    def plain_mapping(self, skip_empty_contexts: bool = False):
+    def plain_mapping(self, skip_none: bool = False, skip_defaults: bool = False):
         """Return the plain mapping for displaying or saving to disk.
 
         Args:
             skip_empty_contexts: when set, filter out empty context_before/after
         """
+        assert isinstance(self.mapping, list)
+        assert isinstance(self.mapping[0], Rule)
+        return [rule.export_to_dict() for rule in self.mapping]
 
-        def sorted_rule_items(rule: dict):
-            """Iterate over the items of rule starting with "in", then "out", then the rest"""
-            if "in" in rule:
-                yield "in", rule["in"]
-            if "out" in rule:
-                yield "out", rule["out"]
-            for k, v in rule.items():
-                if k not in ("in", "out"):
-                    yield k, v
+    def process_model_specs(self):  # noqa: C901
+        """Process all model specifications"""
 
-        return [
-            {
-                k: v
-                for k, v in sorted_rule_items(io)
-                if k not in ["match_pattern", "intermediate_form"]
-                and (not skip_empty_contexts or k[:8] != "context_" or v != "")
-            }
-            for io in self.mapping
-        ]
-
-    def process_kwargs(self, mapping):  # noqa: C901
-        """Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6"""
-
-        if "as_is" in self.kwargs:
-            as_is = self.kwargs["as_is"]
-            if as_is:
-                appropriate_setting = "as-written"
-            else:
-                appropriate_setting = "apply-longest-first"
-
-            self.kwargs["rule_ordering"] = appropriate_setting
-            del self.kwargs["as_is"]
+        if self.mapping_config.as_is is not None:
+            appropriate_setting = (
+                RULE_ORDERING_ENUM.as_written
+                if self.mapping_config.as_is
+                else RULE_ORDERING_ENUM.apply_longest_first
+            )
+            self.mapping_config.rule_ordering = appropriate_setting
 
             LOGGER.warning(
-                f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
+                f"mapping from {self.in_lang} to {self.out_lang} "
                 'is using the deprecated parameter "as_is"; '
-                f"replace `as_is: {as_is}` with `rule_ordering: {appropriate_setting}`"
+                f"replace `as_is: {self.mapping_config.as_is}` with `rule_ordering: {appropriate_setting.value}`"
             )
 
-        # Add defaults
-        if "rule_ordering" in self.kwargs:
-            # right now, "rule-ordering" is a more explict alias of the "as-is" option.
-            ordering = self.kwargs["rule_ordering"]
-            if ordering not in ("as-written", "apply-longest-first"):
-                LOGGER.error(
-                    f"mapping from {self.kwargs.get('in_lang')} to {self.kwargs.get('out_lang')} "
-                    f"has invalid value '{ordering}' for rule_ordering parameter; "
-                    "rule_ordering must be one of "
-                    '"as-written" or "apply-longest-first"'
-                )
-        else:
-            self.kwargs["rule_ordering"] = "as-written"
-        if "case_sensitive" not in self.kwargs:
-            self.kwargs["case_sensitive"] = True
-        if "escape_special" not in self.kwargs:
-            self.kwargs["escape_special"] = False
-        if "norm_form" not in self.kwargs:
-            self.kwargs["norm_form"] = "NFD"
-        if "reverse" not in self.kwargs:
-            self.kwargs["reverse"] = False
-        if "prevent_feeding" not in self.kwargs:
-            self.kwargs["prevent_feeding"] = False
-        if "in_lang" not in self.kwargs:
-            self.kwargs["in_lang"] = "und"
-        if "out_lang" not in self.kwargs:
-            self.kwargs["out_lang"] = "und"
+        # Sorting must happen before the calculation of PUA intermediate forms for proper indexing
+        if self.mapping_config.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first:
+            self.mapping_config.mapping = sorted(
+                # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
+                self.mapping_config.mapping,
+                key=lambda x: len(normalize(x.in_char, "NFD"))
+                if isinstance(x, Rule)
+                else len(normalize(x["in"], "NFD")),
+                reverse=True,
+            )
 
-        # Process kwargs in order received
-        for kwarg, val in self.kwargs.items():
-            if kwarg == "rule_ordering" and self.wants_rules_sorted():
-                # sort by reverse len
-                mapping = sorted(mapping, key=lambda x: len(x["in"]), reverse=True)
-            elif kwarg == "escape_special" and val:
-                mapping = [escape_special_characters(x) for x in mapping]
-            elif kwarg == "norm_form" and val:
-                for io in mapping:
-                    for k, v in io.items():
-                        if isinstance(v, str):
-                            io[k] = normalize(v, self.kwargs["norm_form"])
-            elif kwarg == "reverse" and val:
-                mapping = self.reverse_mappings(mapping)
-
-        # After all processing is done, turn into regex
-        for i, io in enumerate(mapping):
-            if self.kwargs["prevent_feeding"] or (
-                "prevent_feeding" in io and io["prevent_feeding"]
+        non_empty_mappings: List[Rule] = []
+        for i, rule in enumerate(self.mapping_config.mapping):
+            if isinstance(rule, dict):
+                rule = Rule(**rule)
+            # Expand Abbreviations
+            if (
+                self.mapping_config.abbreviations
+                and self.mapping_config.mapping
+                and "match_pattern" not in self.mapping_config.mapping[0]
             ):
-                io["intermediate_form"] = self._string_to_pua(io["out"], i)
-            io["match_pattern"] = self.rule_to_regex(io)
-
-        # Finally, remove rules with an empty match pattern, typically empty rules
-        mapping = [io for io in mapping if io["match_pattern"]]
+                for key in [
+                    "in_char",
+                    "context_before",
+                    "context_after",
+                ]:
+                    setattr(
+                        rule,
+                        key,
+                        expand_abbreviations(getattr(rule, key), self.abbreviations),
+                    )
+            # Reverse Rule
+            if self.mapping_config.reverse:
+                rule.in_char, rule.out_char = rule.out_char, rule.in_char
+                rule.context_before = ""
+                rule.context_after = ""
+            # Escape Special
+            if self.mapping_config.escape_special:
+                rule = escape_special_characters(rule)
+            # Unicode Normalization
+            if self.mapping_config.norm_form != NORM_FORM_ENUM.none:
+                for k in ["in_char", "out_char", "context_before", "context_after"]:
+                    value = getattr(rule, k)
+                    if value:
+                        setattr(
+                            rule,
+                            k,
+                            normalize(value, self.mapping_config.norm_form.value),
+                        )
+            # Prevent Feeding
+            if self.mapping_config.prevent_feeding or rule.prevent_feeding:
+                rule.intermediate_form = self._string_to_pua(rule.out_char, i)
+            # Create match pattern
+            rule.match_pattern = self.rule_to_regex(rule)
+            # Only add non-empty rules
+            if rule.match_pattern:
+                non_empty_mappings.append(rule)
 
         self.processed = True
-        return mapping
+        return non_empty_mappings
 
-    def wants_rules_sorted(self) -> bool:
-        """Returns whether the rules will be sorted prior to finalizing the mapping.
-
-        Returns:
-            bool: True if the rules should be sorted.
-        """
-        return self.kwargs["rule_ordering"] == "apply-longest-first"
-
-    def rule_to_regex(self, rule: dict) -> Union[Pattern, None]:
+    def rule_to_regex(self, rule: Union[Rule, dict]) -> Union[Pattern, None]:
         """Turns an input string (and the context) from an input/output pair
         into a regular expression pattern"
 
@@ -382,32 +287,26 @@ class Mapping:
             None: if input is null
         """
         # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
-        if not rule["in"]:
+        if isinstance(rule, dict):
+            rule = Rule(**rule)
+        if not rule.in_char:
             LOGGER.warning(
-                f'Rule with input \'{rule["in"]}\' and output \'{rule["out"]}\' has no input. '
+                f"Rule with input '{rule.in_char}' and output '{rule.out_char}' has no input. "
                 "This is disallowed. Please check your mapping file for rules with null inputs."
             )
             return None
-        if "context_before" in rule and rule["context_before"]:
-            before = rule["context_before"]
-        else:
-            before = ""
-        if "context_after" in rule and rule["context_after"]:
-            after = rule["context_after"]
-        else:
-            after = ""
-        input_match = re.sub(re.compile(r"{\d+}"), "", rule["in"])
+        input_match = re.sub(re.compile(r"{\d+}"), "", rule.in_char)
         try:
-            inp = create_fixed_width_lookbehind(before) + input_match
-            if after:
-                inp += f"(?={after})"
-            if not self.kwargs["case_sensitive"]:
+            inp = create_fixed_width_lookbehind(rule.context_before) + input_match
+            if rule.context_after:
+                inp += f"(?={rule.context_after})"
+            if not self.mapping_config.case_sensitive:
                 rule_regex = re.compile(inp, re.I)
             else:
                 rule_regex = re.compile(inp)
         except re.error as e:
-            in_lang = self.kwargs.get("in_lang", "und")
-            out_lang = self.kwargs.get("out_lang", "und")
+            in_lang = self.in_lang
+            out_lang = self.out_lang
             LOGGER.error(
                 "Your regex in mapping between %s and %s is malformed.  "
                 "Do you have un-escaped regex characters in your input %s, contexts %s, %s?  "
@@ -415,23 +314,15 @@ class Mapping:
                 in_lang,
                 out_lang,
                 inp,
-                before,
-                after,
+                rule.context_before,
+                rule.context_after,
                 e.msg,
             )
             raise exceptions.MalformedMapping(
                 f"Your regex in mapping between {in_lang} and {out_lang} is malformed.  "
-                f"Do you have un-escaped regex characters in your input {inp}, contexts {before}, {after}?"
+                f"Do you have un-escaped regex characters in your input {inp}, contexts {rule.context_before}, {rule.context_after}?"
             ) from e
         return rule_regex
-
-    def reverse_mappings(self, mapping):
-        """Reverse the mapping"""
-        for io in mapping:
-            io["in"], io["out"] = io["out"], io["in"]
-            del io["context_before"]
-            del io["context_after"]
-        return mapping
 
     def extend(self, mapping):
         """Add all the rules from mapping into self, effectively merging two mappings
@@ -447,27 +338,12 @@ class Mapping:
         # set does not), so deduplicating the rules is a one-liner:
         self.mapping = list({repr(rule): rule for rule in self.mapping}.values())
 
-    def add_abbreviations(self, abbs, mappings):
-        """Return abbreviated forms, given a list of abbreviations.
-
-        {'in': 'a', 'out': 'b', 'context_before': 'V', 'context_after': '' }
-        {'abbreviation': 'V', 'stands_for': ['a','b','c']}
-        ->
-        {'in': 'a', 'out': 'b', 'context_before': 'a|b|c', 'context_after': ''}
-        """
-        for abb in abbs:
-            for io in mappings:
-                for key in io.keys():
-                    if io[key] == abb["abbreviation"]:
-                        io[key] = abb["stands_for"]
-        return mappings
-
     def mapping_to_stream(self, out_stream, file_type: str = "json"):
         """Write mapping to a stream"""
 
         if file_type == "json":
             json.dump(
-                self.plain_mapping(skip_empty_contexts=True),
+                self.plain_mapping(skip_none=True, skip_defaults=True),
                 out_stream,
                 indent=4,
                 ensure_ascii=False,
@@ -480,7 +356,8 @@ class Mapping:
                 out_stream, fieldnames=fieldnames, extrasaction="ignore"
             )
             for io in self.mapping:
-                writer.writerow(io)
+                assert isinstance(io, Rule)
+                writer.writerow(io.export_to_dict())
         else:
             raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
 
@@ -491,11 +368,7 @@ class Mapping:
             raise Exception(f"Path {output_path} is not a directory")
         fn = os.path.join(
             output_path,
-            self.kwargs.get("in_lang", "und")
-            + "_to_"
-            + self.kwargs.get("out_lang", "und")
-            + "."
-            + file_type,
+            self.in_lang + "_to_" + self.out_lang + "." + file_type,
         )
         with open(fn, "w", encoding="utf8", newline="\n") as f:
             self.mapping_to_stream(f, file_type)
@@ -511,46 +384,17 @@ class Mapping:
             output_path = os.path.join(output_path, "config.yaml")
         if os.path.exists(output_path) and os.path.isfile(output_path):
             LOGGER.warning(f"Adding mapping config to file at {output_path}")
-            fn = output_path
             add_config = True
         else:
             LOGGER.warning(f"writing mapping config to file at {output_path}")
-            fn = output_path
-        template = {
-            "mappings": [
-                {
-                    "language_name": self.kwargs.get(
-                        "language_name", self.kwargs.get("in_lang", "und")
-                    ),
-                    "display_name": self.kwargs.get(
-                        "display_name",
-                        self.kwargs.get("in_lang", "und")
-                        + " "
-                        + self.mapping_type(self.kwargs.get("out_lang", "und"))
-                        + " to "
-                        + self.kwargs.get("out_lang", "und")
-                        + " "
-                        + self.mapping_type(self.kwargs.get("out_lang", "und")),
-                    ),
-                    "in_lang": self.kwargs.get("in_lang", "und"),
-                    "out_lang": self.kwargs.get("out_lang", "und"),
-                    "authors": self.kwargs.get(
-                        "authors", [f"Generated {dt.datetime.now()}"]
-                    ),
-                    "rule_ordering": self.kwargs.get("rule_ordering", "as-written"),
-                    "prevent_feeding": self.kwargs.get("prevent_feeding", False),
-                    "case_sensitive": self.kwargs.get("case_sensitive", True),
-                    "escape_special": self.kwargs.get("escape_special", False),
-                    "norm_form": self.kwargs.get("norm_form", "NFD"),
-                    "reverse": self.kwargs.get("reverse", False),
-                    "mapping": self.kwargs.get("in_lang", "und")
-                    + "_to_"
-                    + self.kwargs.get("out_lang", "und")
-                    + "."
-                    + mapping_type,
-                }
-            ]
-        }
+        fn = output_path
+        config_template = json.loads(
+            self.mapping_config.json(exclude_none=True, exclude={"parent_dir": True})
+        )
+        config_template[
+            "mapping"
+        ] = f"{self.mapping_config.in_lang}_to_{self.mapping_config.out_lang}.{mapping_type}"
+        template = {"mappings": [config_template]}
         # If config file exists already, just add the mapping.
         if add_config:
             with open(fn, encoding="utf8") as f:
@@ -572,7 +416,3 @@ class Mapping:
             template = existing_data
         with open(fn, "w", encoding="utf8", newline="\n") as f:
             yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
-
-
-if __name__ == "__main__":
-    pass

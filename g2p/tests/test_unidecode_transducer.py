@@ -12,7 +12,7 @@ class UnidecodeTransducerTest(TestCase):
     def test_unidecode_mapping(self):
         m = Mapping(type="unidecode")
         self.assertEqual(m.mapping, [])
-        self.assertEqual(m.kwargs["type"], "unidecode")
+        self.assertEqual(m.mapping_config.type, "unidecode")
         t = Transducer(m)
         tg = t("été Nunavut ᓄᓇᕗᑦ")
         self.assertEqual(tg.output_string, "ete Nunavut nonafot")

@@ -4,17 +4,20 @@ Utilities used by other classes
 
 """
 import csv
+import datetime as dt
 import json
 import os
 import unicodedata as ud
 from bisect import bisect_left
 from collections import defaultdict
 from copy import deepcopy
+from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Tuple, TypeVar, Union
+from typing import Dict, List, Optional, Pattern, Tuple, TypeVar, Union
 
 import regex as re
 import yaml
+from pydantic import BaseModel, DirectoryPath, Extra, Field, validator
 
 from g2p import exceptions
 from g2p.log import LOGGER
@@ -22,6 +25,53 @@ from g2p.mappings import langs
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
+
+
+class Rule(BaseModel):
+    # We can't just use "in" because it's disallowed by Python
+    in_char: str = Field(alias="in")
+    """The character(s) to convert"""
+
+    out_char: str = Field(alias="out")
+    """What to convert the 'in' characters to"""
+
+    context_before: str = ""
+    """The context before 'in' required for the rule to apply"""
+
+    context_after: str = ""
+    """The context after 'in' required for the rule to apply"""
+
+    prevent_feeding = False
+    """Whether to prevent the rule from feeding other rules"""
+
+    match_pattern: Optional[Pattern]
+    """An automatically generated match_pattern basec on the in_char, context_before and context_after"""
+
+    intermediate_form: Optional[str]
+    """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
+
+    comment: Optional[str]
+    """An optional comment about the rule."""
+
+    class Config:
+        # I'm opting to just ignore extra fields
+        # We can't ban them, since some mappings (ex. crj_equiv.json)
+        # use fields that we shouldn't include, but shouldn't remove either ('roman')
+        extra = Extra.ignore
+        allow_population_by_field_name = True
+
+    def export_to_dict(
+        self, exclude=None, exclude_none=True, exclude_defaults=True, by_alias=True
+    ):
+        """All the options for exporting are tedious to keep track of so this is a helper function"""
+        if exclude is None:
+            exclude = {"match_pattern": True, "intermediate_form": True}
+        return self.dict(
+            exclude=exclude,
+            exclude_none=exclude_none,
+            exclude_defaults=exclude_defaults,
+            by_alias=by_alias,
+        )
 
 
 def expand_abbreviations(data: str, abbs: Dict[str, List[str]], recursion_depth=0):
@@ -296,8 +346,9 @@ def load_from_csv(language, delimiter=","):
     return mapping
 
 
-def load_from_file(path: str) -> list:
+def load_from_file(path: Union[Path, str]) -> list:
     """Helper method to load mapping from file."""
+    path = str(path)
     if path.endswith("csv"):
         mapping = load_from_csv(path, ",")
     elif path.endswith("tsv"):
@@ -316,93 +367,49 @@ def load_from_file(path: str) -> list:
     return validate(mapping, path)
 
 
-def load_mapping_from_path(path_to_mapping_config, index=0):  # noqa: C901
+def find_mapping_type(name):
+    """Return the type of a mapping given its name"""
+    if is_ipa(name):
+        return "IPA"
+    elif is_xsampa(name):
+        return "XSAMPA"
+    elif is_dummy(name):
+        return "dummy"
+    else:
+        return "custom"
+
+
+def load_mapping_from_path(path_to_mapping_config, index=0):
     """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
     provided to the 'index' argument. Default is 0.
     """
     path = Path(path_to_mapping_config)
-    # If path leads to actual mapping config
-    if path.exists() and (path.suffix.endswith("yml") or path.suffix.endswith("yaml")):
-        # safe load it
-        with open(path, encoding="utf8") as f:
-            mapping = yaml.safe_load(f)
-        # If more than one mapping in the mapping config
-        if "mappings" in mapping:
-            try:
-                LOGGER.debug(
-                    'Loading mapping from %s between "%s" and "%s" at index %s',
-                    path_to_mapping_config,
-                    mapping["mappings"][index].get("in_lang", "und"),
-                    mapping["mappings"][index].get("out_lang", "und"),
-                    index,
-                )
-                mapping = mapping["mappings"][index]
-            except KeyError:
-                LOGGER.warning(
-                    "An index of %s was provided for the mapping %s but that index does not exist in the mapping. "
-                    "Please check your mapping.",
-                    index,
-                    path_to_mapping_config,
-                )
-        # Log the warning if an Index other than 0 was provided for a mapping config with a single mapping.
-        elif index != 0:
-            LOGGER.warning(
-                "An index of %s was provided for the mapping %s but that index does not exist in the mapping. "
-                "Please check your mapping.",
-                index,
-                path_to_mapping_config,
-            )
-        # try to load the data from the mapping data file
-        if "mapping" in mapping:
-            try:
-                mapping["mapping_data"] = load_from_file(
-                    os.path.join(path.parent, mapping["mapping"])
-                )
-            except (OSError, exceptions.IncorrectFileType) as e:
-                raise exceptions.MalformedMapping(
-                    f"Cannot load mapping data file specified in {path}: {e}"
-                ) from e
-        elif mapping.get("type", "") == "unidecode":
-            # This mapping is not implemented as a regular mapping, but as custom software
-            pass
-        elif mapping.get("type", "") == "lexicon":
-            # This mapping has a file of alignments
-            try:
-                mapping["alignment_data"] = load_alignments_from_file(
-                    os.path.join(path.parent, mapping["alignments"]),
-                    mapping.get("out_delimiter", ""),
-                )
-            except OSError as e:
-                raise exceptions.MalformedMapping(
-                    f"Cannot load alignment data file specified in {path}: {e}"
-                ) from e
-        else:
-            # Is "mapping" key missing?
-            raise exceptions.MalformedMapping(
-                'Key "mapping:" missing from a mapping in {}.'.format(path)
-            )
-        # load any abbreviations
-        if "abbreviations" in mapping:
-            try:
-                mapping["abbreviations_data"] = load_abbreviations_from_file(
-                    os.path.join(path.parent, mapping["abbreviations"])
-                )
-            except (OSError, exceptions.IncorrectFileType) as e:
-                raise exceptions.MalformedMapping(
-                    f"Cannot load abbreviations data file specified in {path}: {e}"
-                ) from e
-        return mapping
-    else:
-        raise FileNotFoundError
+    parent_dir = path.parent
+    with open(path, encoding="utf8") as f:
+        loaded_config = yaml.safe_load(f)
+    if not isinstance(loaded_config, dict):
+        raise exceptions.MalformedMapping(
+            f"The mapping config at {path} is malformed, please check it is properly formed."
+        )
+    if "mappings" in loaded_config:
+        loaded_config = loaded_config["mappings"][index]
+    loaded_config["parent_dir"] = parent_dir
+    return _MappingModelDefinition(**loaded_config)
 
 
 def find_mapping(in_lang: str, out_lang: str) -> list:
     """Given an input and output, find a mapping to get between them."""
     for mapping in langs.MAPPINGS_AVAILABLE:
-        map_in_lang = mapping.get("in_lang", "")
-        map_out_lang = mapping.get("out_lang", "")
+        if isinstance(mapping, _MappingModelDefinition):
+            map_in_lang = mapping.in_lang
+            map_out_lang = mapping.out_lang
+            mapping_type = mapping.type
+        else:
+            map_in_lang = mapping.get("in_lang", "")
+            map_out_lang = mapping.get("out_lang", "")
+            mapping_type = mapping.get("type")
         if map_in_lang == in_lang and map_out_lang == out_lang:
-            if mapping.get("type") == "lexicon":
+            if mapping_type == "lexicon":
                 # do *not* deep copy this, because alignments are big!
                 return mapping.copy()
             else:
@@ -431,22 +438,23 @@ def validate(mapping, path):
         ) from e
 
 
-def escape_special_characters(to_escape: Dict[str, str]) -> Dict[str, str]:
-    for key in ["in", "context_before", "context_after"]:
-        if key not in to_escape or not isinstance(to_escape[key], str):
-            continue
-        escaped = re.escape(to_escape[key])
-        if to_escape[key] != escaped:
+def escape_special_characters(to_escape: Union[Rule, Dict[str, str]]) -> Rule:
+    if isinstance(to_escape, dict):
+        to_escape = Rule(**to_escape)
+    for key in ["in_char", "context_before", "context_after"]:
+        escaped = re.escape(getattr(to_escape, key))
+        if getattr(to_escape, key) != escaped:
             LOGGER.debug(
-                f"Escaped special characters in '{to_escape[key]}' with '{escaped}'. Set 'escape_special' "
+                f"Escaped special characters in '{getattr(to_escape, key)}' with '{escaped}'. Set 'escape_special' "
                 "to False in your Mapping configuration to disable this."
             )
-        to_escape[key] = escaped
+        setattr(to_escape, key, escaped)
     return to_escape
 
 
-def load_abbreviations_from_file(path):
+def load_abbreviations_from_file(path: Union[str, Path]):
     """Helper method to load abbreviations from file."""
+    path = str(path)
     if path.endswith("csv"):
         abbs = []
         with open(path, encoding="utf8") as f:
@@ -665,3 +673,162 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
 
     def iterencode(self, obj, **kwargs):
         return self.encode(obj)
+
+
+class MAPPING_TYPE(str, Enum):
+    mapping = "mapping"
+    unidecode = "unidecode"
+    lexicon = "lexicon"
+
+
+class NORM_FORM_ENUM(str, Enum):
+    NFC = "NFC"
+    NFD = "NFD"
+    NKFC = "NKFC"
+    NKFD = "NKFD"
+    none = "none"
+
+
+class RULE_ORDERING_ENUM(str, Enum):
+    as_written = "as-written"
+    apply_longest_first = "apply-longest-first"
+
+
+class _MappingModelDefinition(BaseModel):
+    parent_dir: Optional[DirectoryPath]
+    """Optionally resolve all paths to a parent directory"""
+
+    id: Optional[str]
+    """A unique ID for the mapping"""
+
+    in_lang: str = "und"
+    """The input language ID"""
+
+    out_lang: str = "und"
+    """The output language ID"""
+
+    language_name: Optional[str]
+    """The name of the language"""
+
+    display_name: Optional[str]
+    """The display name of the mapping"""
+
+    as_is: Optional[bool]
+    """Deprecated: Please use rule_ordering='as_written' """
+
+    case_sensitive: bool = True
+    """Lower all rules and conversion input"""
+
+    escape_special: bool = False
+    """Escape special characters in rules"""
+
+    norm_form: NORM_FORM_ENUM = NORM_FORM_ENUM.NFD
+    """Normalization standard to follow"""
+
+    out_delimiter: str = ""
+    """Separate output transformations with a delimiter"""
+
+    reverse: bool = False
+    """Reverse all mappings."""
+
+    rule_ordering: RULE_ORDERING_ENUM = RULE_ORDERING_ENUM.as_written
+    """ Affects in what order the rules are applied.
+
+        If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
+        are written in the source file
+        (previously this was accomplished with ``as_is=True``).
+
+        If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
+        input are applied first. Sorting the rules like this prevents shorter rules
+        from taking part in feeding relations
+        (previously this was accomplished with ``as_is=False``)
+    """
+
+    prevent_feeding: bool = False
+    """Converts each rule into an intermediary form in the Unicode PUA"""
+
+    type: Optional[MAPPING_TYPE]
+    """Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
+        "lexicon" (lookup in an aligned lexicon)."""
+
+    alignments: Optional[Union[str, List[str]]]
+    """A string specifying a file from which to load alignments when type = "lexicon", or the actual alignments."""
+
+    authors: Optional[List[str]] = [f"Generated {dt.datetime.now()}"]
+    """A list of authors responsible for the mapping."""
+
+    abbreviations: Optional[Union[Path, Dict[str, List[str]]]]
+    """Either a path to an 'abbreviations' file or a list of 'abbreviations' for your mappings. Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information."""
+
+    mapping: Optional[Union[Path, List[Rule]]]
+    """Either a path to a 'mapping' file or a list of _Rules"""
+
+    class Config:
+        anystr_strip_whitespace = False
+
+    @validator("norm_form", pre=True)
+    def validate_norm_form(cls, v):
+        if not v or v is None:
+            v = "none"
+        return v
+
+    @validator("alignments")
+    def load_alignments(cls, alignments, values):
+        if isinstance(alignments, list) or alignments is None:
+            return alignments
+        if isinstance(alignments, str):
+            alignments = Path(alignments)
+        if (
+            "parent_dir" in values
+            and isinstance(alignments, Path)
+            and values["parent_dir"]
+        ):
+            alignments = Path(values["parent_dir"]) / alignments
+        return load_alignments_from_file(str(alignments.absolute()))
+
+    @validator("abbreviations")
+    def load_abbs(cls, abb, values):
+        if isinstance(abb, dict) or abb is None:
+            return abb
+        if isinstance(abb, str):
+            abb = Path(abb)
+        if "parent_dir" in values and isinstance(abb, Path) and values["parent_dir"]:
+            abb = Path(values["parent_dir"]) / abb
+        return load_abbreviations_from_file(str(abb.absolute()))
+
+    @validator("mapping")
+    def load_mapping(cls, mapping, values):
+        if isinstance(mapping, str):
+            mapping = Path(mapping)
+        if (
+            "parent_dir" in values
+            and isinstance(mapping, Path)
+            and values["parent_dir"]
+        ):
+            mapping = Path(values["parent_dir"]) / mapping
+        return (
+            mapping
+            if isinstance(mapping, list)
+            else load_from_file(str(mapping.absolute()))
+        )
+
+    @validator("language_name", always=True)
+    def create_language_name(cls, language_name, values):
+        # Default language name to in_lang
+        if language_name is None:
+            language_name = values["in_lang"]
+        return language_name
+
+    @validator("display_name", always=True)
+    def create_display_name(cls, display_name, values):
+        if display_name is None:
+            display_name = f"{values['in_lang']} {find_mapping_type(values['in_lang'])} to {values['out_lang']} {find_mapping_type(values['out_lang'])}"
+        return display_name
+
+
+class MappingConfig(BaseModel):
+    """This is the format used by g2p for configuring mappings.
+    It is solely used to generate schemas to validate
+    """
+
+    mappings: List[_MappingModelDefinition]

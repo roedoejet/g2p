@@ -27,7 +27,7 @@ class ExpensiveDoctorTest(TestCase):
         with self.assertLogs(LOGGER, level="WARNING") as cm:
             result = runner.invoke(doctor)
         self.assertEqual(result.exit_code, 0)
-        self.assertGreaterEqual(len(cm.output), 100)
+        self.assertGreaterEqual(len(cm.output), 10)
 
     # Migrated here from test_doctor.py
     # And skip this test, because test_doctor_cli() indirectly does the

@@ -31,8 +31,8 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.mappings.tokenizer import Tokenizer, make_tokenizer
+from g2p.mappings.utils import _MappingModelDefinition
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
-
 
 _g2p_cache: Dict[
     Tuple[str, str, Optional[str], bool, int],
@@ -181,10 +181,11 @@ def get_arpabet_langs():
         for _, v in LANGS.items():
             for mapping in v["mappings"]:
                 # add mapping to names hash table
-                full_lang_names[mapping["in_lang"]] = mapping["language_name"]
+                config: _MappingModelDefinition = mapping
+                full_lang_names[config.in_lang] = config.language_name
                 # add input id to all available langs list
-                if mapping["in_lang"] not in langs_available:
-                    langs_available.append(mapping["in_lang"])
+                if config.in_lang not in langs_available:
+                    langs_available.append(config.in_lang)
 
         # get the key from all networks in g2p module that have a path to 'eng-arpabet',
         # which is needed for the readalongs

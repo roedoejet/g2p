@@ -1,21 +1,9 @@
 #!/usr/bin/env python
 
-import re
 from unittest import TestCase, main
 
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, Rule
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
-
-
-def rule(in_text, out_text, context_before, context_after, match_pattern):
-    """Concise rule initializer for unit testing purposes only"""
-    return {
-        "in": in_text,
-        "out": out_text,
-        "context_before": context_before,
-        "context_after": context_after,
-        "match_pattern": re.compile(match_pattern),
-    }
 
 
 class FallbackTest(TestCase):
@@ -31,6 +19,7 @@ class FallbackTest(TestCase):
         pass
 
     def test_mapping(self):
+        self.maxDiff = None
         mapping = Mapping(
             [
                 {"in": "a", "out": "æ"},
@@ -59,13 +48,13 @@ class FallbackTest(TestCase):
         self.assertEqual(
             test_in.mapping,
             [
-                rule("a", "ɑ", "", "", "a"),
-                rule("e", "i", "", "", "e"),
-                rule("i", "i", "", "", "i"),
-                rule("b", "t", "", "", "b"),
-                rule("g", "t", "", "", "g"),
-                rule("g", "t", "", "", "g"),
-                rule("i", "i", "", "", "i"),
+                Rule(in_char="a", out_char="ɑ", match_pattern="a"),
+                Rule(in_char="e", out_char="i", match_pattern="e"),
+                Rule(in_char="i", out_char="i", match_pattern="i"),
+                Rule(in_char="b", out_char="t", match_pattern="b"),
+                Rule(in_char="g", out_char="t", match_pattern="g"),
+                Rule(in_char="g", out_char="t", match_pattern="g"),
+                Rule(in_char="i", out_char="i", match_pattern="i"),
             ],
         )
 
@@ -73,24 +62,24 @@ class FallbackTest(TestCase):
         self.assertEqual(
             test_out.mapping,
             [
-                rule("æ", "ɑi", "", "", "æ"),
-                rule("ɐ", "ɑ", "", "", "ɐ"),
-                rule("ɑ̃", "ɑ", "", "", "ɑ̃"),
-                rule("β", "t", "", "", "β"),
-                rule("ɡ", "t", "", "", "ɡ"),
-                rule("g", "t", "", "", "g"),
-                rule("ةُ", "ɑu", "", "", "ةُ"),
+                Rule(in_char="æ", out_char="ɑi", match_pattern="æ"),
+                Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),
+                Rule(in_char="ɑ̃", out_char="ɑ", match_pattern="ɑ̃"),
+                Rule(in_char="β", out_char="t", match_pattern="β"),
+                Rule(in_char="ɡ", out_char="t", match_pattern="ɡ"),
+                Rule(in_char="g", out_char="t", match_pattern="g"),
+                Rule(in_char="ةُ", out_char="ɑu", match_pattern="ةُ"),
             ],
         )
         test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
         self.assertEqual(
             test_ipa.mapping,
             [
-                rule("æ", "ɑ", "", "", "æ"),
-                rule("ɐ", "ɑ", "", "", "ɐ"),
-                rule("ɑ̃", "ɑ", "", "", "ɑ̃"),
-                rule("β", "s", "", "", "β"),
-                rule("ɡ", "t", "", "", "ɡ"),
+                Rule(in_char="æ", out_char="ɑ", match_pattern="æ"),
+                Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),
+                Rule(in_char="ɑ̃", out_char="ɑ", match_pattern="ɑ̃"),
+                Rule(in_char="β", out_char="s", match_pattern="β"),
+                Rule(in_char="ɡ", out_char="t", match_pattern="ɡ"),
             ],
         )
 
