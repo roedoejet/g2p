@@ -1,0 +1,10 @@
+mappings:
+  - language_name: Mapping with index and prevent-feeding
+    display_name: nofeed-index
+    in_lang: nofeed-indices-in
+    out_lang: nofeed-indices-out
+    type: mapping
+    prevent_feeding: true
+    authors:
+      - Eric Joanis
+    rules_path: nofeed-indices.csv
