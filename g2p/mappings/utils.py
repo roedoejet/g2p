@@ -725,7 +725,7 @@ class _MappingModelDefinition(BaseModel):
             and not self.rules
             and self.rules_path is None
         ):
-            LOGGER.warn(
+            LOGGER.warning(
                 exceptions.MalformedMapping(
                     "You have to either specify some rules or a path to a file containing rules."
                 )

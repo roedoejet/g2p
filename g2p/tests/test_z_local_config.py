@@ -258,6 +258,18 @@ class LocalConfigTest(TestCase):
         self.assertIn("[[(0, 0)], [(0, 0), (0, 1)]]", result.output)
         self.assertIn("[[('é', 'ò')], [('ò', 'u'), ('ò', '̀')]]", result.output)
 
+    def test_nofeed_indices(self):
+        config_path = self.mappings_dir / "nofeed-indices.yaml"
+        args = ("nofeed-indices-in", "nofeed-indices-out")
+        result = self.runner.invoke(convert, ["ab", *args, "--config", config_path])
+        self.assertIn("ced", result.stdout)
+        result = self.runner.invoke(convert, ["abft", *args, "-d"])
+        self.assertIn("cedft", result.stdout)
+        result = self.runner.invoke(convert, ["deft", *args, "-d"])
+        self.assertIn("ghit", result.stdout)
+        result = self.runner.invoke(convert, ["aātaāabtaā", *args, "-e"])
+        self.assertIn("aʼataʼacedtaʼa", result.stdout)
+
 
 if __name__ == "__main__":
     main()
