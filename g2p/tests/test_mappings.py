@@ -395,6 +395,42 @@ class MappingTest(TestCase):
         )
         os.unlink(tf.name)
 
+    def test_vanishing_edge(self):
+        """1->2+2->1 should not eat the next edge"""
+        mapping = Mapping(rules=[{"in": "d{1}ef{2}", "out": "gh{1}i{2}"}])
+        transducer = Transducer(mapping)
+        # the rule itself works, with the indices doing what they're supposed to do
+        tg = transducer("def")
+        self.assertEqual(tg.output_string, "ghi")
+        self.assertEqual(tg.alignments(), [(0, 0), (0, 1), (1, 2), (2, 2)])
+        # but it swallows the next edge
+        tg = transducer("deft")
+        self.assertEqual(tg.output_string, "ghit")
+        # with vanishing edge bug, the following fails, getting only [(0, 0), (0, 1), (1, 2), (2, 2)]
+        self.assertEqual(tg.alignments(), [(0, 0), (0, 1), (1, 2), (2, 2), (3, 3)])
+
+        # make sure the fix works with "complex" cases too
+        tg = transducer("deftdefdef")
+        self.assertEqual(tg.output_string, "ghitghighi")
+        self.assertEqual(
+            tg.alignments(),
+            [
+                (0, 0),
+                (0, 1),
+                (1, 2),
+                (2, 2),
+                (3, 3),
+                (4, 4),
+                (4, 5),
+                (5, 6),
+                (6, 6),
+                (7, 7),
+                (7, 8),
+                (8, 9),
+                (9, 9),
+            ],
+        )
+
 
 if __name__ == "__main__":
     main()
