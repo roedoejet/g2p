@@ -2,7 +2,7 @@
   language_name: Raga
 mappings:
   - display_name: Raga to IPA
-    mapping: lml_to_ipa.csv
+    rules: lml_to_ipa.csv
     in_lang: lml
     out_lang: lml-ipa
     case_sensitive: false

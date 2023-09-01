@@ -12,7 +12,8 @@ from networkx.exception import NetworkXError
 from g2p import make_g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
-from g2p.mappings.langs import LANGS_NETWORK, MAPPINGS_AVAILABLE
+from g2p.mappings import MAPPINGS_AVAILABLE
+from g2p.mappings.langs import LANGS_NETWORK
 from g2p.static import __file__ as static_file
 
 
@@ -36,7 +37,7 @@ class Langs(Resource):
     def __init__(self):
         # TODO: exclude parent dir and maybe null values too
         self.AVAILABLE_MAPPINGS = [
-            json.loads(mapping.json())
+            json.loads(mapping.model_dump_json())
             for mapping in sorted(MAPPINGS_AVAILABLE, key=lambda x: x.in_lang)
         ]
         self.parser = reqparse.RequestParser()

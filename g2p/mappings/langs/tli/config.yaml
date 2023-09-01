@@ -7,7 +7,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: tli_equiv.csv
+    rules: tli_equiv.csv
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
@@ -19,7 +19,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: tli_to_ipa.csv
+    rules: tli_to_ipa.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false

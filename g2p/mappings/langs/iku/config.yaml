@@ -8,7 +8,7 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
-    mapping: iku_to_iku_equiv.json
+    rules: iku_to_iku_equiv.json
     language_name: Inuktitut Syllabics
   - display_name: Inuktitut to IPA
     in_lang: iku-equiv
@@ -17,7 +17,7 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
-    mapping: iku_equiv_to_ipa.json
+    rules: iku_equiv_to_ipa.json
     <<: *shared
   - display_name: Inuktitut (SRO) to IPA
     in_lang: iku-sro
@@ -28,5 +28,5 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
-    mapping: iku_sro_to_ipa.json
+    rules: iku_sro_to_ipa.json
     language_name: Inuktitut Romanized

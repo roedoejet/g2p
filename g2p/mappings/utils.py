@@ -17,7 +17,15 @@ from typing import Dict, List, Optional, Pattern, Tuple, TypeVar, Union
 
 import regex as re
 import yaml
-from pydantic import BaseModel, DirectoryPath, Extra, Field, validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    DirectoryPath,
+    Field,
+    field_serializer,
+    field_validator,
+    validator,
+)
 
 from g2p import exceptions
 from g2p.log import LOGGER
@@ -41,24 +49,19 @@ class Rule(BaseModel):
     context_after: str = ""
     """The context after 'in' required for the rule to apply"""
 
-    prevent_feeding = False
+    prevent_feeding: bool = False
     """Whether to prevent the rule from feeding other rules"""
 
-    match_pattern: Optional[Pattern]
+    match_pattern: Optional[Pattern] = None
     """An automatically generated match_pattern basec on the in_char, context_before and context_after"""
 
-    intermediate_form: Optional[str]
+    intermediate_form: Optional[str] = None
     """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
 
-    comment: Optional[str]
+    comment: Optional[str] = None
     """An optional comment about the rule."""
 
-    class Config:
-        # I'm opting to just ignore extra fields
-        # We can't ban them, since some mappings (ex. crj_equiv.json)
-        # use fields that we shouldn't include, but shouldn't remove either ('roman')
-        extra = Extra.ignore
-        allow_population_by_field_name = True
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     def export_to_dict(
         self, exclude=None, exclude_none=True, exclude_defaults=True, by_alias=True
@@ -66,7 +69,7 @@ class Rule(BaseModel):
         """All the options for exporting are tedious to keep track of so this is a helper function"""
         if exclude is None:
             exclude = {"match_pattern": True, "intermediate_form": True}
-        return self.dict(
+        return self.model_dump(
             exclude=exclude,
             exclude_none=exclude_none,
             exclude_defaults=exclude_defaults,
@@ -364,7 +367,7 @@ def load_from_file(path: Union[Path, str]) -> list:
         raise exceptions.IncorrectFileType(
             f"File {path} is not a valid mapping filetype."
         )
-    return validate(mapping, path)
+    return mapping
 
 
 def find_mapping_type(name):
@@ -377,65 +380,6 @@ def find_mapping_type(name):
         return "dummy"
     else:
         return "custom"
-
-
-def load_mapping_from_path(path_to_mapping_config, index=0):
-    """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
-    provided to the 'index' argument. Default is 0.
-    """
-    path = Path(path_to_mapping_config)
-    parent_dir = path.parent
-    with open(path, encoding="utf8") as f:
-        loaded_config = yaml.safe_load(f)
-    if not isinstance(loaded_config, dict):
-        raise exceptions.MalformedMapping(
-            f"The mapping config at {path} is malformed, please check it is properly formed."
-        )
-    if "mappings" in loaded_config:
-        loaded_config = loaded_config["mappings"][index]
-    loaded_config["parent_dir"] = parent_dir
-    return _MappingModelDefinition(**loaded_config)
-
-
-def find_mapping(in_lang: str, out_lang: str) -> list:
-    """Given an input and output, find a mapping to get between them."""
-    for mapping in langs.MAPPINGS_AVAILABLE:
-        if isinstance(mapping, _MappingModelDefinition):
-            map_in_lang = mapping.in_lang
-            map_out_lang = mapping.out_lang
-            mapping_type = mapping.type
-        else:
-            map_in_lang = mapping.get("in_lang", "")
-            map_out_lang = mapping.get("out_lang", "")
-            mapping_type = mapping.get("type")
-        if map_in_lang == in_lang and map_out_lang == out_lang:
-            if mapping_type == "lexicon":
-                # do *not* deep copy this, because alignments are big!
-                return mapping.copy()
-            else:
-                return deepcopy(mapping)
-    raise exceptions.MappingMissing(in_lang, out_lang)
-
-
-def validate(mapping, path):
-    try:
-        for io in mapping:
-            if "context_before" not in io:
-                io["context_before"] = ""
-            if "context_after" not in io:
-                io["context_after"] = ""
-        valid = all("in" in d for d in mapping) and all("out" in d for d in mapping)
-        if not valid:
-            raise exceptions.MalformedMapping(
-                'Missing "in" or "out" in an entry in {}.'.format(path)
-            )
-        return mapping
-    except TypeError as e:
-        # The JSON probably is not just a list (ie could be legacy readalongs format)
-        # TODO: proper exception handling
-        raise exceptions.MalformedMapping(
-            "Formatting error in mapping in {}.".format(path)
-        ) from e
 
 
 def escape_special_characters(to_escape: Union[Rule, Dict[str, str]]) -> Rule:
@@ -695,10 +639,10 @@ class RULE_ORDERING_ENUM(str, Enum):
 
 
 class _MappingModelDefinition(BaseModel):
-    parent_dir: Optional[DirectoryPath]
+    parent_dir: Optional[DirectoryPath] = None
     """Optionally resolve all paths to a parent directory"""
 
-    id: Optional[str]
+    id: Optional[str] = None
     """A unique ID for the mapping"""
 
     in_lang: str = "und"
@@ -707,13 +651,13 @@ class _MappingModelDefinition(BaseModel):
     out_lang: str = "und"
     """The output language ID"""
 
-    language_name: Optional[str]
+    language_name: Optional[str] = None
     """The name of the language"""
 
-    display_name: Optional[str]
+    display_name: Optional[str] = None
     """The display name of the mapping"""
 
-    as_is: Optional[bool]
+    as_is: Optional[bool] = None
     """Deprecated: Please use rule_ordering='as_written' """
 
     case_sensitive: bool = True
@@ -747,31 +691,48 @@ class _MappingModelDefinition(BaseModel):
     prevent_feeding: bool = False
     """Converts each rule into an intermediary form in the Unicode PUA"""
 
-    type: Optional[MAPPING_TYPE]
+    type: Optional[MAPPING_TYPE] = None
     """Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
         "lexicon" (lookup in an aligned lexicon)."""
 
-    alignments: Optional[Union[str, List[str]]]
+    alignments: Optional[Union[str, List[str]]] = None
     """A string specifying a file from which to load alignments when type = "lexicon", or the actual alignments."""
 
     authors: Optional[List[str]] = [f"Generated {dt.datetime.now()}"]
     """A list of authors responsible for the mapping."""
 
-    abbreviations: Optional[Union[Path, Dict[str, List[str]]]]
+    abbreviations: Optional[Union[Path, Dict[str, List[str]]]] = None
     """Either a path to an 'abbreviations' file or a list of 'abbreviations' for your mappings. Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information."""
 
-    mapping: Optional[Union[Path, List[Rule]]]
-    """Either a path to a 'mapping' file or a list of _Rules"""
+    rules: Optional[Union[Path, List[Rule]]] = None
+    """Either a path to a file of a list of rules or a list of Rules"""
 
-    class Config:
-        anystr_strip_whitespace = False
+    model_config = ConfigDict(str_strip_whitespace=False, extra="allow")
 
-    @validator("norm_form", pre=True)
+    @field_serializer("rules")
+    def serialize_mapping(self, rules: Union[List[Rule], None]):
+        if not rules:
+            return rules
+        serialized = []
+        for rule in rules:
+            if isinstance(rule, dict):
+                rule = Rule(**rule)
+            serialized.append(rule.export_to_dict())
+        return serialized
+
+    @field_serializer("abbreviations")
+    def serialize_abbreviations(self, abbreviations: Union[dict, None]):
+        return dict(abbreviations) if abbreviations else abbreviations
+
+    @field_validator("norm_form", mode="before")
+    @classmethod
     def validate_norm_form(cls, v):
         if not v or v is None:
             v = "none"
         return v
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("alignments")
     def load_alignments(cls, alignments, values):
         if isinstance(alignments, list) or alignments is None:
@@ -786,6 +747,8 @@ class _MappingModelDefinition(BaseModel):
             alignments = Path(values["parent_dir"]) / alignments
         return load_alignments_from_file(str(alignments.absolute()))
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("abbreviations")
     def load_abbs(cls, abb, values):
         if isinstance(abb, dict) or abb is None:
@@ -796,22 +759,22 @@ class _MappingModelDefinition(BaseModel):
             abb = Path(values["parent_dir"]) / abb
         return load_abbreviations_from_file(str(abb.absolute()))
 
-    @validator("mapping")
-    def load_mapping(cls, mapping, values):
-        if isinstance(mapping, str):
-            mapping = Path(mapping)
-        if (
-            "parent_dir" in values
-            and isinstance(mapping, Path)
-            and values["parent_dir"]
-        ):
-            mapping = Path(values["parent_dir"]) / mapping
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
+    @validator("rules", pre=True)
+    def load_mapping(cls, rules, values):
+        if rules is None:
+            return []
+        if isinstance(rules, str):
+            rules = Path(rules)
+        if "parent_dir" in values and isinstance(rules, Path) and values["parent_dir"]:
+            rules = Path(values["parent_dir"]) / rules
         return (
-            mapping
-            if isinstance(mapping, list)
-            else load_from_file(str(mapping.absolute()))
+            rules if isinstance(rules, list) else load_from_file(str(rules.absolute()))
         )
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("language_name", always=True)
     def create_language_name(cls, language_name, values):
         # Default language name to in_lang
@@ -819,6 +782,8 @@ class _MappingModelDefinition(BaseModel):
             language_name = values["in_lang"]
         return language_name
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("display_name", always=True)
     def create_display_name(cls, display_name, values):
         if display_name is None:

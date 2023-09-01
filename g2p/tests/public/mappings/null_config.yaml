@@ -1,6 +1,6 @@
 language_name: Null
 display_name: Null to Null
-mapping: null.csv
+rules: null.csv
 in_lang: null-in
 out_lang: null-out
 rule_ordering: as-written

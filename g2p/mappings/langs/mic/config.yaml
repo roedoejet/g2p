@@ -2,7 +2,7 @@
   language_name: Mi'kmaq
 mappings:
   - display_name: Mi'kmaq to IPA
-    mapping: mic_to_ipa.json
+    rules: mic_to_ipa.json
     in_lang: mic
     out_lang: mic-ipa
     case_sensitive: false

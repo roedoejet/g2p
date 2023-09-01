@@ -117,7 +117,7 @@ class LocalConfigTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
             with open(config_file, "wt", encoding="utf8") as f:
-                print("mapping: no-such-file.csv", file=f)
+                print("rules: no-such-file.csv", file=f)
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )

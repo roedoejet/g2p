@@ -1,6 +1,6 @@
 language_name: Minimal
 display_name: Minimal to Minimal
-mapping: deletion.json
+rules: deletion.json
 in_lang: min
 out_lang: min
 rule_ordering: as-written

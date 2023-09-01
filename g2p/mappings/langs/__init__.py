@@ -48,7 +48,7 @@ def get_available_languages(langs: dict) -> list:
 
 def get_available_mappings(langs: dict) -> list:
     mappings_available = []
-    for k, v in langs.items():
+    for v in langs.values():
         if "mappings" in v:
             mappings_available.extend(v["mappings"])
         else:
@@ -59,7 +59,8 @@ def get_available_mappings(langs: dict) -> list:
 LANGS = load_langs()
 LANGS_NETWORK = load_network()
 LANGS_AVAILABLE = get_available_languages(LANGS)
-MAPPINGS_AVAILABLE = get_available_mappings(LANGS)
+# Making private because it should be imported from g2p.mappings instead
+_MAPPINGS_AVAILABLE = get_available_mappings(LANGS)
 
 
 def reload_db():
@@ -81,6 +82,6 @@ def reload_db():
     LANGS_AVAILABLE.clear()
     LANGS_AVAILABLE.extend(get_available_languages(LANGS))
 
-    global MAPPINGS_AVAILABLE
-    MAPPINGS_AVAILABLE.clear()
-    MAPPINGS_AVAILABLE.extend(get_available_mappings(LANGS))
+    global _MAPPINGS_AVAILABLE
+    _MAPPINGS_AVAILABLE.clear()
+    _MAPPINGS_AVAILABLE.extend(get_available_mappings(LANGS))

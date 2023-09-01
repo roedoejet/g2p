@@ -21,7 +21,7 @@ class FallbackTest(TestCase):
     def test_mapping(self):
         self.maxDiff = None
         mapping = Mapping(
-            [
+            rules=[
                 {"in": "a", "out": "æ"},
                 {"in": "e", "out": "ɐ"},
                 {"in": "i", "out": "ɑ̃"},
@@ -34,7 +34,7 @@ class FallbackTest(TestCase):
             out_lang="test-out",
         )
         ipa_mapping = Mapping(
-            [
+            rules=[
                 {"in": "a", "out": "æ"},
                 {"in": "e", "out": "ɐ"},
                 {"in": "i", "out": "ɑ̃"},
@@ -46,7 +46,7 @@ class FallbackTest(TestCase):
         )
         test_in = align_to_dummy_fallback(mapping, quiet=True)
         self.assertEqual(
-            test_in.mapping,
+            test_in.rules,
             [
                 Rule(in_char="a", out_char="ɑ", match_pattern="a"),
                 Rule(in_char="e", out_char="i", match_pattern="e"),
@@ -60,7 +60,7 @@ class FallbackTest(TestCase):
 
         test_out = align_to_dummy_fallback(mapping, "out", quiet=True)
         self.assertEqual(
-            test_out.mapping,
+            test_out.rules,
             [
                 Rule(in_char="æ", out_char="ɑi", match_pattern="æ"),
                 Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),
@@ -73,7 +73,7 @@ class FallbackTest(TestCase):
         )
         test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
         self.assertEqual(
-            test_ipa.mapping,
+            test_ipa.rules,
             [
                 Rule(in_char="æ", out_char="ɑ", match_pattern="æ"),
                 Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),

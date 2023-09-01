@@ -7,7 +7,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: tce_equiv.csv
+    rules: tce_equiv.csv
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
@@ -19,7 +19,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    mapping: tce_to_ipa.csv
+    rules: tce_to_ipa.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false

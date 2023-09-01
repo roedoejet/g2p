@@ -2,7 +2,7 @@
   language_name: Kanien'kéha
 mappings:
   - display_name: Kanien'kéha to IPA
-    mapping: moh_to_ipa.json
+    rules: moh_to_ipa.json
     in_lang: moh-equiv
     out_lang: moh-ipa
     case_sensitive: false
@@ -14,7 +14,7 @@ mappings:
       - Akwiratékha' Martin
     <<: *shared
   - display_name: IPA to Kanien'kéha
-    mapping: moh_to_ipa.json
+    rules: moh_to_ipa.json
     in_lang: moh-ipa
     reverse: true
     out_lang: moh
@@ -27,7 +27,7 @@ mappings:
       - Akwiratékha' Martin
     <<: *shared
   - display_name: Kanien'kéha Equivalencies
-    mapping: moh_equiv.json
+    rules: moh_equiv.json
     in_lang: moh
     out_lang: moh-equiv
     case_sensitive: false

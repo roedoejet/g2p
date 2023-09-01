@@ -4,28 +4,28 @@ mappings:
     out_lang: hei
     authors:
       - Aidan Pine
-    mapping: hei_doulos.csv
+    rules: hei_doulos.csv
     language_name: Heiltsuk
   - display_name: Times
     in_lang: hei-times-font
     out_lang: hei
     authors:
       - Aidan Pine
-    mapping: hei_times.csv
+    rules: hei_times.csv
     language_name: Heiltsuk
   - display_name: Times
-    mapping: nav_times.csv
+    rules: nav_times.csv
     in_lang: nav-times-font
     out_lang: nav
     language_name: Navajo
     authors:
       - Aidan Pine
   - display_name: First Nations Unicode
-    mapping: fn_unicode.csv
+    rules: fn_unicode.csv
     in_lang: fn-unicode-font
     out_lang: fn-unicode
     norm_form: NFD
-    escape_special: true
+    escape_special: false
     case_sensitive: false
     language_name: Undetermined
     authors:

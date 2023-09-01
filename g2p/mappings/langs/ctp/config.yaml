@@ -7,7 +7,7 @@ mappings:
     type: mapping
     authors:
       - Patrick Littell
-    mapping: ctp_to_ipa.json
+    rules: ctp_to_ipa.json
     case_sensitive: false
     rule_ordering: as-written
     <<: *shared
@@ -15,6 +15,6 @@ mappings:
     in_lang: ctp-ipa
     out_lang: eng-ipa
     type: mapping
-    mapping: ctp_ipa_to_eng_ipa.json
+    rules: ctp_ipa_to_eng_ipa.json
     rule_ordering: as-written
     <<: *shared

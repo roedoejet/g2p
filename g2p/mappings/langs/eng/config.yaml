@@ -9,7 +9,7 @@ mappings:
     norm_form: "NFC"
     authors:
       - Aidan Pine
-    mapping: dummy_to_arpabet.json
+    rules: dummy_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Hamming Dummy to Arpabet
@@ -20,7 +20,7 @@ mappings:
     norm_form: "NFC"
     authors:
       - Aidan Pine
-    mapping: dummy_to_arpabet.json
+    rules: dummy_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
   - display_name: English IPA to Arpabet
@@ -31,7 +31,7 @@ mappings:
     norm_form: "NFC"
     authors:
       - Patrick Littell
-    mapping: eng_ipa_to_arpabet.json
+    rules: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
   - display_name: English IPA to Arpabet
@@ -42,7 +42,7 @@ mappings:
     norm_form: "NFC"
     authors:
       - Patrick Littell
-    mapping: eng_ipa_to_arpabet.json
+    rules: eng_ipa_to_arpabet.json
     rule_ordering: apply-longest-first
     <<: *shared
   - display_name: English to IPA

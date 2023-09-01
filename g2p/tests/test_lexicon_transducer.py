@@ -22,8 +22,8 @@ class LexiconTransducerTest(TestCase):
                     os.path.dirname(public_data), "mappings", "hello.aligned.txt"
                 ),
             )
-        self.assertEqual(m.mapping, [])
-        self.assertEqual(m.mapping_config.type, "lexicon")
+        self.assertEqual(m.rules, [])
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "HH EH L OW ")
@@ -127,13 +127,13 @@ class LexiconTransducerTest(TestCase):
     def test_load_lexicon_mapping(self):
         """Test loading a lexicon mapping through a config file."""
         with self.assertLogs(LOGGER, level="INFO"):
-            m = Mapping(
+            m = Mapping.load_mapping_from_path(
                 os.path.join(
                     os.path.dirname(public_data), "mappings", "lexicon_config.yaml"
                 )
             )
-        self.assertEqual(m.mapping, [])
-        self.assertEqual(m.mapping_config.type, "lexicon")
+        self.assertEqual(m.rules, [])
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "HH EH L OW ")
@@ -146,7 +146,7 @@ class LexiconTransducerTest(TestCase):
         with self.assertRaises(FileNotFoundError), self.assertLogs(
             LOGGER, level="INFO"
         ):
-            _ = Mapping(
+            _ = Mapping.load_mapping_from_path(
                 os.path.join(
                     os.path.dirname(public_data), "mappings", "bad_lexicon_config.yaml"
                 )
@@ -154,8 +154,8 @@ class LexiconTransducerTest(TestCase):
 
     def test_eng_lexicon(self):
         """Test the cached eng to eng-ipa lexicon as a Mapping."""
-        m = Mapping(in_lang="eng", out_lang="eng-ipa")
-        self.assertEqual(m.mapping_config.type, "lexicon")
+        m = Mapping.find_mapping(in_lang="eng", out_lang="eng-ipa")
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "hʌloʊ")

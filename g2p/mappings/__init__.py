@@ -16,7 +16,7 @@ import yaml
 
 from g2p import exceptions
 from g2p.log import LOGGER
-from g2p.mappings.langs import MAPPINGS_AVAILABLE
+from g2p.mappings.langs import _MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
 from g2p.mappings.utils import (
     MAPPING_TYPE,
@@ -29,99 +29,82 @@ from g2p.mappings.utils import (
     create_fixed_width_lookbehind,
     escape_special_characters,
     expand_abbreviations,
-    find_mapping,
     normalize,
 )
 
 GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 
 
-class Mapping:
+class Mapping(_MappingModelDefinition):
     """Class for lookup tables"""
 
-    def __init__(  # noqa: C901
-        self,
-        mapping: Union[List[str], List[Rule], Union[Path, str], None] = None,
-        **kwargs,
-    ):
-        self.processed = False
-        # Sometimes raw data gets passed instead of a path to a config... ugh
-        # This block determines the mapping configuration
-        if mapping is not None and (
-            isinstance(mapping, list)
-            or (
-                isinstance(mapping, str)
-                and not mapping.endswith("yaml")
-                and not mapping.endswith("yml")
-            )
-        ):
-            kwargs["mapping"] = mapping
-            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
-                **kwargs
-            )
-        elif kwargs.get("in_lang", False) and kwargs.get("out_lang", False):
-            loaded_config = find_mapping(
-                kwargs.get("in_lang", ""), kwargs.get("out_lang", "")
-            )
-            if isinstance(loaded_config, _MappingModelDefinition):
-                self.mapping_config: _MappingModelDefinition = loaded_config
-            else:
-                self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
-                    **loaded_config
-                )
-        elif kwargs.get("id", False):
-            loaded_config = self.find_mapping_by_id(kwargs.get("id"))
-            if isinstance(loaded_config, _MappingModelDefinition):
-                self.mapping_config: _MappingModelDefinition = loaded_config
-            else:
-                self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
-                    **loaded_config
-                )
-        elif isinstance(mapping, str) and (
-            mapping.endswith("yaml") or mapping.endswith("yml")
-        ):
-            # This is for if the config.yaml file gets passed
-            parent_dir = Path(mapping).parent
-            with open(mapping, encoding="utf8") as f:
-                loaded_config = yaml.safe_load(f)
-            loaded_config["parent_dir"] = parent_dir
-            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
-                **loaded_config
-            )
-        elif not mapping and kwargs.get("type", False) in [
-            MAPPING_TYPE.lexicon.value,
-            MAPPING_TYPE.unidecode.value,
-        ]:
-            self.mapping_config: _MappingModelDefinition = _MappingModelDefinition(
-                **kwargs
-            )
+    @staticmethod
+    def find_mapping(
+        in_lang: Union[None, str] = None, out_lang: Union[None, str] = None
+    ) -> "Mapping":
+        """Given an input and output, find a mapping to get between them."""
+        if in_lang is None or out_lang is None:
+            raise exceptions.MappingMissing(in_lang, out_lang)
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.in_lang == in_lang and mapping.out_lang == out_lang:
+                if mapping.type == "lexicon":
+                    # do *not* deep copy this, because alignments are big!
+                    return mapping.model_copy()
+                else:
+                    return deepcopy(mapping)
+        raise exceptions.MappingMissing(in_lang, out_lang)
+
+    @staticmethod
+    def find_mapping_by_id(map_id: str) -> "Mapping":
+        """Find the mapping with a given ID"""
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.id == map_id:
+                return deepcopy(mapping)
+        raise exceptions.MappingMissing(map_id, None)
+
+    @staticmethod
+    def load_mapping_from_path(path_to_mapping_config: Union[str, Path], index=0):
+        """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
+        provided to the 'index' argument. Default is 0.
+        """
+        if isinstance(path_to_mapping_config, str):
+            path = Path(path_to_mapping_config)
         else:
-            raise Exception(f"Sorry we can't process {mapping}")
-        # Process the loaded configuration
-        self.process_loaded_config()
-        if self.mapping_config.type == MAPPING_TYPE.unidecode:
-            self.mapping_config.mapping = []
-        elif self.mapping_config.type == MAPPING_TYPE.lexicon:
-            self.mapping_config.mapping = []
-        self.in_lang = self.mapping_config.in_lang
-        self.out_lang = self.mapping_config.out_lang
-        if not self.processed:
-            self.mapping = self.process_model_specs()
+            path = path_to_mapping_config
+        parent_dir = path.parent
+        with open(path, encoding="utf8") as f:
+            loaded_config = yaml.safe_load(f)
+        if not isinstance(loaded_config, dict):
+            raise exceptions.MalformedMapping(
+                f"The mapping config at {path} is malformed, please check it is properly formed."
+            )
+        if "mappings" in loaded_config:
+            loaded_config = loaded_config["mappings"][index]
+        loaded_config["parent_dir"] = parent_dir
+        return Mapping(**loaded_config)
+
+    def model_post_init(self, *args, **kwargs) -> None:
+        """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
+        if self.type == MAPPING_TYPE.mapping or self.type is None:
+            # This is required so that we don't keep escaping special characters for example
+            self.rules = self.process_model_specs()
+        else:
+            self.rules = []
 
     def __len__(self):
-        return len(self.mapping)
+        return len(self.rules)
 
     def __call__(self):
-        return self.mapping
+        return self.rules
 
     def __iter__(self):
-        return iter(self.mapping)
+        return iter(self.rules)
 
     def __getitem__(self, item):
         if isinstance(item, int):  # item is an integer
-            return self.mapping[item]
+            return self.rules[item]
         if isinstance(item, slice):  # item is a slice
-            return self.mapping[item.start or 0 : item.stop or len(self.mapping)]
+            return self.rules[item.start or 0 : item.stop or len(self.rules)]
         else:  # invalid index type
             raise TypeError(
                 "{cls} indices must be integers or slices, not {idx}".format(
@@ -129,15 +112,6 @@ class Mapping:
                     idx=type(item).__name__,
                 )
             )
-
-    @staticmethod
-    def find_mapping_by_id(map_id: str):
-        """Find the mapping with a given ID"""
-        for mapping in MAPPINGS_AVAILABLE:
-            if (isinstance(mapping, dict) and mapping.get("id", "") == map_id) or (
-                isinstance(mapping, _MappingModelDefinition) and mapping.id == map_id
-            ):
-                return deepcopy(mapping)
 
     @staticmethod
     def _string_to_pua(string: str, offset: int) -> str:
@@ -157,7 +131,7 @@ class Mapping:
 
     def index(self, item):
         """Find the location of an item in self"""
-        return self.mapping.index(item)
+        return self.rules.index(item)
 
     def inventory(self, in_or_out: str = "in"):
         """Return just inputs or outputs as inventory of mapping"""
@@ -165,20 +139,10 @@ class Mapping:
             in_or_out = "in_char"
         if in_or_out == "out":
             in_or_out = "out_char"
-        return [getattr(x, in_or_out) for x in self.mapping]
-
-    def process_loaded_config(self):
-        """For a mapping loaded from a file, take the keyword arguments and supply them to the
-        Mapping, and get any abbreviations data.
-        """
-        if self.mapping_config.type == MAPPING_TYPE.unidecode:
-            self.mapping = []
-        elif self.mapping_config.type == MAPPING_TYPE.lexicon:
-            self.mapping = []
-            self.alignments = self.mapping_config.alignments
-        else:
-            self.mapping = self.mapping_config.mapping
-            self.abbreviations = self.mapping_config.abbreviations
+        try:
+            return [getattr(x, in_or_out) for x in self.rules]
+        except TypeError as e:
+            raise exceptions.MappingNotInitializedProperlyError from e
 
     def plain_mapping(self, skip_none: bool = False, skip_defaults: bool = False):
         """Return the plain mapping for displaying or saving to disk.
@@ -186,32 +150,32 @@ class Mapping:
         Args:
             skip_empty_contexts: when set, filter out empty context_before/after
         """
-        assert isinstance(self.mapping, list)
-        assert isinstance(self.mapping[0], Rule)
-        return [rule.export_to_dict() for rule in self.mapping]
+        assert isinstance(self.rules, list)
+        if self.rules:
+            assert isinstance(self.rules[0], Rule)
+        return [rule.export_to_dict() for rule in self.rules]
 
     def process_model_specs(self):  # noqa: C901
         """Process all model specifications"""
-
-        if self.mapping_config.as_is is not None:
+        if self.as_is is not None:
             appropriate_setting = (
                 RULE_ORDERING_ENUM.as_written
-                if self.mapping_config.as_is
+                if self.as_is
                 else RULE_ORDERING_ENUM.apply_longest_first
             )
-            self.mapping_config.rule_ordering = appropriate_setting
+            self.rule_ordering = appropriate_setting
 
             LOGGER.warning(
                 f"mapping from {self.in_lang} to {self.out_lang} "
                 'is using the deprecated parameter "as_is"; '
-                f"replace `as_is: {self.mapping_config.as_is}` with `rule_ordering: {appropriate_setting.value}`"
+                f"replace `as_is: {self.as_is}` with `rule_ordering: {appropriate_setting.value}`"
             )
 
         # Sorting must happen before the calculation of PUA intermediate forms for proper indexing
-        if self.mapping_config.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first:
-            self.mapping_config.mapping = sorted(
+        if self.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first:
+            self.rules = sorted(
                 # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
-                self.mapping_config.mapping,
+                self.rules,
                 key=lambda x: len(normalize(x.in_char, "NFD"))
                 if isinstance(x, Rule)
                 else len(normalize(x["in"], "NFD")),
@@ -219,14 +183,14 @@ class Mapping:
             )
 
         non_empty_mappings: List[Rule] = []
-        for i, rule in enumerate(self.mapping_config.mapping):
+        for i, rule in enumerate(self.rules):
             if isinstance(rule, dict):
                 rule = Rule(**rule)
             # Expand Abbreviations
             if (
-                self.mapping_config.abbreviations
-                and self.mapping_config.mapping
-                and "match_pattern" not in self.mapping_config.mapping[0]
+                self.abbreviations
+                and self.rules
+                and "match_pattern" not in self.rules[0]
             ):
                 for key in [
                     "in_char",
@@ -239,25 +203,25 @@ class Mapping:
                         expand_abbreviations(getattr(rule, key), self.abbreviations),
                     )
             # Reverse Rule
-            if self.mapping_config.reverse:
+            if self.reverse:
                 rule.in_char, rule.out_char = rule.out_char, rule.in_char
                 rule.context_before = ""
                 rule.context_after = ""
             # Escape Special
-            if self.mapping_config.escape_special:
+            if self.escape_special:
                 rule = escape_special_characters(rule)
             # Unicode Normalization
-            if self.mapping_config.norm_form != NORM_FORM_ENUM.none:
+            if self.norm_form != NORM_FORM_ENUM.none:
                 for k in ["in_char", "out_char", "context_before", "context_after"]:
                     value = getattr(rule, k)
                     if value:
                         setattr(
                             rule,
                             k,
-                            normalize(value, self.mapping_config.norm_form.value),
+                            normalize(value, self.norm_form.value),
                         )
             # Prevent Feeding
-            if self.mapping_config.prevent_feeding or rule.prevent_feeding:
+            if self.prevent_feeding or rule.prevent_feeding:
                 rule.intermediate_form = self._string_to_pua(rule.out_char, i)
             # Create match pattern
             rule.match_pattern = self.rule_to_regex(rule)
@@ -300,7 +264,7 @@ class Mapping:
             inp = create_fixed_width_lookbehind(rule.context_before) + input_match
             if rule.context_after:
                 inp += f"(?={rule.context_after})"
-            if not self.mapping_config.case_sensitive:
+            if not self.case_sensitive:
                 rule_regex = re.compile(inp, re.I)
             else:
                 rule_regex = re.compile(inp)
@@ -324,19 +288,22 @@ class Mapping:
             ) from e
         return rule_regex
 
-    def extend(self, mapping):
+    def extend(self, mapping: "Mapping"):
         """Add all the rules from mapping into self, effectively merging two mappings
 
         Caveat: if self and mapping have contradictory rules, which one will
         "win" is unspecified, and may depend on mapping configuration options.
         """
-        self.mapping.extend(mapping.mapping)
+        try:
+            self.rules.extend(mapping.rules)
+        except TypeError as e:
+            raise exceptions.MappingNotInitializedProperlyError from e
 
     def deduplicate(self):
         """Remove duplicate rules found in self, keeping the first copy found."""
         # Since Python 3.6, dict keeps its element in insertion order (while
         # set does not), so deduplicating the rules is a one-liner:
-        self.mapping = list({repr(rule): rule for rule in self.mapping}.values())
+        self.rules = list({repr(rule): rule for rule in self.rules}.values())
 
     def mapping_to_stream(self, out_stream, file_type: str = "json"):
         """Write mapping to a stream"""
@@ -355,9 +322,11 @@ class Mapping:
             writer = csv.DictWriter(
                 out_stream, fieldnames=fieldnames, extrasaction="ignore"
             )
-            for io in self.mapping:
-                assert isinstance(io, Rule)
-                writer.writerow(io.export_to_dict())
+            try:
+                for io in self.rules:
+                    writer.writerow(io.export_to_dict())
+            except TypeError as e:
+                raise exceptions.MappingNotInitializedProperlyError from e
         else:
             raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
 
@@ -389,11 +358,9 @@ class Mapping:
             LOGGER.warning(f"writing mapping config to file at {output_path}")
         fn = output_path
         config_template = json.loads(
-            self.mapping_config.json(exclude_none=True, exclude={"parent_dir": True})
+            self.model_dump_json(exclude_none=True, exclude={"parent_dir": True})
         )
-        config_template[
-            "mapping"
-        ] = f"{self.mapping_config.in_lang}_to_{self.mapping_config.out_lang}.{mapping_type}"
+        config_template["rules"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         template = {"mappings": [config_template]}
         # If config file exists already, just add the mapping.
         if add_config:
@@ -416,3 +383,8 @@ class Mapping:
             template = existing_data
         with open(fn, "w", encoding="utf8", newline="\n") as f:
             yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
+
+
+MAPPINGS_AVAILABLE: List[Mapping] = [
+    Mapping(**mapping) for mapping in _MAPPINGS_AVAILABLE
+]

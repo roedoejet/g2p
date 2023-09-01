@@ -13,31 +13,36 @@ class TransducerTest(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.test_mapping_moh = Mapping(in_lang="moh-equiv", out_lang="moh-ipa")
+        cls.test_mapping_moh = Mapping.find_mapping(
+            in_lang="moh-equiv", out_lang="moh-ipa"
+        )
         cls.test_mapping = Mapping(
-            [{"in": "a", "out": "b"}], in_lang="spam", out_lang="eggs"
+            rules=[{"in": "a", "out": "b"}], in_lang="spam", out_lang="eggs"
         )
         cls.test_mapping_rev = Mapping(
-            [{"in": "a", "out": "b"}], reverse=True, in_lang="eggs", out_lang="parrot"
+            rules=[{"in": "a", "out": "b"}],
+            reverse=True,
+            in_lang="eggs",
+            out_lang="parrot",
         )
         cls.test_mapping_ordered_feed = Mapping(
-            [{"in": "a", "out": "b"}, {"in": "b", "out": "c"}]
+            rules=[{"in": "a", "out": "b"}, {"in": "b", "out": "c"}]
         )
         cls.test_mapping_ordered_counter_feed = Mapping(
-            [{"in": "b", "out": "c"}, {"in": "a", "out": "b"}]
+            rules=[{"in": "b", "out": "c"}, {"in": "a", "out": "b"}]
         )
         cls.test_longest_first = Mapping(
-            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}]
+            rules=[{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}]
         )
         cls.test_rules_as_written_mapping = Mapping(
-            [{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}],
+            rules=[{"in": "j", "out": "ʣ"}, {"in": "'y", "out": "jˀ"}],
             rule_ordering="apply-longest-first",
         )
         cls.test_case_sensitive_mapping = Mapping(
-            [{"in": "'n", "out": "n̓"}], case_sensitive=True
+            rules=[{"in": "'n", "out": "n̓"}], case_sensitive=True
         )
         cls.test_case_insensitive_mapping = Mapping(
-            [{"in": "'n", "out": "n̓"}], case_sensitive=False
+            rules=[{"in": "'n", "out": "n̓"}], case_sensitive=False
         )
         cls.test_case_sensitive_transducer = Transducer(cls.test_case_sensitive_mapping)
         cls.test_case_insensitive_transducer = Transducer(
@@ -59,18 +64,22 @@ class TransducerTest(TestCase):
             [cls.test_trans_rev, cls.test_trans]
         )
         cls.test_regex_set_transducer_sanity = Transducer(
-            Mapping([{"in": "a", "out": "b", "context_before": "c"}])
+            Mapping(rules=[{"in": "a", "out": "b", "context_before": "c"}])
         )
         cls.test_regex_set_transducer = Transducer(
-            Mapping([{"in": "a", "out": "b", "context_before": "[cd]|[fgh]"}])
+            Mapping(rules=[{"in": "a", "out": "b", "context_before": "[cd]|[fgh]"}])
         )
-        cls.test_deletion_transducer = Transducer(Mapping([{"in": "a", "out": ""}]))
-        csv_deletion_mapping = Mapping(
+        cls.test_deletion_transducer = Transducer(
+            Mapping(rules=[{"in": "a", "out": ""}])
+        )
+        csv_deletion_mapping = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "deletion_config_csv.yaml")
         )
         cls.test_deletion_transducer_csv = Transducer(csv_deletion_mapping)
         cls.test_deletion_transducer_json = Transducer(
-            Mapping(os.path.join(PUBLIC_DIR, "mappings", "deletion_config_json.yaml"))
+            Mapping.load_mapping_from_path(
+                os.path.join(PUBLIC_DIR, "mappings", "deletion_config_json.yaml")
+            )
         )
 
     def test_properties(self):

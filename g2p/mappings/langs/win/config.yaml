@@ -2,7 +2,7 @@
   language_name: Hoocąk
 mappings:
   - display_name: Hoocąk to IPA
-    mapping: win_to_ipa.json
+    rules: win_to_ipa.json
     in_lang: win
     out_lang: win-ipa
     case_sensitive: false

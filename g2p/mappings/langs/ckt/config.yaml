@@ -8,11 +8,11 @@ mappings:
     authors:
       - Vasilisa Andrianets
       - Patrick Littell
-    mapping: ckt_to_ipa.json
+    rules: ckt_to_ipa.json
     <<: *shared
   - display_name: Chukchi IPA to English IPA
     in_lang: ckt-ipa
     out_lang: eng-ipa
     type: mapping
-    mapping: ckt_ipa_to_eng_ipa.json
+    rules: ckt_ipa_to_eng_ipa.json
     <<: *shared

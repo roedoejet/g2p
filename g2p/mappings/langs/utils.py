@@ -12,17 +12,11 @@ import yaml
 from networkx import DiGraph, write_gpickle
 from networkx.algorithms.dag import ancestors, descendants
 
-from g2p.exceptions import MalformedMapping
+from g2p.exceptions import MalformedMapping, MappingNotInitializedProperlyError
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
-from g2p.mappings.langs import (
-    LANGS_DIR,
-    LANGS_NETWORK,
-    LANGS_NWORK_PATH,
-    LANGS_PKL,
-    MAPPINGS_AVAILABLE,
-)
-from g2p.mappings.utils import MAPPING_TYPE, is_ipa, load_mapping_from_path
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
+from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
+from g2p.mappings.utils import MAPPING_TYPE, Rule, is_ipa
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -57,14 +51,18 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     for mapping in [x for x in MAPPINGS_AVAILABLE if x.out_lang in mappings_to_check]:
         if is_ipa(mapping.out_lang) and mapping.type == MAPPING_TYPE.mapping:
             reverse = mapping.reverse
-            for rule in mapping.mapping:
-                output = rule["in"] if reverse else rule["out"]
-                if not is_panphon(output):
-                    LOGGER.warning(
-                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping.in_lang} "
-                        f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
-                    )
-                    found_error = True
+            try:
+                for rule in mapping.rules:
+                    assert isinstance(rule, Rule)
+                    output = rule.in_char if reverse else rule.out_char
+                    if not is_panphon(output):
+                        LOGGER.warning(
+                            f"Output '{rule.out_char}' in rule {rule} in mapping between {mapping.in_lang} "
+                            f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
+                        )
+                        found_error = True
+            except TypeError as e:
+                raise MappingNotInitializedProperlyError from e
     if found_error:
         LOGGER.warning(
             "Please refer to https://github.com/dmort27/panphon for information about panphon."
@@ -83,7 +81,9 @@ def is_panphon(string, display_warnings=False):
     import g2p.transducer
 
     dst = getPanphonDistanceSingleton()
-    panphon_preprocessor = g2p.transducer.Transducer(Mapping(id="panphon_preprocessor"))
+    panphon_preprocessor = g2p.transducer.Transducer(
+        Mapping.find_mapping_by_id("panphon_preprocessor")
+    )
     preprocessed_string = panphon_preprocessor(string).output_string
     # Use a loop that prints the warnings on all strings that are not panphon, even though
     # logically this should not be necessary to calculate the answer.
@@ -126,7 +126,9 @@ def is_arpabet(string):
     global _ARPABET_SET
     if _ARPABET_SET is None:
         _ARPABET_SET = set(
-            Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out")
+            Mapping.find_mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory(
+                "out"
+            )
         )
     # print(f"arpabet_set={_ARPABET_SET}")
     for sound in string.split():
@@ -172,9 +174,15 @@ def cache_langs(
                         f"language_name missing in {path} from mapping "
                         f"from {in_lang} to {out_lang}"
                     )
-                data["mappings"][index] = load_mapping_from_path(path, index)
+                data["mappings"][index] = json.loads(
+                    Mapping.load_mapping_from_path(path, index).model_dump_json(
+                        exclude={"parent_dir": True}
+                    )
+                )
+                # if "abbreviations" in data['mappings'][index] and data['mappings'][index]['abbreviations'] is not None:
+                #     breakpoint()
         else:
-            data = load_mapping_from_path(path)
+            data = Mapping.load_mapping_from_path(path)
             if "language_name" not in data:
                 raise MalformedMapping(f"language_name missing in {path}")
         langs[code] = data

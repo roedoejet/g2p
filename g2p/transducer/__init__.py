@@ -419,14 +419,14 @@ class Transducer:
 
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
-        self.case_sensitive = mapping.mapping_config.case_sensitive
-        self.norm_form = mapping.mapping_config.norm_form
-        self.out_delimiter = mapping.mapping_config.out_delimiter
+        self.case_sensitive = mapping.case_sensitive
+        self.norm_form = mapping.norm_form
+        self.out_delimiter = mapping.out_delimiter
         self._index_match_pattern = re.compile(r"(?<={)\d+(?=})")
         self._char_match_pattern = re.compile(r"[^0-9\{\}]+(?={\d+})", re.U)
 
     def __repr__(self):
-        return f"{self.__class__} between {self.mapping.mapping_config.in_lang} and {self.mapping.mapping_config.out_lang}"
+        return f"{self.__class__} between {self.mapping.in_lang} and {self.mapping.out_lang}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
@@ -461,12 +461,12 @@ class Transducer:
     @property
     def in_lang(self) -> str:
         """Input language node name"""
-        return self.mapping.mapping_config.in_lang
+        return self.mapping.in_lang
 
     @property
     def out_lang(self) -> str:
         """Output language node name"""
-        return self.mapping.mapping_config.out_lang
+        return self.mapping.out_lang
 
     @property
     def transducers(self) -> List["Transducer"]:  # noqa: F821
@@ -849,11 +849,10 @@ class Transducer:
         return tg
 
     def apply_rules(self, to_convert: str):  # noqa: C901
-        if self.mapping.mapping_config.type == MAPPING_TYPE.unidecode:
+        if self.mapping.type == MAPPING_TYPE.unidecode:
             return self.apply_unidecode(to_convert)
-        elif self.mapping.mapping_config.type == MAPPING_TYPE.lexicon:
+        elif self.mapping.type == MAPPING_TYPE.lexicon:
             return self.apply_lexicon(to_convert)
-
         # perform any normalization
         to_convert = unicode_escape(to_convert)
         saved_to_convert = to_convert
@@ -874,7 +873,7 @@ class Transducer:
         # these variables tracks changes in the output string across processing
         # matches of the same pattern
         diff_from_input = defaultdict(int, {n: 0 for n in range(len(tg.output_string))})
-        for io in self.mapping.mapping:
+        for io in self.mapping.rules:
             assert isinstance(io, Rule)
             # Do not allow empty rules
             if not io.in_char and not io.out_char:
@@ -885,9 +884,8 @@ class Transducer:
             diff_from_output = defaultdict(
                 int, {n: 0 for n in range(len(tg.output_string))}
             )
-            for match_i, match in enumerate(
-                reversed(list(io.match_pattern.finditer(tg.output_string)))
-            ):
+            matches = reversed(list(io.match_pattern.finditer(tg.output_string)))
+            for match_i, match in enumerate(matches):
                 debug_string = tg.output_string
                 start = match.start()
                 end = match.end()
@@ -965,7 +963,7 @@ class Transducer:
         display_warnings=False,
         original_input=None,
     ) -> bool:
-        out_lang = self.mapping.mapping_config.out_lang
+        out_lang = self.mapping.out_lang
         if "eng-arpabet" in out_lang:
             if is_arpabet(tg.output_string):
                 return True
@@ -1119,7 +1117,7 @@ class CompositeTransducer:
         self.norm_form = transducers[0].norm_form if transducers else "none"
 
     def __repr__(self):
-        return f"{self.__class__} between {self._transducers[0].mapping.mapping_config.in_lang} and {self._transducers[-1].mapping.mapping_config.out_lang}"
+        return f"{self.__class__} between {self._transducers[0].mapping.in_lang} and {self._transducers[-1].mapping.out_lang}"
 
     def __call__(self, to_convert: str):
         return self.apply_rules(to_convert)

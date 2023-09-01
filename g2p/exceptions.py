@@ -98,6 +98,15 @@ class MalformedLookup(CommandLineError):
         )
 
 
+class MappingNotInitializedProperlyError(CommandLineError):
+    def __init__(self, msg="Your Mapping object was not properly initialized"):
+        super().__init__(self)
+        self.msg = msg
+
+    def __str__(self):
+        return self.render(self.msg)
+
+
 class IncorrectFileType(CommandLineError):
     def __init__(self, msg):
         super().__init__(self)

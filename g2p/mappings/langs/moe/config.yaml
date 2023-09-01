@@ -8,7 +8,7 @@ mappings:
     authors:
       - Delasie Torkornoo
       - Bradley Ellert
-    mapping: moe_to_ipa.json
+    rules: moe_to_ipa.json
     abbreviations: moe_abbs.csv
     case_sensitive: false
     <<: *shared

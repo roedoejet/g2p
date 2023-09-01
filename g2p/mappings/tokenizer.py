@@ -65,8 +65,8 @@ class SpecializedTokenizer(Tokenizer):
     def __init__(self, mapping: Mapping):
         self.delim = ""
         self.inventory = mapping.inventory("in")
-        self.lang = mapping.mapping_config.language_name
-        self.case_sensitive = mapping.mapping_config.case_sensitive
+        self.lang = mapping.language_name
+        self.case_sensitive = mapping.case_sensitive
         self.dot_is_letter = False
         # create regex
         self._build_regex()
@@ -103,8 +103,8 @@ class MultiHopTokenizer(SpecializedTokenizer):
         self.delim = ""
         assert mappings
         self.inventory = sum([m.inventory("in") for m in mappings], [])
-        self.lang = mappings[0].mapping_config.language_name
-        self.case_sensitive = mappings[0].mapping_config.case_sensitive
+        self.lang = mappings[0].language_name
+        self.case_sensitive = mappings[0].case_sensitive
         self.dot_is_letter = False
         self._build_regex()
         # LOGGER.warning(pprint.pformat([self.lang, self.delim, self.case_sensitive, self.inventory]))
@@ -183,10 +183,14 @@ class TokenizerLibrary:
                 # Build a multi-hop tokenizer
                 assert len(out_lang) > 1
                 try:
-                    mappings = [Mapping(in_lang=in_lang, out_lang=out_lang[0])]
+                    mappings = [
+                        Mapping.find_mapping(in_lang=in_lang, out_lang=out_lang[0])
+                    ]
                     for i in range(1, len(out_lang)):
                         mappings.append(
-                            Mapping(in_lang=out_lang[i - 1], out_lang=out_lang[i])
+                            Mapping.find_mapping(
+                                in_lang=out_lang[i - 1], out_lang=out_lang[i]
+                            )
                         )
                     self.tokenizers[tokenizer_key] = MultiHopTokenizer(mappings)
                 except MappingMissing:
@@ -197,7 +201,7 @@ class TokenizerLibrary:
             else:
                 # Build a one-hop tokenizer
                 try:
-                    mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
+                    mapping = Mapping.find_mapping(in_lang=in_lang, out_lang=out_lang)
                     self.tokenizers[tokenizer_key] = SpecializedTokenizer(mapping)
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]

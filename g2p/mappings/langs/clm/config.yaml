@@ -2,7 +2,7 @@
   language_name: Klallam
 mappings:
   - display_name: Klallam to IPA
-    mapping: clm_to_ipa.csv
+    rules: clm_to_ipa.csv
     in_lang: clm-equiv
     out_lang: clm-ipa
     authors:
@@ -18,6 +18,6 @@ mappings:
     out_lang: clm-equiv
     authors:
       - Eric Joanis
-    mapping: clm_equiv.csv
+    rules: clm_equiv.csv
     norm_form: NFD
     <<: *shared

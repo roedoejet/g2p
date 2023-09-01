@@ -32,7 +32,10 @@ class MappingCreationTest(TestCase):
             {"in": "ʒ", "out": "ZH"},
         ]
         self.target_mapping = Mapping(
-            self.mappings, in_lang="eng-ipa", out_lang="eng-arpabet", out_delimiter=" "
+            rules=self.mappings,
+            in_lang="eng-ipa",
+            out_lang="eng-arpabet",
+            out_delimiter=" ",
         )
 
     def test_unigram_mappings(self):
@@ -41,7 +44,7 @@ class MappingCreationTest(TestCase):
             {"in": "ᐅ", "out": "u"},
             {"in": "ᐊ", "out": "a"},
         ]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         transducer = Transducer(mapping)
         self.assertEqual(transducer("a").output_string, "ɑ")
@@ -54,7 +57,7 @@ class MappingCreationTest(TestCase):
             {"in": "ᑎ", "out": "ti"},
             {"in": "ᑭ", "out": "ki"},
         ]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         transducer = Transducer(mapping)
         self.assertEqual(transducer("pi").output_string, "pi")
@@ -67,7 +70,7 @@ class MappingCreationTest(TestCase):
             {"in": "ᒍ", "out": "t͡ʃu"},
             {"in": "ᒐ", "out": "t͡ʃa"},
         ]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         transducer = Transducer(mapping)
         self.assertEqual(transducer("t͡ʃi").output_string, "tʃi")
@@ -80,7 +83,7 @@ class MappingCreationTest(TestCase):
             {"in": "ᐧᑌ", "out": "tʷeː"},
             {"in": "ᐧᑫ", "out": "kʷeː"},
         ]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         transducer = Transducer(mapping)
         self.assertEqual(transducer("pʷeː").output_string, "pweː")
@@ -89,7 +92,7 @@ class MappingCreationTest(TestCase):
 
     def test_distance_errors(self):
         src_mappings = [{"in": "ᐃ", "out": "i"}]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         # Exercise looking up distances in the known list
         with self.assertRaises(ValueError):
             _ = create_mapping(
@@ -129,18 +132,18 @@ class MappingCreationTest(TestCase):
             {"in": "ᒋ", "out": "t͡ʃi"},
             {"in": "ᕃ", "out": "ʁaj"},
         ]
-        src_mapping = Mapping(src_mappings, in_lang="crj", out_lang="crj-ipa")
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
         mapping = create_mapping(src_mapping, self.target_mapping, quiet=True)
         # print("mapping", mapping, list(mapping), "distance", "default")
         self.assertTrue(isinstance(mapping, Mapping))
-        set_of_mappings = {tuple(rule.out_char for rule in mapping.mapping)}
+        set_of_mappings = {tuple(rule.out_char for rule in mapping.rules)}
         for distance in DISTANCE_METRICS:
             mapping = create_mapping(
                 src_mapping, self.target_mapping, distance=distance, quiet=True
             )
             # print("mapping", mapping, list(mapping), "distance", distance)
             self.assertTrue(isinstance(mapping, Mapping))
-            set_of_mappings.add(tuple(rule.out_char for rule in mapping.mapping))
+            set_of_mappings.add(tuple(rule.out_char for rule in mapping.rules))
 
             mapping = create_multi_mapping(
                 [(src_mapping, "out")],
@@ -149,7 +152,7 @@ class MappingCreationTest(TestCase):
                 quiet=True,
             )
             self.assertTrue(isinstance(mapping, Mapping))
-            set_of_mappings.add(tuple(rule.out_char for rule in mapping.mapping))
+            set_of_mappings.add(tuple(rule.out_char for rule in mapping.rules))
         self.assertGreater(len(set_of_mappings), 3)
 
 

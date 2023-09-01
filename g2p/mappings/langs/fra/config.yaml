@@ -7,7 +7,7 @@ mappings:
     authors:
       - Eric Joanis
     type: mapping
-    mapping: fra_to_ipa.csv
+    rules: fra_to_ipa.csv
     abbreviations: fra_abbs.csv
     rule_ordering: as-written
     case_sensitive: false

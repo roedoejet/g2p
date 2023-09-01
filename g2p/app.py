@@ -143,7 +143,7 @@ def convert(message):
         mapping_args["abbreviations"] = flatten_abbreviations_format(
             mapping["abbreviations"]
         )
-        mapping_args["mapping"] = mapping["mapping"]
+        mapping_args["rules"] = mapping["rules"]
         mappings_obj = Mapping(**mapping_args)
         transducer = Transducer(mappings_obj)
         transducers.append(transducer)
@@ -187,7 +187,7 @@ def change_table(message):
             out_lang="custom",
             type="mapping",
             norm_form="NFC",
-        ).dict()
+        ).model_dump()
         kwargs["include"] = False
         emit(
             "table response",
@@ -211,7 +211,7 @@ def change_table(message):
                 {
                     "mappings": x.plain_mapping(),
                     "abbs": expand_abbreviations_format(x.abbreviations),
-                    "kwargs": json.loads(x.mapping_config.json()),
+                    "kwargs": json.loads(x.model_dump_json()),
                 }
                 for x in mappings
             ],

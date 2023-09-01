@@ -2,7 +2,7 @@
   language_name: Normalization
 mappings:
   - display_name: Panphon Normalization
-    mapping: panphon_preprocessor.csv
+    rules: panphon_preprocessor.csv
     id: panphon_preprocessor
     in_lang: ipa
     out_lang: ipa

@@ -31,7 +31,6 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS, LANGS_NETWORK
 from g2p.mappings.tokenizer import Tokenizer, make_tokenizer
-from g2p.mappings.utils import _MappingModelDefinition
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
 _g2p_cache: Dict[
@@ -106,7 +105,7 @@ def make_g2p(  # noqa: C901
     # Find all mappings needed
     mappings_needed = []
     for lang1, lang2 in zip(path[:-1], path[1:]):
-        mapping = Mapping(in_lang=lang1, out_lang=lang2)
+        mapping = Mapping.find_mapping(in_lang=lang1, out_lang=lang2)
         LOGGER.debug(
             f"Adding mapping between {lang1} and {lang2} to composite transducer."
         )
@@ -181,11 +180,10 @@ def get_arpabet_langs():
         for _, v in LANGS.items():
             for mapping in v["mappings"]:
                 # add mapping to names hash table
-                config: _MappingModelDefinition = mapping
-                full_lang_names[config.in_lang] = config.language_name
+                full_lang_names[mapping["in_lang"]] = mapping["language_name"]
                 # add input id to all available langs list
-                if config.in_lang not in langs_available:
-                    langs_available.append(config.in_lang)
+                if mapping["in_lang"] not in langs_available:
+                    langs_available.append(mapping["in_lang"])
 
         # get the key from all networks in g2p module that have a path to 'eng-arpabet',
         # which is needed for the readalongs

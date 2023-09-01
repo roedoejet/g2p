@@ -9,7 +9,7 @@ mappings:
       - Delasie Torkornoo
       - Bradley Ellert
       - Aidan Pine
-    mapping: crm_equiv.json
+    rules: crm_equiv.json
     case_sensitive: false
     <<: *shared
   - display_name: Moose Cree to IPA
@@ -21,14 +21,14 @@ mappings:
       - Patrick Littell
       - Delasie Torkornoo
       - Bradley Ellert
-    mapping: crm_to_ipa.json
+    rules: crm_to_ipa.json
     case_sensitive: false
     <<: *shared
   - display_name: Moose Cree IPA to English IPA
     in_lang: crm-ipa
     out_lang: eng-ipa
     type: mapping
-    mapping: crm_ipa_to_eng_ipa.json
+    rules: crm_ipa_to_eng_ipa.json
     rule_ordering: as-written
     case_sensitive: false
     <<: *shared

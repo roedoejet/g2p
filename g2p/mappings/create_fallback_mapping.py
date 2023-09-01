@@ -16,7 +16,7 @@ def align_to_dummy_fallback(
     quiet=False,
 ):
     """Create a mapping from mapping's output inventory to a minimalist dummy inventory"""
-    mapping_config = mapping.mapping_config.dict()
+    mapping_config = mapping.model_dump()
     config = {"in_lang": mapping_config[f"{io}_lang"], "out_lang": "dummy"}
     default_char = "t"
     if is_ipa(mapping_config[f"{io}_lang"]):
@@ -53,5 +53,5 @@ def align_to_dummy_fallback(
                 )
                 x["out"] = default_char
 
-    config["mapping"] = list_of_rules
+    config["rules"] = list_of_rules
     return Mapping(**config)

@@ -1,6 +1,6 @@
 language_name: Abbreviation
 display_name: Minimal to Minimal
-mapping: abbreviation_mapping.csv
+rules: abbreviation_mapping.csv
 in_lang: min
 out_lang: min
 rule_ordering: as-written
