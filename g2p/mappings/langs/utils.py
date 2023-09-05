@@ -144,7 +144,7 @@ def cache_langs(
     """Read in all files and save as pickle.
 
     Args:
-       dir_path: Path to scan for config.yaml files.  Default is the
+       dir_path: Path to scan for config-g2p.yaml files.  Default is the
                  installed g2p/mappings/langs directory.
        langs_path: Path to output langs.pkl pickle file.  Default is
                    the installed g2p/mappings/langs/langs.pkl
@@ -154,8 +154,14 @@ def cache_langs(
     langs = {}
 
     # Sort by language code
-    paths = sorted(Path(dir_path).glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
+    paths = sorted(
+        Path(dir_path).glob("./*/config-g2p.y*ml"), key=lambda x: x.parent.stem
+    )
     mappings_legal_pairs = []
+    if not paths:
+        raise FileNotFoundError(
+            f"There don't seem to be any valid mappings in {dir_path}"
+        )
     for path in paths:
         code = path.parent.stem
         mapping_config = MappingConfig.load_mapping_config_from_path(path)

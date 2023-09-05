@@ -236,7 +236,7 @@ class MappingTest(TestCase):
     def test_minimal(self):
         mapping = Mapping.load_mapping_from_path(
             os.path.join(
-                os.path.dirname(public_data), "mappings", "minimal_config.yaml"
+                os.path.dirname(public_data), "mappings", "minimal_config-g2p.yaml"
             )
         )
         transducer = Transducer(mapping)
@@ -253,7 +253,7 @@ class MappingTest(TestCase):
     def test_abbreviations(self):
         mapping = Mapping.load_mapping_from_path(
             os.path.join(
-                os.path.dirname(public_data), "mappings", "abbreviation_config.yaml"
+                os.path.dirname(public_data), "mappings", "abbreviation_config-g2p.yaml"
             )
         )
         self.assertEqual(mapping.rules[0].rule_input, "i|u")

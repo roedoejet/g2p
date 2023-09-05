@@ -204,7 +204,7 @@ In order to add a new mapping, you have to follow the following steps.
 
 1. Determine your language's [ISO 639-3 code](https://en.wikipedia.org/wiki/List_of_ISO_639-3_codes).
 2. Add a folder with your language's ISO 639-3 code to `g2p/mappings/langs`
-3. Add a configuration file at `g2p/mappings/langs/<yourlangISOcode>/config.yaml`. Here is the basic template for a configuration:
+3. Add a configuration file at `g2p/mappings/langs/<yourlangISOcode>/config-g2p.yaml`. Here is the basic template for a configuration:
 
 ```yaml
 <<: &shared

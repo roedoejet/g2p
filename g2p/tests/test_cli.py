@@ -33,7 +33,7 @@ class CliTest(TestCase):
                     )
             shutil.copy(
                 os.path.join(mappings_dir, "minimal_configs.yaml"),
-                os.path.join(lang1_dir, "config.yaml"),
+                os.path.join(lang1_dir, "config-g2p.yaml"),
             )
             result = self.runner.invoke(update, ["-i", tmpdir])
             langs_pkl = os.path.join(tmpdir, "langs.pkl")

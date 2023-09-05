@@ -24,7 +24,7 @@ class UtilsTest(TestCase):
 
     def tearDown(self):
         gen_mapping = os.path.join(PUBLIC_DIR, "mappings", "test_to_test-out.json")
-        gen_config = os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+        gen_config = os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
         if os.path.exists(gen_config):
             os.remove(gen_config)
         if os.path.exists(gen_mapping):
@@ -107,10 +107,10 @@ class UtilsTest(TestCase):
     def test_load_mapping(self):
         with self.assertRaises(MalformedMapping):
             Mapping.load_mapping_from_path(
-                os.path.join(PUBLIC_DIR, "mappings", "malformed_config.yaml")
+                os.path.join(PUBLIC_DIR, "mappings", "malformed_config-g2p.yaml")
             )
         minimal = Mapping.load_mapping_from_path(
-            os.path.join(PUBLIC_DIR, "mappings", "minimal_config.yaml")
+            os.path.join(PUBLIC_DIR, "mappings", "minimal_config-g2p.yaml")
         )
         csv = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 0
@@ -163,7 +163,7 @@ class UtilsTest(TestCase):
         )
         with self.assertLogs(LOGGER, level="WARNING"):
             mapping.config_to_file(
-                os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+                os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
             )
         with self.assertLogs(LOGGER, level="WARNING"):
             mapping.config_to_file(
@@ -171,7 +171,7 @@ class UtilsTest(TestCase):
             )
         mapping.mapping_to_file(os.path.join(PUBLIC_DIR, "mappings"))
         test_config = Mapping.load_mapping_from_path(
-            os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+            os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
         )
 
         test_config_added = Mapping.load_mapping_from_path(

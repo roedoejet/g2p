@@ -129,7 +129,7 @@ class LexiconTransducerTest(TestCase):
         with self.assertLogs(LOGGER, level="INFO"):
             m = Mapping.load_mapping_from_path(
                 os.path.join(
-                    os.path.dirname(public_data), "mappings", "lexicon_config.yaml"
+                    os.path.dirname(public_data), "mappings", "lexicon_config-g2p.yaml"
                 )
             )
         self.assertEqual(m.rules, [])
@@ -148,7 +148,9 @@ class LexiconTransducerTest(TestCase):
         ):
             _ = Mapping.load_mapping_from_path(
                 os.path.join(
-                    os.path.dirname(public_data), "mappings", "bad_lexicon_config.yaml"
+                    os.path.dirname(public_data),
+                    "mappings",
+                    "bad_lexicon_config-g2p.yaml",
                 )
             )
 

@@ -31,7 +31,7 @@ from g2p.log import LOGGER
 from g2p.mappings import langs
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
-GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
+GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
 
 
 class Rule(BaseModel):

@@ -43,7 +43,7 @@ class Mapping(_MappingModelDefinition):
     def find_mapping(
         in_lang: Union[None, str] = None, out_lang: Union[None, str] = None
     ) -> "Mapping":
-        """Given an input and output, find a mapping to get between them."""
+        """Given an input and an output language, find a mapping to get between them."""
         if in_lang is None or out_lang is None:
             raise exceptions.MappingMissing(in_lang, out_lang)
         for mapping in MAPPINGS_AVAILABLE:
@@ -57,7 +57,7 @@ class Mapping(_MappingModelDefinition):
 
     @staticmethod
     def find_mapping_by_id(map_id: str) -> "Mapping":
-        """Find the mapping with a given ID"""
+        """Find the mapping with a given ID, i.e., the "id" found in the mapping, like in the "panphon_preprocessor" mapping."""
         for mapping in MAPPINGS_AVAILABLE:
             if mapping.id == map_id:
                 return deepcopy(mapping)
@@ -346,13 +346,13 @@ class Mapping(_MappingModelDefinition):
 
     def config_to_file(
         self,
-        output_path: str = os.path.join(GEN_DIR, "config.yaml"),
+        output_path: str = os.path.join(GEN_DIR, "config-g2p.yaml"),
         mapping_type: str = "json",
     ):
         """Write config to file"""
         add_config = False
         if os.path.isdir(output_path):
-            output_path = os.path.join(output_path, "config.yaml")
+            output_path = os.path.join(output_path, "config-g2p.yaml")
         if os.path.exists(output_path) and os.path.isfile(output_path):
             LOGGER.warning(f"Adding mapping config to file at {output_path}")
             add_config = True
