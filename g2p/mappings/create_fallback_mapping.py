@@ -1,3 +1,5 @@
+import datetime as dt
+
 from text_unidecode import unidecode
 
 from g2p import make_g2p
@@ -17,7 +19,11 @@ def align_to_dummy_fallback(
 ):
     """Create a mapping from mapping's output inventory to a minimalist dummy inventory"""
     mapping_config = mapping.model_dump()
-    config = {"in_lang": mapping_config[f"{io}_lang"], "out_lang": "dummy"}
+    config = {
+        "in_lang": mapping_config[f"{io}_lang"],
+        "out_lang": "dummy",
+        "authors": [f"Generated {dt.datetime.now()}"],
+    }
     default_char = "t"
     if is_ipa(mapping_config[f"{io}_lang"]):
         list_of_rules = align_inventories(

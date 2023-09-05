@@ -4,7 +4,6 @@ Utilities used by other classes
 
 """
 import csv
-import datetime as dt
 import json
 import os
 import unicodedata as ud
@@ -698,7 +697,7 @@ class _MappingModelDefinition(BaseModel):
     alignments: Optional[Union[str, List[str]]] = None
     """A string specifying a file from which to load alignments when type = "lexicon", or the actual alignments."""
 
-    authors: Optional[List[str]] = [f"Generated {dt.datetime.now()}"]
+    authors: Optional[List[str]] = None
     """A list of authors responsible for the mapping."""
 
     abbreviations: Optional[Union[Path, Dict[str, List[str]]]] = None

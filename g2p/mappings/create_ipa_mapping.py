@@ -12,7 +12,7 @@
 #
 # AP Note: Taken from ReadAlongs-Studio and implemented with G2P formatting
 ######################################################################
-
+import datetime as dt
 from typing import Iterable, List, Tuple
 
 from tqdm import tqdm
@@ -166,6 +166,7 @@ def create_multi_mapping(
         "rules": mapping,
         "prevent_feeding": True,
         "norm_form": "NFC",
+        "authors": [f"Generated {dt.datetime.now()}"],
         "display_name": (
             long_ipa_names(map_1_names) + " to " + long_ipa_names(map_2_names)
         ),
@@ -212,7 +213,7 @@ def create_mapping(
     config = {
         **config,
         **{
-            "authors": [],
+            "authors": [f"Generated {dt.datetime.now()}"],
             "display_name": None,
             "language_name": None,
             "in_lang": map_1_name,
