@@ -135,7 +135,9 @@ class UtilsTest(TestCase):
 
     def test_escape_special(self):
         self.assertEqual(
-            utils.escape_special_characters(Rule(in_char="?", out_char="")).in_char,
+            utils.escape_special_characters(
+                Rule(rule_input="?", rule_output="")
+            ).rule_input,
             "\\?",
         )
 
@@ -157,7 +159,7 @@ class UtilsTest(TestCase):
             in_lang="test",
             out_lang="test-out",
             rule_ordering=RULE_ORDERING_ENUM.apply_longest_first,
-            rules=[Rule(in_char="a", out_char="b")],
+            rules=[Rule(rule_input="a", rule_output="b")],
         )
         with self.assertLogs(LOGGER, level="WARNING"):
             mapping.config_to_file(

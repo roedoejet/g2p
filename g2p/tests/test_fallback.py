@@ -48,13 +48,13 @@ class FallbackTest(TestCase):
         self.assertEqual(
             test_in.rules,
             [
-                Rule(in_char="a", out_char="ɑ", match_pattern="a"),
-                Rule(in_char="e", out_char="i", match_pattern="e"),
-                Rule(in_char="i", out_char="i", match_pattern="i"),
-                Rule(in_char="b", out_char="t", match_pattern="b"),
-                Rule(in_char="g", out_char="t", match_pattern="g"),
-                Rule(in_char="g", out_char="t", match_pattern="g"),
-                Rule(in_char="i", out_char="i", match_pattern="i"),
+                Rule(rule_input="a", rule_output="ɑ", match_pattern="a"),
+                Rule(rule_input="e", rule_output="i", match_pattern="e"),
+                Rule(rule_input="i", rule_output="i", match_pattern="i"),
+                Rule(rule_input="b", rule_output="t", match_pattern="b"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="i", rule_output="i", match_pattern="i"),
             ],
         )
 
@@ -62,24 +62,24 @@ class FallbackTest(TestCase):
         self.assertEqual(
             test_out.rules,
             [
-                Rule(in_char="æ", out_char="ɑi", match_pattern="æ"),
-                Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),
-                Rule(in_char="ɑ̃", out_char="ɑ", match_pattern="ɑ̃"),
-                Rule(in_char="β", out_char="t", match_pattern="β"),
-                Rule(in_char="ɡ", out_char="t", match_pattern="ɡ"),
-                Rule(in_char="g", out_char="t", match_pattern="g"),
-                Rule(in_char="ةُ", out_char="ɑu", match_pattern="ةُ"),
+                Rule(rule_input="æ", rule_output="ɑi", match_pattern="æ"),
+                Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
+                Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
+                Rule(rule_input="β", rule_output="t", match_pattern="β"),
+                Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="ةُ", rule_output="ɑu", match_pattern="ةُ"),
             ],
         )
         test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
         self.assertEqual(
             test_ipa.rules,
             [
-                Rule(in_char="æ", out_char="ɑ", match_pattern="æ"),
-                Rule(in_char="ɐ", out_char="ɑ", match_pattern="ɐ"),
-                Rule(in_char="ɑ̃", out_char="ɑ", match_pattern="ɑ̃"),
-                Rule(in_char="β", out_char="s", match_pattern="β"),
-                Rule(in_char="ɡ", out_char="t", match_pattern="ɡ"),
+                Rule(rule_input="æ", rule_output="ɑ", match_pattern="æ"),
+                Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
+                Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
+                Rule(rule_input="β", rule_output="s", match_pattern="β"),
+                Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
             ],
         )
 

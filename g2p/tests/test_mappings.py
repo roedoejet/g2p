@@ -48,14 +48,14 @@ class MappingTest(TestCase):
 
     def test_normalization(self):
         self.assertEqual(
-            ud.normalize("NFD", "\u00e1"), self.test_mapping_norm.rules[0].in_char
+            ud.normalize("NFD", "\u00e1"), self.test_mapping_norm.rules[0].rule_input
         )
-        self.assertNotEqual(self.test_mapping_norm.rules[0].in_char, "\u00e1")
-        self.assertEqual(self.test_mapping_norm.rules[0].in_char, "\u0061\u0301")
-        self.assertEqual(self.test_mapping_no_norm.rules[0].in_char, "\u00e1")
-        self.assertEqual(self.test_mapping_no_norm.rules[0].out_char, "\u00e1")
-        self.assertEqual(self.test_mapping_no_norm.rules[1].in_char, "\u0061\u0301")
-        self.assertEqual(self.test_mapping_no_norm.rules[1].out_char, "\u0061\u0301")
+        self.assertNotEqual(self.test_mapping_norm.rules[0].rule_input, "\u00e1")
+        self.assertEqual(self.test_mapping_norm.rules[0].rule_input, "\u0061\u0301")
+        self.assertEqual(self.test_mapping_no_norm.rules[0].rule_input, "\u00e1")
+        self.assertEqual(self.test_mapping_no_norm.rules[0].rule_output, "\u00e1")
+        self.assertEqual(self.test_mapping_no_norm.rules[1].rule_input, "\u0061\u0301")
+        self.assertEqual(self.test_mapping_no_norm.rules[1].rule_output, "\u0061\u0301")
 
     def test_json_map(self):
         json_map = Mapping(
@@ -256,8 +256,8 @@ class MappingTest(TestCase):
                 os.path.dirname(public_data), "mappings", "abbreviation_config.yaml"
             )
         )
-        self.assertEqual(mapping.rules[0].in_char, "i|u")
-        self.assertEqual(mapping.rules[1].in_char, "a|e|i|o|u")
+        self.assertEqual(mapping.rules[0].rule_input, "i|u")
+        self.assertEqual(mapping.rules[1].rule_input, "a|e|i|o|u")
         transducer = Transducer(mapping)
         self.assertEqual(transducer("i").output_string, "1")
         self.assertEqual(transducer("e").output_string, "2")

@@ -126,9 +126,9 @@ class Mapping(_MappingModelDefinition):
     def inventory(self, in_or_out: str = "in"):
         """Return just inputs or outputs as inventory of mapping"""
         if in_or_out == "in":
-            in_or_out = "in_char"
+            in_or_out = "rule_input"
         if in_or_out == "out":
-            in_or_out = "out_char"
+            in_or_out = "rule_output"
         try:
             return [getattr(x, in_or_out) for x in self.rules]
         except TypeError as e:
@@ -166,7 +166,7 @@ class Mapping(_MappingModelDefinition):
             self.rules = sorted(
                 # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
                 self.rules,
-                key=lambda x: len(normalize(x.in_char, "NFD"))
+                key=lambda x: len(normalize(x.rule_input, "NFD"))
                 if isinstance(x, Rule)
                 else len(normalize(x["in"], "NFD")),
                 reverse=True,
@@ -183,7 +183,7 @@ class Mapping(_MappingModelDefinition):
                 and "match_pattern" not in self.rules[0]
             ):
                 for key in [
-                    "in_char",
+                    "rule_input",
                     "context_before",
                     "context_after",
                 ]:
@@ -194,7 +194,7 @@ class Mapping(_MappingModelDefinition):
                     )
             # Reverse Rule
             if self.reverse:
-                rule.in_char, rule.out_char = rule.out_char, rule.in_char
+                rule.rule_input, rule.rule_output = rule.rule_output, rule.rule_input
                 rule.context_before = ""
                 rule.context_after = ""
             # Escape Special
@@ -202,7 +202,12 @@ class Mapping(_MappingModelDefinition):
                 rule = escape_special_characters(rule)
             # Unicode Normalization
             if self.norm_form != NORM_FORM_ENUM.none:
-                for k in ["in_char", "out_char", "context_before", "context_after"]:
+                for k in [
+                    "rule_input",
+                    "rule_output",
+                    "context_before",
+                    "context_after",
+                ]:
                     value = getattr(rule, k)
                     if value:
                         setattr(
@@ -212,7 +217,7 @@ class Mapping(_MappingModelDefinition):
                         )
             # Prevent Feeding
             if self.prevent_feeding or rule.prevent_feeding:
-                rule.intermediate_form = self._string_to_pua(rule.out_char, i)
+                rule.intermediate_form = self._string_to_pua(rule.rule_output, i)
             # Create match pattern
             rule.match_pattern = self.rule_to_regex(rule)
             # Only add non-empty rules
@@ -243,13 +248,13 @@ class Mapping(_MappingModelDefinition):
         # Prevent null input. See, https://github.com/roedoejet/g2p/issues/24
         if isinstance(rule, dict):
             rule = Rule(**rule)
-        if not rule.in_char:
+        if not rule.rule_input:
             LOGGER.warning(
-                f"Rule with input '{rule.in_char}' and output '{rule.out_char}' has no input. "
+                f"Rule with input '{rule.rule_input}' and output '{rule.rule_output}' has no input. "
                 "This is disallowed. Please check your mapping file for rules with null inputs."
             )
             return None
-        input_match = re.sub(re.compile(r"{\d+}"), "", rule.in_char)
+        input_match = re.sub(re.compile(r"{\d+}"), "", rule.rule_input)
         try:
             inp = create_fixed_width_lookbehind(rule.context_before) + input_match
             if rule.context_after:

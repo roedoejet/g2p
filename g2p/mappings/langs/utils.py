@@ -53,10 +53,10 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
             try:
                 for rule in mapping.rules:
                     assert isinstance(rule, Rule)
-                    output = rule.in_char if reverse else rule.out_char
+                    output = rule.rule_input if reverse else rule.rule_output
                     if not is_panphon(output):
                         LOGGER.warning(
-                            f"Output '{rule.out_char}' in rule {rule} in mapping between {mapping.in_lang} "
+                            f"Output '{rule.rule_output}' in rule {rule} in mapping between {mapping.in_lang} "
                             f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
                         )
                         found_error = True

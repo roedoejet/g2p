@@ -702,7 +702,7 @@ def scan(lang, path):
         assert isinstance(lang_mapping, Mapping)
         for x in lang_mapping.rules:
             assert isinstance(x, Rule)
-            mapped_chars.add(normalize(x.in_char, "NFD"))
+            mapped_chars.add(normalize(x.rule_input, "NFD"))
     # Find unmapped chars
     filter_chars = " \n"
     mapped_string = "".join(mapped_chars)

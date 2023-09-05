@@ -487,7 +487,7 @@ class Transducer:
             try:
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index].out_char[output_char_index]
+                    + self.mapping[intermediate_index].rule_output[output_char_index]
                     + output_string[i + 1 :]
                 )
             except IndexError:
@@ -495,7 +495,7 @@ class Transducer:
                 output_char_index = 0
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index].out_char[output_char_index]
+                    + self.mapping[intermediate_index].rule_output[output_char_index]
                     + output_string[i + 1 :]
                 )
             indices_seen[intermediate_index] += 1
@@ -536,10 +536,10 @@ class Transducer:
             outputs (dict): dictionary containing matches grouped by explicit index match
         """
         input_char_matches = [
-            x.group() for x in self._char_match_pattern.finditer(io.in_char)
+            x.group() for x in self._char_match_pattern.finditer(io.rule_input)
         ]
         input_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(io.in_char)
+            x.group() for x in self._index_match_pattern.finditer(io.rule_input)
         ]
         inputs: Dict[str, List[dict]] = {}
         index = 0
@@ -769,14 +769,14 @@ class Transducer:
         # Conversion is done character by character using unidecode
         # We retain spaces in the input, but spaces from unidecode are removed
         converted = []
-        for in_char in to_convert:
+        for rule_input in to_convert:
             unidecode_str = text_unidecode.unidecode(
-                unicodedata.normalize("NFKC", in_char)
+                unicodedata.normalize("NFKC", rule_input)
             )
             cc = [
                 c
                 for c in unidecode_str
-                if c.isalpha() or c in UNIDECODE_SPECIALS or in_char.isspace()
+                if c.isalpha() or c in UNIDECODE_SPECIALS or rule_input.isspace()
             ]
             converted.append("".join(cc))
         tg.output_string = "".join(converted)
@@ -876,7 +876,7 @@ class Transducer:
         for io in self.mapping.rules:
             assert isinstance(io, Rule)
             # Do not allow empty rules
-            if not io.in_char and not io.out_char:
+            if not io.rule_input and not io.rule_output:
                 continue
             io = copy.deepcopy(io)
             # create empty out_string
@@ -896,10 +896,10 @@ class Transducer:
                     out_string = io.intermediate_form
                     intermediate_forms = True
                 else:
-                    out_string = io.out_char
+                    out_string = io.rule_output
                 if self.out_delimiter:
                     out_string += self.out_delimiter
-                if any(self._char_match_pattern.finditer(io.in_char)) and any(
+                if any(self._char_match_pattern.finditer(io.rule_input)) and any(
                     self._char_match_pattern.finditer(out_string)
                 ):
                     self.update_explicit_indices(
@@ -919,7 +919,11 @@ class Transducer:
                         match.group(),
                         out_string,
                     )
-                if io.in_char != io.out_char or io.context_after or io.context_before:
+                if (
+                    io.rule_input != io.rule_output
+                    or io.context_after
+                    or io.context_before
+                ):
                     tg.debugger[-1].append(
                         {
                             "input": debug_string,

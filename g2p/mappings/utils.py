@@ -36,10 +36,10 @@ GEN_CONFIG = os.path.join(GEN_DIR, "config.yaml")
 
 class Rule(BaseModel):
     # We can't just use "in" because it's disallowed by Python
-    in_char: str = Field(alias="in")
+    rule_input: str = Field(alias="in")
     """The character(s) to convert"""
 
-    out_char: str = Field(alias="out")
+    rule_output: str = Field(alias="out")
     """What to convert the 'in' characters to"""
 
     context_before: str = ""
@@ -52,7 +52,7 @@ class Rule(BaseModel):
     """Whether to prevent the rule from feeding other rules"""
 
     match_pattern: Optional[Pattern] = None
-    """An automatically generated match_pattern basec on the in_char, context_before and context_after"""
+    """An automatically generated match_pattern basec on the rule_input, context_before and context_after"""
 
     intermediate_form: Optional[str] = None
     """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
@@ -384,7 +384,7 @@ def find_mapping_type(name):
 def escape_special_characters(to_escape: Union[Rule, Dict[str, str]]) -> Rule:
     if isinstance(to_escape, dict):
         to_escape = Rule(**to_escape)
-    for key in ["in_char", "context_before", "context_after"]:
+    for key in ["rule_input", "context_before", "context_after"]:
         escaped = re.escape(getattr(to_escape, key))
         if getattr(to_escape, key) != escaped:
             LOGGER.debug(
