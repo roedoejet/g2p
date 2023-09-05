@@ -7,6 +7,7 @@ import os
 import pprint
 import re
 import sys
+from pathlib import Path
 from typing import List, Tuple
 
 import click
@@ -668,6 +669,23 @@ def update(in_dir, out_dir):
         network_to_echart(
             outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
         )  # updates g2p/status/languages-network.json
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+def update_schema():
+    """Generate a schema for the model configuration - this should only be done once for each Minor version.
+    Changes to the schema should result in a minor version bump.
+    """
+    # Generate schema
+    schema_path = (
+        Path(LANGS_DIR) / ".." / ".schema" / f"g2p-config-schema-{VERSION}.json"
+    )
+    if schema_path.exists():
+        raise FileExistsError(
+            f"Sorry a schema already exists for version {VERSION}. Please bump the minor version number and generate the schema again."
+        )
+    with open(schema_path, "w") as f:
+        json.dump(MappingConfig.model_json_schema(), f)
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
