@@ -66,6 +66,14 @@ class MappingTest(TestCase):
         # This is a very old version of the config, I'm not even sure these tests should be in here at all.
         # self.assertTrue(json_map.kwargs["in_metadata"]["case_insensitive"])
 
+    def test_no_mappings_key(self):
+        with self.assertRaises(ValidationError):
+            Mapping.load_mapping_from_path(
+                os.path.join(
+                    os.path.dirname(public_data), "mappings", "no_mappings_key.yaml"
+                )
+            )
+
     def test_as_is(self):
         """
         Test deprecated config: as_is.

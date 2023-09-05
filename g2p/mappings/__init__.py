@@ -10,13 +10,14 @@ import os
 import re
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Pattern, Union
+from typing import Dict, List, Pattern, Union
 
 import yaml
+from pydantic import BaseModel
 
 from g2p import exceptions
 from g2p.log import LOGGER
-from g2p.mappings.langs import _MAPPINGS_AVAILABLE
+from g2p.mappings.langs import _LANGS, _MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
 from g2p.mappings.utils import (
     MAPPING_TYPE,
@@ -67,21 +68,10 @@ class Mapping(_MappingModelDefinition):
         """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
         provided to the 'index' argument. Default is 0.
         """
-        if isinstance(path_to_mapping_config, str):
-            path = Path(path_to_mapping_config)
-        else:
-            path = path_to_mapping_config
-        parent_dir = path.parent
-        with open(path, encoding="utf8") as f:
-            loaded_config = yaml.safe_load(f)
-        if not isinstance(loaded_config, dict):
-            raise exceptions.MalformedMapping(
-                f"The mapping config at {path} is malformed, please check it is properly formed."
-            )
-        if "mappings" in loaded_config:
-            loaded_config = loaded_config["mappings"][index]
-        loaded_config["parent_dir"] = parent_dir
-        return Mapping(**loaded_config)
+        mapping_config = MappingConfig.load_mapping_config_from_path(
+            path_to_mapping_config
+        )
+        return mapping_config.mappings[index]
 
     def model_post_init(self, *args, **kwargs) -> None:
         """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
@@ -342,6 +332,13 @@ class Mapping(_MappingModelDefinition):
         with open(fn, "w", encoding="utf8", newline="\n") as f:
             self.mapping_to_stream(f, file_type)
 
+    def export_to_dict(self, mapping_type="json"):
+        model_dict = json.loads(
+            self.model_dump_json(exclude_none=True, exclude={"parent_dir": True})
+        )
+        model_dict["rules"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
+        return model_dict
+
     def config_to_file(
         self,
         output_path: str = os.path.join(GEN_DIR, "config.yaml"),
@@ -357,34 +354,65 @@ class Mapping(_MappingModelDefinition):
         else:
             LOGGER.warning(f"writing mapping config to file at {output_path}")
         fn = output_path
-        config_template = json.loads(
-            self.model_dump_json(exclude_none=True, exclude={"parent_dir": True})
-        )
-        config_template["rules"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
-        template = {"mappings": [config_template]}
+        config_template = self.export_to_dict()
+        # Serialize piece-by-piece, which is why this is a list of type dict and not type Mapping
         # If config file exists already, just add the mapping.
+        to_export = None
         if add_config:
-            with open(fn, encoding="utf8") as f:
-                existing_data = yaml.safe_load(f.read())
+            existing_data = MappingConfig.load_mapping_config_from_path(fn)
             updated = False
-            for i, mapping in enumerate(existing_data["mappings"]):
+            for i, mapping in enumerate(existing_data.mappings):
                 # if the mapping exists, just update the generation data
                 if (
-                    mapping["in_lang"] == template["mappings"][0]["in_lang"]
-                    and mapping["out_lang"] == template["mappings"][0]["out_lang"]
+                    mapping.in_lang == config_template["in_lang"]
+                    and mapping.out_lang == config_template["out_lang"]
                 ):
-                    existing_data["mappings"][i]["authors"] = template["mappings"][0][
-                        "authors"
-                    ]
+                    existing_data.mappings[i].authors = config_template["authors"]
                     updated = True
                     break
             if not updated:
-                existing_data["mappings"].append(template["mappings"][0])
-            template = existing_data
+                existing_data.mappings.append(config_template)
+            to_export = {
+                "mappings": [
+                    x.export_to_dict() if isinstance(x, Mapping) else x
+                    for x in existing_data.mappings
+                ]
+            }
+        else:
+            to_export = {"mappings": [config_template]}
         with open(fn, "w", encoding="utf8", newline="\n") as f:
-            yaml.dump(template, f, Dumper=IndentDumper, default_flow_style=False)
+            yaml.dump(to_export, f, Dumper=IndentDumper, default_flow_style=False)
 
 
 MAPPINGS_AVAILABLE: List[Mapping] = [
     Mapping(**mapping) for mapping in _MAPPINGS_AVAILABLE
 ]
+
+
+class MappingConfig(BaseModel):
+    """This is the format used by g2p for configuring mappings."""
+
+    mappings: List[Mapping]
+
+    @staticmethod
+    def load_mapping_config_from_path(path_to_mapping_config: Union[str, Path]):
+        """Loads a mapping configuration from a path, if you just want one specific mapping
+        from the config, you can try Mapping.load_mapping_from_path instead.
+        """
+        if isinstance(path_to_mapping_config, str):
+            path = Path(path_to_mapping_config)
+        else:
+            path = path_to_mapping_config
+        parent_dir = path.parent
+        with open(path, encoding="utf8") as f:
+            loaded_config = yaml.safe_load(f)
+            if "mappings" in loaded_config:
+                for mapping in loaded_config["mappings"]:
+                    mapping["parent_dir"] = parent_dir
+        try:
+            return MappingConfig(**loaded_config)
+        except TypeError as e:
+            raise exceptions.MalformedMapping from e
+
+
+LANGS: Dict[str, MappingConfig] = {k: MappingConfig(**v) for k, v in _LANGS.items()}

@@ -28,8 +28,8 @@ from networkx.exception import NetworkXNoPath
 import g2p.deprecation
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
-from g2p.mappings.langs import LANGS, LANGS_NETWORK
+from g2p.mappings import LANGS, Mapping
+from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.tokenizer import Tokenizer, make_tokenizer
 from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
@@ -177,13 +177,13 @@ def get_arpabet_langs():
         # this will be the set of all langs in g2p, which we need temporarily
         full_lang_names = {}
 
-        for _, v in LANGS.items():
-            for mapping in v["mappings"]:
+        for v in LANGS.values():
+            for mapping in v.mappings:
                 # add mapping to names hash table
-                full_lang_names[mapping["in_lang"]] = mapping["language_name"]
+                full_lang_names[mapping.in_lang] = mapping.language_name
                 # add input id to all available langs list
-                if mapping["in_lang"] not in langs_available:
-                    langs_available.append(mapping["in_lang"])
+                if mapping.in_lang not in langs_available:
+                    langs_available.append(mapping.in_lang)
 
         # get the key from all networks in g2p module that have a path to 'eng-arpabet',
         # which is needed for the readalongs

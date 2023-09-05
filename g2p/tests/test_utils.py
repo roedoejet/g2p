@@ -106,7 +106,6 @@ class UtilsTest(TestCase):
 
     def test_load_mapping(self):
         with self.assertRaises(MalformedMapping):
-
             Mapping.load_mapping_from_path(
                 os.path.join(PUBLIC_DIR, "mappings", "malformed_config.yaml")
             )
@@ -172,6 +171,7 @@ class UtilsTest(TestCase):
         test_config = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
         )
+
         test_config_added = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
         )

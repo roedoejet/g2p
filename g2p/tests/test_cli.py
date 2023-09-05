@@ -69,13 +69,11 @@ class CliTest(TestCase):
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
-            self.assertIn("language_name", str(result.exception))
+            self.assertIn("mappings", str(result.exception))
         with tempfile.TemporaryDirectory() as tmpdir:
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs2")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
-            self.assertNotEqual(result.exit_code, 0)
-            self.assertIn("language_name", str(result.exception))
-            self.assertIn("min to min", str(result.exception))
+            self.assertEqual(result.exit_code, 0)
 
     def test_convert(self):
         langs_to_test = load_public_test_data()

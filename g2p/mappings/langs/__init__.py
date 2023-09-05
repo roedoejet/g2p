@@ -37,12 +37,9 @@ def get_available_languages(langs: dict) -> list:
     for k, v in langs.items():
         if k in ["generated", "font-encodings"]:
             continue
-        if "mappings" in v:
-            for vv in v["mappings"]:
-                if "language_name" in vv:
-                    language_names.add(vv["language_name"])
-        elif "language_name" in v:
-            language_names.add(v["language_name"])
+        for vv in v["mappings"]:
+            if "language_name" in vv:
+                language_names.add(vv["language_name"])
     return sorted(language_names)
 
 
@@ -56,11 +53,11 @@ def get_available_mappings(langs: dict) -> list:
     return mappings_available
 
 
-LANGS = load_langs()
 LANGS_NETWORK = load_network()
-LANGS_AVAILABLE = get_available_languages(LANGS)
 # Making private because it should be imported from g2p.mappings instead
-_MAPPINGS_AVAILABLE = get_available_mappings(LANGS)
+_LANGS = load_langs()
+LANGS_AVAILABLE = get_available_languages(_LANGS)
+_MAPPINGS_AVAILABLE = get_available_mappings(_LANGS)
 
 
 def reload_db():
@@ -69,9 +66,9 @@ def reload_db():
     # We update all structures in place, so that another module having done from
     # g2p.mappings.langs import VAR will see the udpates without any code changes.
 
-    global LANGS
-    LANGS.clear()
-    LANGS.update(load_langs())
+    global _LANGS
+    _LANGS.clear()
+    _LANGS.update(load_langs())
 
     global LANGS_NETWORK
     LANGS_NETWORK.clear()
@@ -80,8 +77,8 @@ def reload_db():
 
     global LANGS_AVAILABLE
     LANGS_AVAILABLE.clear()
-    LANGS_AVAILABLE.extend(get_available_languages(LANGS))
+    LANGS_AVAILABLE.extend(get_available_languages(_LANGS))
 
     global _MAPPINGS_AVAILABLE
     _MAPPINGS_AVAILABLE.clear()
-    _MAPPINGS_AVAILABLE.extend(get_available_mappings(LANGS))
+    _MAPPINGS_AVAILABLE.extend(get_available_mappings(_LANGS))

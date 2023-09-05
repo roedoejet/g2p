@@ -1,12 +1,13 @@
-language_name: Minimal
-display_name: Minimal to Minimal
-rules: deletion.json
-in_lang: min
-out_lang: min
-rule_ordering: as-written
-case_sensitive: false
-escape_special: true
-norm_form: 'NFD'
-reverse: false
-authors:
-  - Aidan Pine
+mappings:
+  - language_name: Minimal
+    display_name: Minimal to Minimal
+    rules: deletion.json
+    in_lang: min
+    out_lang: min
+    rule_ordering: as-written
+    case_sensitive: false
+    escape_special: true
+    norm_form: 'NFD'
+    reverse: false
+    authors:
+      - Aidan Pine

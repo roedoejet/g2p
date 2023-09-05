@@ -10,7 +10,6 @@ import sys
 from typing import List, Tuple
 
 import click
-import yaml
 from flask.cli import FlaskGroup
 from networkx import has_path
 
@@ -20,7 +19,7 @@ from g2p.api import update_docs
 from g2p.app import APP
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
-from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, Rule
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig, Rule
 from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
@@ -517,21 +516,17 @@ def convert(  # noqa: C901
     if config:
         # This isn't that DRY - copied from g2p/mappings/langs/__init__.py
         mappings_legal_pairs = []
-        with open(config, encoding="utf8") as f:
-            data = yaml.safe_load(f)
-        if "mappings" in data:
-            for index, mapping in enumerate(data["mappings"]):
-                mappings_legal_pairs.append(
-                    (
-                        data["mappings"][index]["in_lang"],
-                        data["mappings"][index]["out_lang"],
-                    )
+        mapping_config = MappingConfig.load_mapping_config_from_path(config)
+        for index in range(len(mapping_config.mappings)):
+            mappings_legal_pairs.append(
+                (
+                    mapping_config.mappings[index].in_lang,
+                    mapping_config.mappings[index].out_lang,
                 )
-                data["mappings"][index] = Mapping.load_mapping_from_path(config, index)
-        else:
-            mapping = Mapping.load_mapping_from_path(config)
-            data["mappings"] = [mapping]
-            mappings_legal_pairs.append((mapping.in_lang, mapping.out_lang))
+            )
+            mapping_config.mappings[index] = Mapping.load_mapping_from_path(
+                config, index
+            )
         for pair in mappings_legal_pairs:
             if pair[0] in LANGS_NETWORK.nodes:
                 LOGGER.warning(
@@ -539,7 +534,7 @@ def convert(  # noqa: C901
                     "Your local mapping with the same name might not function properly."
                 )
         LANGS_NETWORK.add_edges_from(mappings_legal_pairs)
-        MAPPINGS_AVAILABLE.extend(data["mappings"])
+        MAPPINGS_AVAILABLE.extend(mapping_config.mappings)
     # Check input lang exists
     if in_lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{in_lang}' is not a valid value for 'IN_LANG'")
@@ -687,7 +682,6 @@ def scan(lang, path):
     Displays the set of un-mapped characters in a document.
     Accounts for case sensitivity in the configuration.
     """
-    # breakpoint()
     # Check input lang exists
     if lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{lang}' is not a valid value for 'LANG'")

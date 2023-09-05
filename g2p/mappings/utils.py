@@ -644,10 +644,10 @@ class _MappingModelDefinition(BaseModel):
     id: Optional[str] = None
     """A unique ID for the mapping"""
 
-    in_lang: str = "und"
+    in_lang: str = "standalone"
     """The input language ID"""
 
-    out_lang: str = "und"
+    out_lang: str = "standalone"
     """The output language ID"""
 
     language_name: Optional[str] = None
@@ -788,11 +788,3 @@ class _MappingModelDefinition(BaseModel):
         if display_name is None:
             display_name = f"{values['in_lang']} {find_mapping_type(values['in_lang'])} to {values['out_lang']} {find_mapping_type(values['out_lang'])}"
         return display_name
-
-
-class MappingConfig(BaseModel):
-    """This is the format used by g2p for configuring mappings.
-    It is solely used to generate schemas to validate
-    """
-
-    mappings: List[_MappingModelDefinition]

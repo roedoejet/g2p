@@ -8,13 +8,12 @@ import json
 import pickle
 from pathlib import Path
 
-import yaml
 from networkx import DiGraph, write_gpickle
 from networkx.algorithms.dag import ancestors, descendants
 
 from g2p.exceptions import MalformedMapping, MappingNotInitializedProperlyError
 from g2p.log import LOGGER
-from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
 from g2p.mappings.utils import MAPPING_TYPE, Rule, is_ipa
 
@@ -159,33 +158,23 @@ def cache_langs(
     mappings_legal_pairs = []
     for path in paths:
         code = path.parent.stem
-        with open(path, encoding="utf8") as f:
-            data = yaml.safe_load(f)
-        # If there is a mappings key, there is more than one mapping
+        mapping_config = MappingConfig.load_mapping_config_from_path(path)
         # TODO: should put in some measure to prioritize non-generated
         # mappings and warn when they override
-        if "mappings" in data:
-            for index, mapping in enumerate(data["mappings"]):
-                in_lang = data["mappings"][index]["in_lang"]
-                out_lang = data["mappings"][index]["out_lang"]
-                mappings_legal_pairs.append((in_lang, out_lang))
-                if "language_name" not in mapping:
-                    raise MalformedMapping(
-                        f"language_name missing in {path} from mapping "
-                        f"from {in_lang} to {out_lang}"
-                    )
-                data["mappings"][index] = json.loads(
-                    Mapping.load_mapping_from_path(path, index).model_dump_json(
-                        exclude={"parent_dir": True}
-                    )
+        for index, mapping in enumerate(mapping_config.mappings):
+            in_lang = mapping_config.mappings[index].in_lang
+            out_lang = mapping_config.mappings[index].out_lang
+            mappings_legal_pairs.append((in_lang, out_lang))
+
+            if not mapping.language_name:
+                raise MalformedMapping(
+                    f"language_name missing in {path} from mapping "
+                    f"from {in_lang} to {out_lang}"
                 )
-                # if "abbreviations" in data['mappings'][index] and data['mappings'][index]['abbreviations'] is not None:
-                #     breakpoint()
-        else:
-            data = Mapping.load_mapping_from_path(path)
-            if "language_name" not in data:
-                raise MalformedMapping(f"language_name missing in {path}")
-        langs[code] = data
+            mapping_config.mappings[index] = Mapping.load_mapping_from_path(path, index)
+            # Exclude the parent directory when caching
+            mapping_config.mappings[index].parent_dir = None
+        langs[code] = mapping_config.model_dump()
 
     # Save as a Directional Graph
     lang_network = DiGraph()

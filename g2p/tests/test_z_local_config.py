@@ -20,6 +20,8 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, main
 
+import yaml
+
 from g2p.app import APP
 from g2p.cli import convert, generate_mapping
 from g2p.mappings.utils import normalize
@@ -117,7 +119,7 @@ class LocalConfigTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
             with open(config_file, "wt", encoding="utf8") as f:
-                print("rules: no-such-file.csv", file=f)
+                yaml.dump({"mappings": [{"rules": "no-such-file.csv"}]}, f)
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )
@@ -131,8 +133,14 @@ class LocalConfigTest(TestCase):
             with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
                 pass
             with open(config_file, "wt", encoding="utf8") as f:
-                print("mapping: empty.csv", file=f)
-                print("abbreviations: no-such-file.csv", file=f)
+                yaml.dump(
+                    {
+                        "mappings": [
+                            {"rules": "empty.csv", "abbreviations": "no-such-file.csv"}
+                        ]
+                    },
+                    f,
+                )
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )
@@ -170,11 +178,9 @@ class LocalConfigTest(TestCase):
         # Now we do the real tests
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir)
-
             # for debugging:
             # output_dir = Path(".") / "gen-map-tests"
             # output_dir.mkdir(exist_ok=True)
-
             # 1 mapping in to 1 mapping out
             result = self.runner.invoke(
                 generate_mapping,
