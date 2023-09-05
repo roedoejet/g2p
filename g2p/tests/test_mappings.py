@@ -13,7 +13,7 @@ from pydantic import ValidationError
 
 from g2p import exceptions
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, Rule
 from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
@@ -73,6 +73,12 @@ class MappingTest(TestCase):
                     os.path.dirname(public_data), "mappings", "no_mappings_key.yaml"
                 )
             )
+
+    def test_improperly_initialized(self):
+        mapping = Mapping(rules=[Rule(rule_input="a", rule_output="b")])
+        mapping.rules = [{"rule_input": "something misguided"}]
+        with self.assertRaises(exceptions.MappingNotInitializedProperlyError):
+            mapping.inventory()
 
     def test_as_is(self):
         """

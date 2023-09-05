@@ -12,7 +12,7 @@ from pathlib import Path
 from networkx import DiGraph, write_gpickle
 from networkx.algorithms.dag import ancestors, descendants
 
-from g2p.exceptions import MalformedMapping, MappingNotInitializedProperlyError
+from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
@@ -51,18 +51,15 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     for mapping in [x for x in MAPPINGS_AVAILABLE if x.out_lang in mappings_to_check]:
         if is_ipa(mapping.out_lang) and mapping.type == MAPPING_TYPE.mapping:
             reverse = mapping.reverse
-            try:
-                for rule in mapping.rules:
-                    assert isinstance(rule, Rule)
-                    output = rule.rule_input if reverse else rule.rule_output
-                    if not is_panphon(output):
-                        LOGGER.warning(
-                            f"Output '{rule.rule_output}' in rule {rule} in mapping between {mapping.in_lang} "
-                            f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
-                        )
-                        found_error = True
-            except TypeError as e:
-                raise MappingNotInitializedProperlyError from e
+            for rule in mapping.rules:
+                assert isinstance(rule, Rule)
+                output = rule.rule_input if reverse else rule.rule_output
+                if not is_panphon(output):
+                    LOGGER.warning(
+                        f"Output '{rule.rule_output}' in rule {rule} in mapping between {mapping.in_lang} "
+                        f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
+                    )
+                    found_error = True
     if found_error:
         LOGGER.warning(
             "Please refer to https://github.com/dmort27/panphon for information about panphon."

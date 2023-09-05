@@ -83,21 +83,6 @@ class MalformedMapping(CommandLineError):
         )
 
 
-class MalformedLookup(CommandLineError):
-    def __init__(self):
-        super().__init__(self)
-
-    def __str__(self):
-        return self.render(
-            (
-                "\n"
-                "In order to use a default lookup table, you need to initialize \n"
-                'the Mapping class with a dictionary containing two keys: "lang" and "table". \n'
-                "Please try again."
-            )
-        )
-
-
 class MappingNotInitializedProperlyError(CommandLineError):
     def __init__(self, msg="Your Mapping object was not properly initialized"):
         super().__init__(self)

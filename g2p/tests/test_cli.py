@@ -7,7 +7,15 @@ import tempfile
 from unittest import TestCase, main
 
 from g2p.app import APP
-from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
+from g2p.cli import (
+    convert,
+    doctor,
+    generate_mapping,
+    scan,
+    show_mappings,
+    update,
+    update_schema,
+)
 from g2p.log import LOGGER
 from g2p.mappings.langs import load_langs, load_network
 from g2p.tests.public.data import DATA_DIR, load_public_test_data
@@ -74,6 +82,11 @@ class CliTest(TestCase):
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs2")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
+
+    def test_update_schema(self):
+        result = self.runner.invoke(update_schema)
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("FileExistsError", str(result))
 
     def test_convert(self):
         langs_to_test = load_public_test_data()

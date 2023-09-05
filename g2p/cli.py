@@ -322,12 +322,6 @@ def generate_mapping(  # noqa: C901
         if out_lang is None:
             raise click.UsageError("OUT_LANG is required with --merge.")
 
-    if out_dir and not os.path.isdir(out_dir):
-        raise click.BadParameter(
-            f'Output directory "{out_dir}" does not exist. Cannot write mapping.',
-            param_hint="--out-dir",
-        )
-
     if list_dummy:
         # --list-dummy mode
         print(f"Dummy phone inventory: {DUMMY_INVENTORY}")

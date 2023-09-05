@@ -131,10 +131,10 @@ class Mapping(_MappingModelDefinition):
             in_or_out = "rule_output"
         try:
             return [getattr(x, in_or_out) for x in self.rules]
-        except TypeError as e:
+        except (TypeError, AttributeError) as e:
             raise exceptions.MappingNotInitializedProperlyError from e
 
-    def plain_mapping(self, skip_none: bool = False, skip_defaults: bool = False):
+    def plain_mapping(self):
         """Return the plain mapping for displaying or saving to disk.
 
         Args:
@@ -305,7 +305,7 @@ class Mapping(_MappingModelDefinition):
 
         if file_type == "json":
             json.dump(
-                self.plain_mapping(skip_none=True, skip_defaults=True),
+                self.plain_mapping(),
                 out_stream,
                 indent=4,
                 ensure_ascii=False,
