@@ -1,24 +1,25 @@
 """
 Language mappings for g2p.
 """
+import gzip
+import json
 import os
-import pickle
 
 from networkx import DiGraph, read_gpickle
 
 from g2p.log import LOGGER
 
 LANGS_DIR = os.path.dirname(__file__)
-LANGS_PKL_NAME = "langs.pkl"
-LANGS_PKL = os.path.join(LANGS_DIR, LANGS_PKL_NAME)
+LANGS_JSON_NAME = "langs.json.gz"
+LANGS_PKL = os.path.join(LANGS_DIR, LANGS_JSON_NAME)
 NETWORK_PKL_NAME = "network.pkl"
 LANGS_NWORK_PATH = os.path.join(LANGS_DIR, NETWORK_PKL_NAME)
 
 
 def load_langs(path: str = LANGS_PKL):
     try:
-        with open(path, "rb") as f:
-            return pickle.load(f)
+        with gzip.open(path, "rt", encoding="utf8") as f:
+            return json.load(f)
     except Exception as e:
         LOGGER.warning(f"Failed to read language cache from {path}: {e}")
         return {}

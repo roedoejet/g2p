@@ -4,8 +4,9 @@ Utilities used by other classes
 
 """
 
+import gzip
+import io
 import json
-import pickle
 from pathlib import Path
 
 from networkx import DiGraph, write_gpickle
@@ -146,8 +147,8 @@ def cache_langs(
     Args:
        dir_path: Path to scan for config-g2p.yaml files.  Default is the
                  installed g2p/mappings/langs directory.
-       langs_path: Path to output langs.pkl pickle file.  Default is
-                   the installed g2p/mappings/langs/langs.pkl
+       langs_path: Path to output langs.json.gz file.  Default is
+                   the installed g2p/mappings/langs/langs.json.gz
        network_path: Path to output pickle file.  Default is the
                      installed g2p/mappings/langs/network.pkl.
     """
@@ -180,7 +181,7 @@ def cache_langs(
             mapping_config.mappings[index] = Mapping.load_mapping_from_path(path, index)
             # Exclude the parent directory when caching
             mapping_config.mappings[index].parent_dir = None
-        langs[code] = mapping_config.model_dump()
+        langs[code] = mapping_config.model_dump(exclude_none=True)
 
     # Save as a Directional Graph
     lang_network = DiGraph()
@@ -189,9 +190,16 @@ def cache_langs(
     with open(network_path, "wb") as f:
         write_gpickle(lang_network, f, protocol=4)
 
-    with open(langs_path, "wb") as f:
-        pickle.dump(langs, f, protocol=4)
-
+    with open(langs_path, "w", encoding="utf8") as f:
+        with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
+            with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:
+                json.dump(
+                    langs,
+                    zipfile,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                    sort_keys=True,
+                )
     return langs
 
 

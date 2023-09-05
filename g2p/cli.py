@@ -31,8 +31,8 @@ from g2p.mappings.create_ipa_mapping import (
 )
 from g2p.mappings.langs import (
     LANGS_DIR,
+    LANGS_JSON_NAME,
     LANGS_NETWORK,
-    LANGS_PKL_NAME,
     NETWORK_PKL_NAME,
     reload_db,
 )
@@ -654,10 +654,10 @@ def update(in_dir, out_dir):
     if in_dir is None:
         in_dir = LANGS_DIR
     if out_dir is None:
-        langs_path = os.path.join(in_dir, LANGS_PKL_NAME)
+        langs_path = os.path.join(in_dir, LANGS_JSON_NAME)
         network_path = os.path.join(in_dir, NETWORK_PKL_NAME)
     else:
-        langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
+        langs_path = os.path.join(out_dir, LANGS_JSON_NAME)
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
     cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
 

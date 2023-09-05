@@ -399,6 +399,9 @@ class MappingConfig(BaseModel):
 
     mappings: List[Mapping]
 
+    def export_to_dict(self):
+        return {"mappings": [mapping.export_to_dict() for mapping in self.mappings]}
+
     @staticmethod
     def load_mapping_config_from_path(path_to_mapping_config: Union[str, Path]):
         """Loads a mapping configuration from a path, if you just want one specific mapping

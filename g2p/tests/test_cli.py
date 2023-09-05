@@ -36,30 +36,30 @@ class CliTest(TestCase):
                 os.path.join(lang1_dir, "config-g2p.yaml"),
             )
             result = self.runner.invoke(update, ["-i", tmpdir])
-            langs_pkl = os.path.join(tmpdir, "langs.pkl")
+            langs_json = os.path.join(tmpdir, "langs.json.gz")
             network_pkl = os.path.join(tmpdir, "network.pkl")
-            self.assertTrue(os.path.exists(langs_pkl))
+            self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
 
         # Make sure it produces output
         with tempfile.TemporaryDirectory() as tmpdir:
             result = self.runner.invoke(update, ["-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
-            langs_pkl = os.path.join(tmpdir, "langs.pkl")
+            langs_json = os.path.join(tmpdir, "langs.json.gz")
             network_pkl = os.path.join(tmpdir, "network.pkl")
-            self.assertTrue(os.path.exists(langs_pkl))
+            self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
-            langs = load_langs(langs_pkl)
+            langs = load_langs(langs_json)
             self.assertTrue(langs is not None)
             network = load_network(network_pkl)
             self.assertTrue(network is not None)
             # Corrupt the output and make sure we still can run
-            with open(langs_pkl, "wb") as fh:
+            with open(langs_json, "wb") as fh:
                 fh.write(b"spam spam spam")
             with open(network_pkl, "wb") as fh:
                 fh.write(b"eggs bacon spam")
             with self.assertLogs(LOGGER, "WARNING"):
-                langs = load_langs(langs_pkl)
+                langs = load_langs(langs_json)
             self.assertTrue(langs is not None)
             with self.assertLogs(LOGGER, "WARNING"):
                 network = load_network(network_pkl)

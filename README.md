@@ -166,7 +166,7 @@ Gen DB: this is the part of the textual database that is generated when running 
 * g2p/mappings/generated/\*
 
 Compiled DB: this contains the same info as Text DB + Gen DB, but in a format optimized for fast reading by the machine. This is what any program using `g2p` reads: `g2p convert`, `readalongs align`, `convertextract`, and also `g2p generate-mapping`. It consists of these files:
-* g2p/mappings/langs/langs.pkl
+* g2p/mappings/langs/langs.json.gz
 * g2p/mappings/langs/network.pkl
 * g2p/mappings/langs/static/languages-network.json
 * g2p/mappings/langs/static/swagger.json
