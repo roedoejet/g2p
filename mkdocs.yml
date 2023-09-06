@@ -1,0 +1,39 @@
+site_name: Gᵢ2Pᵢ Documentation
+theme:
+  name: material
+  favicon: favicon-32x32.png
+  custom_dir: docs/overrides
+  palette:
+    primary: white
+  features:
+    - content.code.copy
+    - content.code.select
+    - announce.dismiss
+plugins:
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [g2p]
+extra:
+  homepage: https://docs.mothertongues.org
+  version:
+    provider: mike
+    default: stable
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - mkdocs-click
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Guides:
+    - Getting started: start.md
+    - How to contribute: contributing.md
+    - Using the g2p studio: studio.md
+  - Reference:
+    - Package: package.md
+    - Command Line: cli.md
