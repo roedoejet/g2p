@@ -1,7 +1,9 @@
 name: Run all tests
 on:
-  - push
-  - pull_request
+  pull_request:
+      types: [review_requested]
+  push:
+
 jobs:
   test-all-on-linux:
     # This is our main test job, exercising everything and uploading to coverage
@@ -66,29 +68,3 @@ jobs:
           # Warning: This is PowerShell syntax, not bash!
           g2p convert est fra fra-ipa > out
           if (diff (echo ɛ) (cat out)) { throw "Output did not match reference" }
-  docs:
-    # Create latest docs
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # fetch all commits/branches
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.8"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e .
-      - name: Install documentation dependencies
-        run: |
-          pip install -r docs/requirements.txt
-      - name: Setup doc deploy
-        run: |
-            git config user.name 'github-actions[bot]'
-            git config user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: Deploy docs with mike 🚀
-        run: |
-          mkdocs build
-          mike deploy --push --update-aliases latest
