@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import os
 import re
 import shutil
@@ -440,6 +441,19 @@ class CliTest(TestCase):
         results_long = self.runner.invoke(convert, "--help")
         self.assertEqual(results_long.exit_code, 0)
         self.assertEqual(results_short.output, results_long.output)
+
+    def test_generate_mapping(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.runner.invoke(
+                generate_mapping, ["--ipa", "--out-dir", tmpdir, "fra"]
+            )
+            self.assertEqual(result.exit_code, 0)
+            with open(
+                os.path.join(tmpdir, "fra-ipa_to_eng-ipa.json"), "r", encoding="utf8"
+            ) as f:
+                fra2eng_ipa = json.load(f)
+            for s in ("ɛj", "ks", "ɔn"):
+                self.assertIn({"in": s, "out": s}, fra2eng_ipa)
 
 
 if __name__ == "__main__":

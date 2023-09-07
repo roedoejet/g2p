@@ -52,7 +52,7 @@ class Rule(BaseModel):
     """Whether to prevent the rule from feeding other rules"""
 
     match_pattern: Optional[Pattern] = None
-    """An automatically generated match_pattern basec on the rule_input, context_before and context_after"""
+    """An automatically generated match_pattern based on the rule_input, context_before and context_after"""
 
     intermediate_form: Optional[str] = None
     """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
