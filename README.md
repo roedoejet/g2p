@@ -1,7 +1,7 @@
 # Gᵢ2Pᵢ
 
 [![codecov](https://codecov.io/gh/roedoejet/g2p/branch/main/graph/badge.svg)](https://codecov.io/gh/roedoejet/g2p)
-[![Documentation Status](https://readthedocs.org/projects/g2p/badge/?version=latest)](https://g2p.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](https://img.shields.io/badge/docs-passing-brightgreen.svg)](https://roedoejet.github.io/g2p)
 [![Build Status](https://github.com/roedoejet/g2p/actions/workflows/tests.yml/badge.svg)](https://github.com/roedoejet/g2p/actions)
 [![PyPI package](https://img.shields.io/pypi/v/g2p.svg)](https://pypi.org/project/g2p/)
 [![license](https://img.shields.io/badge/Licence-MIT-green)](LICENSE)
@@ -31,7 +31,7 @@ This library is for handling arbitrary conversions between input and output segm
   - [License](#license)
 
 See also:
-  - [Gᵢ2Pᵢ documentation](https://g2p.readthedocs.io/en/latest/?badge=latest)
+  - [Gᵢ2Pᵢ documentation](https://roedoejet.github.io/g2p)
   - [7-part series on the Mother Tongues Blog](https://blog.mothertongues.org/g2p-background/)
   - [Gᵢ2Pᵢ Studio](https://g2p-studio.herokuapp.com)
 
