@@ -30,6 +30,9 @@ from g2p.mappings.utils import (
     create_fixed_width_lookbehind,
     escape_special_characters,
     expand_abbreviations,
+    load_abbreviations_from_file,
+    load_alignments_from_file,
+    load_from_file,
     normalize,
 )
 
@@ -76,8 +79,20 @@ class Mapping(_MappingModelDefinition):
     def model_post_init(self, *args, **kwargs) -> None:
         """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
         if self.type == MAPPING_TYPE.mapping or self.type is None:
+            # load abbreviations from path
+            if self.abbreviations_path is not None and not self.abbreviations:
+                self.abbreviations = load_abbreviations_from_file(
+                    self.abbreviations_path
+                )
+            # load rules from path
+            if self.rules_path is not None and not self.rules:
+                self.rules = load_from_file(self.rules_path)
             # This is required so that we don't keep escaping special characters for example
             self.rules = self.process_model_specs()
+        elif self.type == MAPPING_TYPE.lexicon:
+            # load alignments from path
+            if self.alignments_path is not None and not self.alignments:
+                self.alignments = load_alignments_from_file(self.alignments_path)
         else:
             self.rules = []
 
@@ -129,10 +144,7 @@ class Mapping(_MappingModelDefinition):
             in_or_out = "rule_input"
         if in_or_out == "out":
             in_or_out = "rule_output"
-        try:
-            return [getattr(x, in_or_out) for x in self.rules]
-        except (TypeError, AttributeError) as e:
-            raise exceptions.MappingNotInitializedProperlyError from e
+        return [getattr(x, in_or_out) for x in self.rules]
 
     def plain_mapping(self):
         """Return the plain mapping for displaying or saving to disk.
@@ -140,9 +152,6 @@ class Mapping(_MappingModelDefinition):
         Args:
             skip_empty_contexts: when set, filter out empty context_before/after
         """
-        assert isinstance(self.rules, list)
-        if self.rules:
-            assert isinstance(self.rules[0], Rule)
         return [rule.export_to_dict() for rule in self.rules]
 
     def process_model_specs(self):  # noqa: C901
@@ -289,10 +298,7 @@ class Mapping(_MappingModelDefinition):
         Caveat: if self and mapping have contradictory rules, which one will
         "win" is unspecified, and may depend on mapping configuration options.
         """
-        try:
-            self.rules.extend(mapping.rules)
-        except TypeError as e:
-            raise exceptions.MappingNotInitializedProperlyError from e
+        self.rules.extend(mapping.rules)
 
     def deduplicate(self):
         """Remove duplicate rules found in self, keeping the first copy found."""
@@ -317,11 +323,8 @@ class Mapping(_MappingModelDefinition):
             writer = csv.DictWriter(
                 out_stream, fieldnames=fieldnames, extrasaction="ignore"
             )
-            try:
-                for io in self.rules:
-                    writer.writerow(io.export_to_dict())
-            except TypeError as e:
-                raise exceptions.MappingNotInitializedProperlyError from e
+            for io in self.rules:
+                writer.writerow(io.export_to_dict())
         else:
             raise exceptions.IncorrectFileType(f"File type {file_type} is invalid.")
 
@@ -341,13 +344,12 @@ class Mapping(_MappingModelDefinition):
         model_dict = json.loads(
             self.model_dump_json(exclude_none=True, exclude={"parent_dir": True})
         )
-        model_dict["rules"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
+        model_dict["rules_path"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         return model_dict
 
     def config_to_file(
         self,
         output_path: str = os.path.join(GEN_DIR, "config-g2p.yaml"),
-        mapping_type: str = "json",
     ):
         """Write config to file"""
         add_config = False

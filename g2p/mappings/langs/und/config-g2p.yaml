@@ -2,7 +2,7 @@
   language_name: Undetermined
 mappings:
   - display_name: Undetermined ASCII to IPA
-    rules: und_to_ipa.json
+    rules_path: und_to_ipa.json
     in_lang: und-ascii
     out_lang: und-ipa
     norm: NFD
@@ -12,7 +12,7 @@ mappings:
       - Patrick Littell
     <<: *shared
   - display_name: Undetermined IPA to English IPA
-    rules: und_ipa_to_eng_ipa.json
+    rules_path: und_ipa_to_eng_ipa.json
     in_lang: und-ipa
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
@@ -20,7 +20,7 @@ mappings:
       - Patrick Littell
     <<: *shared
   - display_name: Undetermined IPA to English IPA
-    rules: und_ipa_to_eng_ipa.json
+    rules_path: und_ipa_to_eng_ipa.json
     in_lang: und-ipa
     out_lang: hamming-eng-ipa
     rule_ordering: apply-longest-first

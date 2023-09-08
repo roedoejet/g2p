@@ -2,7 +2,7 @@
   language_name: Tsilhqot'in
 mappings:
   - display_name: Doulos
-    rules: doulos.csv
+    rules_path: doulos.csv
     in_lang: clc-doulos
     out_lang: clc
     <<: *shared

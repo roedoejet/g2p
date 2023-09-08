@@ -16,7 +16,7 @@ from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
-from g2p.mappings.utils import MAPPING_TYPE, Rule, is_ipa
+from g2p.mappings.utils import MAPPING_TYPE, is_ipa
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -52,7 +52,6 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
         if is_ipa(mapping.out_lang) and mapping.type == MAPPING_TYPE.mapping:
             reverse = mapping.reverse
             for rule in mapping.rules:
-                assert isinstance(rule, Rule)
                 output = rule.rule_input if reverse else rule.rule_output
                 if not is_panphon(output):
                     LOGGER.warning(
@@ -188,7 +187,7 @@ def cache_langs(
         write_gpickle(lang_network, f, protocol=4)
 
     with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
-        with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:
+        with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:  # type: ignore
             json.dump(
                 langs,
                 zipfile,

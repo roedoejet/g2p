@@ -216,7 +216,7 @@ mappings:
     type: mapping
     authors:
       - <YourNameHere>
-    rules: <FilenameOfMapping>
+    rules_path: <FilenameOfMapping>
     <<: *shared
 ```
 
@@ -241,8 +241,8 @@ mappings:
     type: mapping
     authors:
       - Aidan Pine
-    rules: dan_to_ipa.csv
-    abbreviations: dan_abbs.csv
+    rules_path: dan_to_ipa.csv
+    abbreviations_path: dan_abbs.csv
     rule_ordering: as-written
     case_sensitive: false
     norm_form: 'none'

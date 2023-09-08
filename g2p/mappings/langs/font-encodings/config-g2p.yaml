@@ -4,24 +4,24 @@ mappings:
     out_lang: hei
     authors:
       - Aidan Pine
-    rules: hei_doulos.csv
+    rules_path: hei_doulos.csv
     language_name: Heiltsuk
   - display_name: Times
     in_lang: hei-times-font
     out_lang: hei
     authors:
       - Aidan Pine
-    rules: hei_times.csv
+    rules_path: hei_times.csv
     language_name: Heiltsuk
   - display_name: Times
-    rules: nav_times.csv
+    rules_path: nav_times.csv
     in_lang: nav-times-font
     out_lang: nav
     language_name: Navajo
     authors:
       - Aidan Pine
   - display_name: First Nations Unicode
-    rules: fn_unicode.csv
+    rules_path: fn_unicode.csv
     in_lang: fn-unicode-font
     out_lang: fn-unicode
     norm_form: NFD

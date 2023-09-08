@@ -20,7 +20,7 @@ from g2p.api import update_docs
 from g2p.app import APP
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
-from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig, Rule
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
@@ -710,7 +710,7 @@ def scan(lang, path):
 
     # Retrieve the mappings for lang
     case_sensitive = True
-    mappings = []
+    mappings: List[Mapping] = []
     for mapping in MAPPINGS_AVAILABLE:
         mapping_name = mapping.in_lang
         # Exclude mappings for converting between IPAs
@@ -721,22 +721,19 @@ def scan(lang, path):
     # Get input chars in mapping
     mapped_chars = set()
     for lang_mapping in mappings:
-        assert isinstance(lang_mapping, Mapping)
         for x in lang_mapping.rules:
-            assert isinstance(x, Rule)
             mapped_chars.add(normalize(x.rule_input, "NFD"))
     # Find unmapped chars
     filter_chars = " \n"
     mapped_string = "".join(mapped_chars)
-    pattern = "[^" + mapped_string + filter_chars + ".]"
+    pattern = f"[^{mapped_string}{filter_chars}.]"
     prog = re.compile(pattern)
 
     with open(path, "r", encoding="utf8") as file:
         data = normalize(file.read(), "NFD")
         if not case_sensitive:
             data = data.lower()
-        unmapped = set(prog.findall(data))
-        if unmapped:
+        if unmapped := set(prog.findall(data)):
             LOGGER.warning("The following characters are not mapped:")
             print(unmapped)
 
@@ -793,7 +790,7 @@ def show_mappings(lang1, lang2, verbose, csv):
     if verbose:
         for m in mappings:
             json.dump(
-                json.loads(m.model_dump_json()),
+                json.loads(m.model_dump_json(exclude={"rules": True})),
                 sys.stdout,
                 indent=4,
                 ensure_ascii=False,

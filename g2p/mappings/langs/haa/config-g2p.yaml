@@ -7,7 +7,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    rules: haa_equiv.csv
+    rules_path: haa_equiv.csv
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
@@ -19,8 +19,8 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    rules: haa_to_ipa.csv
-    abbreviations: haa_abbs.csv
+    rules_path: haa_to_ipa.csv
+    abbreviations_path: haa_abbs.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false

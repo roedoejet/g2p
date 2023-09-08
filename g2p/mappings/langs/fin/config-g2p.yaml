@@ -7,7 +7,7 @@ mappings:
     authors:
       - David Huggins-Daines
     type: mapping
-    rules: fin_to_ipa.csv
+    rules_path: fin_to_ipa.csv
     rule_ordering: apply-longest-first
     case_sensitive: false
     norm_form: 'NFC'

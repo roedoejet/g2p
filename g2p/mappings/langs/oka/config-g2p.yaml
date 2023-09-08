@@ -2,7 +2,7 @@
   language_name: nsyilxcən
 mappings:
   - display_name: nsyilxcən to IPA
-    rules: oka_to_ipa.csv
+    rules_path: oka_to_ipa.csv
     in_lang: oka-equiv
     out_lang: oka-ipa
     authors:
@@ -17,6 +17,6 @@ mappings:
     out_lang: oka-equiv
     authors:
       - Eric Joanis
-    rules: oka_equiv.csv
+    rules_path: oka_equiv.csv
     norm_form: NFD
     <<: *shared

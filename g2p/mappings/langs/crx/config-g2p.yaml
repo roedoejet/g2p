@@ -2,7 +2,7 @@
   language_name: Stella Nadleh
 mappings:
   - display_name: Roman to Syllabics
-    rules: stella_orth_to_syllabics.csv
+    rules_path: stella_orth_to_syllabics.csv
     in_lang: crx-sro
     out_lang: crx-syl
     case_sensitive: false
@@ -10,7 +10,7 @@ mappings:
       - Aidan Pine
     <<: *shared
   - display_name: Syllabics to Roman
-    rules: stella_orth_to_syllabics.csv
+    rules_path: stella_orth_to_syllabics.csv
     in_lang: crx-syl
     out_lang: crx-sro
     case_sensitive: false

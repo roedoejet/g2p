@@ -7,8 +7,8 @@ mappings:
     authors:
       - Eric Joanis
     type: mapping
-    rules: fra_to_ipa.csv
-    abbreviations: fra_abbs.csv
+    rules_path: fra_to_ipa.csv
+    abbreviations_path: fra_abbs.csv
     rule_ordering: as-written
     case_sensitive: false
     norm_form: 'NFC'

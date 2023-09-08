@@ -2,38 +2,38 @@
   language_name: Kanien'kéha
 mappings:
   - display_name: Kanien'kéha to IPA
-    rules: moh_to_ipa.json
+    rules_path: moh_to_ipa.json
     in_lang: moh-equiv
     out_lang: moh-ipa
     case_sensitive: false
     norm_form: NFC
     rule_ordering: as-written
-    abbreviations: abbreviations.csv
+    abbreviations_path: abbreviations.csv
     authors:
       - Aidan Pine
       - Akwiratékha' Martin
     <<: *shared
   - display_name: IPA to Kanien'kéha
-    rules: moh_to_ipa.json
+    rules_path: moh_to_ipa.json
     in_lang: moh-ipa
     reverse: true
     out_lang: moh
     case_sensitive: false
     norm_form: NFC
     rule_ordering: as-written
-    abbreviations: abbreviations.csv
+    abbreviations_path: abbreviations.csv
     authors:
       - Aidan Pine
       - Akwiratékha' Martin
     <<: *shared
   - display_name: Kanien'kéha Equivalencies
-    rules: moh_equiv.json
+    rules_path: moh_equiv.json
     in_lang: moh
     out_lang: moh-equiv
     case_sensitive: false
     norm_form: NFC
     rule_ordering: as-written
-    abbreviations: abbreviations.csv
+    abbreviations_path: abbreviations.csv
     authors:
       - Aidan Pine
     <<: *shared

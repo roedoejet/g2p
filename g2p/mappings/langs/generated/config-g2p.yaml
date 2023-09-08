@@ -3,7 +3,7 @@ mappings:
   - display_name: Atikamekw IPA to English IPA
     in_lang: atj-ipa
     language_name: Atikamekw
-    rules: atj-ipa_to_eng-ipa.json
+    rules_path: atj-ipa_to_eng-ipa.json
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-09-26 13:48:19.852180
@@ -12,7 +12,7 @@ mappings:
     display_name: Danish IPA to English IPA
     in_lang: dan-ipa
     language_name: Danish
-    rules: dan-ipa_to_eng-ipa.json
+    rules_path: dan-ipa_to_eng-ipa.json
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2020-02-06 11:01:41.458466
@@ -22,7 +22,7 @@ mappings:
     display_name: French IPA to English IPA
     in_lang: fra-ipa
     language_name: French
-    rules: fra-ipa_to_eng-ipa.json
+    rules_path: fra-ipa_to_eng-ipa.json
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - author: Generated 2019-10-24 16:21:41.605592
@@ -31,7 +31,7 @@ mappings:
     display_name: "SEN\u0106O\u0166EN IPA to English IPA"
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
-    rules: str-ipa_to_eng-ipa.json
+    rules_path: str-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
@@ -41,7 +41,7 @@ mappings:
     display_name: "SEN\u0106O\u0166EN IPA to English IPA"
     in_lang: str-ipa
     language_name: "SEN\u0106O\u0166EN"
-    rules: str-ipa_to_hamming-eng-ipa.json
+    rules_path: str-ipa_to_hamming-eng-ipa.json
     norm_form: NFD
     out_lang: hamming-eng-ipa
     rule_ordering: apply-longest-first
@@ -49,7 +49,7 @@ mappings:
     display_name: Algonquin IPA to English IPA
     in_lang: alq-ipa
     language_name: Algonquin
-    rules: alq-ipa_to_eng-ipa.json
+    rules_path: alq-ipa_to_eng-ipa.json
     out_lang: eng-ipa
     rule_ordering: apply-longest-first
   - authors:
@@ -59,7 +59,7 @@ mappings:
     escape_special: false
     in_lang: see-ipa
     language_name: see-ipa
-    rules: see-ipa_to_eng-ipa.json
+    rules_path: see-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
@@ -71,7 +71,7 @@ mappings:
     escape_special: false
     in_lang: lml-ipa
     language_name: lml-ipa
-    rules: lml-ipa_to_eng-ipa.json
+    rules_path: lml-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     reverse: false
@@ -83,7 +83,7 @@ mappings:
     escape_special: false
     in_lang: oji-ipa
     language_name: oji-ipa
-    rules: oji-ipa_to_eng-ipa.json
+    rules_path: oji-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -96,7 +96,7 @@ mappings:
     escape_special: false
     in_lang: gla-ipa
     language_name: gla-ipa
-    rules: gla-ipa_to_eng-ipa.json
+    rules_path: gla-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -109,7 +109,7 @@ mappings:
     escape_special: false
     in_lang: crk-ipa
     language_name: crk-ipa
-    rules: crk-ipa_to_eng-ipa.json
+    rules_path: crk-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -122,7 +122,7 @@ mappings:
     escape_special: false
     in_lang: tce-ipa
     language_name: tce-ipa
-    rules: tce-ipa_to_eng-ipa.json
+    rules_path: tce-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -135,7 +135,7 @@ mappings:
     escape_special: false
     in_lang: crg-ipa
     language_name: crg-ipa
-    rules: crg-ipa_to_eng-ipa.json
+    rules_path: crg-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
@@ -150,7 +150,7 @@ mappings:
     escape_special: false
     in_lang: tli-ipa
     language_name: Tlingit IPA
-    rules: tli-ipa_to_eng-ipa.json
+    rules_path: tli-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
@@ -163,7 +163,7 @@ mappings:
     escape_special: false
     in_lang: gwi-ipa
     language_name: Gwich'in IPA
-    rules: gwi-ipa_to_eng-ipa.json
+    rules_path: gwi-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -176,7 +176,7 @@ mappings:
     escape_special: false
     in_lang: mic-ipa
     language_name: mic-ipa
-    rules: mic-ipa_to_eng-ipa.json
+    rules_path: mic-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: true
@@ -189,7 +189,7 @@ mappings:
     escape_special: false
     in_lang: iku-ipa
     language_name: iku-ipa
-    rules: iku-ipa_to_eng-ipa.json
+    rules_path: iku-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -202,7 +202,7 @@ mappings:
     escape_special: false
     in_lang: ikt-ipa
     language_name: ikt-ipa
-    rules: ikt-ipa_to_eng-ipa.json
+    rules_path: ikt-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -215,7 +215,7 @@ mappings:
     escape_special: false
     in_lang: iku-sro-ipa
     language_name: iku-sro-ipa
-    rules: iku-sro-ipa_to_eng-ipa.json
+    rules_path: iku-sro-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -228,7 +228,7 @@ mappings:
     escape_special: false
     in_lang: haa-ipa
     language_name: haa-ipa
-    rules: haa-ipa_to_eng-ipa.json
+    rules_path: haa-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -241,7 +241,7 @@ mappings:
     escape_special: false
     in_lang: ttm-ipa
     language_name: ttm-ipa
-    rules: ttm-ipa_to_eng-ipa.json
+    rules_path: ttm-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -254,7 +254,7 @@ mappings:
     escape_special: false
     in_lang: tau-ipa
     language_name: tau-ipa
-    rules: tau-ipa_to_eng-ipa.json
+    rules_path: tau-ipa_to_eng-ipa.json
     norm_form: NFD
     out_lang: eng-ipa
     prevent_feeding: false
@@ -267,7 +267,7 @@ mappings:
     escape_special: false
     in_lang: moh-ipa
     language_name: moh-ipa
-    rules: moh-ipa_to_eng-ipa.json
+    rules_path: moh-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: false
@@ -280,7 +280,7 @@ mappings:
     escape_special: false
     in_lang: moh-ipa
     language_name: moh-ipa
-    rules: moh-ipa_to_hamming-eng-ipa.json
+    rules_path: moh-ipa_to_hamming-eng-ipa.json
     norm_form: NFC
     out_lang: hamming-eng-ipa
     prevent_feeding: false
@@ -293,7 +293,7 @@ mappings:
     escape_special: false
     in_lang: moh-equiv
     language_name: moh-equiv
-    rules: moh-equiv_to_dummy.json
+    rules_path: moh-equiv_to_dummy.json
     norm_form: NFD
     out_lang: dummy
     prevent_feeding: false
@@ -306,7 +306,7 @@ mappings:
     escape_special: false
     in_lang: moh-equiv
     language_name: moh-equiv
-    rules: moh-equiv_to_hamming_dummy.json
+    rules_path: moh-equiv_to_hamming_dummy.json
     norm_form: NFD
     out_lang: hamming-dummy
     prevent_feeding: false
@@ -319,7 +319,7 @@ mappings:
     escape_special: false
     in_lang: str-equiv
     language_name: str-equiv
-    rules: str-equiv_to_dummy.json
+    rules_path: str-equiv_to_dummy.json
     norm_form: NFD
     out_lang: dummy
     prevent_feeding: false
@@ -332,7 +332,7 @@ mappings:
     escape_special: false
     in_lang: str-equiv
     language_name: str-equiv
-    rules: str-equiv_to_dummy.json
+    rules_path: str-equiv_to_dummy.json
     norm_form: NFD
     out_lang: hamming-dummy
     prevent_feeding: false
@@ -345,7 +345,7 @@ mappings:
     escape_special: false
     in_lang: und-ascii
     language_name: und-ascii
-    rules: und-ascii_to_dummy.json
+    rules_path: und-ascii_to_dummy.json
     norm_form: NFD
     out_lang: dummy
     prevent_feeding: false
@@ -358,7 +358,7 @@ mappings:
     escape_special: false
     in_lang: und-ascii
     language_name: und-ascii
-    rules: und-ascii_to_hamming_dummy.json
+    rules_path: und-ascii_to_hamming_dummy.json
     norm_form: NFD
     out_lang: hamming-dummy
     prevent_feeding: false
@@ -371,7 +371,7 @@ mappings:
     escape_special: false
     in_lang: iku-ipa
     language_name: IPA
-    rules: iku-ipa_to_hamming-eng-ipa.json
+    rules_path: iku-ipa_to_hamming-eng-ipa.json
     norm_form: NFC
     out_lang: hamming-eng-ipa
     prevent_feeding: true
@@ -384,7 +384,7 @@ mappings:
     escape_special: false
     in_lang: und-ipa
     language_name: IPA
-    rules: und-ipa_to_hamming-eng-ipa.json
+    rules_path: und-ipa_to_hamming-eng-ipa.json
     norm_form: NFC
     out_lang: hamming-eng-ipa
     prevent_feeding: true
@@ -397,7 +397,7 @@ mappings:
     escape_special: false
     in_lang: ikt-ipa
     language_name: IPA
-    rules: ikt-ipa_to_hamming-eng-ipa.json
+    rules_path: ikt-ipa_to_hamming-eng-ipa.json
     norm_form: NFC
     out_lang: hamming-eng-ipa
     prevent_feeding: true
@@ -410,7 +410,7 @@ mappings:
     escape_special: false
     in_lang: moe-ipa
     language_name: IPA
-    rules: moe-ipa_to_eng-ipa.json
+    rules_path: moe-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -423,7 +423,7 @@ mappings:
     escape_special: false
     in_lang: win-ipa
     language_name: win-ipa
-    rules: win-ipa_to_eng-ipa.json
+    rules_path: win-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -437,7 +437,7 @@ mappings:
     escape_special: false
     in_lang: fin-ipa
     language_name: fin-ipa
-    rules: fin-ipa_to_eng-ipa.json
+    rules_path: fin-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -450,7 +450,7 @@ mappings:
     escape_special: false
     in_lang: oka-ipa
     language_name: IPA
-    rules: oka-ipa_to_eng-ipa.json
+    rules_path: oka-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true
@@ -463,7 +463,7 @@ mappings:
     escape_special: false
     in_lang: clm-ipa
     language_name: IPA
-    rules: clm-ipa_to_eng-ipa.json
+    rules_path: clm-ipa_to_eng-ipa.json
     norm_form: NFC
     out_lang: eng-ipa
     prevent_feeding: true

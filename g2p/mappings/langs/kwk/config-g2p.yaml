@@ -2,7 +2,7 @@
   language_name: Kwak'wala
 mappings:
   - display_name: Kwak'wala IPA to English IPA
-    rules: kwk_ipa_to_eng_ipa.json
+    rules_path: kwk_ipa_to_eng_ipa.json
     in_lang: kwk-ipa
     out_lang: eng-ipa
     case_sensitive: false
@@ -10,7 +10,7 @@ mappings:
       - Patrick Littell
     <<: *shared
   - display_name: Kwak'wala (NAPA) to IPA
-    rules: kwk_napa_to_ipa.csv
+    rules_path: kwk_napa_to_ipa.csv
     in_lang: kwk-napa
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
@@ -19,7 +19,7 @@ mappings:
       - Fineen Davis
     language_name: Kwak'wala (NAPA orthography)
   - display_name: Kwak'wala (U'mista) to IPA
-    rules: kwk_umista_to_ipa.json
+    rules_path: kwk_umista_to_ipa.json
     in_lang: kwk-umista
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
@@ -27,7 +27,7 @@ mappings:
       - Patrick Littell
     <<: *shared
   - display_name: Kwak'wala (U'mista) Equivalencies
-    rules: umista_equiv.csv
+    rules_path: umista_equiv.csv
     in_lang: kwk-umista
     out_lang: kwk-umista-con
     rule_ordering: apply-longest-first
@@ -35,7 +35,7 @@ mappings:
       - Fineen Davis
     language_name: Kwak'wala (U'mista orthography)
   - display_name: Kwak'wala (NAPA) Equivalencies
-    rules: napa_equiv_ubc.csv
+    rules_path: napa_equiv_ubc.csv
     in_lang: kwk-napa-ubc
     out_lang: kwk-napa-ubc-con
     rule_ordering: apply-longest-first
@@ -43,7 +43,7 @@ mappings:
       - Fineen Davis
     <<: *shared
   - display_name: Kwak'wala (NAPA) Equivalencies
-    rules: napa_equiv_uvic.csv
+    rules_path: napa_equiv_uvic.csv
     in_lang: kwk-napa-uvic
     out_lang: kwk-napa-uvic-con
     rule_ordering: apply-longest-first
@@ -51,7 +51,7 @@ mappings:
       - Fineen Davis
     <<: *shared
   - display_name: Kwak'wala (Boas) to Umista
-    rules: kwk_boas_to_umista.csv
+    rules_path: kwk_boas_to_umista.csv
     in_lang: kwk-boas
     out_lang: kwk-umista
     rule_ordering: apply-longest-first

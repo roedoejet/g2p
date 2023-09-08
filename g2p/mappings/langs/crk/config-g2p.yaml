@@ -10,7 +10,7 @@ mappings:
     prevent_feeding: true
     authors:
       - Eddie Antonio Santos
-    rules: crk-no-symbols_to_ipa.json
+    rules_path: crk-no-symbols_to_ipa.json
     <<: *shared
   - display_name: Plains Cree Symbols to SRO
     in_lang: crk
@@ -22,5 +22,5 @@ mappings:
     escape_special: true
     authors:
       - Aidan Pine
-    rules: crk_to_crk-no-symbols.json
+    rules_path: crk_to_crk-no-symbols.json
     <<: *shared

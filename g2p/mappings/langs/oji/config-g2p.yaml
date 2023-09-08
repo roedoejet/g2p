@@ -7,7 +7,7 @@ mappings:
     authors:
       - David Huggins-Daines
     type: mapping
-    rules: oji_to_ipa.csv
+    rules_path: oji_to_ipa.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false
@@ -19,7 +19,7 @@ mappings:
     authors:
       - Shankhalika Srikanth
     type: mapping
-    rules: oji_syllabics_to_orth.csv
+    rules_path: oji_syllabics_to_orth.csv
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false

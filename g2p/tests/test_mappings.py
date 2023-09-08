@@ -77,7 +77,7 @@ class MappingTest(TestCase):
     def test_improperly_initialized(self):
         mapping = Mapping(rules=[Rule(rule_input="a", rule_output="b")])
         mapping.rules = [{"rule_input": "something misguided"}]
-        with self.assertRaises(exceptions.MappingNotInitializedProperlyError):
+        with self.assertRaises(AttributeError):
             mapping.inventory()
 
     def test_as_is(self):
@@ -286,13 +286,12 @@ class MappingTest(TestCase):
         self.assertTrue(mapping.reverse)
 
     def test_null_input(self):
-        with self.assertLogs(LOGGER, level="WARNING"):
-            mapping = Mapping(rules=[{"in": "", "out": "a"}])
-        self.assertFalse(mapping())
+        with self.assertRaises(exceptions.MalformedMapping):
+            Mapping(rules=[{"in": "", "out": "a"}])
 
     def test_no_escape(self):
         mapping = Mapping(
-            rules=os.path.join(
+            rules_path=os.path.join(
                 os.path.dirname(public_data), "mappings", "no_escape.csv"
             )
         )
@@ -318,7 +317,7 @@ class MappingTest(TestCase):
         tf.write("good-in,good-out\n\ngood-in-no-out\n")
         tf.close()
         with self.assertRaises(exceptions.MalformedMapping):
-            Mapping(rules=tf.name)
+            Mapping(rules_path=tf.name)
         os.unlink(tf.name)
 
     def test_invalid_rules_filetype(self):
@@ -328,7 +327,7 @@ class MappingTest(TestCase):
         tf.write("good-in,good-out\n\ngood-in-no-out\n")
         tf.close()
         with self.assertRaises(exceptions.IncorrectFileType):
-            Mapping(rules=tf.name)
+            Mapping(rules_path=tf.name)
         os.unlink(tf.name)
 
     def test_extend_and_deduplicate(self):
@@ -347,7 +346,7 @@ class MappingTest(TestCase):
         # Ensure that a single CSV file from Studio works properly
         with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
             mapping = Mapping(
-                rules=os.path.join(
+                rules_path=os.path.join(
                     os.path.dirname(public_data), "mappings", "g2p_studio.csv"
                 )
             )
@@ -378,7 +377,7 @@ class MappingTest(TestCase):
             tf.write(fh.read())
         tf.close()
         with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
-            mapping = Mapping(rules=tf.name)
+            mapping = Mapping(rules_path=tf.name)
         transducer = Transducer(mapping)
         self.assertEqual(
             transducer("tee on herkullista").output_string, "teː on herkullistɑ"

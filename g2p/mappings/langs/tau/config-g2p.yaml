@@ -7,7 +7,7 @@ mappings:
     authors:
       - Sabrina Yu
     type: mapping
-    rules: tau_equiv.json
+    rules_path: tau_equiv.json
     prevent_feeding: false
     rule_ordering: as-written
     case_sensitive: false
@@ -19,7 +19,7 @@ mappings:
     authors:
       - Sabrina Yu
     type: mapping
-    rules: tau_to_ipa.json
+    rules_path: tau_to_ipa.json
     prevent_feeding: true
     rule_ordering: as-written
     case_sensitive: false

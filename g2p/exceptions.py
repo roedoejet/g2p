@@ -2,6 +2,7 @@
 All custom Exceptions
 """
 
+
 # traceback from exceptions that inherit from this class are suppressed
 class CommandLineError(Exception):
     """The traceback of all CommandLineError's is supressed when the
@@ -81,15 +82,6 @@ class MalformedMapping(CommandLineError):
                 "Please refer to the documentation and fix your mapping." + self.message
             )
         )
-
-
-class MappingNotInitializedProperlyError(CommandLineError):
-    def __init__(self, msg="Your Mapping object was not properly initialized"):
-        super().__init__(self)
-        self.msg = msg
-
-    def __str__(self):
-        return self.render(self.msg)
 
 
 class IncorrectFileType(CommandLineError):

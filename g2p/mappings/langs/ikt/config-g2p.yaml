@@ -10,5 +10,5 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Patrick Littell
-    rules: ikt_to_ipa.json
+    rules_path: ikt_to_ipa.json
     <<: *shared

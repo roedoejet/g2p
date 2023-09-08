@@ -2,13 +2,13 @@
   language_name: Mi'kmaq
 mappings:
   - display_name: Mi'kmaq to IPA
-    rules: mic_to_ipa.json
+    rules_path: mic_to_ipa.json
     in_lang: mic
     out_lang: mic-ipa
     case_sensitive: false
     norm_form: NFD
     rule_ordering: as-written
-    abbreviations: abbreviations.csv
+    abbreviations_path: abbreviations.csv
     authors:
       - Aidan Pine
     notes:

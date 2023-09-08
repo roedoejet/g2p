@@ -18,7 +18,7 @@ class LexiconTransducerTest(TestCase):
                 type="lexicon",
                 case_sensitive=False,
                 out_delimiter=" ",
-                alignments=os.path.join(
+                alignments_path=os.path.join(
                     os.path.dirname(public_data), "mappings", "hello.aligned.txt"
                 ),
             )

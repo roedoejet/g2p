@@ -1,6 +1,6 @@
 mappings:
   - display_name: Minimal to Minimal
-    rules: minimal.csv
+    rules_path: minimal.csv
     in_lang: min
     out_lang: min
     rule_ordering: as-written

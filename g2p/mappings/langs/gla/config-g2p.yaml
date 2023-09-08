@@ -9,5 +9,5 @@ mappings:
     rule_ordering: apply-longest-first
     authors:
       - Aidan Pine
-    rules: gla_to_ipa.json
+    rules_path: gla_to_ipa.json
     <<: *shared

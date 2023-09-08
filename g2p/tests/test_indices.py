@@ -7,7 +7,7 @@
 from unicodedata import normalize
 from unittest import TestCase, main
 
-from g2p.log import LOGGER
+from g2p import exceptions
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
@@ -185,7 +185,7 @@ class IndicesTest(TestCase):
         )
         self.test_mapping_four = Mapping(rules=[{"in": "te", "out": "p"}])
         # We know this issues a warning, so let's silence it by asserting it.
-        with self.assertLogs(LOGGER, "WARNING"):
+        with self.assertRaises(exceptions.MalformedMapping):
             self.test_mapping_five = Mapping(
                 rules=[
                     {"context_before": "t", "context_after": "$", "in": "", "out": "y"}
@@ -264,7 +264,6 @@ class IndicesTest(TestCase):
         self.trans_two = Transducer(self.test_mapping_two)
         self.trans_three = Transducer(self.test_mapping_three)
         self.trans_four = Transducer(self.test_mapping_four)
-        self.trans_five = Transducer(self.test_mapping_five)
         self.trans_six = Transducer(self.test_mapping_six)
         self.trans_seven = Transducer(self.test_mapping_seven)
         self.test_seven_as_written = Transducer(self.test_mapping_seven_as_written)
@@ -537,18 +536,10 @@ class IndicesTest(TestCase):
 
     def test_case_twelve(self):
         # Empty inputs are not allowed (should it actually throw an exception?)
-        with self.assertLogs() as cm:
+        with self.assertRaises(exceptions.MalformedMapping):
             self.test_mapping_twelve = Mapping(
                 rules=[{"in": "", "out": "aa", "context_before": "b"}]
             )
-            self.trans_twelve = Transducer(self.test_mapping_twelve)
-            transducer = self.trans_twelve("b")
-        self.assertIn(
-            "disallowed",
-            cm.output[0],
-            "it should warn that empty inputs are disallowed",
-        )
-        self.assertEqual(transducer.output_string, "b")
 
     def test_case_acdc(self):
         transducer = Transducer(

@@ -1,7 +1,7 @@
 mappings:
   - language_name: tok punct
     display_name: Tokenize Punctuation Case Insensitive
-    rules: tokenize_punct.csv
+    rules_path: tokenize_punct.csv
     comment: "test mapping for Readalongs-Studio issue #40"
     issue_url: "https://github.com/ReadAlongs/Studio/issues/40"
     in_lang: tok-in

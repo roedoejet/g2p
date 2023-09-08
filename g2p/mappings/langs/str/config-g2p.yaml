@@ -2,7 +2,7 @@
   language_name: SENĆOŦEN
 mappings:
   - display_name: SENĆOŦEN equivalency
-    rules: str_equiv.json
+    rules_path: str_equiv.json
     in_lang: str
     out_lang: str-equiv
     rule_ordering: as-written
@@ -12,7 +12,7 @@ mappings:
       - Shankhalika Srikanth
     <<: *shared
   - display_name: SENĆOŦEN to IPA
-    rules: str_to_ipa.json
+    rules_path: str_to_ipa.json
     in_lang: str-equiv
     out_lang: str-ipa
     rule_ordering: as-written

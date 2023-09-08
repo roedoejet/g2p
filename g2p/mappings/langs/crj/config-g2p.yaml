@@ -9,7 +9,7 @@ mappings:
       - Delasie Torkornoo
       - Aidan Pine
       - Eric Joanis
-    rules: crj_equiv.json
+    rules_path: crj_equiv.json
     rule_ordering: as-written
     case_sensitive: false
     <<: *shared
@@ -20,7 +20,7 @@ mappings:
     authors:
       - David Huggins-Daines
       - Patrick Littell
-    rules: crj_to_ipa.json
+    rules_path: crj_to_ipa.json
     rule_ordering: apply-longest-first
     case_sensitive: false
     <<: *shared
@@ -28,7 +28,7 @@ mappings:
     in_lang: crj-ipa
     out_lang: eng-ipa
     type: mapping
-    rules: crj_ipa_to_eng_ipa.json
+    rules_path: crj_ipa_to_eng_ipa.json
     rule_ordering: apply-longest-first
     case_sensitive: false
     <<: *shared

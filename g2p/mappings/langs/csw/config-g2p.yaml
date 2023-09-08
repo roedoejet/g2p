@@ -9,7 +9,7 @@ mappings:
       - Delasie Torkornoo
       - Bradley Ellert
       - Aidan Pine
-    rules: csw_equiv.json
+    rules_path: csw_equiv.json
     <<: *shared
   - display_name: Swampy Cree to IPA
     in_lang: csw-equiv
@@ -20,12 +20,12 @@ mappings:
       - Patrick Littell
       - Delasie Torkornoo
       - Bradley Ellert
-    rules: csw_to_ipa.json
+    rules_path: csw_to_ipa.json
     <<: *shared
   - display_name: Swampy Cree IPA to English IPA
     in_lang: csw-ipa
     out_lang: eng-ipa
     type: mapping
-    rules: csw_ipa_to_eng_ipa.json
+    rules_path: csw_ipa_to_eng_ipa.json
     rule_ordering: as-written
     <<: *shared

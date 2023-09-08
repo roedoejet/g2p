@@ -119,7 +119,7 @@ class LocalConfigTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
             with open(config_file, "wt", encoding="utf8") as f:
-                yaml.dump({"mappings": [{"rules": "no-such-file.csv"}]}, f)
+                yaml.dump({"mappings": [{"rules_path": "no-such-file.csv"}]}, f)
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )
@@ -136,7 +136,10 @@ class LocalConfigTest(TestCase):
                 yaml.dump(
                     {
                         "mappings": [
-                            {"rules": "empty.csv", "abbreviations": "no-such-file.csv"}
+                            {
+                                "rules_path": "empty.csv",
+                                "abbreviations_path": "no-such-file.csv",
+                            }
                         ]
                     },
                     f,

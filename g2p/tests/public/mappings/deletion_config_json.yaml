@@ -1,7 +1,7 @@
 mappings:
   - language_name: Minimal
     display_name: Minimal to Minimal
-    rules: deletion.json
+    rules_path: deletion.json
     in_lang: min
     out_lang: min
     rule_ordering: as-written

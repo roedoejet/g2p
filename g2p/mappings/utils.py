@@ -23,6 +23,7 @@ from pydantic import (
     Field,
     field_serializer,
     field_validator,
+    model_validator,
     validator,
 )
 
@@ -694,34 +695,56 @@ class _MappingModelDefinition(BaseModel):
     """Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
         "lexicon" (lookup in an aligned lexicon)."""
 
-    alignments: Optional[Union[str, List[str]]] = None
-    """A string specifying a file from which to load alignments when type = "lexicon", or the actual alignments."""
+    alignments: List[str] = []
+    """The alignments for a lexicon mapping"""
+
+    alignments_path: Optional[Path] = None
+    """A path specifying a file from which to load alignments when type = 'lexicon'"""
 
     authors: Optional[List[str]] = None
     """A list of authors responsible for the mapping."""
 
-    abbreviations: Optional[Union[Path, Dict[str, List[str]]]] = None
-    """Either a path to an 'abbreviations' file or a list of 'abbreviations' for your mappings. Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information."""
+    abbreviations: Dict[str, List[str]] = {}
+    """A list of 'abbreviations' for your mappings. Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information."""
 
-    rules: Optional[Union[Path, List[Rule]]] = None
-    """Either a path to a file of a list of rules or a list of Rules"""
+    abbreviations_path: Optional[Path] = None
+    """A path to an 'abbreviations' file"""
+
+    rules: List[Rule] = []
+    """A list of Rules"""
+
+    rules_path: Optional[Path] = None
+    """A path to a file of a list of rules"""
 
     model_config = ConfigDict(str_strip_whitespace=False, extra="allow")
 
-    @field_serializer("rules")
-    def serialize_mapping(self, rules: Union[List[Rule], None]):
-        if not rules:
-            return rules
-        serialized = []
-        for rule in rules:
-            if isinstance(rule, dict):
-                rule = Rule(**rule)
-            serialized.append(rule.export_to_dict())
-        return serialized
+    @model_validator(mode="after")
+    def check_mapping_types(self) -> "_MappingModelDefinition":
+        if (
+            (self.type == MAPPING_TYPE.mapping or self.type is None)
+            and not self.rules
+            and self.rules_path is None
+        ):
+            raise exceptions.MalformedMapping(
+                "You have to either specify some rules or a path to a file containing rules."
+            )
+        if (
+            (self.type == MAPPING_TYPE.lexicon)
+            and not self.alignments
+            and self.alignments_path is None
+        ):
+            raise exceptions.MalformedMapping(
+                "Lexicon mappings must also provide alignments"
+            )
+        return self
 
-    @field_serializer("abbreviations")
-    def serialize_abbreviations(self, abbreviations: Union[dict, None]):
-        return dict(abbreviations) if abbreviations else abbreviations
+    @field_serializer("rules_path", "abbreviations_path", "alignments_path")
+    def serialize_paths(self, path: Path):
+        return path.name if path else path
+
+    @field_serializer("rules")
+    def serialize_mapping(self, rules: List[Rule]):
+        return [rule.export_to_dict() for rule in rules]
 
     @field_validator("norm_form", mode="before")
     @classmethod
@@ -730,47 +753,14 @@ class _MappingModelDefinition(BaseModel):
             v = "none"
         return v
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("alignments")
-    def load_alignments(cls, alignments, values):
-        if isinstance(alignments, list) or alignments is None:
-            return alignments
-        if isinstance(alignments, str):
-            alignments = Path(alignments)
-        if (
-            "parent_dir" in values
-            and isinstance(alignments, Path)
-            and values["parent_dir"]
-        ):
-            alignments = Path(values["parent_dir"]) / alignments
-        return load_alignments_from_file(str(alignments.absolute()))
-
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("abbreviations")
-    def load_abbs(cls, abb, values):
-        if isinstance(abb, dict) or abb is None:
-            return abb
-        if isinstance(abb, str):
-            abb = Path(abb)
-        if "parent_dir" in values and isinstance(abb, Path) and values["parent_dir"]:
-            abb = Path(values["parent_dir"]) / abb
-        return load_abbreviations_from_file(str(abb.absolute()))
-
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("rules", pre=True)
-    def load_mapping(cls, rules, values):
-        if rules is None:
-            return []
-        if isinstance(rules, str):
-            rules = Path(rules)
-        if "parent_dir" in values and isinstance(rules, Path) and values["parent_dir"]:
-            rules = Path(values["parent_dir"]) / rules
-        return (
-            rules if isinstance(rules, list) else load_from_file(str(rules.absolute()))
-        )
+    @validator("rules_path", "abbreviations_path", "alignments_path", pre=True)
+    def add_parent_dir(cls, path, values):
+        if isinstance(path, str):
+            path = Path(path)
+        # Append the parent directory to the path
+        if isinstance(path, Path) and "parent_dir" in values and values["parent_dir"]:
+            path = Path(values["parent_dir"]) / path
+        return path
 
     # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
