@@ -665,15 +665,25 @@ def update(in_dir, out_dir):
         )  # updates g2p/status/languages-network.json
 
 
+@click.option(
+    "-o",
+    "--out-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help=f"Output results in DIRECTORY instead of the installed directory ({Path(LANGS_DIR) / '..' / '.schema'}).",
+)
 @cli.command(context_settings=CONTEXT_SETTINGS)
-def update_schema():
+def update_schema(out_dir):
     """Generate a schema for the model configuration - this should only be done once for each Minor version.
     Changes to the schema should result in a minor version bump.
     """
+    # Determine path
+    if out_dir is None:
+        schema_path = (
+            Path(LANGS_DIR) / ".." / ".schema" / f"g2p-config-schema-{VERSION}.json"
+        )
+    else:
+        schema_path = Path(out_dir) / f"g2p-config-schema-{VERSION}.json"
     # Generate schema
-    schema_path = (
-        Path(LANGS_DIR) / ".." / ".schema" / f"g2p-config-schema-{VERSION}.json"
-    )
     if schema_path.exists():
         raise FileExistsError(
             f"Sorry a schema already exists for version {VERSION}. Please bump the minor version number and generate the schema again."

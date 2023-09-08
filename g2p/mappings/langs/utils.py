@@ -187,16 +187,15 @@ def cache_langs(
     with open(network_path, "wb") as f:
         write_gpickle(lang_network, f, protocol=4)
 
-    with open(langs_path, "w", encoding="utf8") as f:
-        with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
-            with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:
-                json.dump(
-                    langs,
-                    zipfile,
-                    separators=(",", ":"),
-                    ensure_ascii=False,
-                    sort_keys=True,
-                )
+    with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
+        with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:
+            json.dump(
+                langs,
+                zipfile,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                sort_keys=True,
+            )
     return langs
 
 

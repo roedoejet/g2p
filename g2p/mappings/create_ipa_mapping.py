@@ -212,16 +212,14 @@ def create_mapping(
     config = mapping_1.model_copy().model_dump()
     config = {
         **config,
-        **{
-            "authors": [f"Generated {dt.datetime.now()}"],
-            "display_name": None,
-            "language_name": None,
-            "in_lang": map_1_name,
-            "out_lang": map_2_name,
-            "rules": rules,
-            "prevent_feeding": True,
-            "rule_ordering": RULE_ORDERING_ENUM.apply_longest_first,
-        },
+        "authors": [f"Generated {dt.datetime.now()}"],
+        "display_name": None,
+        "language_name": None,
+        "in_lang": map_1_name,
+        "out_lang": map_2_name,
+        "rules": rules,
+        "prevent_feeding": True,
+        "rule_ordering": RULE_ORDERING_ENUM.apply_longest_first,
     }
 
     return Mapping(**config)

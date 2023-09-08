@@ -5,8 +5,14 @@ import os
 import re
 import shutil
 import tempfile
+from pathlib import Path
 from unittest import TestCase, main
 
+import jsonschema
+import yaml
+from tqdm import tqdm
+
+from g2p._version import VERSION
 from g2p.app import APP
 from g2p.cli import (
     convert,
@@ -18,7 +24,7 @@ from g2p.cli import (
     update_schema,
 )
 from g2p.log import LOGGER
-from g2p.mappings.langs import load_langs, load_network
+from g2p.mappings.langs import LANGS_DIR, load_langs, load_network
 from g2p.tests.public.data import DATA_DIR, load_public_test_data
 
 
@@ -88,6 +94,19 @@ class CliTest(TestCase):
         result = self.runner.invoke(update_schema)
         self.assertNotEqual(result.exit_code, 0)
         self.assertIn("FileExistsError", str(result))
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.runner.invoke(update_schema, ["-o", tmpdir])
+            with open(
+                Path(tmpdir) / f"g2p-config-schema-{VERSION}.json", encoding="utf8"
+            ) as f:
+                schema = json.load(f)
+        for config in tqdm(
+            Path(LANGS_DIR).glob("**/config-g2p.yaml"),
+            desc="Validating all configurations against current schema",
+        ):
+            with open(config, encoding="utf8") as f:
+                config_yaml = yaml.safe_load(f)
+            self.assertIsNone(jsonschema.validate(config_yaml, schema=schema))
 
     def test_convert(self):
         langs_to_test = load_public_test_data()
