@@ -286,7 +286,7 @@ class MappingTest(TestCase):
         self.assertTrue(mapping.reverse)
 
     def test_null_input(self):
-        with self.assertRaises(exceptions.MalformedMapping):
+        with self.assertLogs(LOGGER, "WARNING"):
             Mapping(rules=[{"in": "", "out": "a"}])
 
     def test_no_escape(self):

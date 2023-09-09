@@ -725,8 +725,10 @@ class _MappingModelDefinition(BaseModel):
             and not self.rules
             and self.rules_path is None
         ):
-            raise exceptions.MalformedMapping(
-                "You have to either specify some rules or a path to a file containing rules."
+            LOGGER.warn(
+                exceptions.MalformedMapping(
+                    "You have to either specify some rules or a path to a file containing rules."
+                )
             )
         if (
             (self.type == MAPPING_TYPE.lexicon)
@@ -753,6 +755,8 @@ class _MappingModelDefinition(BaseModel):
             v = "none"
         return v
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("rules_path", "abbreviations_path", "alignments_path", pre=True)
     def add_parent_dir(cls, path, values):
         if isinstance(path, str):

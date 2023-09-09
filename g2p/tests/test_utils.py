@@ -11,7 +11,7 @@ from unittest import TestCase, main
 import yaml
 
 from g2p import get_arpabet_langs
-from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
+from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
 from g2p.mappings.utils import RULE_ORDERING_ENUM, Rule
@@ -105,7 +105,7 @@ class UtilsTest(TestCase):
             )
 
     def test_load_mapping(self):
-        with self.assertRaises(MalformedMapping):
+        with self.assertLogs(LOGGER, "WARNING"):
             Mapping.load_mapping_from_path(
                 os.path.join(PUBLIC_DIR, "mappings", "malformed_config-g2p.yaml")
             )

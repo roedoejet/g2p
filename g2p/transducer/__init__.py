@@ -884,7 +884,7 @@ class Transducer:
             diff_from_output = defaultdict(
                 int, {n: 0 for n in range(len(tg.output_string))}
             )
-            matches = reversed(list(io.match_pattern.finditer(tg.output_string)))
+            matches = reversed(list(io.match_pattern.finditer(tg.output_string)))  # type: ignore
             for match_i, match in enumerate(matches):
                 debug_string = tg.output_string
                 start = match.start()
