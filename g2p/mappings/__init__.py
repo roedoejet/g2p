@@ -42,40 +42,6 @@ GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 class Mapping(_MappingModelDefinition):
     """Class for lookup tables"""
 
-    @staticmethod
-    def find_mapping(
-        in_lang: Union[None, str] = None, out_lang: Union[None, str] = None
-    ) -> "Mapping":
-        """Given an input and an output language, find a mapping to get between them."""
-        if in_lang is None or out_lang is None:
-            raise exceptions.MappingMissing(in_lang, out_lang)
-        for mapping in MAPPINGS_AVAILABLE:
-            if mapping.in_lang == in_lang and mapping.out_lang == out_lang:
-                if mapping.type == "lexicon":
-                    # do *not* deep copy this, because alignments are big!
-                    return mapping.model_copy()
-                else:
-                    return deepcopy(mapping)
-        raise exceptions.MappingMissing(in_lang, out_lang)
-
-    @staticmethod
-    def find_mapping_by_id(map_id: str) -> "Mapping":
-        """Find the mapping with a given ID, i.e., the "id" found in the mapping, like in the "panphon_preprocessor" mapping."""
-        for mapping in MAPPINGS_AVAILABLE:
-            if mapping.id == map_id:
-                return deepcopy(mapping)
-        raise exceptions.MappingMissing(map_id, None)
-
-    @staticmethod
-    def load_mapping_from_path(path_to_mapping_config: Union[str, Path], index=0):
-        """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
-        provided to the 'index' argument. Default is 0.
-        """
-        mapping_config = MappingConfig.load_mapping_config_from_path(
-            path_to_mapping_config
-        )
-        return mapping_config.mappings[index]
-
     def model_post_init(self, *args, **kwargs) -> None:
         """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
         if self.type == MAPPING_TYPE.mapping or self.type is None:
@@ -117,6 +83,40 @@ class Mapping(_MappingModelDefinition):
                     idx=type(item).__name__,
                 )
             )
+
+    @staticmethod
+    def find_mapping(
+        in_lang: Union[None, str] = None, out_lang: Union[None, str] = None
+    ) -> "Mapping":
+        """Given an input and an output language, find a mapping to get between them."""
+        if in_lang is None or out_lang is None:
+            raise exceptions.MappingMissing(in_lang, out_lang)
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.in_lang == in_lang and mapping.out_lang == out_lang:
+                if mapping.type == "lexicon":
+                    # do *not* deep copy this, because alignments are big!
+                    return mapping.model_copy()
+                else:
+                    return deepcopy(mapping)
+        raise exceptions.MappingMissing(in_lang, out_lang)
+
+    @staticmethod
+    def find_mapping_by_id(map_id: str) -> "Mapping":
+        """Find the mapping with a given ID, i.e., the "id" found in the mapping, like in the "panphon_preprocessor" mapping."""
+        for mapping in MAPPINGS_AVAILABLE:
+            if mapping.id == map_id:
+                return deepcopy(mapping)
+        raise exceptions.MappingMissing(map_id, None)
+
+    @staticmethod
+    def load_mapping_from_path(path_to_mapping_config: Union[str, Path], index=0):
+        """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
+        provided to the 'index' argument. Default is 0.
+        """
+        mapping_config = MappingConfig.load_mapping_config_from_path(
+            path_to_mapping_config
+        )
+        return mapping_config.mappings[index]
 
     @staticmethod
     def _string_to_pua(string: str, offset: int) -> str:

@@ -12,7 +12,6 @@ from pathlib import Path
 from networkx import DiGraph, write_gpickle
 from networkx.algorithms.dag import ancestors, descendants
 
-from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
@@ -164,20 +163,10 @@ def cache_langs(
         mapping_config = MappingConfig.load_mapping_config_from_path(path)
         # TODO: should put in some measure to prioritize non-generated
         # mappings and warn when they override
-        for index, mapping in enumerate(mapping_config.mappings):
-            in_lang = mapping_config.mappings[index].in_lang
-            out_lang = mapping_config.mappings[index].out_lang
-            mappings_legal_pairs.append((in_lang, out_lang))
-
-            if not mapping.language_name:
-                raise MalformedMapping(
-                    f"language_name missing in {path} from mapping "
-                    f"from {in_lang} to {out_lang}"
-                )
-            mapping_config.mappings[index] = Mapping.load_mapping_from_path(path, index)
-            # Exclude the parent directory when caching
-            mapping_config.mappings[index].parent_dir = None
-        langs[code] = mapping_config.model_dump(exclude_none=True)
+        mappings_legal_pairs.extend(
+            [(mapping.in_lang, mapping.out_lang) for mapping in mapping_config.mappings]
+        )
+        langs[code] = mapping_config.export_to_dict()
 
     # Save as a Directional Graph
     lang_network = DiGraph()
