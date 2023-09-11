@@ -62,28 +62,6 @@ class Mapping(_MappingModelDefinition):
         else:
             self.rules = []
 
-    def __len__(self):
-        return len(self.rules)
-
-    def __call__(self):
-        return self.rules
-
-    def __iter__(self):
-        return iter(self.rules)
-
-    def __getitem__(self, item):
-        if isinstance(item, int):  # item is an integer
-            return self.rules[item]
-        if isinstance(item, slice):  # item is a slice
-            return self.rules[item.start or 0 : item.stop or len(self.rules)]
-        else:  # invalid index type
-            raise TypeError(
-                "{cls} indices must be integers or slices, not {idx}".format(
-                    cls=type(self).__name__,
-                    idx=type(item).__name__,
-                )
-            )
-
     @staticmethod
     def find_mapping(
         in_lang: Union[None, str] = None, out_lang: Union[None, str] = None

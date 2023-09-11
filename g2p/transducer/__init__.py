@@ -487,7 +487,9 @@ class Transducer:
             try:
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index].rule_output[output_char_index]
+                    + self.mapping.rules[intermediate_index].rule_output[
+                        output_char_index
+                    ]
                     + output_string[i + 1 :]
                 )
             except IndexError:
@@ -495,7 +497,9 @@ class Transducer:
                 output_char_index = 0
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index].rule_output[output_char_index]
+                    + self.mapping.rules[intermediate_index].rule_output[
+                        output_char_index
+                    ]
                     + output_string[i + 1 :]
                 )
             indices_seen[intermediate_index] += 1
