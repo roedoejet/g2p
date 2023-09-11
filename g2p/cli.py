@@ -733,7 +733,8 @@ def scan(lang, path):
         data = normalize(file.read(), "NFD")
         if not case_sensitive:
             data = data.lower()
-        if unmapped := set(prog.findall(data)):
+        unmapped = set(prog.findall(data))
+        if unmapped:
             LOGGER.warning("The following characters are not mapped:")
             print(unmapped)
 
