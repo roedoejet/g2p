@@ -62,7 +62,7 @@ class MappingTest(TestCase):
             rules=self.json_map["map"],
             **{k: v for k, v in self.json_map.items() if k != "map"}
         )
-        self.assertEqual(len(json_map), 34)
+        self.assertEqual(len(json_map.rules), 34)
         # This is a very old version of the config, I'm not even sure these tests should be in here at all.
         # self.assertTrue(json_map.kwargs["in_metadata"]["case_insensitive"])
 
