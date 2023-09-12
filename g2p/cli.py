@@ -688,8 +688,12 @@ def update_schema(out_dir):
         raise FileExistsError(
             f"Sorry a schema already exists for version {VERSION}. Please bump the minor version number and generate the schema again."
         )
+    json_schema = MappingConfig.model_json_schema()
+    # Add explicit schema dialect for SchemaStore
+    # Note that pydantic actually targets
+    json_schema["$schema"] = "http://json-schema.org/draft-07/schema#"
     with open(schema_path, "w") as f:
-        json.dump(MappingConfig.model_json_schema(), f)
+        json.dump(json_schema, f, indent=2)
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
