@@ -86,41 +86,11 @@ a,b
 c,d
 ```
 
-The equivalent python syntax would be:
-
-```python
-from g2p.mappings import Mapping, Rule
-from g2p.transducer import Transducer
-
-mapping = Mapping(rules=[
-    Rule(rule_input="a", rule_output="b"),
-    Rule(rule_input="c", rule_output="d")
-  ])
-
-transducer = Transducer(mapping)
-transducer('a') # returns "b"
-```
-
 2. This mapping describes two rules; a -> b / c _ d<sup id="a1">[1](#f1)</sup> and a -> e
 
 ```csv
 a,b,c,d
 a,e
-```
-
-The equivalent python syntax would be:
-
-```python
-from g2p.mappings import Mapping, Rule
-from g2p.transducer import Transducer
-
-mapping = Mapping(rules=[
-    Rule(rule_input="a", rule_output="b", context_before="c", context_after="d"),
-    Rule(rule_input="a", rule_output="e")
-  ])
-
-transducer = Transducer(mapping)
-transducer('cad') # returns "cbd"
 ```
 
 The [g2p studio](https://g2p-studio.herokuapp.com) exports its rules to CSV format.
@@ -144,21 +114,6 @@ JSON files are written as an array of objects where each object corresponds to a
  ]
 ```
 
-The equivalent python syntax would be:
-
-```python
-from g2p.mappings import Mapping, Rule
-from g2p.transducer import Transducer
-
-mapping = Mapping(rules=[
-    Rule(rule_input="a", rule_output="b"),
-    Rule(rule_input="c", rule_output="d")
-  ])
-
-transducer = Transducer(mapping)
-transducer('a') # returns "b"
-```
-
 2. This mapping describes two rules; a -> b / c _ d<sup id="a1">[1](#f1)</sup>  and a -> e
 
 ```json
@@ -176,7 +131,9 @@ transducer('a') # returns "b"
  ]
 ```
 
-The equivalent python syntax would be:
+#### Python
+
+You can also write your rules programatically in Python. For example:
 
 ```python
 from g2p.mappings import Mapping, Rule
@@ -190,6 +147,7 @@ mapping = Mapping(rules=[
 transducer = Transducer(mapping)
 transducer('cad') # returns "cbd"
 ```
+
 
 ## CLI
 
