@@ -24,7 +24,13 @@ from g2p.cli import (
     update_schema,
 )
 from g2p.log import LOGGER
-from g2p.mappings.langs import LANGS_DIR, load_langs, load_network
+from g2p.mappings.langs import (
+    LANGS_DIR,
+    LANGS_FILE_NAME,
+    NETWORK_FILE_NAME,
+    load_langs,
+    load_network,
+)
 from g2p.tests.public.data import DATA_DIR, load_public_test_data
 
 
@@ -51,8 +57,8 @@ class CliTest(TestCase):
                 os.path.join(lang1_dir, "config-g2p.yaml"),
             )
             result = self.runner.invoke(update, ["-i", tmpdir])
-            langs_json = os.path.join(tmpdir, "langs.json.gz")
-            network_pkl = os.path.join(tmpdir, "network.pkl")
+            langs_json = os.path.join(tmpdir, LANGS_FILE_NAME)
+            network_pkl = os.path.join(tmpdir, NETWORK_FILE_NAME)
             self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
 
@@ -60,8 +66,8 @@ class CliTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             result = self.runner.invoke(update, ["-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
-            langs_json = os.path.join(tmpdir, "langs.json.gz")
-            network_pkl = os.path.join(tmpdir, "network.pkl")
+            langs_json = os.path.join(tmpdir, LANGS_FILE_NAME)
+            network_pkl = os.path.join(tmpdir, NETWORK_FILE_NAME)
             self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
             langs = load_langs(langs_json)
