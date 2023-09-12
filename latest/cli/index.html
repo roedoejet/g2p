@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.2.8">
+      <meta name="generator" content="mkdocs-1.5.2, mkdocs-material-9.3.1">
     
     
       
@@ -668,12 +668,22 @@ With no LANG, all cached mappings are included.</p>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -o, --out-dir DIRECTORY  Output results in DIRECTORY instead of the
                            installed directory
-                           (/Users/pinea/miniconda3/lib/python3.11/site-
-                           packages/g2p/mappings/langs).
+                           (/home/runner/work/g2p/g2p/g2p/mappings/langs).
   -i, --in-dir DIRECTORY   Scan DIRECTORY for mappings instead of the
                            installed directory
-                           (/Users/pinea/miniconda3/lib/python3.11/site-
-                           packages/g2p/mappings/langs).
+                           (/home/runner/work/g2p/g2p/g2p/mappings/langs).
+  --help                   Show this message and exit.
+</code></pre></div>
+<h2 id="update-schema">update-schema<a class="headerlink" href="#update-schema" title="Permanent link">&para;</a></h2>
+<p>Generate a schema for the model configuration - this should only be done once for each Minor version.
+Changes to the schema should result in a minor version bump.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight"><pre><span></span><code>cli update-schema [OPTIONS]
+</code></pre></div>
+<p><strong>Options:</strong></p>
+<div class="highlight"><pre><span></span><code>  -o, --out-dir DIRECTORY  Output results in DIRECTORY instead of the
+                           installed directory (/home/runner/work/g2p/g2p/g2p/
+                           mappings/langs/../.schema).
   --help                   Show this message and exit.
 </code></pre></div>
 
