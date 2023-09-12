@@ -4,7 +4,6 @@ import os
 from unittest import TestCase, main
 
 from g2p import make_g2p
-from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.tests.public import __file__ as public_data
@@ -19,12 +18,12 @@ class LexiconTransducerTest(TestCase):
                 type="lexicon",
                 case_sensitive=False,
                 out_delimiter=" ",
-                alignments=os.path.join(
+                alignments_path=os.path.join(
                     os.path.dirname(public_data), "mappings", "hello.aligned.txt"
                 ),
             )
-        self.assertEqual(m.mapping, [])
-        self.assertEqual(m.kwargs["type"], "lexicon")
+        self.assertEqual(m.rules, [])
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "HH EH L OW ")
@@ -128,13 +127,13 @@ class LexiconTransducerTest(TestCase):
     def test_load_lexicon_mapping(self):
         """Test loading a lexicon mapping through a config file."""
         with self.assertLogs(LOGGER, level="INFO"):
-            m = Mapping(
+            m = Mapping.load_mapping_from_path(
                 os.path.join(
-                    os.path.dirname(public_data), "mappings", "lexicon_config.yaml"
+                    os.path.dirname(public_data), "mappings", "lexicon_config-g2p.yaml"
                 )
             )
-        self.assertEqual(m.mapping, [])
-        self.assertEqual(m.kwargs["type"], "lexicon")
+        self.assertEqual(m.rules, [])
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "HH EH L OW ")
@@ -144,17 +143,21 @@ class LexiconTransducerTest(TestCase):
 
     def test_bad_lexicon_mapping(self):
         """Test failure to load alignments."""
-        with self.assertRaises(MalformedMapping), self.assertLogs(LOGGER, level="INFO"):
-            _ = Mapping(
+        with self.assertRaises(FileNotFoundError), self.assertLogs(
+            LOGGER, level="INFO"
+        ):
+            _ = Mapping.load_mapping_from_path(
                 os.path.join(
-                    os.path.dirname(public_data), "mappings", "bad_lexicon_config.yaml"
+                    os.path.dirname(public_data),
+                    "mappings",
+                    "bad_lexicon_config-g2p.yaml",
                 )
             )
 
     def test_eng_lexicon(self):
         """Test the cached eng to eng-ipa lexicon as a Mapping."""
-        m = Mapping(in_lang="eng", out_lang="eng-ipa")
-        self.assertEqual(m.kwargs["type"], "lexicon")
+        m = Mapping.find_mapping(in_lang="eng", out_lang="eng-ipa")
+        self.assertEqual(m.type, "lexicon")
         t = Transducer(m)
         tg = t("hello")
         self.assertEqual(tg.output_string, "hʌloʊ")

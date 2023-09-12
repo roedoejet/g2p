@@ -324,10 +324,10 @@ getIncludedMappings = function() {
             mapping = {}
             let kwargs = getKwargs(index)
             if (kwargs["type"] == "lexicon")
-                mapping['mapping'] = null;
+                mapping['rules'] = null;
             else
-                mapping['mapping'] = TABLES[index].getSourceData().filter(v => v.in)
-            // Extract only non-empty rules and abbreviations for processing
+                mapping['rules'] = TABLES[index].getSourceData().filter(v => v.in)
+                // Extract only non-empty rules and abbreviations for processing
             mapping['abbreviations'] = ABBS[index].getData().filter(v => v[0])
             mapping['kwargs'] = getKwargs(index)
             mappings.push(mapping)
@@ -351,10 +351,18 @@ var getKwargs = function(index) {
         const out_lang = document.getElementById(`out_lang-${index}`).value
         // Lexicon G2P cannot be customized (FIXME: likewise for unidecode actually)
         return { type, in_lang, out_lang }
-    }
-    else
-        return { rule_ordering, case_sensitive, escape_special, reverse, include,
-                 out_delimiter, norm_form, prevent_feeding, type }
+    } else
+        return {
+            rule_ordering,
+            case_sensitive,
+            escape_special,
+            reverse,
+            include,
+            out_delimiter,
+            norm_form,
+            prevent_feeding,
+            type
+        }
 }
 
 var setKwargs = function(index, kwargs) {

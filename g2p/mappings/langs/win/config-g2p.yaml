@@ -1,0 +1,13 @@
+<<: &shared
+  language_name: Hoocąk
+mappings:
+  - display_name: Hoocąk to IPA
+    rules_path: win_to_ipa.json
+    in_lang: win
+    out_lang: win-ipa
+    case_sensitive: false
+    norm_form: NFC
+    rule_ordering: apply-longest-first
+    authors:
+      - David Huggins-Daines
+    <<: *shared

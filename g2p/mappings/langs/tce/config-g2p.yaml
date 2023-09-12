@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Southern Tutchone
+mappings:
+  - display_name: Southern Tutchone equivalencies
+    in_lang: tce
+    out_lang: tce-equiv
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    rules_path: tce_equiv.csv
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Southern Tutchone to IPA
+    in_lang: tce-equiv
+    out_lang: tce-ipa
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    rules_path: tce_to_ipa.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared

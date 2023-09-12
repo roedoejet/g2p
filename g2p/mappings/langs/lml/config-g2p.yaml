@@ -1,0 +1,16 @@
+<<: &shared
+  language_name: Raga
+mappings:
+  - display_name: Raga to IPA
+    rules_path: lml_to_ipa.csv
+    in_lang: lml
+    out_lang: lml-ipa
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: as-written
+    prevent_feeding: true
+    abbreviations_path: abbreviations.csv
+    authors:
+      - Fineen Davis
+      - Codrington Hinge
+    <<: *shared

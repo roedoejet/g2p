@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Ojibwe
+mappings:
+  - display_name: Ojibwe to IPA
+    in_lang: oji
+    out_lang: oji-ipa
+    authors:
+      - David Huggins-Daines
+    type: mapping
+    rules_path: oji_to_ipa.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
+  - display_name: Anishinaabemowin Syllabics to Romanized
+    in_lang: oji-syl
+    out_lang: oji
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    rules_path: oji_syllabics_to_orth.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFC
+    language_name: Ojibwe Syllabics

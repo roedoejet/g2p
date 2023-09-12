@@ -38,31 +38,12 @@ jobs:
           sleep 5
           coverage combine
           coverage xml
-          if git status | grep -E 'static.*json|mapping.*pkl'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
+          if git status | grep -E 'static.*json|mapping.*pkl|mapping.*langs.json.gz'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
       - name: Upload coverage information
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"
-
-  test-36:
-    # This test job exercises only the g2p library code with Python 3.6, which
-    # is what we still keep compatible with 3.6
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.6"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -e .
-      - name: Run tests
-        run: |
-          ./run_tests.py dev
 
   test-on-windows:
     # Make sure stuff stays compatible with Windows by testing there too.
@@ -73,10 +54,11 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6"
+          python-version: "3.8"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -r requirements/requirements.test.txt
           pip install -e .
       - name: Run tests on Windows
         run: python run_tests.py dev

@@ -1,0 +1,26 @@
+<<: &shared
+  language_name: Plains Cree
+mappings:
+  - display_name: Plains Cree (SRO) to IPA
+    in_lang: crk-no-symbols
+    out_lang: crk-ipa
+    type: mapping
+    norm_form: NFD
+    rule_ordering: as-written
+    prevent_feeding: true
+    authors:
+      - Eddie Antonio Santos
+    rules_path: crk-no-symbols_to_ipa.json
+    <<: *shared
+  - display_name: Plains Cree Symbols to SRO
+    in_lang: crk
+    out_lang: crk-no-symbols
+    type: mapping
+    norm_form: NFD
+    rule_ordering: as-written
+    prevent_feeding: true
+    escape_special: true
+    authors:
+      - Aidan Pine
+    rules_path: crk_to_crk-no-symbols.json
+    <<: *shared

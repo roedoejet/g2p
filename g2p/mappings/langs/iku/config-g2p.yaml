@@ -1,0 +1,32 @@
+<<: &shared
+  language_name: Inuktitut
+mappings:
+  - display_name: Inuktitut to Inuktitut (equiv)
+    in_lang: iku
+    out_lang: iku-equiv
+    type: mapping
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    rules_path: iku_to_iku_equiv.json
+    language_name: Inuktitut Syllabics
+  - display_name: Inuktitut to IPA
+    in_lang: iku-equiv
+    out_lang: iku-ipa
+    type: mapping
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    rules_path: iku_equiv_to_ipa.json
+    <<: *shared
+  - display_name: Inuktitut (SRO) to IPA
+    in_lang: iku-sro
+    out_lang: iku-sro-ipa
+    type: mapping
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    rules_path: iku_sro_to_ipa.json
+    language_name: Inuktitut Romanized

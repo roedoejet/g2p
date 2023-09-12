@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: SENĆOŦEN
+mappings:
+  - display_name: SENĆOŦEN equivalency
+    rules_path: str_equiv.json
+    in_lang: str
+    out_lang: str-equiv
+    rule_ordering: as-written
+    norm_form: NFD
+    case_sensitive: true
+    authors:
+      - Shankhalika Srikanth
+    <<: *shared
+  - display_name: SENĆOŦEN to IPA
+    rules_path: str_to_ipa.json
+    in_lang: str-equiv
+    out_lang: str-ipa
+    rule_ordering: as-written
+    norm_form: NFD
+    case_sensitive: true
+    authors:
+      - Aidan Pine
+    <<: *shared

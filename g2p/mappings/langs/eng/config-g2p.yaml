@@ -1,0 +1,57 @@
+<<: &shared
+  language_name: English
+mappings:
+  - display_name: Dummy to Arpabet
+    in_lang: dummy
+    out_lang: dummy-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFC"
+    authors:
+      - Aidan Pine
+    rules_path: dummy_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
+  - display_name: Hamming Dummy to Arpabet
+    in_lang: hamming-dummy
+    out_lang: hamming-dummy-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFC"
+    authors:
+      - Aidan Pine
+    rules_path: dummy_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
+  - display_name: English IPA to Arpabet
+    in_lang: eng-ipa
+    out_lang: eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFC"
+    authors:
+      - Patrick Littell
+    rules_path: eng_ipa_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
+  - display_name: English IPA to Arpabet
+    in_lang: hamming-eng-ipa
+    out_lang: hamming-eng-arpabet
+    out_delimiter: " "
+    type: mapping
+    norm_form: "NFC"
+    authors:
+      - Patrick Littell
+    rules_path: eng_ipa_to_arpabet.json
+    rule_ordering: apply-longest-first
+    <<: *shared
+  - display_name: English to IPA
+    type: lexicon
+    alignments_path: cmudict.ipa.aligned.txt
+    in_lang: eng
+    out_lang: eng-ipa
+    case_sensitive: false
+    norm_form: "NFC"
+    authors:
+      - David Huggins-Daines
+    <<: *shared

@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: Tsuut'ina
+mappings:
+  - display_name: Tsuut'ina to IPA
+    rules_path: srs_to_ipa.json
+    in_lang: srs
+    out_lang: srs-ipa
+    rule_ordering: as-written
+    norm_form: NFD
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared
+  - display_name: Tsuut'ina IPA to English IPA
+    rules_path: srs_ipa_to_eng_ipa.json
+    in_lang: srs-ipa
+    out_lang: eng-ipa
+    norm_form: NFD
+    rule_ordering: as-written
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared

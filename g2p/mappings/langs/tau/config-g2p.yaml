@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Upper Tanana
+mappings:
+  - display_name: Upper Tanana Equivalencies
+    in_lang: tau
+    out_lang: tau-equiv
+    authors:
+      - Sabrina Yu
+    type: mapping
+    rules_path: tau_equiv.json
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Upper Tanana to IPA
+    in_lang: tau-equiv
+    out_lang: tau-ipa
+    authors:
+      - Sabrina Yu
+    type: mapping
+    rules_path: tau_to_ipa.json
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared

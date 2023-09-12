@@ -1,0 +1,12 @@
+mappings:
+  - language_name: English
+    display_name: English to ARPABET
+    type: lexicon
+    alignments_path: hello.aligned.txt
+    out_delimiter: " "
+    in_lang: eng
+    out_lang: eng-arpabet
+    case_sensitive: false
+    norm_form: 'NFC'
+    authors:
+      - David Huggins-Daines

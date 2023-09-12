@@ -26,7 +26,7 @@ with open(
 
 setup(
     name="g2p",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     version=VERSION,
     author="Aidan Pine",
     author_email="hello@aidanpine.ca",

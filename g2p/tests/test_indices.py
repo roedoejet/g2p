@@ -7,7 +7,7 @@
 from unicodedata import normalize
 from unittest import TestCase, main
 
-from g2p.log import LOGGER
+from g2p import LOGGER
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 
@@ -176,36 +176,40 @@ class IndicesTest(TestCase):
         # Let's use __init__() to set all these up just once at class creation
         # time, instead of setUp() which repeatedly does it for each test case
         super().__init__(*args)
-        self.test_mapping_one = Mapping([{"in": "t", "out": "p", "context_after": "e"}])
-        self.test_mapping_two = Mapping([{"in": "e", "out": ""}])
-        self.test_mapping_three = Mapping(
-            [{"in": "t", "out": "ch", "context_after": "e"}]
+        self.test_mapping_one = Mapping(
+            rules=[{"in": "t", "out": "p", "context_after": "e"}]
         )
-        self.test_mapping_four = Mapping([{"in": "te", "out": "p"}])
+        self.test_mapping_two = Mapping(rules=[{"in": "e", "out": ""}])
+        self.test_mapping_three = Mapping(
+            rules=[{"in": "t", "out": "ch", "context_after": "e"}]
+        )
+        self.test_mapping_four = Mapping(rules=[{"in": "te", "out": "p"}])
         # We know this issues a warning, so let's silence it by asserting it.
         with self.assertLogs(LOGGER, "WARNING"):
             self.test_mapping_five = Mapping(
-                [{"context_before": "t", "context_after": "$", "in": "", "out": "y"}]
+                rules=[
+                    {"context_before": "t", "context_after": "$", "in": "", "out": "y"}
+                ]
             )
-        self.test_mapping_six = Mapping([{"in": "e{1}s{2}", "out": "s{2}e{1}"}])
+        self.test_mapping_six = Mapping(rules=[{"in": "e{1}s{2}", "out": "s{2}e{1}"}])
         self.test_mapping_seven = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}],
+            rules=[{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}],
             rule_ordering="apply-longest-first",
         )
         self.test_mapping_seven_as_written = Mapping(
-            [{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
+            rules=[{"in": "s", "out": "sh"}, {"in": "sh", "out": "s"}]
         )
         self.test_mapping_eight = Mapping(
-            [{"in": "te", "out": "che"}, {"in": "t", "out": "s"}]
+            rules=[{"in": "te", "out": "che"}, {"in": "t", "out": "s"}]
         )
-        self.test_mapping_nine = Mapping([{"in": "aa", "out": ""}])
-        self.test_mapping_ten = Mapping([{"in": "abc", "out": "a"}])
-        self.test_mapping_eleven = Mapping([{"in": "a", "out": "aaaa"}])
+        self.test_mapping_nine = Mapping(rules=[{"in": "aa", "out": ""}])
+        self.test_mapping_ten = Mapping(rules=[{"in": "abc", "out": "a"}])
+        self.test_mapping_eleven = Mapping(rules=[{"in": "a", "out": "aaaa"}])
         self.test_mapping_combining = Mapping(
-            [{"in": "k{1}\u0313{2}", "out": "'{2}k{1}"}]
+            rules=[{"in": "k{1}\u0313{2}", "out": "'{2}k{1}"}]
         )
         self.test_mapping_wacky = Mapping(
-            [
+            rules=[
                 {
                     "in": "\U0001f600{1}\U0001f603\U0001f604{2}\U0001f604{3}",
                     "out": "\U0001f604\U0001f604\U0001f604{2}\U0001f604{3}\U0001f604{1}",
@@ -213,31 +217,35 @@ class IndicesTest(TestCase):
             ]
         )
         self.test_mapping_wacky_lite = Mapping(
-            [{"in": "a{1}bc{2}c{3}", "out": "ccc{2}c{3}c{1}"}]
+            rules=[{"in": "a{1}bc{2}c{3}", "out": "ccc{2}c{3}c{1}"}]
         )
-        self.test_mapping_circum = Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}])
+        self.test_mapping_circum = Mapping(
+            rules=[{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]
+        )
         self.test_mapping_explicit_equal_1 = Mapping(
-            [{"in": "a{1}b{1}", "out": "c{1}d{1}"}]
+            rules=[{"in": "a{1}b{1}", "out": "c{1}d{1}"}]
         )
-        self.test_mapping_explicit_equal_2 = Mapping([{"in": "ab{1}", "out": "cd{1}"}])
-        self.test_mapping_explicit_equal_3 = Mapping([{"in": "ab", "out": "cd"}])
+        self.test_mapping_explicit_equal_2 = Mapping(
+            rules=[{"in": "ab{1}", "out": "cd{1}"}]
+        )
+        self.test_mapping_explicit_equal_3 = Mapping(rules=[{"in": "ab", "out": "cd"}])
         self.test_mapping_explicit_equal_4 = Mapping(
-            [{"in": "a{1}b{2}", "out": "c{1}d{2}"}]
+            rules=[{"in": "a{1}b{2}", "out": "c{1}d{2}"}]
         )
         self.test_issue_173_1 = Mapping(
-            [
+            rules=[
                 {"in": "x{1}y{2}z{3}", "out": "a{2}b{1}"},
                 {"in": "d{1}e{2}f{3}", "out": "d{1}e{2}f{3}"},
             ]
         )
         self.test_issue_173_2 = Mapping(
-            [
+            rules=[
                 {"in": "x{1}y{2}z{3}", "out": "a{1}b{2}"},
                 {"in": "d{1}e{2}f{3}", "out": "d{1}e{2}f{3}"},
             ]
         )
         self.test_issue_157_mapping = Mapping(
-            [
+            rules=[
                 {"in": "a", "out": "d"},
                 {"in": "bc", "out": "e"},
                 {"in": "g{1}h{2}i{3}", "out": "G{2}H{1}I{3}J{1}"},
@@ -245,18 +253,17 @@ class IndicesTest(TestCase):
             ]
         )
         self.test_feeding_mapping_1 = Mapping(
-            [{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"}]
+            rules=[{"in": "ab", "out": "a"}, {"in": "a", "out": "cd"}]
         )
         self.test_feeding_mapping_2 = Mapping(
-            [{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"}]
+            rules=[{"in": "a", "out": "cd"}, {"in": "cd", "out": "b"}]
         )
-        self.test_issue_173_3 = Mapping([{"in": "ab{1}c{2}", "out": "X{1}Y{2}"}])
-        self.test_issue_173_4 = Mapping([{"in": "a{1}bc{2}", "out": "xy{1}z{2}"}])
+        self.test_issue_173_3 = Mapping(rules=[{"in": "ab{1}c{2}", "out": "X{1}Y{2}"}])
+        self.test_issue_173_4 = Mapping(rules=[{"in": "a{1}bc{2}", "out": "xy{1}z{2}"}])
         self.trans_one = Transducer(self.test_mapping_one)
         self.trans_two = Transducer(self.test_mapping_two)
         self.trans_three = Transducer(self.test_mapping_three)
         self.trans_four = Transducer(self.test_mapping_four)
-        self.trans_five = Transducer(self.test_mapping_five)
         self.trans_six = Transducer(self.test_mapping_six)
         self.trans_seven = Transducer(self.test_mapping_seven)
         self.test_seven_as_written = Transducer(self.test_mapping_seven_as_written)
@@ -531,7 +538,7 @@ class IndicesTest(TestCase):
         # Empty inputs are not allowed (should it actually throw an exception?)
         with self.assertLogs() as cm:
             self.test_mapping_twelve = Mapping(
-                [{"in": "", "out": "aa", "context_before": "b"}]
+                rules=[{"in": "", "out": "aa", "context_before": "b"}]
             )
             self.trans_twelve = Transducer(self.test_mapping_twelve)
             transducer = self.trans_twelve("b")
@@ -543,7 +550,9 @@ class IndicesTest(TestCase):
         self.assertEqual(transducer.output_string, "b")
 
     def test_case_acdc(self):
-        transducer = Transducer(Mapping([{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}]))
+        transducer = Transducer(
+            Mapping(rules=[{"in": "a{1}c{2}", "out": "c{2}a{1}c{2}"}])
+        )
         tg = transducer("acdc")
         self.assertEqual(tg.output_string, "cacdc")
         self.assertEqual(tg.edges, [(0, 1), (1, 0), (1, 2), (2, 3), (3, 4)])
@@ -552,9 +561,9 @@ class IndicesTest(TestCase):
         )
 
     def test_case_acac(self):
-        transducer = Transducer(Mapping([{"in": "ab{1}c{2}", "out": "ab{2}"}]))
+        transducer = Transducer(Mapping(rules=[{"in": "ab{1}c{2}", "out": "ab{2}"}]))
         transducer_default = Transducer(
-            Mapping([{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
+            Mapping(rules=[{"in": "ab", "out": ""}, {"in": "c", "out": "ab"}])
         )
         tg = transducer("abcabc")
         self.assertEqual(tg.output_string, "abab")
@@ -593,10 +602,14 @@ class IndicesTest(TestCase):
 
     def test_arpabet(self):
         transducer = Transducer(
-            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFC", out_delimiter=" ")
+            Mapping(
+                rules=[{"in": "ĩ", "out": "IY N"}], norm_form="NFC", out_delimiter=" "
+            )
         )
         transducer_nfd = Transducer(
-            Mapping([{"in": "ĩ", "out": "IY N"}], norm_form="NFD", out_delimiter=" ")
+            Mapping(
+                rules=[{"in": "ĩ", "out": "IY N"}], norm_form="NFD", out_delimiter=" "
+            )
         )
         tg = transducer(normalize("NFC", "ĩĩ"))
         tg_nfd = transducer_nfd(normalize("NFD", "ĩĩ"))

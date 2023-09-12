@@ -1,0 +1,15 @@
+<<: &shared
+  language_name: Danish
+mappings:
+  - display_name: Danish to IPA
+    in_lang: dan
+    out_lang: dan-ipa
+    type: mapping
+    authors:
+      - Aidan Pine
+    rules_path: dan_to_ipa.csv
+    abbreviations_path: dan_abbs.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: 'none'
+    <<: *shared

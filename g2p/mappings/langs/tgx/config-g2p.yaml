@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: Tagish
+mappings:
+  - display_name: Tagish to IPA
+    rules_path: tgx_to_ipa.json
+    in_lang: tgx
+    out_lang: tgx-ipa
+    rule_ordering: apply-longest-first
+    norm_form: NFD
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared
+  - display_name: Tagish IPA to English IPA
+    rules_path: tgx_ipa_to_eng_ipa.json
+    in_lang: tgx-ipa
+    out_lang: eng-ipa
+    norm_form: NFD
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    authors:
+      - Christopher Cox
+    <<: *shared

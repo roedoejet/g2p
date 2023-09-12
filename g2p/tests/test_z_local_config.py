@@ -20,6 +20,8 @@ import tempfile
 from pathlib import Path
 from unittest import TestCase, main
 
+import yaml
+
 from g2p.app import APP
 from g2p.cli import convert, generate_mapping
 from g2p.mappings.utils import normalize
@@ -64,7 +66,7 @@ class LocalConfigTest(TestCase):
 
         # This test incidentally exercises passing --config a config file with
         # only one mapping in it, without the top-level "mappings:" list.
-        tok_config = self.mappings_dir / "tokenize_punct_config.yaml"
+        tok_config = self.mappings_dir / "tokenize_punct_config-g2p.yaml"
         results = self.runner.invoke(
             convert, ["--tok", "--config", tok_config, "AAA-BBB", "tok-in", "tok-out"]
         )
@@ -87,7 +89,7 @@ class LocalConfigTest(TestCase):
         # cause the next rule to not get its match pattern created, and raise
         # an exception later. The null.csv mapping has such an empty rule,
         # which should get ignored, with the next rule, d->e, still working.
-        null_config = self.mappings_dir / "null_config.yaml"
+        null_config = self.mappings_dir / "null_config-g2p.yaml"
         results = self.runner.invoke(
             convert, ["--config", null_config, "x-ad-x", "null-in", "null-out"]
         )
@@ -96,7 +98,7 @@ class LocalConfigTest(TestCase):
 
     def test_case_feeding_mapping(self):
         """Exercise the mapping using case to prevent feeding on in/out but not context"""
-        case_feeding_config = self.mappings_dir / "case-feed" / "config.yaml"
+        case_feeding_config = self.mappings_dir / "case-feed" / "config-g2p.yaml"
         results = self.runner.invoke(
             convert,
             [
@@ -117,13 +119,13 @@ class LocalConfigTest(TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
             with open(config_file, "wt", encoding="utf8") as f:
-                print("mapping: no-such-file.csv", file=f)
+                yaml.dump({"mappings": [{"rules_path": "no-such-file.csv"}]}, f)
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )
             self.assertNotEqual(results.exit_code, 0)
             self.assertIn(
-                "Cannot load mapping data file", results.output + str(results.exception)
+                "No such file or directory", results.output + str(results.exception)
             )
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -131,14 +133,23 @@ class LocalConfigTest(TestCase):
             with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
                 pass
             with open(config_file, "wt", encoding="utf8") as f:
-                print("mapping: empty.csv", file=f)
-                print("abbreviations: no-such-file.csv", file=f)
+                yaml.dump(
+                    {
+                        "mappings": [
+                            {
+                                "rules_path": "empty.csv",
+                                "abbreviations_path": "no-such-file.csv",
+                            }
+                        ]
+                    },
+                    f,
+                )
             results = self.runner.invoke(
                 convert, ["--config", config_file, "a", "b", "c"]
             )
             self.assertNotEqual(results.exit_code, 0)
             self.assertIn(
-                "Cannot load abbreviations data file",
+                "No such file or directory",
                 results.output + str(results.exception),
             )
 
@@ -157,24 +168,22 @@ class LocalConfigTest(TestCase):
         # TODO: write a internal load_from_config() function, or some such, and
         # factor out the repeated code to use it.
 
-        # This first case has the side effect of loading gen-map_config.yaml
-        config_path = self.mappings_dir / "gen-map_config.yaml"
+        # This first case has the side effect of loading gen-map_config-g2p.yaml
+        config_path = self.mappings_dir / "gen-map_config-g2p.yaml"
         result = self.runner.invoke(
             convert, ["uyoesnmklbdt", "gm2", "gm2-ipa", "--config", config_path]
         )
         self.assertIn("uyɔɛsnmklbdt", result.stdout)
-        # This second case confirms that gen-map_config.yaml is still loaded
+        # This second case confirms that gen-map_config-g2p.yaml is still loaded
         result = self.runner.invoke(convert, ["uyoesnmklbdt", "gm3a", "gm3-ipa"])
         self.assertIn("uyoesnmklbdt", result.stdout)
 
         # Now we do the real tests
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir)
-
             # for debugging:
             # output_dir = Path(".") / "gen-map-tests"
             # output_dir.mkdir(exist_ok=True)
-
             # 1 mapping in to 1 mapping out
             result = self.runner.invoke(
                 generate_mapping,

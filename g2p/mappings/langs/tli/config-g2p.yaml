@@ -1,0 +1,27 @@
+<<: &shared
+  language_name: Tlingit
+mappings:
+  - display_name: Tlingit Equivalencies
+    in_lang: tli
+    out_lang: tli-equiv
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    rules_path: tli_equiv.csv
+    prevent_feeding: false
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
+  - display_name: Tlingit to IPA
+    in_lang: tli-equiv
+    out_lang: tli-ipa
+    authors:
+      - Shankhalika Srikanth
+    type: mapping
+    rules_path: tli_to_ipa.csv
+    prevent_feeding: true
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared

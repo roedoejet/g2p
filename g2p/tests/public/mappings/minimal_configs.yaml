@@ -3,7 +3,7 @@
 mappings:
   - language_name: Minimal
     display_name: Minimal CSV to Minimal
-    mapping: minimal.csv
+    rules_path: minimal.csv
     in_lang: min
     out_lang: min
     rule_ordering: as-written
@@ -16,7 +16,7 @@ mappings:
     <<: *shared
   - language_name: Minimal
     display_name: Minimal TSV to Minimal
-    mapping: minimal.tsv
+    rules_path: minimal.tsv
     in_lang: min
     out_lang: min
     rule_ordering: as-written
@@ -29,7 +29,7 @@ mappings:
     <<: *shared
   - language_name: Minimal
     display_name: Minimal PSV to Minimal
-    mapping: minimal.psv
+    rules_path: minimal.psv
     in_lang: min
     out_lang: min
     rule_ordering: as-written
@@ -42,7 +42,7 @@ mappings:
     <<: *shared
   - language_name: Minimal
     display_name: Minimal JSON to Minimal
-    mapping: minimal.json
+    rules_path: minimal.json
     in_lang: min
     out_lang: min
     rule_ordering: as-written
@@ -55,7 +55,7 @@ mappings:
     <<: *shared
   - language_name: Minimal
     display_name: Minimal XLSX to Minimal
-    mapping: minimal.xlsx
+    rules_path: minimal.xlsx
     in_lang: min
     out_lang: min
     rule_ordering: as-written

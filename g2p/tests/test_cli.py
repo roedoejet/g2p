@@ -1,15 +1,30 @@
 #!/usr/bin/env python
 
+import json
 import os
 import re
 import shutil
 import tempfile
+from pathlib import Path
 from unittest import TestCase, main
 
+import jsonschema
+import yaml
+from tqdm import tqdm
+
+from g2p._version import VERSION
 from g2p.app import APP
-from g2p.cli import convert, doctor, generate_mapping, scan, show_mappings, update
+from g2p.cli import (
+    convert,
+    doctor,
+    generate_mapping,
+    scan,
+    show_mappings,
+    update,
+    update_schema,
+)
 from g2p.log import LOGGER
-from g2p.mappings.langs import load_langs, load_network
+from g2p.mappings.langs import LANGS_DIR, load_langs, load_network
 from g2p.tests.public.data import DATA_DIR, load_public_test_data
 
 
@@ -33,33 +48,33 @@ class CliTest(TestCase):
                     )
             shutil.copy(
                 os.path.join(mappings_dir, "minimal_configs.yaml"),
-                os.path.join(lang1_dir, "config.yaml"),
+                os.path.join(lang1_dir, "config-g2p.yaml"),
             )
             result = self.runner.invoke(update, ["-i", tmpdir])
-            langs_pkl = os.path.join(tmpdir, "langs.pkl")
+            langs_json = os.path.join(tmpdir, "langs.json.gz")
             network_pkl = os.path.join(tmpdir, "network.pkl")
-            self.assertTrue(os.path.exists(langs_pkl))
+            self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
 
         # Make sure it produces output
         with tempfile.TemporaryDirectory() as tmpdir:
             result = self.runner.invoke(update, ["-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
-            langs_pkl = os.path.join(tmpdir, "langs.pkl")
+            langs_json = os.path.join(tmpdir, "langs.json.gz")
             network_pkl = os.path.join(tmpdir, "network.pkl")
-            self.assertTrue(os.path.exists(langs_pkl))
+            self.assertTrue(os.path.exists(langs_json))
             self.assertTrue(os.path.exists(network_pkl))
-            langs = load_langs(langs_pkl)
+            langs = load_langs(langs_json)
             self.assertTrue(langs is not None)
             network = load_network(network_pkl)
             self.assertTrue(network is not None)
             # Corrupt the output and make sure we still can run
-            with open(langs_pkl, "wb") as fh:
+            with open(langs_json, "wb") as fh:
                 fh.write(b"spam spam spam")
             with open(network_pkl, "wb") as fh:
                 fh.write(b"eggs bacon spam")
             with self.assertLogs(LOGGER, "WARNING"):
-                langs = load_langs(langs_pkl)
+                langs = load_langs(langs_json)
             self.assertTrue(langs is not None)
             with self.assertLogs(LOGGER, "WARNING"):
                 network = load_network(network_pkl)
@@ -69,13 +84,29 @@ class CliTest(TestCase):
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertNotEqual(result.exit_code, 0)
-            self.assertIn("language_name", str(result.exception))
+            self.assertIn("mappings", str(result.exception))
         with tempfile.TemporaryDirectory() as tmpdir:
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs2")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
-            self.assertNotEqual(result.exit_code, 0)
-            self.assertIn("language_name", str(result.exception))
-            self.assertIn("min to min", str(result.exception))
+            self.assertEqual(result.exit_code, 0)
+
+    def test_update_schema(self):
+        result = self.runner.invoke(update_schema)
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("FileExistsError", str(result))
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.runner.invoke(update_schema, ["-o", tmpdir])
+            with open(
+                Path(tmpdir) / f"g2p-config-schema-{VERSION}.json", encoding="utf8"
+            ) as f:
+                schema = json.load(f)
+        for config in tqdm(
+            Path(LANGS_DIR).glob("**/config-g2p.yaml"),
+            desc="Validating all configurations against current schema",
+        ):
+            with open(config, encoding="utf8") as f:
+                config_yaml = yaml.safe_load(f)
+            self.assertIsNone(jsonschema.validate(config_yaml, schema=schema))
 
     def test_convert(self):
         langs_to_test = load_public_test_data()
@@ -88,7 +119,7 @@ class CliTest(TestCase):
                 output_string = self.runner.invoke(
                     convert, [*tok_option, test[2], test[0], test[1]]
                 ).stdout.strip()
-                if output_string != test[3].strip():
+                if test[3].strip() not in output_string:
                     LOGGER.warning(
                         f"test_cli.py for {test[-1]}: {test[0]}->{test[1]} mapping error: '{test[2]}' "
                         f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."
@@ -429,6 +460,19 @@ class CliTest(TestCase):
         results_long = self.runner.invoke(convert, "--help")
         self.assertEqual(results_long.exit_code, 0)
         self.assertEqual(results_short.output, results_long.output)
+
+    def test_generate_mapping(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = self.runner.invoke(
+                generate_mapping, ["--ipa", "--out-dir", tmpdir, "fra"]
+            )
+            self.assertEqual(result.exit_code, 0)
+            with open(
+                os.path.join(tmpdir, "fra-ipa_to_eng-ipa.json"), "r", encoding="utf8"
+            ) as f:
+                fra2eng_ipa = json.load(f)
+            for s in ("ɛj", "ks", "ɔn"):
+                self.assertIn({"in": s, "out": s}, fra2eng_ipa)
 
 
 if __name__ == "__main__":

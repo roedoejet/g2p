@@ -1,0 +1,31 @@
+<<: &shared
+  language_name: Swampy Cree
+mappings:
+  - display_name: Swampy Cree Equivalencies
+    in_lang: csw
+    out_lang: csw-equiv
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Bradley Ellert
+      - Aidan Pine
+    rules_path: csw_equiv.json
+    <<: *shared
+  - display_name: Swampy Cree to IPA
+    in_lang: csw-equiv
+    out_lang: csw-ipa
+    type: mapping
+    authors:
+      - David Huggins-Daines
+      - Patrick Littell
+      - Delasie Torkornoo
+      - Bradley Ellert
+    rules_path: csw_to_ipa.json
+    <<: *shared
+  - display_name: Swampy Cree IPA to English IPA
+    in_lang: csw-ipa
+    out_lang: eng-ipa
+    type: mapping
+    rules_path: csw_ipa_to_eng_ipa.json
+    rule_ordering: as-written
+    <<: *shared

@@ -9,9 +9,12 @@ from tempfile import NamedTemporaryFile
 from typing import List
 from unittest import TestCase, main
 
+from pydantic import ValidationError
+
 from g2p import exceptions
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, Rule
+from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
 
@@ -30,13 +33,13 @@ class MappingTest(TestCase):
 
     def setUp(self):
         self.test_mapping_no_norm = Mapping(
-            [
+            rules=[
                 {"in": "\u00e1", "out": "\u00e1"},
                 {"in": "\u0061\u0301", "out": "\u0061\u0301"},
             ],
             norm_form="none",
         )
-        self.test_mapping_norm = Mapping([{"in": "\u00e1", "out": "\u00e1"}])
+        self.test_mapping_norm = Mapping(rules=[{"in": "\u00e1", "out": "\u00e1"}])
         with open(
             os.path.join(os.path.dirname(public_data), "git_to_ipa.json"),
             encoding="utf8",
@@ -45,22 +48,37 @@ class MappingTest(TestCase):
 
     def test_normalization(self):
         self.assertEqual(
-            ud.normalize("NFD", "\u00e1"), self.test_mapping_norm.mapping[0]["in"]
+            ud.normalize("NFD", "\u00e1"), self.test_mapping_norm.rules[0].rule_input
         )
-        self.assertNotEqual(self.test_mapping_norm.mapping[0]["in"], "\u00e1")
-        self.assertEqual(self.test_mapping_norm.mapping[0]["in"], "\u0061\u0301")
-        self.assertEqual(self.test_mapping_no_norm.mapping[0]["in"], "\u00e1")
-        self.assertEqual(self.test_mapping_no_norm.mapping[0]["out"], "\u00e1")
-        self.assertEqual(self.test_mapping_no_norm.mapping[1]["in"], "\u0061\u0301")
-        self.assertEqual(self.test_mapping_no_norm.mapping[1]["out"], "\u0061\u0301")
+        self.assertNotEqual(self.test_mapping_norm.rules[0].rule_input, "\u00e1")
+        self.assertEqual(self.test_mapping_norm.rules[0].rule_input, "\u0061\u0301")
+        self.assertEqual(self.test_mapping_no_norm.rules[0].rule_input, "\u00e1")
+        self.assertEqual(self.test_mapping_no_norm.rules[0].rule_output, "\u00e1")
+        self.assertEqual(self.test_mapping_no_norm.rules[1].rule_input, "\u0061\u0301")
+        self.assertEqual(self.test_mapping_no_norm.rules[1].rule_output, "\u0061\u0301")
 
     def test_json_map(self):
         json_map = Mapping(
-            self.json_map["map"],
+            rules=self.json_map["map"],
             **{k: v for k, v in self.json_map.items() if k != "map"}
         )
-        self.assertEqual(len(json_map), 34)
-        self.assertTrue(json_map.kwargs["in_metadata"]["case_insensitive"])
+        self.assertEqual(len(json_map.rules), 34)
+        # This is a very old version of the config, I'm not even sure these tests should be in here at all.
+        # self.assertTrue(json_map.kwargs["in_metadata"]["case_insensitive"])
+
+    def test_no_mappings_key(self):
+        with self.assertRaises(ValidationError):
+            Mapping.load_mapping_from_path(
+                os.path.join(
+                    os.path.dirname(public_data), "mappings", "no_mappings_key.yaml"
+                )
+            )
+
+    def test_improperly_initialized(self):
+        mapping = Mapping(rules=[Rule(rule_input="a", rule_output="b")])
+        mapping.rules = [{"rule_input": "something misguided"}]
+        with self.assertRaises(AttributeError):
+            mapping.inventory()
 
     def test_as_is(self):
         """
@@ -71,9 +89,11 @@ class MappingTest(TestCase):
         log_output = io.StringIO()
         with redirect_stderr(log_output):
             mapping_sorted = Mapping(
-                [{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}], as_is=False
+                rules=[{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}], as_is=False
             )
-        self.assertTrue(mapping_sorted.wants_rules_sorted())
+        self.assertTrue(
+            mapping_sorted.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first
+        )
         self.assertIn(
             "deprecated",
             log_output.getvalue(),
@@ -89,9 +109,11 @@ class MappingTest(TestCase):
         log_output = io.StringIO()
         with redirect_stderr(log_output):
             mapping = Mapping(
-                [{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}], as_is=True
+                rules=[{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}], as_is=True
             )
-        self.assertFalse(mapping.wants_rules_sorted())
+        self.assertFalse(
+            mapping.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first
+        )
         self.assertIn(
             "deprecated",
             log_output.getvalue(),
@@ -104,8 +126,12 @@ class MappingTest(TestCase):
         )
 
         # test the default (rule_ordering="as-written")
-        mapping_as_is = Mapping([{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}])
-        self.assertFalse(mapping.wants_rules_sorted())
+        mapping_as_is = Mapping(
+            rules=[{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}]
+        )
+        self.assertFalse(
+            mapping.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first
+        )
 
         # test the alternative (rule_ordering="apply-longest-first")
         transducer = Transducer(mapping_sorted)
@@ -126,14 +152,16 @@ class MappingTest(TestCase):
         rules = [{"in": "a", "out": "b"}, {"in": "aa", "out": "c"}]
 
         transducer_longest_first = Transducer(
-            Mapping(rules, rule_ordering="apply-longest-first")
+            Mapping(rules=rules, rule_ordering="apply-longest-first")
         )
         self.assertEqual(transducer_longest_first("aa").output_string, "c")
 
-        transducer_as_written = Transducer(Mapping(rules, rule_ordering="as-written"))
+        transducer_as_written = Transducer(
+            Mapping(rules=rules, rule_ordering="as-written")
+        )
         self.assertEqual(transducer_as_written("aa").output_string, "bb")
 
-        transducer_default = Transducer(Mapping(rules))
+        transducer_default = Transducer(Mapping(rules=rules))
         self.assertEqual(transducer_default("aa").output_string, "bb")
 
     def test_rule_ordering_given_invalid_value(self):
@@ -145,18 +173,14 @@ class MappingTest(TestCase):
 
         # typo in the valid setting:
         incorrect_value = "apply-longest-frist"
-        correct_value = "apply-longest-first"
 
         log_output = io.StringIO()
-        with redirect_stderr(log_output):
-            Mapping(rules, rule_ordering=incorrect_value)
-
-        self.assertIn(incorrect_value, log_output.getvalue())
-        self.assertIn(correct_value, log_output.getvalue())
+        with redirect_stderr(log_output) and self.assertRaises(ValidationError):
+            Mapping(rules=rules, rule_ordering=incorrect_value)
 
     def test_case_sensitive(self):
-        mapping = Mapping([{"in": "A", "out": "b"}], case_sensitive=False)
-        mapping_case_sensitive = Mapping([{"in": "A", "out": "b"}])
+        mapping = Mapping(rules=[{"in": "A", "out": "b"}], case_sensitive=False)
+        mapping_case_sensitive = Mapping(rules=[{"in": "A", "out": "b"}])
         transducer = Transducer(mapping)
         transducer_case_sensitive = Transducer(mapping_case_sensitive)
         self.assertEqual(transducer("a").output_string, "b")
@@ -164,26 +188,35 @@ class MappingTest(TestCase):
         self.assertEqual(transducer("A").output_string, "b")
 
     def test_escape_special(self):
-        mapping = Mapping([{"in": r"\d", "out": "digit"}])
-        mapping_escaped = Mapping([{"in": r"\d", "out": "b"}], escape_special=True)
-        mapping_input_and_output_special_escaped = Mapping([{"in": "&", "out": "&"}], escape_special=True)
-        mapping_specific_from_fpcc = Mapping([{"in": r"^", "out": "A"}, {"in": "o", "out": r"."}], rule_ordering="apply-longest-first", escape_special=True)
+        mapping = Mapping(rules=[{"in": r"\d", "out": "digit"}])
+        mapping_escaped = Mapping(
+            rules=[{"in": r"\d", "out": "b"}], escape_special=True
+        )
+        mapping_input_and_output_special_escaped = Mapping(
+            rules=[{"in": "&", "out": "&"}], escape_special=True
+        )
+        mapping_specific_from_fpcc = Mapping(
+            rules=[{"in": r"^", "out": "A"}, {"in": "o", "out": r"."}],
+            rule_ordering="apply-longest-first",
+            escape_special=True,
+        )
         transducer = Transducer(mapping)
         transducer_escaped = Transducer(mapping_escaped)
-        transducer_escaped_input_output = Transducer(mapping_input_and_output_special_escaped)
+        transducer_escaped_input_output = Transducer(
+            mapping_input_and_output_special_escaped
+        )
         transducer_fpcc = Transducer(mapping_specific_from_fpcc)
         self.assertEqual(transducer("1").output_string, "digit")
         self.assertEqual(transducer(r"\d").output_string, r"\d")
         self.assertEqual(transducer_escaped("1").output_string, "1")
         self.assertEqual(transducer_escaped(r"\d").output_string, "b")
-        self.assertEqual(transducer_escaped_input_output('&').output_string, "&")
+        self.assertEqual(transducer_escaped_input_output("&").output_string, "&")
         self.assertEqual(transducer_fpcc("^o").output_string, "A.")
-        
 
     def test_norm_form(self):
-        mapping_nfc = Mapping([{"in": "a\u0301", "out": "a"}])  # Defaults to NFC
-        mapping_nfd = Mapping([{"in": "a\u0301", "out": "a"}], norm_form="NFD")
-        mapping_none = Mapping([{"in": "a\u0301", "out": "a"}], norm_form=False)
+        mapping_nfc = Mapping(rules=[{"in": "a\u0301", "out": "a"}])  # Defaults to NFC
+        mapping_nfd = Mapping(rules=[{"in": "a\u0301", "out": "a"}], norm_form="NFD")
+        mapping_none = Mapping(rules=[{"in": "a\u0301", "out": "a"}], norm_form=False)
 
         transducer_nfc = Transducer(mapping_nfc)
         transducer_nfd = Transducer(mapping_nfd)
@@ -197,8 +230,8 @@ class MappingTest(TestCase):
         self.assertEqual(transducer_none("\u00E1").output_string, "\u00E1")
 
     def test_reverse(self):
-        mapping = Mapping([{"in": "a", "out": "b"}])
-        mapping_reversed = Mapping([{"in": "a", "out": "b"}], reverse=True)
+        mapping = Mapping(rules=[{"in": "a", "out": "b"}])
+        mapping_reversed = Mapping(rules=[{"in": "a", "out": "b"}], reverse=True)
         transducer = Transducer(mapping)
         transducer_reversed = Transducer(mapping_reversed)
         self.assertEqual(transducer("a").output_string, "b")
@@ -207,28 +240,30 @@ class MappingTest(TestCase):
         self.assertEqual(transducer_reversed("b").output_string, "a")
 
     def test_minimal(self):
-        mapping = Mapping(
+        mapping = Mapping.load_mapping_from_path(
             os.path.join(
-                os.path.dirname(public_data), "mappings", "minimal_config.yaml"
+                os.path.dirname(public_data), "mappings", "minimal_config-g2p.yaml"
             )
         )
         transducer = Transducer(mapping)
         self.assertEqual(transducer("abb").output_string, "aaa")
         self.assertEqual(transducer("a").output_string, "a")
-        self.assertFalse(mapping.wants_rules_sorted())
-        self.assertFalse(mapping.kwargs["case_sensitive"])
-        self.assertTrue(mapping.kwargs["escape_special"])
-        self.assertEqual(mapping.kwargs["norm_form"], "NFD")
-        self.assertTrue(mapping.kwargs["reverse"])
+        self.assertFalse(
+            mapping.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first
+        )
+        self.assertFalse(mapping.case_sensitive)
+        self.assertTrue(mapping.escape_special)
+        self.assertEqual(mapping.norm_form, NORM_FORM_ENUM.NFD)
+        self.assertTrue(mapping.reverse)
 
     def test_abbreviations(self):
-        mapping = Mapping(
+        mapping = Mapping.load_mapping_from_path(
             os.path.join(
-                os.path.dirname(public_data), "mappings", "abbreviation_config.yaml"
+                os.path.dirname(public_data), "mappings", "abbreviation_config-g2p.yaml"
             )
         )
-        self.assertEqual(mapping.mapping[0]["in"], "i|u")
-        self.assertEqual(mapping.mapping[1]["in"], "a|e|i|o|u")
+        self.assertEqual(mapping.rules[0].rule_input, "i|u")
+        self.assertEqual(mapping.rules[1].rule_input, "a|e|i|o|u")
         transducer = Transducer(mapping)
         self.assertEqual(transducer("i").output_string, "1")
         self.assertEqual(transducer("e").output_string, "2")
@@ -237,27 +272,28 @@ class MappingTest(TestCase):
         """
         Same as test_minimal, but uses "rule-ordering" instead of "as-is" in the config.
         """
-        mapping = Mapping(
+        mapping = Mapping.load_mapping_from_path(
             os.path.join(os.path.dirname(public_data), "mappings", "rule-ordering.yaml")
         )
         transducer = Transducer(mapping)
         self.assertEqual(transducer("abb").output_string, "aaa")
         self.assertEqual(transducer("a").output_string, "a")
-        self.assertTrue(mapping.wants_rules_sorted())
-        self.assertEqual(mapping.kwargs["rule_ordering"], "apply-longest-first")
-        self.assertFalse(mapping.kwargs["case_sensitive"])
-        self.assertTrue(mapping.kwargs["escape_special"])
-        self.assertEqual(mapping.kwargs["norm_form"], "NFD")
-        self.assertTrue(mapping.kwargs["reverse"])
+        self.assertTrue(mapping.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first)
+        self.assertEqual(mapping.rule_ordering, RULE_ORDERING_ENUM.apply_longest_first)
+        self.assertFalse(mapping.case_sensitive)
+        self.assertTrue(mapping.escape_special)
+        self.assertEqual(mapping.norm_form, NORM_FORM_ENUM.NFD)
+        self.assertTrue(mapping.reverse)
 
     def test_null_input(self):
-        with self.assertLogs(LOGGER, level="WARNING"):
-            mapping = Mapping([{"in": "", "out": "a"}])
-        self.assertFalse(mapping())
+        with self.assertLogs(LOGGER, "WARNING"):
+            Mapping(rules=[{"in": "", "out": "a"}])
 
     def test_no_escape(self):
         mapping = Mapping(
-            os.path.join(os.path.dirname(public_data), "mappings", "no_escape.csv")
+            rules_path=os.path.join(
+                os.path.dirname(public_data), "mappings", "no_escape.csv"
+            )
         )
         transducer = Transducer(mapping)
         self.assertEqual(transducer("?").output_string, "ʔ")
@@ -266,12 +302,13 @@ class MappingTest(TestCase):
         rules = [{"in": "fo(o", "out": "bar"}]
         with self.assertLogs(LOGGER, level="ERROR"):
             with self.assertRaises(exceptions.MalformedMapping) as cm:
-                _ = Mapping(rules)
+                _ = Mapping(rules=rules)
         self.assertIn("regex", cm.exception.message)
 
     def test_invalid_rules_json(self):
         rules = [{"in": "a"}, {"out": "c"}]
-        self.assertRaises(exceptions.MalformedMapping, Mapping, rules)
+        with self.assertRaises(ValidationError):
+            Mapping(rules=rules)
 
     def test_invalid_rules_csv(self):
         tf = NamedTemporaryFile(
@@ -279,7 +316,8 @@ class MappingTest(TestCase):
         )
         tf.write("good-in,good-out\n\ngood-in-no-out\n")
         tf.close()
-        self.assertRaises(exceptions.MalformedMapping, Mapping, tf.name)
+        with self.assertRaises(exceptions.MalformedMapping):
+            Mapping(rules_path=tf.name)
         os.unlink(tf.name)
 
     def test_invalid_rules_filetype(self):
@@ -288,26 +326,29 @@ class MappingTest(TestCase):
         )
         tf.write("good-in,good-out\n\ngood-in-no-out\n")
         tf.close()
-        self.assertRaises(exceptions.IncorrectFileType, Mapping, tf.name)
+        with self.assertRaises(exceptions.IncorrectFileType):
+            Mapping(rules_path=tf.name)
         os.unlink(tf.name)
 
     def test_extend_and_deduplicate(self):
-        mapping1 = Mapping(rules_from_strings("a:b", "c:d", "g:h"))
-        mapping2 = Mapping(rules_from_strings("a:x", "c:d", "e:f"))
+        mapping1 = Mapping(rules=rules_from_strings("a:b", "c:d", "g:h"))
+        mapping2 = Mapping(rules=rules_from_strings("a:x", "c:d", "e:f"))
         extend_ref = Mapping(
-            rules_from_strings("a:b", "c:d", "g:h", "a:x", "c:d", "e:f")
+            rules=rules_from_strings("a:b", "c:d", "g:h", "a:x", "c:d", "e:f")
         )
         mapping1.extend(mapping2)
-        self.assertEqual(mapping1.mapping, extend_ref.mapping)
-        dedup_ref = Mapping(rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
+        self.assertEqual(mapping1.rules, extend_ref.rules)
+        dedup_ref = Mapping(rules=rules_from_strings("a:b", "c:d", "g:h", "a:x", "e:f"))
         mapping1.deduplicate()
-        self.assertEqual(mapping1.mapping, dedup_ref.mapping)
+        self.assertEqual(mapping1.rules, dedup_ref.rules)
 
     def test_g2p_studio_csv(self):
         # Ensure that a single CSV file from Studio works properly
         with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
             mapping = Mapping(
-                os.path.join(os.path.dirname(public_data), "mappings", "g2p_studio.csv")
+                rules_path=os.path.join(
+                    os.path.dirname(public_data), "mappings", "g2p_studio.csv"
+                )
             )
         transducer = Transducer(mapping)
         self.assertEqual(
@@ -336,7 +377,7 @@ class MappingTest(TestCase):
             tf.write(fh.read())
         tf.close()
         with self.assertLogs(LOGGER, level="WARNING"):  # silence "" input warnings
-            mapping = Mapping(tf.name)
+            mapping = Mapping(rules_path=tf.name)
         transducer = Transducer(mapping)
         self.assertEqual(
             transducer("tee on herkullista").output_string, "teː on herkullistɑ"

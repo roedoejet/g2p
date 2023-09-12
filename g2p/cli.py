@@ -7,9 +7,10 @@ import os
 import pprint
 import re
 import sys
+from pathlib import Path
+from typing import List, Tuple
 
 import click
-import yaml
 from flask.cli import FlaskGroup
 from networkx import has_path
 
@@ -19,7 +20,7 @@ from g2p.api import update_docs
 from g2p.app import APP
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.create_fallback_mapping import (
     DUMMY_INVENTORY,
     align_to_dummy_fallback,
@@ -31,9 +32,8 @@ from g2p.mappings.create_ipa_mapping import (
 )
 from g2p.mappings.langs import (
     LANGS_DIR,
+    LANGS_JSON_NAME,
     LANGS_NETWORK,
-    LANGS_PKL_NAME,
-    MAPPINGS_AVAILABLE,
     NETWORK_PKL_NAME,
     reload_db,
 )
@@ -42,7 +42,7 @@ from g2p.mappings.langs.utils import (
     check_ipa_known_segs,
     network_to_echart,
 )
-from g2p.mappings.utils import is_ipa, is_xsampa, load_mapping_from_path, normalize
+from g2p.mappings.utils import is_ipa, is_xsampa, normalize
 from g2p.static import __file__ as static_file
 from g2p.transducer import Transducer
 
@@ -81,7 +81,7 @@ def parse_from_or_to_lang_spec(lang_spec):
 
     if out_lang:
         try:
-            mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
+            mapping = Mapping.find_mapping(in_lang=in_lang, out_lang=out_lang)
         except MappingMissing as e:
             raise click.BadParameter(
                 f'Cannot find mapping {in_lang}->{out_lang} for --from or --to spec "{lang_spec}": {e}'
@@ -111,16 +111,16 @@ def parse_from_or_to_lang_spec(lang_spec):
                 "supported with the full in-lang_to_out-lang[[in]|[out]] syntax."
             )
         if in_lang == "eng":
-            mapping = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
+            mapping = Mapping.find_mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
             in_or_out = "in"
             return [(mapping, in_or_out)]
         else:
             out_lang = in_lang + "-ipa"
             # check_ipa_known_segs([out_lang])  # this outputs a lot of spurious noise...
             mappings = [
-                (Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"]), "out")
+                (Mapping.find_mapping(in_lang=m.in_lang, out_lang=m.out_lang), "out")
                 for m in MAPPINGS_AVAILABLE
-                if m["out_lang"] == out_lang and not is_ipa(m["in_lang"])
+                if m.out_lang == out_lang and not is_ipa(m.in_lang)
             ]
             if not mappings:
                 raise click.BadParameter(f'No IPA mappings found for "{lang_spec}".')
@@ -322,12 +322,6 @@ def generate_mapping(  # noqa: C901
         if out_lang is None:
             raise click.UsageError("OUT_LANG is required with --merge.")
 
-    if out_dir and not os.path.isdir(out_dir):
-        raise click.BadParameter(
-            f'Output directory "{out_dir}" does not exist. Cannot write mapping.',
-            param_hint="--out-dir",
-        )
-
     if list_dummy:
         # --list-dummy mode
         print(f"Dummy phone inventory: {DUMMY_INVENTORY}")
@@ -365,7 +359,9 @@ def generate_mapping(  # noqa: C901
         source_mappings = []
         for in_lang in in_langs:
             try:
-                source_mapping = Mapping(in_lang=in_lang, out_lang=out_lang)
+                source_mapping = Mapping.find_mapping(
+                    in_lang=in_lang, out_lang=out_lang
+                )
             except MappingMissing as e:
                 raise click.BadParameter(
                     f'Cannot find IPA mapping from "{in_lang}" to "{out_lang}": {e}',
@@ -375,7 +371,7 @@ def generate_mapping(  # noqa: C901
 
         if ipa:
             check_ipa_known_segs([f"{in_lang}-ipa"])
-            eng_ipa = Mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
+            eng_ipa = Mapping.find_mapping(in_lang="eng-ipa", out_lang="eng-arpabet")
             click.echo(f"Writing English IPA mapping for {out_lang} to file")
             new_mapping = create_mapping(source_mappings[0], eng_ipa, distance=distance)
             for m in source_mappings[1:]:
@@ -399,10 +395,10 @@ def generate_mapping(  # noqa: C901
         # --from/--to mode
         assert to_langs is not None
 
-        from_mappings = []
+        from_mappings: List[Tuple[Mapping, str]] = []
         for from_lang in re.split(r"[:,]", from_langs):
             from_mappings.extend(parse_from_or_to_lang_spec(from_lang))
-        to_mappings = []
+        to_mappings: List[Tuple[Mapping, str]] = []
         for to_lang in re.split(r"[:,]", to_langs):
             to_mappings.extend(parse_from_or_to_lang_spec(to_lang))
 
@@ -417,11 +413,11 @@ def generate_mapping(  # noqa: C901
 
         for from_mapping, in_or_out in from_mappings:
             LOGGER.info(
-                f'From mapping: {from_mapping.kwargs["in_lang"]}_to_{from_mapping.kwargs["out_lang"]}[{in_or_out}]'
+                f"From mapping: {from_mapping.in_lang}_to_{from_mapping.out_lang}[{in_or_out}]"
             )
         for to_mapping, in_or_out in to_mappings:
             LOGGER.info(
-                f'To mapping: {to_mapping.kwargs["in_lang"]}_to_{to_mapping.kwargs["out_lang"]}[{in_or_out}]'
+                f"To mapping: {to_mapping.in_lang}_to_{to_mapping.out_lang}[{in_or_out}]"
             )
 
         new_mapping = create_multi_mapping(
@@ -515,21 +511,17 @@ def convert(  # noqa: C901
     if config:
         # This isn't that DRY - copied from g2p/mappings/langs/__init__.py
         mappings_legal_pairs = []
-        with open(config, encoding="utf8") as f:
-            data = yaml.safe_load(f)
-        if "mappings" in data:
-            for index, mapping in enumerate(data["mappings"]):
-                mappings_legal_pairs.append(
-                    (
-                        data["mappings"][index]["in_lang"],
-                        data["mappings"][index]["out_lang"],
-                    )
+        mapping_config = MappingConfig.load_mapping_config_from_path(config)
+        for index in range(len(mapping_config.mappings)):
+            mappings_legal_pairs.append(
+                (
+                    mapping_config.mappings[index].in_lang,
+                    mapping_config.mappings[index].out_lang,
                 )
-                data["mappings"][index] = load_mapping_from_path(config, index)
-        else:
-            mapping = load_mapping_from_path(config)
-            data["mappings"] = [mapping]
-            mappings_legal_pairs.append((mapping["in_lang"], mapping["out_lang"]))
+            )
+            mapping_config.mappings[index] = Mapping.load_mapping_from_path(
+                config, index
+            )
         for pair in mappings_legal_pairs:
             if pair[0] in LANGS_NETWORK.nodes:
                 LOGGER.warning(
@@ -537,7 +529,7 @@ def convert(  # noqa: C901
                     "Your local mapping with the same name might not function properly."
                 )
         LANGS_NETWORK.add_edges_from(mappings_legal_pairs)
-        MAPPINGS_AVAILABLE.extend(data["mappings"])
+        MAPPINGS_AVAILABLE.extend(mapping_config.mappings)
     # Check input lang exists
     if in_lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{in_lang}' is not a valid value for 'IN_LANG'")
@@ -604,7 +596,7 @@ def doctor(mapping, list_all, list_ipa):
     http://g2p-studio.herokuapp.com/api/v1/langs .
     """
     if list_all or list_ipa:
-        out_langs = sorted({x["out_lang"] for x in MAPPINGS_AVAILABLE})
+        out_langs = sorted({x.out_lang for x in MAPPINGS_AVAILABLE})
         if list_ipa:
             out_langs = [x for x in out_langs if is_ipa(x)]
         LOGGER.info(
@@ -614,16 +606,14 @@ def doctor(mapping, list_all, list_ipa):
             print(f"{m}: ", end="")
             print(
                 ("\n" + " " * len(m) + "  ").join(
-                    sorted(
-                        x["in_lang"] for x in MAPPINGS_AVAILABLE if x["out_lang"] == m
-                    )
+                    sorted(x.in_lang for x in MAPPINGS_AVAILABLE if x.out_lang == m)
                 )
             )
             print("")
         return
 
     for m in mapping:
-        if m not in [x["out_lang"] for x in MAPPINGS_AVAILABLE]:
+        if m not in [x.out_lang for x in MAPPINGS_AVAILABLE]:
             raise click.UsageError(
                 f"No known mappings into '{m}'. "
                 "Use --list-all or --list-ipa to list valid options."
@@ -659,10 +649,10 @@ def update(in_dir, out_dir):
     if in_dir is None:
         in_dir = LANGS_DIR
     if out_dir is None:
-        langs_path = os.path.join(in_dir, LANGS_PKL_NAME)
+        langs_path = os.path.join(in_dir, LANGS_JSON_NAME)
         network_path = os.path.join(in_dir, NETWORK_PKL_NAME)
     else:
-        langs_path = os.path.join(out_dir, LANGS_PKL_NAME)
+        langs_path = os.path.join(out_dir, LANGS_JSON_NAME)
         network_path = os.path.join(out_dir, NETWORK_PKL_NAME)
     cache_langs(dir_path=in_dir, langs_path=langs_path, network_path=network_path)
 
@@ -673,6 +663,33 @@ def update(in_dir, out_dir):
         network_to_echart(
             outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
         )  # updates g2p/status/languages-network.json
+
+
+@click.option(
+    "-o",
+    "--out-dir",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True),
+    help=f"Output results in DIRECTORY instead of the installed directory ({Path(LANGS_DIR) / '..' / '.schema'}).",
+)
+@cli.command(context_settings=CONTEXT_SETTINGS)
+def update_schema(out_dir):
+    """Generate a schema for the model configuration - this should only be done once for each Minor version.
+    Changes to the schema should result in a minor version bump.
+    """
+    # Determine path
+    if out_dir is None:
+        schema_path = (
+            Path(LANGS_DIR) / ".." / ".schema" / f"g2p-config-schema-{VERSION}.json"
+        )
+    else:
+        schema_path = Path(out_dir) / f"g2p-config-schema-{VERSION}.json"
+    # Generate schema
+    if schema_path.exists():
+        raise FileExistsError(
+            f"Sorry a schema already exists for version {VERSION}. Please bump the minor version number and generate the schema again."
+        )
+    with open(schema_path, "w") as f:
+        json.dump(MappingConfig.model_json_schema(), f)
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
@@ -693,23 +710,23 @@ def scan(lang, path):
 
     # Retrieve the mappings for lang
     case_sensitive = True
-    mappings = []
+    mappings: List[Mapping] = []
     for mapping in MAPPINGS_AVAILABLE:
-        mapping_name = mapping["in_lang"]
+        mapping_name = mapping.in_lang
         # Exclude mappings for converting between IPAs
         if mapping_name.startswith(lang) and "ipa" not in mapping_name:
-            case_sensitive = case_sensitive and mapping.get("case_sensitive", True)
+            case_sensitive = case_sensitive and mapping.case_sensitive
             mappings.append(mapping)
 
     # Get input chars in mapping
     mapped_chars = set()
     for lang_mapping in mappings:
-        for x in lang_mapping["mapping_data"]:
-            mapped_chars.add(normalize(x["in"], "NFD"))
+        for x in lang_mapping.rules:
+            mapped_chars.add(normalize(x.rule_input, "NFD"))
     # Find unmapped chars
     filter_chars = " \n"
     mapped_string = "".join(mapped_chars)
-    pattern = "[^" + mapped_string + filter_chars + ".]"
+    pattern = f"[^{mapped_string}{filter_chars}.]"
     prog = re.compile(pattern)
 
     with open(path, "r", encoding="utf8") as file:
@@ -755,9 +772,9 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     elif lang1 is not None:
         mappings = [
-            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+            Mapping.find_mapping(in_lang=m.in_lang, out_lang=m.out_lang)
             for m in MAPPINGS_AVAILABLE
-            if m["in_lang"] == lang1 or m["out_lang"] == lang1
+            if m.in_lang == lang1 or m.out_lang == lang1
         ]
         if not mappings:
             raise click.BadParameter(
@@ -766,18 +783,23 @@ def show_mappings(lang1, lang2, verbose, csv):
 
     else:
         mappings = (
-            Mapping(in_lang=m["in_lang"], out_lang=m["out_lang"])
+            Mapping.find_mapping(in_lang=m.in_lang, out_lang=m.out_lang)
             for m in MAPPINGS_AVAILABLE
         )
 
     file_type = "csv" if csv else "json"
     if verbose:
         for m in mappings:
-            json.dump(m.kwargs, sys.stdout, indent=4, ensure_ascii=False)
+            json.dump(
+                json.loads(m.model_dump_json(exclude={"rules": True})),
+                sys.stdout,
+                indent=4,
+                ensure_ascii=False,
+            )
             print()
             m.mapping_to_stream(sys.stdout, file_type=file_type)
             print()
             print()
     else:
         for i, m in enumerate(mappings):
-            print(f"{i+1}: {m.kwargs['in_lang']} → {m.kwargs['out_lang']}")
+            print(f"{i+1}: {m.in_lang} → {m.out_lang}")

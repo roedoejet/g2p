@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: Innu-aimun
+mappings:
+  - display_name: Innu-aimun to IPA
+    in_lang: moe
+    out_lang: moe-ipa
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Bradley Ellert
+    rules_path: moe_to_ipa.json
+    abbreviations_path: moe_abbs.csv
+    case_sensitive: false
+    <<: *shared

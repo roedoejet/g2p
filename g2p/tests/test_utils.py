@@ -11,9 +11,10 @@ from unittest import TestCase, main
 import yaml
 
 from g2p import get_arpabet_langs
-from g2p.exceptions import IncorrectFileType, MalformedMapping, RecursionError
+from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
+from g2p.mappings.utils import RULE_ORDERING_ENUM, Rule
 from g2p.tests.public import PUBLIC_DIR
 
 
@@ -23,7 +24,7 @@ class UtilsTest(TestCase):
 
     def tearDown(self):
         gen_mapping = os.path.join(PUBLIC_DIR, "mappings", "test_to_test-out.json")
-        gen_config = os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+        gen_config = os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
         if os.path.exists(gen_config):
             os.remove(gen_config)
         if os.path.exists(gen_mapping):
@@ -104,39 +105,41 @@ class UtilsTest(TestCase):
             )
 
     def test_load_mapping(self):
-        with self.assertRaises(MalformedMapping):
-            utils.load_mapping_from_path(
-                os.path.join(PUBLIC_DIR, "mappings", "malformed_config.yaml")
+        with self.assertLogs(LOGGER, "WARNING"):
+            Mapping.load_mapping_from_path(
+                os.path.join(PUBLIC_DIR, "mappings", "malformed_config-g2p.yaml")
             )
-        minimal = utils.load_mapping_from_path(
-            os.path.join(PUBLIC_DIR, "mappings", "minimal_config.yaml")
+        minimal = Mapping.load_mapping_from_path(
+            os.path.join(PUBLIC_DIR, "mappings", "minimal_config-g2p.yaml")
         )
-        csv = utils.load_mapping_from_path(
+        csv = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 0
         )
-        tsv = utils.load_mapping_from_path(
+        tsv = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 1
         )
-        psv = utils.load_mapping_from_path(
+        psv = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 2
         )
-        json = utils.load_mapping_from_path(
+        json = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 3
         )
-        xlsx = utils.load_mapping_from_path(
+        xlsx = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "minimal_configs.yaml"), 4
         )
-        self.assertEqual(minimal["mapping_data"], csv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], tsv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], psv["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], json["mapping_data"])
-        self.assertEqual(minimal["mapping_data"], xlsx["mapping_data"])
-
-    def test_validate(self):
-        pass
+        self.assertEqual(minimal.rules, csv.rules)
+        self.assertEqual(minimal.rules, tsv.rules)
+        self.assertEqual(minimal.rules, psv.rules)
+        self.assertEqual(minimal.rules, json.rules)
+        self.assertEqual(minimal.rules, xlsx.rules)
 
     def test_escape_special(self):
-        self.assertEqual(utils.escape_special_characters({"in": "?"}), {"in": "\\?"})
+        self.assertEqual(
+            utils.escape_special_characters(
+                Rule(rule_input="?", rule_output="")
+            ).rule_input,
+            "\\?",
+        )
 
     def test_load_abbs(self):
         with self.assertRaises(IncorrectFileType):
@@ -151,46 +154,48 @@ class UtilsTest(TestCase):
             self.assertEqual(abbs["VOWEL"], ["a", "e", "i", "o", "u"])
 
     def test_generated_mapping(self):
-        config = {
-            "in_lang": "test",
-            "out_lang": "test-out",
-            "rule_ordering": "apply-longest-first",
-        }
         # config = utils.generate_config('test', 'test-out', 'Test', 'TestOut')
-        config["mapping"] = [{"in": "a", "out": "b"}]
-        mapping = Mapping(**config)
+        mapping = Mapping(
+            in_lang="test",
+            out_lang="test-out",
+            rule_ordering=RULE_ORDERING_ENUM.apply_longest_first,
+            rules=[Rule(rule_input="a", rule_output="b")],
+        )
         with self.assertLogs(LOGGER, level="WARNING"):
             mapping.config_to_file(
-                os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+                os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
             )
         with self.assertLogs(LOGGER, level="WARNING"):
             mapping.config_to_file(
                 os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
             )
         mapping.mapping_to_file(os.path.join(PUBLIC_DIR, "mappings"))
-        test_config = utils.load_mapping_from_path(
-            os.path.join(PUBLIC_DIR, "mappings", "test_config.yaml")
+        test_config = Mapping.load_mapping_from_path(
+            os.path.join(PUBLIC_DIR, "mappings", "test_config-g2p.yaml")
         )
-        test_config_added = utils.load_mapping_from_path(
+
+        test_config_added = Mapping.load_mapping_from_path(
             os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml")
         )
         self.assertEqual(
-            test_config["mapping_data"],
-            [{"in": "a", "out": "b", "context_before": "", "context_after": ""}],
+            test_config.rules[0].export_to_dict(),
+            Rule(
+                **{"in": "a", "out": "b", "context_before": "", "context_after": ""}
+            ).export_to_dict(),
         )
-        self.assertEqual(test_config["in_lang"], "test")
-        self.assertEqual(test_config["out_lang"], "test-out")
-        self.assertEqual(test_config["language_name"], "test")
-        self.assertEqual(test_config["display_name"], "test custom to test-out custom")
+        self.assertEqual(test_config.in_lang, "test")
+        self.assertEqual(test_config.out_lang, "test-out")
+        self.assertEqual(test_config.language_name, "test")
+        self.assertEqual(test_config.display_name, "test custom to test-out custom")
         self.assertEqual(
-            test_config_added["mapping_data"],
-            [{"in": "a", "out": "b", "context_before": "", "context_after": ""}],
+            test_config_added.rules[0].export_to_dict(),
+            {"in": "a", "out": "b"},
         )
-        self.assertEqual(test_config_added["in_lang"], "test")
-        self.assertEqual(test_config_added["out_lang"], "test-out")
-        self.assertEqual(test_config_added["language_name"], "test")
+        self.assertEqual(test_config_added.in_lang, "test")
+        self.assertEqual(test_config_added.out_lang, "test-out")
+        self.assertEqual(test_config_added.language_name, "test")
         self.assertEqual(
-            test_config_added["display_name"], "test custom to test-out custom"
+            test_config_added.display_name, "test custom to test-out custom"
         )
 
     def test_normalize_to_NFD_with_indices(self):

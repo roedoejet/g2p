@@ -8,15 +8,16 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
-from typing import Dict, List, Optional, Set, Tuple, Union
+from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode
 
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import MAPPING_TYPE, Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.tokenizer import Tokenizer
 from g2p.mappings.utils import (
+    Rule,
     compose_indices,
     find_alignment,
     is_ipa,
@@ -418,14 +419,14 @@ class Transducer:
 
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
-        self.case_sensitive = mapping.kwargs["case_sensitive"]
-        self.norm_form = mapping.kwargs.get("norm_form", "none")
-        self.out_delimiter = mapping.kwargs.get("out_delimiter", "")
+        self.case_sensitive = mapping.case_sensitive
+        self.norm_form = mapping.norm_form
+        self.out_delimiter = mapping.out_delimiter
         self._index_match_pattern = re.compile(r"(?<={)\d+(?=})")
         self._char_match_pattern = re.compile(r"[^0-9\{\}]+(?={\d+})", re.U)
 
     def __repr__(self):
-        return f"{self.__class__} between {self.mapping.kwargs.get('in_lang', 'und')} and {self.mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self.mapping.in_lang} and {self.mapping.out_lang}"
 
     def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
         """The basic method to transduce an input. A proxy for self.apply_rules.
@@ -460,12 +461,12 @@ class Transducer:
     @property
     def in_lang(self) -> str:
         """Input language node name"""
-        return self.mapping.kwargs.get("in_lang", "und")
+        return self.mapping.in_lang
 
     @property
     def out_lang(self) -> str:
         """Output language node name"""
-        return self.mapping.kwargs.get("out_lang", "und")
+        return self.mapping.out_lang
 
     @property
     def transducers(self) -> List["Transducer"]:  # noqa: F821
@@ -486,7 +487,9 @@ class Transducer:
             try:
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index]["out"][output_char_index]
+                    + self.mapping.rules[intermediate_index].rule_output[
+                        output_char_index
+                    ]
                     + output_string[i + 1 :]
                 )
             except IndexError:
@@ -494,14 +497,22 @@ class Transducer:
                 output_char_index = 0
                 output_string = (
                     output_string[:i]
-                    + self.mapping[intermediate_index]["out"][output_char_index]
+                    + self.mapping.rules[intermediate_index].rule_output[
+                        output_char_index
+                    ]
                     + output_string[i + 1 :]
                 )
             indices_seen[intermediate_index] += 1
         return output_string
 
     def get_match_groups(
-        self, tg, start_end, io, diff_from_input, out_string, output_start
+        self,
+        tg: TransductionGraph,
+        start_end: Tuple[int, int],
+        io: Rule,
+        diff_from_input: DefaultDict,
+        out_string: str,
+        output_start: int,
     ) -> Tuple[dict, dict]:
         """Take the inputs to explicit indices matching and create groups of
             Input and Output matches that are grouped by their explicit indices.
@@ -518,7 +529,7 @@ class Transducer:
         Args:
             tg (TransductionGraph): the graph holding information about the transduction
             start_end (Tuple(int, int)): a tuple containing the start and end of the input match
-            io (List): an input/output rule
+            io (Rule): an input/output rule
             diff_from_input (DefaultDict): A dictionary containing the single character distance
                                            from a given character index to its input
             out_string (str): the raw output string
@@ -529,10 +540,10 @@ class Transducer:
             outputs (dict): dictionary containing matches grouped by explicit index match
         """
         input_char_matches = [
-            x.group() for x in self._char_match_pattern.finditer(io["in"])
+            x.group() for x in self._char_match_pattern.finditer(io.rule_input)
         ]
         input_match_indices = [
-            x.group() for x in self._index_match_pattern.finditer(io["in"])
+            x.group() for x in self._index_match_pattern.finditer(io.rule_input)
         ]
         inputs: Dict[str, List[dict]] = {}
         index = 0
@@ -762,14 +773,14 @@ class Transducer:
         # Conversion is done character by character using unidecode
         # We retain spaces in the input, but spaces from unidecode are removed
         converted = []
-        for in_char in to_convert:
+        for rule_input in to_convert:
             unidecode_str = text_unidecode.unidecode(
-                unicodedata.normalize("NFKC", in_char)
+                unicodedata.normalize("NFKC", rule_input)
             )
             cc = [
                 c
                 for c in unidecode_str
-                if c.isalpha() or c in UNIDECODE_SPECIALS or in_char.isspace()
+                if c.isalpha() or c in UNIDECODE_SPECIALS or rule_input.isspace()
             ]
             converted.append("".join(cc))
         tg.output_string = "".join(converted)
@@ -842,11 +853,10 @@ class Transducer:
         return tg
 
     def apply_rules(self, to_convert: str):  # noqa: C901
-        if self.mapping.kwargs.get("type", "") == "unidecode":
+        if self.mapping.type == MAPPING_TYPE.unidecode:
             return self.apply_unidecode(to_convert)
-        elif self.mapping.kwargs.get("type", "") == "lexicon":
+        elif self.mapping.type == MAPPING_TYPE.lexicon:
             return self.apply_lexicon(to_convert)
-
         # perform any normalization
         to_convert = unicode_escape(to_convert)
         saved_to_convert = to_convert
@@ -867,9 +877,10 @@ class Transducer:
         # these variables tracks changes in the output string across processing
         # matches of the same pattern
         diff_from_input = defaultdict(int, {n: 0 for n in range(len(tg.output_string))})
-        for io in self.mapping:
+        for io in self.mapping.rules:
+            assert isinstance(io, Rule)
             # Do not allow empty rules
-            if not io["in"] and not io["out"]:
+            if not io.rule_input and not io.rule_output:
                 continue
             io = copy.deepcopy(io)
             # create empty out_string
@@ -877,23 +888,22 @@ class Transducer:
             diff_from_output = defaultdict(
                 int, {n: 0 for n in range(len(tg.output_string))}
             )
-            for match_i, match in enumerate(
-                reversed(list(io["match_pattern"].finditer(tg.output_string)))
-            ):
+            matches = reversed(list(io.match_pattern.finditer(tg.output_string)))  # type: ignore
+            for match_i, match in enumerate(matches):
                 debug_string = tg.output_string
                 start = match.start()
                 end = match.end()
                 if match_i:
                     start += diff_from_output[start]
                     end += diff_from_output[end - 1]
-                if "intermediate_form" in io:
-                    out_string = io["intermediate_form"]
+                if io.intermediate_form:
+                    out_string = io.intermediate_form
                     intermediate_forms = True
                 else:
-                    out_string = io["out"]
+                    out_string = io.rule_output
                 if self.out_delimiter:
                     out_string += self.out_delimiter
-                if any(self._char_match_pattern.finditer(io["in"])) and any(
+                if any(self._char_match_pattern.finditer(io.rule_input)) and any(
                     self._char_match_pattern.finditer(out_string)
                 ):
                     self.update_explicit_indices(
@@ -914,17 +924,15 @@ class Transducer:
                         out_string,
                     )
                 if (
-                    io["in"] != io["out"]
-                    or ("context_after" in io and io["context_after"])
-                    or ("context_before" in io and io["context_before"])
+                    io.rule_input != io.rule_output
+                    or io.context_after
+                    or io.context_before
                 ):
                     tg.debugger[-1].append(
                         {
                             "input": debug_string,
                             "output": tg.output_string,
-                            "rule": {
-                                k: v for k, v in io.items() if k != "match_pattern"
-                            },
+                            "rule": io.export_to_dict(),
                             "start": match.start(),
                             "end": match.end(),
                         }
@@ -963,7 +971,7 @@ class Transducer:
         display_warnings=False,
         original_input=None,
     ) -> bool:
-        out_lang = self.mapping.kwargs["out_lang"]
+        out_lang = self.mapping.out_lang
         if "eng-arpabet" in out_lang:
             if is_arpabet(tg.output_string):
                 return True
@@ -1117,7 +1125,7 @@ class CompositeTransducer:
         self.norm_form = transducers[0].norm_form if transducers else "none"
 
     def __repr__(self):
-        return f"{self.__class__} between {self._transducers[0].mapping.kwargs.get('in_lang', 'und')} and {self._transducers[-1].mapping.kwargs.get('out_lang', 'und')}"
+        return f"{self.__class__} between {self._transducers[0].mapping.in_lang} and {self._transducers[-1].mapping.out_lang}"
 
     def __call__(self, to_convert: str):
         return self.apply_rules(to_convert)

@@ -1,21 +1,9 @@
 #!/usr/bin/env python
 
-import re
 from unittest import TestCase, main
 
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, Rule
 from g2p.mappings.create_fallback_mapping import align_to_dummy_fallback
-
-
-def rule(in_text, out_text, context_before, context_after, match_pattern):
-    """Concise rule initializer for unit testing purposes only"""
-    return {
-        "in": in_text,
-        "out": out_text,
-        "context_before": context_before,
-        "context_after": context_after,
-        "match_pattern": re.compile(match_pattern),
-    }
 
 
 class FallbackTest(TestCase):
@@ -31,8 +19,9 @@ class FallbackTest(TestCase):
         pass
 
     def test_mapping(self):
+        self.maxDiff = None
         mapping = Mapping(
-            [
+            rules=[
                 {"in": "a", "out": "æ"},
                 {"in": "e", "out": "ɐ"},
                 {"in": "i", "out": "ɑ̃"},
@@ -45,7 +34,7 @@ class FallbackTest(TestCase):
             out_lang="test-out",
         )
         ipa_mapping = Mapping(
-            [
+            rules=[
                 {"in": "a", "out": "æ"},
                 {"in": "e", "out": "ɐ"},
                 {"in": "i", "out": "ɑ̃"},
@@ -57,40 +46,40 @@ class FallbackTest(TestCase):
         )
         test_in = align_to_dummy_fallback(mapping, quiet=True)
         self.assertEqual(
-            test_in.mapping,
+            test_in.rules,
             [
-                rule("a", "ɑ", "", "", "a"),
-                rule("e", "i", "", "", "e"),
-                rule("i", "i", "", "", "i"),
-                rule("b", "t", "", "", "b"),
-                rule("g", "t", "", "", "g"),
-                rule("g", "t", "", "", "g"),
-                rule("i", "i", "", "", "i"),
+                Rule(rule_input="a", rule_output="ɑ", match_pattern="a"),
+                Rule(rule_input="e", rule_output="i", match_pattern="e"),
+                Rule(rule_input="i", rule_output="i", match_pattern="i"),
+                Rule(rule_input="b", rule_output="t", match_pattern="b"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="i", rule_output="i", match_pattern="i"),
             ],
         )
 
         test_out = align_to_dummy_fallback(mapping, "out", quiet=True)
         self.assertEqual(
-            test_out.mapping,
+            test_out.rules,
             [
-                rule("æ", "ɑi", "", "", "æ"),
-                rule("ɐ", "ɑ", "", "", "ɐ"),
-                rule("ɑ̃", "ɑ", "", "", "ɑ̃"),
-                rule("β", "t", "", "", "β"),
-                rule("ɡ", "t", "", "", "ɡ"),
-                rule("g", "t", "", "", "g"),
-                rule("ةُ", "ɑu", "", "", "ةُ"),
+                Rule(rule_input="æ", rule_output="ɑi", match_pattern="æ"),
+                Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
+                Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
+                Rule(rule_input="β", rule_output="t", match_pattern="β"),
+                Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
+                Rule(rule_input="g", rule_output="t", match_pattern="g"),
+                Rule(rule_input="ةُ", rule_output="ɑu", match_pattern="ةُ"),
             ],
         )
         test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
         self.assertEqual(
-            test_ipa.mapping,
+            test_ipa.rules,
             [
-                rule("æ", "ɑ", "", "", "æ"),
-                rule("ɐ", "ɑ", "", "", "ɐ"),
-                rule("ɑ̃", "ɑ", "", "", "ɑ̃"),
-                rule("β", "s", "", "", "β"),
-                rule("ɡ", "t", "", "", "ɡ"),
+                Rule(rule_input="æ", rule_output="ɑ", match_pattern="æ"),
+                Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
+                Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
+                Rule(rule_input="β", rule_output="s", match_pattern="β"),
+                Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
             ],
         )
 

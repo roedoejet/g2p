@@ -1,0 +1,13 @@
+mappings:
+  - language_name: Minimal
+    display_name: Minimal to Minimal
+    rules_path: minimal.csv
+    in_lang: min
+    out_lang: min
+    rule_ordering: as-written
+    case_sensitive: false
+    escape_special: true
+    norm_form: 'NFD'
+    reverse: true
+    authors:
+      - Aidan Pine

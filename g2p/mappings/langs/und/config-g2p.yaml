@@ -1,0 +1,37 @@
+<<: &shared
+  language_name: Undetermined
+mappings:
+  - display_name: Undetermined ASCII to IPA
+    rules_path: und_to_ipa.json
+    in_lang: und-ascii
+    out_lang: und-ipa
+    norm: NFD
+    case_sensitive: false
+    escape_special: false
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Undetermined IPA to English IPA
+    rules_path: und_ipa_to_eng_ipa.json
+    in_lang: und-ipa
+    out_lang: eng-ipa
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Undetermined IPA to English IPA
+    rules_path: und_ipa_to_eng_ipa.json
+    in_lang: und-ipa
+    out_lang: hamming-eng-ipa
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    <<: *shared
+  - display_name: Undetermined Unicode to ASCII
+    type: unidecode
+    norm: NFD
+    in_lang: und
+    out_lang: und-ascii
+    authors:
+      - Eric Joanis
+    <<: *shared

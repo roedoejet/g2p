@@ -1,3 +1,5 @@
+import datetime as dt
+
 from text_unidecode import unidecode
 
 from g2p import make_g2p
@@ -16,15 +18,20 @@ def align_to_dummy_fallback(
     quiet=False,
 ):
     """Create a mapping from mapping's output inventory to a minimalist dummy inventory"""
-    config = {"in_lang": mapping.kwargs[f"{io}_lang"], "out_lang": "dummy"}
+    mapping_config = mapping.model_dump()
+    config = {
+        "in_lang": mapping_config[f"{io}_lang"],
+        "out_lang": "dummy",
+        "authors": [f"Generated {dt.datetime.now()}"],
+    }
     default_char = "t"
-    if is_ipa(mapping.kwargs[f"{io}_lang"]):
-        mapping = align_inventories(
+    if is_ipa(mapping_config[f"{io}_lang"]):
+        list_of_rules = align_inventories(
             mapping.inventory(io), DUMMY_INVENTORY, distance=distance, quiet=quiet
         )
     else:
         und_g2p = make_g2p("und", "und-ipa", tokenize=False)
-        mapping = [
+        list_of_rules = [
             {
                 "in": unicode_escape(x),
                 "out": und_g2p(unidecode(x).lower()).output_string,
@@ -32,14 +39,17 @@ def align_to_dummy_fallback(
             for x in mapping.inventory(io)
         ]
         dummy_list = align_inventories(
-            [x["out"] for x in mapping], DUMMY_INVENTORY, distance=distance, quiet=quiet
+            [x["out"] for x in list_of_rules],
+            DUMMY_INVENTORY,
+            distance=distance,
+            quiet=quiet,
         )
         dummy_dict = {}
         for x in dummy_list:
             if x["in"]:
                 dummy_dict[x["in"]] = x["out"]
 
-        for x in mapping:
+        for x in list_of_rules:
             try:
                 x["out"] = dummy_dict[x["out"]]
             except KeyError:
@@ -49,6 +59,5 @@ def align_to_dummy_fallback(
                 )
                 x["out"] = default_char
 
-    config["mapping"] = mapping
-    mapping = Mapping(**config)
-    return mapping
+    config["rules"] = list_of_rules
+    return Mapping(**config)

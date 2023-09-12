@@ -1,0 +1,13 @@
+<<: &shared
+  language_name: Seneca
+mappings:
+  - display_name: Seneca to IPA
+    rules_path: see_to_ipa.csv
+    in_lang: see
+    out_lang: see-ipa
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: as-written
+    authors:
+      - Aidan Pine
+    <<: *shared

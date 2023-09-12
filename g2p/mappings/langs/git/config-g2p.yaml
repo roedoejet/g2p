@@ -1,0 +1,34 @@
+<<: &shared
+  language_name: Gitksan
+mappings:
+  - display_name: Orthography
+    in_lang: git
+    out_lang: git-ipa
+    rule_ordering: as-written
+    case_sensitive: false
+    authors:
+      - Fineen Davis
+    rules_path: git_to_ipa.json
+    <<: *shared
+  - display_name: Rigsby APA
+    in_lang: git
+    out_lang: git-apa
+    authors:
+      - Fineen Davis
+    rules_path: RAPA_Deterministic.csv
+    <<: *shared
+  - display_name: Unicode Equivalencies
+    in_lang: git
+    out_lang: git-equiv
+    authors:
+      - Aidan Pine
+    rules_path: equiv.csv
+    <<: *shared
+  - display_name: Gitksan IPA to English IPA
+    in_lang: git-ipa
+    out_lang: eng-ipa
+    rule_ordering: apply-longest-first
+    authors:
+      - Aidan Pine
+    rules_path: git_ipa_to_eng_ipa.json
+    <<: *shared

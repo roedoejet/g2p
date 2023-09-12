@@ -1,0 +1,14 @@
+<<: &shared
+  language_name: Western Inuktut
+mappings:
+  - display_name: Western Inuktut to IPA
+    in_lang: ikt
+    out_lang: ikt-ipa
+    type: mapping
+    case_sensitive: false
+    norm_form: NFD
+    rule_ordering: apply-longest-first
+    authors:
+      - Patrick Littell
+    rules_path: ikt_to_ipa.json
+    <<: *shared

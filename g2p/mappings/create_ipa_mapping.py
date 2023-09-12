@@ -12,7 +12,7 @@
 #
 # AP Note: Taken from ReadAlongs-Studio and implemented with G2P formatting
 ######################################################################
-
+import datetime as dt
 from typing import Iterable, List, Tuple
 
 from tqdm import tqdm
@@ -20,7 +20,7 @@ from tqdm import tqdm
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import getPanphonDistanceSingleton
-from g2p.mappings.utils import is_ipa, is_xsampa
+from g2p.mappings.utils import RULE_ORDERING_ENUM, is_ipa, is_xsampa
 from g2p.transducer import Transducer
 
 #################################
@@ -49,7 +49,9 @@ def process_character(p, is_xsampa=False):
 
             _xsampa_converter = XSampa()
         p = _xsampa_converter.convert(p)
-    panphon_preprocessor = Transducer(Mapping(id="panphon_preprocessor"))
+    panphon_preprocessor = Transducer(
+        Mapping.find_mapping_by_id("panphon_preprocessor")
+    )
     return panphon_preprocessor(p).output_string
 
 
@@ -122,7 +124,7 @@ def create_multi_mapping(
 
     def get_sorted_unique_names(mappings: List[Tuple[Mapping, str]]) -> List[str]:
         return sorted(
-            {mapping.kwargs[f"{in_or_out}_lang"] for mapping, in_or_out in mappings}
+            {getattr(mapping, f"{in_or_out}_lang") for mapping, in_or_out in mappings}
         )
 
     def deduplicate(iterable: Iterable) -> List:
@@ -134,7 +136,7 @@ def create_multi_mapping(
 
     src_inventory = []
     for (mapping, io) in src_mappings:
-        name = mapping.kwargs[f"{io}_lang"]
+        name = getattr(mapping, f"{io}_lang")
         if not is_ipa(name):
             LOGGER.warning(
                 "Unsupported orthography of src inventory: %s; must be IPA", name
@@ -144,7 +146,7 @@ def create_multi_mapping(
 
     tgt_inventory = []
     for (mapping, io) in tgt_mappings:
-        name = mapping.kwargs[f"{io}_lang"]
+        name = getattr(mapping, f"{io}_lang")
         if not is_ipa(name):
             LOGGER.warning(
                 "Unsupported orthography of tgt inventory: %s; must be IPA", name
@@ -160,10 +162,11 @@ def create_multi_mapping(
         "in_lang": compact_ipa_names(map_1_names),
         "out_lang": compact_ipa_names(map_2_names),
         "language_name": "IPA",
-        "rule_ordering": "apply-longest-first",
-        "mapping": mapping,
+        "rule_ordering": RULE_ORDERING_ENUM.apply_longest_first.value,
+        "rules": mapping,
         "prevent_feeding": True,
         "norm_form": "NFC",
+        "authors": [f"Generated {dt.datetime.now()}"],
         "display_name": (
             long_ipa_names(map_1_names) + " to " + long_ipa_names(map_2_names)
         ),
@@ -182,8 +185,8 @@ def create_mapping(
 ) -> Mapping:
     """Create a mapping from mapping_1's output inventory to mapping_2's input inventory"""
 
-    map_1_name = mapping_1.kwargs[f"{mapping_1_io}_lang"]
-    map_2_name = mapping_2.kwargs[f"{mapping_2_io}_lang"]
+    map_1_name = getattr(mapping_1, f"{mapping_1_io}_lang")
+    map_2_name = getattr(mapping_2, f"{mapping_2_io}_lang")
     if not is_ipa(map_1_name) and not is_xsampa(map_1_name):
         LOGGER.warning(
             "Unsupported orthography of inventory 1: %s (must be ipa or x-sampa)",
@@ -195,7 +198,7 @@ def create_mapping(
             map_2_name,
         )
     l1_is_xsampa, l2_is_xsampa = is_xsampa(map_1_name), is_xsampa(map_2_name)
-    mapping = align_inventories(
+    rules = align_inventories(
         mapping_1.inventory(mapping_1_io),
         mapping_2.inventory(mapping_2_io),
         l1_is_xsampa,
@@ -206,26 +209,20 @@ def create_mapping(
 
     # Initialize mapping with input language parameters (as_is,
     # case_sensitive, prevent_feeding, etc)
-    config = mapping_1.kwargs.copy()
-    # Fix up names, etc.
-    if "authors" in config:
-        del config["authors"]
-    if "display_name" in config:
-        del config["display_name"]
-    if "language_name" in config:
-        del config["language_name"]
+    config = mapping_1.model_copy().model_dump()
+    config = {
+        **config,
+        "authors": [f"Generated {dt.datetime.now()}"],
+        "display_name": None,
+        "language_name": None,
+        "in_lang": map_1_name,
+        "out_lang": map_2_name,
+        "rules": rules,
+        "prevent_feeding": True,
+        "rule_ordering": RULE_ORDERING_ENUM.apply_longest_first,
+    }
 
-    config["in_lang"] = map_1_name
-    config["out_lang"] = map_2_name
-    config["mapping"] = mapping
-
-    # generated IPA mappings should always prevent feeding and be applied from
-    # longest first, by virtue of how they are created.
-    config["prevent_feeding"] = True
-    config["rule_ordering"] = "apply-longest-first"
-
-    mapping = Mapping(**config)
-    return mapping
+    return Mapping(**config)
 
 
 def align_inventories(

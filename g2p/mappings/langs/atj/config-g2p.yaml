@@ -1,0 +1,20 @@
+<<: &shared
+  language_name: Atikamekw
+mappings:
+  - display_name: Atikamekw to IPA
+    in_lang: atj
+    out_lang: atj-ipa
+    type: mapping
+    case_sensitive: false
+    authors:
+      - David Huggins-Daines
+      - Patrick Littell
+    rules_path: atj_to_ipa.json
+    <<: *shared
+  - display_name: Atikamekw IPA to English IPA
+    in_lang: atj-ipa
+    out_lang: eng-ipa
+    type: mapping
+    rules_path: atj_ipa_to_eng_ipa.json
+    case_sensitive: false
+    <<: *shared

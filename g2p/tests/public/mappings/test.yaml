@@ -6,7 +6,7 @@ mappings:
     type: mapping
     authors:
       - Aidan Pine
-    mapping: test_to_ipa.csv
+    rules_path: test_to_ipa.csv
   - language_name: Local Config
     display_name: Local Config to IPA
     in_lang: local-config-in
@@ -14,4 +14,4 @@ mappings:
     type: mapping
     authors:
       - Aidan Pine
-    mapping: test_to_ipa.csv
+    rules_path: test_to_ipa.csv

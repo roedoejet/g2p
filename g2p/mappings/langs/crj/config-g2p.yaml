@@ -1,0 +1,34 @@
+<<: &shared
+  language_name: Southern East Cree
+mappings:
+  - display_name: Northern East Cree Equivalencies
+    in_lang: crj
+    out_lang: crj-equiv
+    type: mapping
+    authors:
+      - Delasie Torkornoo
+      - Aidan Pine
+      - Eric Joanis
+    rules_path: crj_equiv.json
+    rule_ordering: as-written
+    case_sensitive: false
+    <<: *shared
+  - display_name: Southern East Cree to IPA
+    in_lang: crj-equiv
+    out_lang: crj-ipa
+    type: mapping
+    authors:
+      - David Huggins-Daines
+      - Patrick Littell
+    rules_path: crj_to_ipa.json
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    <<: *shared
+  - display_name: Southern East Cree IPA to English IPA
+    in_lang: crj-ipa
+    out_lang: eng-ipa
+    type: mapping
+    rules_path: crj_ipa_to_eng_ipa.json
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    <<: *shared

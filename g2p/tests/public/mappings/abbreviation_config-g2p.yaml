@@ -1,0 +1,14 @@
+mappings:
+  - language_name: Abbreviation
+    display_name: Minimal to Minimal
+    rules_path: abbreviation_mapping.csv
+    in_lang: min
+    out_lang: min
+    rule_ordering: as-written
+    case_sensitive: false
+    escape_special: false
+    norm_form: "NFD"
+    reverse: false
+    abbreviations_path: abbreviations.substring.csv
+    authors:
+      - Aidan Pine

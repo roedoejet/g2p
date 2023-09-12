@@ -4,25 +4,18 @@ Utilities used by other classes
 
 """
 
+import gzip
+import io
 import json
-import pickle
 from pathlib import Path
 
-import yaml
 from networkx import DiGraph, write_gpickle
 from networkx.algorithms.dag import ancestors, descendants
 
-from g2p.exceptions import MalformedMapping
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
-from g2p.mappings.langs import (
-    LANGS_DIR,
-    LANGS_NETWORK,
-    LANGS_NWORK_PATH,
-    LANGS_PKL,
-    MAPPINGS_AVAILABLE,
-)
-from g2p.mappings.utils import is_ipa, load_mapping_from_path
+from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
+from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
+from g2p.mappings.utils import MAPPING_TYPE, is_ipa
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -51,19 +44,18 @@ def check_ipa_known_segs(mappings_to_check=False) -> bool:
     Returns True iff not errors were found.
     """
     if not mappings_to_check:
-        mappings_to_check = [x["out_lang"] for x in MAPPINGS_AVAILABLE]
+        mappings_to_check = [x.out_lang for x in MAPPINGS_AVAILABLE]
     found_error = False
-    for mapping in [
-        x for x in MAPPINGS_AVAILABLE if x["out_lang"] in mappings_to_check
-    ]:
-        if is_ipa(mapping["out_lang"]):
-            reverse = mapping.get("reverse", False)
-            for rule in mapping.get("mapping_data", ()):
-                output = rule["in"] if reverse else rule["out"]
+
+    for mapping in [x for x in MAPPINGS_AVAILABLE if x.out_lang in mappings_to_check]:
+        if is_ipa(mapping.out_lang) and mapping.type == MAPPING_TYPE.mapping:
+            reverse = mapping.reverse
+            for rule in mapping.rules:
+                output = rule.rule_input if reverse else rule.rule_output
                 if not is_panphon(output):
                     LOGGER.warning(
-                        f"Output '{rule['out']}' in rule {rule} in mapping between {mapping['in_lang']} "
-                        f"and {mapping['out_lang']} is not recognized as valid IPA by panphon."
+                        f"Output '{rule.rule_output}' in rule {rule} in mapping between {mapping.in_lang} "
+                        f"and {mapping.out_lang} is not recognized as valid IPA by panphon."
                     )
                     found_error = True
     if found_error:
@@ -84,7 +76,9 @@ def is_panphon(string, display_warnings=False):
     import g2p.transducer
 
     dst = getPanphonDistanceSingleton()
-    panphon_preprocessor = g2p.transducer.Transducer(Mapping(id="panphon_preprocessor"))
+    panphon_preprocessor = g2p.transducer.Transducer(
+        Mapping.find_mapping_by_id("panphon_preprocessor")
+    )
     preprocessed_string = panphon_preprocessor(string).output_string
     # Use a loop that prints the warnings on all strings that are not panphon, even though
     # logically this should not be necessary to calculate the answer.
@@ -127,7 +121,9 @@ def is_arpabet(string):
     global _ARPABET_SET
     if _ARPABET_SET is None:
         _ARPABET_SET = set(
-            Mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory("out")
+            Mapping.find_mapping(in_lang="eng-ipa", out_lang="eng-arpabet").inventory(
+                "out"
+            )
         )
     # print(f"arpabet_set={_ARPABET_SET}")
     for sound in string.split():
@@ -144,41 +140,33 @@ def cache_langs(
     """Read in all files and save as pickle.
 
     Args:
-       dir_path: Path to scan for config.yaml files.  Default is the
+       dir_path: Path to scan for config-g2p.yaml files.  Default is the
                  installed g2p/mappings/langs directory.
-       langs_path: Path to output langs.pkl pickle file.  Default is
-                   the installed g2p/mappings/langs/langs.pkl
+       langs_path: Path to output langs.json.gz file.  Default is
+                   the installed g2p/mappings/langs/langs.json.gz
        network_path: Path to output pickle file.  Default is the
                      installed g2p/mappings/langs/network.pkl.
     """
     langs = {}
 
     # Sort by language code
-    paths = sorted(Path(dir_path).glob("./*/config.y*ml"), key=lambda x: x.parent.stem)
+    paths = sorted(
+        Path(dir_path).glob("./*/config-g2p.y*ml"), key=lambda x: x.parent.stem
+    )
     mappings_legal_pairs = []
+    if not paths:
+        raise FileNotFoundError(
+            f"There don't seem to be any valid mappings in {dir_path}"
+        )
     for path in paths:
         code = path.parent.stem
-        with open(path, encoding="utf8") as f:
-            data = yaml.safe_load(f)
-        # If there is a mappings key, there is more than one mapping
+        mapping_config = MappingConfig.load_mapping_config_from_path(path)
         # TODO: should put in some measure to prioritize non-generated
         # mappings and warn when they override
-        if "mappings" in data:
-            for index, mapping in enumerate(data["mappings"]):
-                in_lang = data["mappings"][index]["in_lang"]
-                out_lang = data["mappings"][index]["out_lang"]
-                mappings_legal_pairs.append((in_lang, out_lang))
-                if "language_name" not in mapping:
-                    raise MalformedMapping(
-                        f"language_name missing in {path} from mapping "
-                        f"from {in_lang} to {out_lang}"
-                    )
-                data["mappings"][index] = load_mapping_from_path(path, index)
-        else:
-            data = load_mapping_from_path(path)
-            if "language_name" not in data:
-                raise MalformedMapping(f"language_name missing in {path}")
-        langs[code] = data
+        mappings_legal_pairs.extend(
+            [(mapping.in_lang, mapping.out_lang) for mapping in mapping_config.mappings]
+        )
+        langs[code] = mapping_config.export_to_dict()
 
     # Save as a Directional Graph
     lang_network = DiGraph()
@@ -187,9 +175,15 @@ def cache_langs(
     with open(network_path, "wb") as f:
         write_gpickle(lang_network, f, protocol=4)
 
-    with open(langs_path, "wb") as f:
-        pickle.dump(langs, f, protocol=4)
-
+    with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
+        with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:  # type: ignore
+            json.dump(
+                langs,
+                zipfile,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                sort_keys=True,
+            )
     return langs
 
 

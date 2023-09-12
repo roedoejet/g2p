@@ -1,0 +1,10 @@
+mappings:
+  - language_name: Null
+    display_name: Null to Null
+    rules_path: null.csv
+    in_lang: null-in
+    out_lang: null-out
+    rule_ordering: as-written
+    case_sensitive: false
+    authors:
+      - Eric Joanis

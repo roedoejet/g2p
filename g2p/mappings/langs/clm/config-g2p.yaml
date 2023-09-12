@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: Klallam
+mappings:
+  - display_name: Klallam to IPA
+    rules_path: clm_to_ipa.csv
+    in_lang: clm-equiv
+    out_lang: clm-ipa
+    authors:
+      - Eric Joanis (coding)
+      - Timothy Montler (linguistic data)
+    type: mapping
+    prevent_feeding: true
+    rule_ordering: as-written
+    norm_form: NFD
+    <<: *shared
+  - display_name: Unicode Equivalencies
+    in_lang: clm
+    out_lang: clm-equiv
+    authors:
+      - Eric Joanis
+    rules_path: clm_equiv.csv
+    norm_form: NFD
+    <<: *shared

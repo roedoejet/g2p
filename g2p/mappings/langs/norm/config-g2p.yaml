@@ -1,0 +1,13 @@
+<<: &shared
+  language_name: Normalization
+mappings:
+  - display_name: Panphon Normalization
+    rules_path: panphon_preprocessor.csv
+    id: panphon_preprocessor
+    in_lang: ipa
+    out_lang: ipa
+    rule_ordering: as-written
+    authors:
+      - Patrick Littell
+      - Eric Joanis
+    <<: *shared

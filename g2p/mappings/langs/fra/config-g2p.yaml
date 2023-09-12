@@ -1,0 +1,15 @@
+<<: &shared
+  language_name: French
+mappings:
+  - display_name: French to IPA
+    in_lang: fra
+    out_lang: fra-ipa
+    authors:
+      - Eric Joanis
+    type: mapping
+    rules_path: fra_to_ipa.csv
+    abbreviations_path: fra_abbs.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: 'NFC'
+    <<: *shared

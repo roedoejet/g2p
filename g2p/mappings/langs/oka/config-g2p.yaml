@@ -1,0 +1,22 @@
+<<: &shared
+  language_name: nsyilxcən
+mappings:
+  - display_name: nsyilxcən to IPA
+    rules_path: oka_to_ipa.csv
+    in_lang: oka-equiv
+    out_lang: oka-ipa
+    authors:
+      - Craig Carpenter
+    type: mapping
+    prevent_feeding: true
+    rule_ordering: apply-longest-first
+    norm_form: NFC
+    <<: *shared
+  - display_name: Unicode Equivalencies
+    in_lang: oka
+    out_lang: oka-equiv
+    authors:
+      - Eric Joanis
+    rules_path: oka_equiv.csv
+    norm_form: NFD
+    <<: *shared
