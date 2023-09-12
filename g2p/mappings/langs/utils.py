@@ -9,7 +9,7 @@ import io
 import json
 from pathlib import Path
 
-from networkx import DiGraph, write_gpickle
+import networkx
 from networkx.algorithms.dag import ancestors, descendants
 
 from g2p.log import LOGGER
@@ -169,22 +169,23 @@ def cache_langs(
         langs[code] = mapping_config.export_to_dict()
 
     # Save as a Directional Graph
-    lang_network = DiGraph()
+    lang_network = networkx.DiGraph()
     lang_network.add_edges_from(mappings_legal_pairs)
+    write_json_gz(network_path, networkx.node_link_data(lang_network))
+    write_json_gz(langs_path, langs)
+    return langs
 
-    with open(network_path, "wb") as f:
-        write_gpickle(lang_network, f, protocol=4)
 
-    with gzip.GzipFile(langs_path, "wb", mtime=0) as zipfile_raw:
-        with io.TextIOWrapper(zipfile_raw, encoding="utf-8") as zipfile:  # type: ignore
-            json.dump(
-                langs,
-                zipfile,
+def write_json_gz(path: str, data: str):
+    with gzip.GzipFile(path, "wb", mtime=0) as zipfile:
+        zipfile.write(
+            json.dumps(
+                data,
                 separators=(",", ":"),
                 ensure_ascii=False,
                 sort_keys=True,
-            )
-    return langs
+            ).encode("utf-8")
+        )
 
 
 def network_to_echart(outfile: str = None, layout: bool = False):
