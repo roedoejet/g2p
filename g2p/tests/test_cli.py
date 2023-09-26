@@ -121,35 +121,43 @@ class CliTest(TestCase):
         )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
-            for test in langs_to_test:
+            for row in langs_to_test:
+                (in_lang, out_lang, word_to_convert, reference_string, fileline) = row[
+                    :5
+                ]
                 output_string = self.runner.invoke(
-                    convert, [*tok_option, test[2], test[0], test[1]]
+                    convert, [*tok_option, word_to_convert, in_lang, out_lang]
                 ).stdout.strip()
-                if test[3].strip() not in output_string:
+                if reference_string.strip() not in output_string:
                     LOGGER.warning(
-                        f"test_cli.py for {test[-1]}: {test[0]}->{test[1]} mapping error: '{test[2]}' "
-                        f"should map to '{test[3]}', got '{output_string}' (with {tok_option})."
+                        f"test_cli.py for {fileline}: {in_lang}->{out_lang} mapping error: '{word_to_convert}' "
+                        f"should map to '{reference_string}', got '{output_string}' (with {tok_option})."
                     )
                     if error_count == 0:
-                        first_failed_test = test + [tok_option]
+                        first_failed_test = (
+                            in_lang,
+                            out_lang,
+                            word_to_convert,
+                            tok_option,
+                        )
                     error_count += 1
 
         if error_count > 0:
-            reference_string = first_failed_test[3]
+            (
+                in_lang,
+                out_lang,
+                word_to_convert,
+                tok_option,
+            ) = first_failed_test
             output_string = self.runner.invoke(
                 convert,
-                [
-                    first_failed_test[4],  # tok_option
-                    first_failed_test[2],  # word to convert
-                    first_failed_test[0],  # in_lang
-                    first_failed_test[1],  # out_lang
-                ],
+                [*tok_option, word_to_convert, in_lang, out_lang],
             ).stdout.strip()
             self.assertEqual(
                 output_string,
                 reference_string.strip(),
-                f"{first_failed_test[0]}->{first_failed_test[1]} mapping error "
-                "for '{first_failed_test[2]}'.\n"
+                f"{in_lang}->{out_lang} mapping error "
+                "for '{word_to_convert}'.\n"
                 "Look for warnings in the log for any more mapping errors",
             )
 
