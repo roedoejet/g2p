@@ -121,10 +121,14 @@ class CliTest(TestCase):
         )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
-            for row in langs_to_test:
-                (in_lang, out_lang, word_to_convert, reference_string, fileline) = row[
-                    :5
-                ]
+            for (
+                in_lang,
+                out_lang,
+                word_to_convert,
+                reference_string,
+                *_,
+                fileline,
+            ) in langs_to_test:
                 output_string = self.runner.invoke(
                     convert, [*tok_option, word_to_convert, in_lang, out_lang]
                 ).stdout.strip()
