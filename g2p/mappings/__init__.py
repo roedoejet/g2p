@@ -320,7 +320,11 @@ class Mapping(_MappingModelDefinition):
 
     def export_to_dict(self, mapping_type="json"):
         model_dict = json.loads(
-            self.model_dump_json(exclude_none=True, exclude={"parent_dir": True})
+            self.model_dump_json(
+                exclude_none=True,
+                exclude_defaults=True,
+                exclude={"parent_dir": True, "rules": True, "processed": True},
+            )
         )
         model_dict["rules_path"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         return model_dict
@@ -358,15 +362,24 @@ class Mapping(_MappingModelDefinition):
             if not updated:
                 existing_data.mappings.append(config_template)
             to_export = {
+                "language_name": "generated",
                 "mappings": [
                     x.export_to_dict() if isinstance(x, Mapping) else x
                     for x in existing_data.mappings
-                ]
+                ],
             }
         else:
-            to_export = {"mappings": [config_template]}
+            to_export = {"language_name": "generated", "mappings": [config_template]}
         with open(fn, "w", encoding="utf8", newline="\n") as f:
-            yaml.dump(to_export, f, Dumper=IndentDumper, default_flow_style=False)
+            # do not write strings as unreadable \u escapes! (see
+            # https://stackoverflow.com/questions/10648614/dump-in-pyyaml-as-utf-8)
+            yaml.dump(
+                to_export,
+                f,
+                Dumper=IndentDumper,
+                default_flow_style=False,
+                allow_unicode=True,
+            )
 
 
 MAPPINGS_AVAILABLE: List[Mapping] = [
