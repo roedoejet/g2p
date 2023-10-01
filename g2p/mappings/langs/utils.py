@@ -5,9 +5,9 @@ Utilities used by other classes
 """
 
 import gzip
-import io
 import json
 from pathlib import Path
+from typing import Any
 
 import networkx
 from networkx.algorithms.dag import ancestors, descendants
@@ -176,7 +176,7 @@ def cache_langs(
     return langs
 
 
-def write_json_gz(path: str, data: str):
+def write_json_gz(path: str, data: Any):
     with gzip.GzipFile(path, "wb", mtime=0) as zipfile:
         zipfile.write(
             json.dumps(
