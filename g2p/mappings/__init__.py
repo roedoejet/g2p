@@ -323,19 +323,19 @@ class Mapping(_MappingModelDefinition):
         configuration (and not the rules or alignments) in the case
         where we are just writing the config file.
         """
-        # FIXME: Really not sure why we are dumping and reloading json here
         if config_only:
-            serialized = self.model_dump_json(
+            model_dict = self.model_dump(
+                mode="json",
                 exclude_none=True,
                 exclude_defaults=True,
                 exclude={"parent_dir": True, "rules": True, "processed": True},
             )
         else:
-            serialized = self.model_dump_json(
+            model_dict = self.model_dump(
+                mode="json",
                 exclude_none=True,
                 exclude={"parent_dir": True},
             )
-        model_dict = json.loads(serialized)
         model_dict["rules_path"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         return model_dict
 

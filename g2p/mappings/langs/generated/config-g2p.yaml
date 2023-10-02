@@ -1,4 +1,3 @@
-language_name: generated
 mappings:
   - display_name: Atikamekw IPA to English IPA
     in_lang: atj-ipa
@@ -99,7 +98,7 @@ mappings:
     out_lang: eng-ipa
     rules_path: tce-ipa_to_eng-ipa.json
   - authors:
-      - Generated 2023-10-01 19:31:24.467200
+      - Generated 2023-10-01 20:57:11.343458
     case_sensitive: false
     display_name: crg-ipa IPA to eng-ipa IPA
     in_lang: crg-ipa
