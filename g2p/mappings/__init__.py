@@ -318,14 +318,24 @@ class Mapping(_MappingModelDefinition):
         with open(fn, "w", encoding="utf8", newline="\n") as f:
             self.mapping_to_stream(f, file_type)
 
-    def export_to_dict(self, mapping_type="json"):
-        model_dict = json.loads(
-            self.model_dump_json(
+    def export_to_dict(self, mapping_type="json", config_only=False):
+        """Export a mapping to a dictionary, optionally including only the
+        configuration (and not the rules or alignments) in the case
+        where we are just writing the config file.
+        """
+        # FIXME: Really not sure why we are dumping and reloading json here
+        if config_only:
+            serialized = self.model_dump_json(
                 exclude_none=True,
                 exclude_defaults=True,
                 exclude={"parent_dir": True, "rules": True, "processed": True},
             )
-        )
+        else:
+            serialized = self.model_dump_json(
+                exclude_none=True,
+                exclude={"parent_dir": True},
+            )
+        model_dict = json.loads(serialized)
         model_dict["rules_path"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         return model_dict
 
@@ -333,7 +343,7 @@ class Mapping(_MappingModelDefinition):
         self,
         output_path: str = os.path.join(GEN_DIR, "config-g2p.yaml"),
     ):
-        """Write config to file"""
+        """Write configuration to file."""
         add_config = False
         if os.path.isdir(output_path):
             output_path = os.path.join(output_path, "config-g2p.yaml")
@@ -343,7 +353,7 @@ class Mapping(_MappingModelDefinition):
         else:
             LOGGER.warning(f"writing mapping config to file at {output_path}")
         fn = output_path
-        config_template = self.export_to_dict()
+        config_template = self.export_to_dict(config_only=True)
         # Serialize piece-by-piece, which is why this is a list of type dict and not type Mapping
         # If config file exists already, just add the mapping.
         to_export = None
@@ -362,22 +372,21 @@ class Mapping(_MappingModelDefinition):
             if not updated:
                 existing_data.mappings.append(config_template)
             to_export = {
-                "language_name": "generated",
                 "mappings": [
-                    x.export_to_dict() if isinstance(x, Mapping) else x
+                    x.export_to_dict(config_only=True) if isinstance(x, Mapping) else x
                     for x in existing_data.mappings
                 ],
             }
         else:
-            to_export = {"language_name": "generated", "mappings": [config_template]}
+            to_export = {"mappings": [config_template]}
         with open(fn, "w", encoding="utf8", newline="\n") as f:
-            # do not write strings as unreadable \u escapes! (see
-            # https://stackoverflow.com/questions/10648614/dump-in-pyyaml-as-utf-8)
             yaml.dump(
                 to_export,
                 f,
                 Dumper=IndentDumper,
                 default_flow_style=False,
+                # do not write strings as unreadable \u escapes! (see
+                # https://stackoverflow.com/questions/10648614/dump-in-pyyaml-as-utf-8)
                 allow_unicode=True,
             )
 
