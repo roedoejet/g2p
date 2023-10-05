@@ -327,8 +327,13 @@ class Mapping(_MappingModelDefinition):
             model_dict = self.model_dump(
                 mode="json",
                 exclude_none=True,
-                exclude_defaults=True,
-                exclude={"parent_dir": True, "rules": True, "processed": True},
+                exclude={
+                    "parent_dir": True,
+                    "rules": True,
+                    "processed": True,
+                    "alignments": True,
+                    "abbreviations": True,
+                },
             )
         else:
             model_dict = self.model_dump(
