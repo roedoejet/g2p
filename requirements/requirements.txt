@@ -15,7 +15,7 @@ tqdm
 text_unidecode
 
 Flask==2.2.5
-werkzeug==2.2.3
+werkzeug==3.0.1
 flask_socketio>=5.0.0
 python-engineio>=4.0.0
 python-socketio>=5.0.0
