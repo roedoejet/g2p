@@ -143,6 +143,7 @@ class CliTest(TestCase):
                             out_lang,
                             word_to_convert,
                             tok_option,
+                            reference_string,
                         )
                     error_count += 1
 
@@ -152,6 +153,7 @@ class CliTest(TestCase):
                 out_lang,
                 word_to_convert,
                 tok_option,
+                reference_string,
             ) = first_failed_test
             output_string = self.runner.invoke(
                 convert,
@@ -160,8 +162,7 @@ class CliTest(TestCase):
             self.assertEqual(
                 output_string,
                 reference_string.strip(),
-                f"{in_lang}->{out_lang} mapping error "
-                "for '{word_to_convert}'.\n"
+                f"{in_lang}->{out_lang} mapping error for '{word_to_convert}'.\n"
                 "Look for warnings in the log for any more mapping errors",
             )
 
