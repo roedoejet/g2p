@@ -18,3 +18,10 @@ kwk-boas|kwk-umista|yîxs sēsᴇyūʟaēs|yix̱s sisa̱yutłaʼis
 kwk-napa|kwk-ipa|gam̓ən|ɡaʔmən
 kwk-napa|kwk-ipa|c̓ay̓ux̌ʷ|tʼsaʔyuχʷ
 kwk-napa|kwk-ipa|wəq̓ʷɛʔs|wəqʼʷɛʔs
+
+# Artificial data to test capitalization of kwk BOAS->Umista
+kwk-boas|kwk-umista|TAtap!Aʟa|TAtap̓Atła
+# A real word, capitalized
+kwk-boas|kwk-umista|G·āyaxalisē|Gayax̱alisi
+# This case not activated because it doesn't actually currently work
+#kwk-boas|kwk-umista|TᴇAtᴇapʟ!Aʟa|TA̱ʼAta̱ʼaptʼłAtła
