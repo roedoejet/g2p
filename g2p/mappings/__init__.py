@@ -37,6 +37,7 @@ from g2p.mappings.utils import (
 )
 
 GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
+EXPLICIT_INDEX_PATTERN = re.compile(r"{\d+}")
 
 
 class Mapping(_MappingModelDefinition):
@@ -153,7 +154,9 @@ class Mapping(_MappingModelDefinition):
             self.rules = sorted(
                 # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
                 self.rules,
-                key=lambda x: len(normalize(x.rule_input, "NFD"))
+                key=lambda x: len(
+                    normalize(re.sub(EXPLICIT_INDEX_PATTERN, "", x.rule_input), "NFD")
+                )
                 if isinstance(x, Rule)
                 else len(normalize(x["in"], "NFD")),
                 reverse=True,
@@ -241,7 +244,7 @@ class Mapping(_MappingModelDefinition):
                 "This is disallowed. Please check your mapping file for rules with null inputs."
             )
             return None
-        input_match = re.sub(re.compile(r"{\d+}"), "", rule.rule_input)
+        input_match = re.sub(EXPLICIT_INDEX_PATTERN, "", rule.rule_input)
         try:
             inp = create_fixed_width_lookbehind(rule.context_before) + input_match
             if rule.context_after:

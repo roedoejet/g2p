@@ -164,6 +164,13 @@ class MappingTest(TestCase):
         transducer_default = Transducer(Mapping(rules=rules))
         self.assertEqual(transducer_default("aa").output_string, "bb")
 
+    def test_rule_ordering_with_indices(self):
+        """a{1}b{3} should be shorter than abc"""
+        rules = [{"in": "a{1}b{2}", "out": "x{1}x{2}"}, {"in": "abc", "out": "y"}]
+        mapping = Mapping(rules=rules, rule_ordering="apply-longest-first")
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer("abc").output_string, "y")
+
     def test_rule_ordering_given_invalid_value(self):
         """
         It should log an error messages if given an invalid value for
