@@ -498,6 +498,8 @@ def convert(  # noqa: C901
 ):
     """Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.
 
+    INPUT_TEXT can be actual text to convert, or a path to a text file to convert.
+
     Visit http://g2p-studio.herokuapp.com/api/v1/langs for a list of languages.
 
     There must be a path from IN_LANG to OUT_LANG, possibly via some intermediates.
