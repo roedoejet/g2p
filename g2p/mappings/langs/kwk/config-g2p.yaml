@@ -25,6 +25,7 @@ mappings:
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
+    prevent_feeding: true
     authors:
       - Patrick Littell
       - Eric Joanis
@@ -36,6 +37,7 @@ mappings:
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
+    prevent_feeding: true
     authors:
       - Fineen Davis
       - Eric Joanis
