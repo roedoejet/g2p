@@ -21,7 +21,7 @@ mappings:
     language_name: Kwak'wala (NAPA orthography)
   - display_name: Kwak'wala (U'mista) to IPA
     rules_path: kwk_umista_to_ipa.json
-    in_lang: kwk-umista-con
+    in_lang: kwk-umista-equiv
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
@@ -33,7 +33,7 @@ mappings:
   - display_name: Kwak'wala (U'mista) Equivalencies
     rules_path: umista_equiv.csv
     in_lang: kwk-umista
-    out_lang: kwk-umista-con
+    out_lang: kwk-umista-equiv
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
@@ -45,7 +45,7 @@ mappings:
   - display_name: Kwak'wala (NAPA) Equivalencies
     rules_path: napa_equiv_ubc.csv
     in_lang: kwk-napa-ubc
-    out_lang: kwk-napa-ubc-con
+    out_lang: kwk-napa-ubc-equiv
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
@@ -55,7 +55,7 @@ mappings:
   - display_name: Kwak'wala (NAPA) Equivalencies
     rules_path: napa_equiv_uvic.csv
     in_lang: kwk-napa-uvic
-    out_lang: kwk-napa-uvic-con
+    out_lang: kwk-napa-uvic-equiv
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
