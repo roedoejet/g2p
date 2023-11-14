@@ -25,6 +25,7 @@ from g2p.mappings.utils import (
     normalize_with_indices,
     unicode_escape,
 )
+from g2p.utils import strip_index_notation
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
@@ -478,9 +479,6 @@ class Transducer:
         to their mapped equivalents.
         """
 
-        def strip_index_notation(string: str) -> str:
-            return re.sub(r"{\d+}", "", string)
-
         indices_seen: Dict[int, int] = defaultdict(int)
         for i, char in enumerate(output_string):
             intermediate_index = self._pua_to_index(char)
@@ -652,7 +650,7 @@ class Transducer:
         inputs, outputs = self.get_match_groups(
             tg, start_end, io, diff_from_input, out_string, output_start
         )
-        out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
+        out_string = strip_index_notation(out_string)
         # keep track of deletions that haven't yet been processed by diff_from_x
         deleted = 0
         for match_index, input_matches in inputs.items():
@@ -941,7 +939,7 @@ class Transducer:
                             "end": match.end(),
                         }
                     )
-                out_string = re.sub(re.compile(r"{\d+}"), "", out_string)
+                out_string = strip_index_notation(out_string)
                 # update the output intermediate diff after each match
                 diff = len(out_string) - len(match.group())
 
