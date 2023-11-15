@@ -661,7 +661,13 @@ class _MappingModelDefinition(BaseModel):
     """Deprecated: Please use rule_ordering='as_written' """
 
     case_sensitive: bool = True
-    """Lower all rules and conversion input"""
+    """When false, lowercase all rules and conversion input"""
+
+    case_equivalencies: dict = {}
+    """List of case equivalencies for preserve_case that are not already in the Unicode standard"""
+
+    preserve_case: bool = False
+    """Preserve source case in output (requires case_sensitive=False)"""
 
     escape_special: bool = False
     """Escape special characters in rules"""
@@ -725,7 +731,7 @@ class _MappingModelDefinition(BaseModel):
             and not self.rules
             and self.rules_path is None
         ):
-            LOGGER.warn(
+            LOGGER.warning(
                 exceptions.MalformedMapping(
                     "You have to either specify some rules or a path to a file containing rules."
                 )
@@ -754,6 +760,27 @@ class _MappingModelDefinition(BaseModel):
         if not v or v is None:
             v = "none"
         return v
+
+    @field_validator("case_equivalencies", mode="before")
+    @classmethod
+    def validate_case_equivalencies(cls, v):
+        if not v or v is None:
+            v = {}
+        for lower_case, upper_case in v.items():
+            if len(lower_case) != len(upper_case):
+                raise exceptions.MalformedMapping(
+                    f"Sorry, the case equivalency between {lower_case} and {upper_case} is not valid because it is not the same length, please write rules such that any case equivalent is of equal length."
+                )
+        return v
+
+    @model_validator(mode="after")
+    def validate_preserve_case(self):
+        """preserve_case=True requires case_sensitive=False"""
+        if self.preserve_case and self.case_sensitive:
+            raise exceptions.MalformedMapping(
+                "Sorry, preserve_case=True requires case_sensitive=False."
+            )
+        return self
 
     # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
     # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.

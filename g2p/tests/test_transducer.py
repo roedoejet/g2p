@@ -3,6 +3,7 @@
 import os
 from unittest import TestCase, main
 
+from g2p.exceptions import MalformedMapping
 from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
 from g2p.transducer import CompositeTransducer, Transducer, normalize_edges
@@ -217,6 +218,45 @@ class TransducerTest(TestCase):
         self.assertEqual(tg.pretty_edges(), [("a", None)])
         self.assertEqual(self.test_deletion_transducer_csv("a").output_string, "")
         self.assertEqual(self.test_deletion_transducer_json("a").output_string, "")
+
+    def test_case_preservation(self):
+        mapping = Mapping(
+            rules=[
+                {"in": "'a", "out": "b"},
+                {"in": "e\u0301", "out": "f"},
+                {"in": "tl", "out": "λ"},
+            ],
+            case_sensitive=False,
+            preserve_case=True,
+            norm_form="NFC",
+            case_equivalencies={"λ": "\u2144"},
+        )
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer("'a").output_string, "b")
+        self.assertEqual(transducer("'A").output_string, "B")
+        self.assertEqual(transducer("E\u0301").output_string, "F")
+        self.assertEqual(transducer("e\u0301").output_string, "f")
+        # Test what happens in Heiltsuk. \u03BB (λ) should be capitalized as \u2144 (⅄)
+        self.assertEqual(transducer("TLaba").output_string, "\u2144aba")
+        self.assertEqual(transducer("tlaba").output_string, "λaba")
+        # I guess it's arguable what should happen here, but I'll just change case if any of the characters are differently cased
+        self.assertEqual(transducer("Tlaba").output_string, "\u2144aba")
+        # case equivalencies that are not the same length cause indexing errors in the current implementation
+        with self.assertRaises(MalformedMapping):
+            Mapping(
+                rules=[
+                    {"in": "'a", "out": "b"},
+                    {"in": "e\u0301", "out": "f"},
+                    {"in": "tl", "out": "λ"},
+                ],
+                case_sensitive=False,
+                preserve_case=True,
+                norm_form="NFC",
+                case_equivalencies={"λ": "\u2144\u2144\u2144"},
+            )
+
+        with self.assertRaises(MalformedMapping):
+            _ = Mapping(rules=[], case_sensitive=True, preserve_case=True)
 
     def test_normalize_edges(self):
         # Remove non-deletion edges with the same index as deletions

@@ -53,6 +53,7 @@ function createSettings(index, data) {
     let include = 'checked';
     let rule_ordering = '';
     let case_sensitive = '';
+    let preserve_case = '';
     let escape_special = '';
     let reverse = '';
     let active = '';
@@ -75,6 +76,9 @@ function createSettings(index, data) {
     }
     if (data['case_sensitive']) {
         case_sensitive = 'checked'
+    }
+    if (data['preserve_case']) {
+        preserve_case = 'checked'
     }
     if (data['escape_special']) {
         escape_special = 'checked'
@@ -114,6 +118,10 @@ function createSettings(index, data) {
                     <input  ${case_sensitive} id='case_sensitive-${index}' type='checkbox' name='case_sensitive'
                         value='case_sensitive'>
                     <label for='case_sensitive'>Rules are case sensitive</label>
+                </div>
+                <div>
+                    <input ${preserve_case} id='preserve_case-${index}' type='checkbox' name='preserve_case' value='preserve_case'>
+                    <label for='preserve_case'>Preserve input case in output</label>
                 </div>
                 <div>
                     <input ${escape_special} id='escape_special-${index}' type='checkbox' name='escape_special' value='escape_special'>
@@ -161,7 +169,18 @@ function createSettings(index, data) {
 
     document.getElementById(`case_sensitive-${index}`).addEventListener('click', function(event) {
         const case_sensitive = event.target.checked
+        if (case_sensitive) {
+            document.getElementById(`preserve_case-${index}`).checked = false
+        }
         setKwargs(index, { case_sensitive })
+    })
+
+    document.getElementById(`preserve_case-${index}`).addEventListener('click', function(event) {
+        const preserve_case = event.target.checked
+        if (preserve_case) {
+            document.getElementById(`case_sensitive-${index}`).checked = false
+        }
+        setKwargs(index, { preserve_case })
     })
 
     document.getElementById(`escape_special-${index}`).addEventListener('click', function(event) {
@@ -276,7 +295,7 @@ function createTable(index, data) {
 var size = 10;
 var dataObject = []
 var varsObject = []
-var settingsObject = { 'include': true, 'rule_ordering': "as-written", 'case_sensitive': true, 'escape_special': false, 'reverse': false }
+var settingsObject = { 'include': true, 'rule_ordering': "as-written", 'case_sensitive': true, 'preserve_case': false, 'escape_special': false, 'reverse': false }
 for (var j = 0; j < size; j++) {
     dataObject.push({
         "in": '',
@@ -339,6 +358,7 @@ getIncludedMappings = function() {
 var getKwargs = function(index) {
     const rule_ordering = $(`#rule_ordering-${index}`).val()
     const case_sensitive = document.getElementById(`case_sensitive-${index}`).checked
+    const preserve_case = document.getElementById(`preserve_case-${index}`).checked
     const escape_special = document.getElementById(`escape_special-${index}`).checked
     const reverse = document.getElementById(`reverse-${index}`).checked
     const include = document.getElementById(`include-${index}`).checked
@@ -355,6 +375,7 @@ var getKwargs = function(index) {
         return {
             rule_ordering,
             case_sensitive,
+            preserve_case,
             escape_special,
             reverse,
             include,
@@ -371,6 +392,9 @@ var setKwargs = function(index, kwargs) {
     }
     if ('case_sensitive' in kwargs) {
         document.getElementById(`case_sensitive-${index}`).checked = kwargs['case_sensitive']
+    }
+    if ('preserve_case' in kwargs) {
+        document.getElementById(`preserve_case-${index}`).checked = kwargs['preserve_case']
     }
     if ('escape_special' in kwargs) {
         document.getElementById(`escape_special-${index}`).checked = kwargs['escape_special']

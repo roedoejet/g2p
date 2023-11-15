@@ -420,6 +420,7 @@ class Transducer:
     def __init__(self, mapping: Mapping):
         self.mapping = mapping
         self.case_sensitive = mapping.case_sensitive
+        self.preserve_case = mapping.preserve_case
         self.norm_form = mapping.norm_form
         self.out_delimiter = mapping.out_delimiter
         self._index_match_pattern = re.compile(r"(?<={)\d+(?=})")
@@ -428,7 +429,7 @@ class Transducer:
     def __repr__(self):
         return f"{self.__class__} between {self.mapping.in_lang} and {self.mapping.out_lang}"
 
-    def __call__(self, to_convert: str, index: bool = False, debugger: bool = False):
+    def __call__(self, to_convert: str):
         """The basic method to transduce an input. A proxy for self.apply_rules.
 
         Args:
@@ -439,7 +440,11 @@ class Transducer:
             and output characters and their corresponding edges representing the indices
             of the transformation.
         """
-        return self.apply_rules(to_convert)
+        tg = self.apply_rules(to_convert)
+        if self.preserve_case:
+            return preserve_case(tg, self.mapping.case_equivalencies)
+        else:
+            return tg
 
     @staticmethod
     def _pua_to_index(string: str) -> int:
@@ -1257,3 +1262,53 @@ class TokenizingTransducer:
                 else:
                     return False
         return result
+
+
+def preserve_case(
+    tg: TransductionGraph, case_equivalencies: Dict[str, str] = None
+) -> TransductionGraph:
+    if case_equivalencies is None:
+        case_equivalencies = {}
+    reverse_case_equivalencies = {v: k for k, v in case_equivalencies.items()}
+    all_lower_case_equivalencies = case_equivalencies.keys()
+    all_upper_case_equivalencies = case_equivalencies.values()
+    new_string = ""
+    for item in tg.substring_alignments():
+        in_sub = item[0]
+        out_sub = item[1]
+        any_in_upper = any(x.isupper() for x in in_sub)
+        any_in_lower = any(x.islower() for x in in_sub)
+        any_out_upper = any(x.isupper() for x in out_sub)
+        any_out_lower = any(x.islower() for x in out_sub)
+        # continue if character is un-caseable
+        if (
+            out_sub not in case_equivalencies
+            and not any_out_upper
+            and not any_out_lower
+        ):
+            new_string += out_sub
+            continue
+        # lower case using case equivalencies if they exist
+        if (
+            any_in_lower or in_sub in all_lower_case_equivalencies
+        ) and out_sub in all_upper_case_equivalencies:
+            new_string += reverse_case_equivalencies[out_sub]
+            continue
+        # upper case using case equivalencies if they exist
+        elif (
+            any_in_upper or in_sub in all_upper_case_equivalencies
+        ) and out_sub in all_lower_case_equivalencies:
+            new_string += case_equivalencies[out_sub]
+            continue
+        # change to upper if required
+        if any_in_upper and any_out_lower:
+            new_string += out_sub.upper()
+            continue
+        # change to lower if required
+        if any_in_lower and any_out_upper:
+            new_string += out_sub.lower()
+            continue
+        # just in case, append the out_sub
+        new_string += out_sub
+    tg.output_string = new_string
+    return tg

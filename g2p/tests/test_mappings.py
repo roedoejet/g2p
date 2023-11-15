@@ -194,6 +194,10 @@ class MappingTest(TestCase):
         self.assertEqual(transducer_case_sensitive("a").output_string, "a")
         self.assertEqual(transducer("A").output_string, "b")
 
+    def test_case_equivalencies(self):
+        with self.assertRaises(exceptions.MalformedMapping):
+            Mapping(rules=[{"in": "a", "out": "b"}], case_equivalencies={"a": "AA"})
+
     def test_escape_special(self):
         mapping = Mapping(rules=[{"in": r"\d", "out": "digit"}])
         mapping_escaped = Mapping(
