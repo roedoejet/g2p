@@ -255,6 +255,9 @@ class TransducerTest(TestCase):
                 case_equivalencies={"λ": "\u2144\u2144\u2144"},
             )
 
+        with self.assertRaises(MalformedMapping):
+            _ = Mapping(rules=[], case_sensitive=True, preserve_case=True)
+
     def test_normalize_edges(self):
         # Remove non-deletion edges with the same index as deletions
         bad_edges = [
