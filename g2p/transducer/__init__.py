@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 This module contains the Transducer and CompositeTransducer classes
 which are responsible for performing transductions in the g2p library.
@@ -23,9 +22,9 @@ from g2p.mappings.utils import (
     is_ipa,
     normalize,
     normalize_with_indices,
+    strip_index_notation,
     unicode_escape,
 )
-from g2p.utils import strip_index_notation
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)

@@ -256,7 +256,11 @@ class TransducerTest(TestCase):
             )
 
         with self.assertRaises(MalformedMapping):
-            _ = Mapping(rules=[], case_sensitive=True, preserve_case=True)
+            _ = Mapping(
+                rules=[{"in": "a", "out": "b"}],
+                case_sensitive=True,
+                preserve_case=True,
+            )
 
     def test_normalize_edges(self):
         # Remove non-deletion edges with the same index as deletions
