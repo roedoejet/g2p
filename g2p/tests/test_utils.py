@@ -3,6 +3,7 @@
 """ Test Mapping utility functions
 """
 
+import doctest
 import os
 import re
 from collections import defaultdict
@@ -30,10 +31,19 @@ class UtilsTest(TestCase):
         if os.path.exists(gen_mapping):
             os.remove(gen_mapping)
         fresh_config = {"language_name": "generated", "mappings": []}
-        with open(os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml"), "w") as f:
+        with open(
+            os.path.join(PUBLIC_DIR, "mappings", "generated_add.yaml"),
+            "w",
+            encoding="utf8",
+        ) as f:
             yaml.dump(
                 fresh_config, f, Dumper=utils.IndentDumper, default_flow_style=False
             )
+
+    def test_run_doctest(self):
+        """Run doctests in g2p.mappings.utils"""
+        results = doctest.testmod(utils)
+        self.assertFalse(results.failed, results)
 
     def test_abb_expand(self):
         test_dict = defaultdict(list)

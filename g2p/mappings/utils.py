@@ -229,6 +229,27 @@ def escape_to_codepoint(match):
     return chr(int(hex_codepoint, base=16))
 
 
+EXPLICIT_INDEX_PATTERN = re.compile(r"{\d+}")
+
+
+def strip_index_notation(string: str) -> str:
+    """Return a string stripped of any explicit indices
+
+    >>> strip_index_notation('test')
+    'test'
+
+    >>> strip_index_notation('t{0}e{2}st')
+    'test'
+
+    Args:
+        string (str): a string that might have explicit indices
+
+    Returns:
+        str: a string without explicit indices
+    """
+    return re.sub(EXPLICIT_INDEX_PATTERN, "", string)
+
+
 def create_fixed_width_lookbehind(pattern):
     """Turn all characters into fixed width lookbehinds"""
     return re.sub(
@@ -512,7 +533,7 @@ class IndentDumper(yaml.Dumper):
     def increase_indent(self, flow=False, indentless=False):
         return super().increase_indent(flow, False)
 
-    def ignore_aliases(self, *args):
+    def ignore_aliases(self, *_args):
         return True
 
 

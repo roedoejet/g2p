@@ -34,8 +34,8 @@ from g2p.mappings.utils import (
     load_alignments_from_file,
     load_from_file,
     normalize,
+    strip_index_notation,
 )
-from g2p.utils import strip_index_notation
 
 GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 
@@ -43,7 +43,7 @@ GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 class Mapping(_MappingModelDefinition):
     """Class for lookup tables"""
 
-    def model_post_init(self, *args, **kwargs) -> None:
+    def model_post_init(self, *_args, **_kwargs) -> None:
         """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
         if self.type == MAPPING_TYPE.mapping or self.type is None:
             # load abbreviations from path
