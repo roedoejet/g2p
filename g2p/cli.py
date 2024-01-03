@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import List, Tuple
 
 import click
-from flask.cli import FlaskGroup
 
 from g2p import make_g2p, make_tokenizer
 from g2p._version import VERSION
@@ -112,7 +111,7 @@ def parse_from_or_to_lang_spec(lang_spec):
 
 
 @click.version_option(version=VERSION, prog_name="g2p")
-@click.group(cls=FlaskGroup, create_app=create_app, context_settings=CONTEXT_SETTINGS)
+@click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     """Management script for G2P"""
 
