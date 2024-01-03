@@ -12,38 +12,17 @@ from typing import List, Tuple
 
 import click
 from flask.cli import FlaskGroup
-from networkx import has_path
 
 from g2p import make_g2p, make_tokenizer
 from g2p._version import VERSION
-from g2p.api import update_docs
-from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
-from g2p.log import LOGGER
-from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
-from g2p.mappings.create_fallback_mapping import (
-    DUMMY_INVENTORY,
-    align_to_dummy_fallback,
-)
-from g2p.mappings.create_ipa_mapping import (
+from g2p.constants import (
     DISTANCE_METRICS,
-    create_mapping,
-    create_multi_mapping,
-)
-from g2p.mappings.langs import (
     LANGS_DIR,
     LANGS_FILE_NAME,
-    LANGS_NETWORK,
     NETWORK_FILE_NAME,
-    reload_db,
 )
-from g2p.mappings.langs.utils import (
-    cache_langs,
-    check_ipa_known_segs,
-    network_to_echart,
-)
-from g2p.mappings.utils import is_ipa, is_xsampa, normalize
+from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.static import __file__ as static_file
-from g2p.transducer import Transducer
 
 PRINTER = pprint.PrettyPrinter(indent=4)
 
@@ -76,6 +55,10 @@ def parse_from_or_to_lang_spec(lang_spec):
     Raises:
         click.BadParameter if lang_spec is not valid
     """
+    # Defer expensive imports
+    from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
+    from g2p.mappings.utils import is_ipa
+
     mapping_spec, _, in_or_out = lang_spec.partition("[")
     in_or_out.rstrip("]")
     in_lang, _, out_lang = mapping_spec.partition("_to_")
@@ -288,6 +271,17 @@ def generate_mapping(  # noqa: C901
     You can list available mappings with "g2p doctor --list-ipa", or by
     visiting http://g2p-studio.herokuapp.com/api/v1/langs .
     """
+    # Defer expensive imports
+    from g2p.log import LOGGER
+    from g2p.mappings import Mapping
+    from g2p.mappings.create_fallback_mapping import (
+        DUMMY_INVENTORY,
+        align_to_dummy_fallback,
+    )
+    from g2p.mappings.create_ipa_mapping import create_mapping, create_multi_mapping
+    from g2p.mappings.langs import LANGS_NETWORK
+    from g2p.mappings.langs.utils import check_ipa_known_segs
+    from g2p.mappings.utils import is_ipa, is_xsampa
 
     # Make sure only one mode was specified on the command line
     mode_count = (
@@ -505,6 +499,13 @@ def convert(  # noqa: C901
     For example, mapping from fra to eng-arpabet will successively apply
     fra->fra-ipa, fra-ipa->eng-ipa and eng-ipa->eng-arpabet.
     """
+    # Defer expensive imports
+    from networkx import has_path
+
+    from g2p.log import LOGGER
+    from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
+    from g2p.mappings.langs import LANGS_NETWORK
+
     # Check valid input
     # Check input != output
     if in_lang == out_lang:
@@ -596,6 +597,12 @@ def doctor(mapping, list_all, list_ipa):
     You can list available mappings with --list-all or --list-ipa, or by visiting
     http://g2p-studio.herokuapp.com/api/v1/langs .
     """
+    # Defer expensive imports
+    from g2p.log import LOGGER
+    from g2p.mappings import MAPPINGS_AVAILABLE
+    from g2p.mappings.langs.utils import check_ipa_known_segs
+    from g2p.mappings.utils import is_ipa
+
     if list_all or list_ipa:
         out_langs = sorted({x.out_lang for x in MAPPINGS_AVAILABLE})
         if list_ipa:
@@ -647,6 +654,11 @@ def doctor(mapping, list_all, list_ipa):
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update(in_dir, out_dir):
     """Update cached language files."""
+    # Defer expensive imports
+    from g2p.api import update_docs
+    from g2p.mappings.langs import reload_db
+    from g2p.mappings.langs.utils import cache_langs, network_to_echart
+
     if in_dir is None:
         in_dir = LANGS_DIR
     if out_dir is None:
@@ -677,6 +689,9 @@ def update_schema(out_dir):
     """Generate a schema for the model configuration - this should only be done once for each Minor version.
     Changes to the schema should result in a minor version bump.
     """
+    # Defer expensive imports
+    from g2p.mappings import MappingConfig
+
     # Determine path
     if out_dir is None:
         schema_path = (
@@ -709,6 +724,12 @@ def scan(lang, path):
     Displays the set of un-mapped characters in a document.
     Accounts for case sensitivity in the configuration.
     """
+    # Defer expensive imports
+    from g2p.log import LOGGER
+    from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
+    from g2p.mappings.langs import LANGS_NETWORK
+    from g2p.mappings.utils import normalize
+
     # Check input lang exists
     if lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{lang}' is not a valid value for 'LANG'")
@@ -761,6 +782,9 @@ def show_mappings(lang1, lang2, verbose, csv):
     If only LANG1 is used, all mappings to or from LANG1 are displayed.
     With no LANG, all cached mappings are included.
     """
+    # Defer expensive imports
+    from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
+    from g2p.transducer import Transducer
 
     if lang1 is not None and lang2 is not None:
         try:

@@ -17,6 +17,7 @@ from typing import Iterable, List, Tuple
 
 from tqdm import tqdm
 
+from g2p.constants import DISTANCE_METRICS
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import getPanphonDistanceSingleton
@@ -66,16 +67,6 @@ def process_characters(inv, is_xsampa=False):
 #
 #
 ###################################
-
-
-DISTANCE_METRICS = [
-    "weighted_feature_edit_distance",
-    "hamming_feature_edit_distance",
-    "feature_edit_distance",
-    "dolgo_prime_distance",
-    "fast_levenshtein_distance",
-    "levenshtein_distance",
-]
 
 
 def get_distance_method(dst, distance: str):

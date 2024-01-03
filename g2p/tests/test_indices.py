@@ -7,7 +7,7 @@
 from unicodedata import normalize
 from unittest import TestCase, main
 
-from g2p import LOGGER
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.transducer import Transducer
 

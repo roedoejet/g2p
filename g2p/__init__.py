@@ -20,23 +20,12 @@ Basic Usage:
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
 """
-from typing import Dict, Optional, Tuple, Union
-
-from networkx import has_path, shortest_path
-from networkx.exception import NetworkXNoPath
+from typing import Optional, Union
 
 import g2p.deprecation
 from g2p.exceptions import InvalidLanguageCode, NoPath
-from g2p.log import LOGGER
-from g2p.mappings import LANGS, Mapping
-from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.tokenizer import Tokenizer, make_tokenizer
-from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
-_g2p_cache: Dict[
-    Tuple[str, str, Optional[str], bool, int],
-    Union[Transducer, CompositeTransducer, TokenizingTransducer],
-] = {}
+_g2p_cache = {}
 
 
 def make_g2p(  # noqa: C901
@@ -45,7 +34,7 @@ def make_g2p(  # noqa: C901
     tok_lang: Optional[str] = None,  # DEPRECATED
     *,
     tokenize: bool = True,
-    custom_tokenizer: Optional[Tokenizer] = None,
+    custom_tokenizer=None,
 ):
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
@@ -69,6 +58,15 @@ def make_g2p(  # noqa: C901
         InvalidLanguageCode: if in_lang or out_lang don't exist
         NoPath: if there is path between in_lang and out_lang
     """
+    # Defer expensive imports
+    from networkx import shortest_path
+    from networkx.exception import NetworkXNoPath
+
+    from g2p.log import LOGGER
+    from g2p.mappings import Mapping
+    from g2p.mappings.langs import LANGS_NETWORK
+    from g2p.mappings.tokenizer import make_tokenizer
+    from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
     if (in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))]
@@ -160,6 +158,11 @@ def get_arpabet_langs():
             LANGS is the sorted list of valid language codes supported
             LANG_NAMES maps each code to its full language name and is ordered by codes
     """
+    # Defer expensive imports
+    from networkx import has_path
+
+    from g2p.mappings import LANGS
+    from g2p.mappings.langs import LANGS_NETWORK
 
     global _langs_cache
     global _lang_names_cache
@@ -189,6 +192,7 @@ def get_arpabet_langs():
         # which is needed for the readalongs
         # Filter out <lang>-ipa: we only want "normal" input languages.
         # Filter out *-norm and crk-no-symbols, these are just intermediate representations.
+
         _langs_cache = [
             x
             for x in langs_available
@@ -209,3 +213,26 @@ def get_arpabet_langs():
         }
 
         return _langs_cache, _lang_names_cache
+
+
+def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+    """Make the tokenizer for input in language in_lang
+
+    Logic used when only in_lang is provided:
+    - if in_lang -> in_lang-ipa, or in_lang -> X-ipa exists, tokenize using the input
+      inventory of that mapping.
+    - elif in_lang -> X -> Y-ipa exists, e.g., tce -> tce-equiv -> tce-ipa, tokenize
+      using the input inventory of those two hops.
+    - otherwise, just use the default tokenizer, which accepts as part of words all
+      unicode letter, numbers and diacritics
+
+    Logic used when in_lang and out_lang are provided:
+    - if in_lang -> out_lang exists, tokenize using the input inventory of that mapping
+    - otherwise use the default tokenizer
+
+    Logic used when in_lang and tok_path are provided:
+    - use the first one or two hops in path, stopping at the first -ipa node
+    """
+    from g2p.mappings.tokenizer import make_tokenizer as _make_tokenizer
+
+    return _make_tokenizer(in_lang, out_lang, tok_path)
