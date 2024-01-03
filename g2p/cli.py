@@ -17,7 +17,6 @@ from networkx import has_path
 from g2p import make_g2p, make_tokenizer
 from g2p._version import VERSION
 from g2p.api import update_docs
-from g2p.app import APP
 from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
@@ -57,6 +56,8 @@ if "pytest" not in sys.modules:  # pragma: no cover
 
 def create_app():
     """Return the flask app for g2p"""
+    from g2p.app import APP
+
     return APP
 
 
