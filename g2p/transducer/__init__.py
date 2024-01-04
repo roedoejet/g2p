@@ -11,10 +11,10 @@ from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode
 
+from g2p.constants import BaseTokenizer, BaseTransducer, BaseTransductionGraph
 from g2p.log import LOGGER
 from g2p.mappings import MAPPING_TYPE, Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
-from g2p.mappings.tokenizer import Tokenizer
 from g2p.mappings.utils import (
     Rule,
     compose_indices,
@@ -83,7 +83,7 @@ def normalize_edges(
     return list(OrderedDict.fromkeys((i, j) for i, j in edges))
 
 
-class TransductionGraph:
+class TransductionGraph(BaseTransductionGraph):
     """This is the object returned after performing a transduction using a Transducer.
 
     Each TransductionGraph must be initialized with an input string.
@@ -407,7 +407,7 @@ class TransductionGraph:
         return self
 
 
-class Transducer:
+class Transducer(BaseTransducer):
     """This is the fundamental class for performing conversions in the g2p library.
 
     Each Transducer must be initialized with a Mapping object. The Transducer
@@ -1119,7 +1119,7 @@ class CompositeTransductionGraph(TransductionGraph):
             tier.clear_debugger()
 
 
-class CompositeTransducer:
+class CompositeTransducer(BaseTransducer):
     """This class combines Transducer objects to form a CompositeTransducer object.
 
     Attributes:
@@ -1185,7 +1185,7 @@ class CompositeTransducer:
             return result
 
 
-class TokenizingTransducer:
+class TokenizingTransducer(BaseTransducer):
     """This class combines tokenization and transduction.
 
     This is particularly useful for lexicon mappings, which cannot
@@ -1199,7 +1199,7 @@ class TokenizingTransducer:
     def __init__(
         self,
         transducer: Union[Transducer, CompositeTransducer],
-        tokenizer: Tokenizer,
+        tokenizer: BaseTokenizer,
     ):
         self._transducer = transducer
         self._tokenizer = tokenizer
@@ -1266,7 +1266,7 @@ class TokenizingTransducer:
 
 
 def preserve_case(
-    tg: TransductionGraph, case_equivalencies: Dict[str, str] = None
+    tg: TransductionGraph, case_equivalencies: Optional[Dict[str, str]] = None
 ) -> TransductionGraph:
     if case_equivalencies is None:
         case_equivalencies = {}

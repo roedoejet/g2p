@@ -20,12 +20,13 @@ Basic Usage:
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
 """
-from typing import Optional, Union
+from typing import Dict, Optional, Tuple, Union
 
 import g2p.deprecation
+from g2p.constants import BaseTokenizer, BaseTransducer
 from g2p.exceptions import InvalidLanguageCode, NoPath
 
-_g2p_cache = {}
+_g2p_cache: Dict[Tuple[str, str, Optional[str], bool, int], BaseTransducer] = {}
 
 
 def make_g2p(  # noqa: C901
@@ -34,7 +35,7 @@ def make_g2p(  # noqa: C901
     tok_lang: Optional[str] = None,  # DEPRECATED
     *,
     tokenize: bool = True,
-    custom_tokenizer=None,
+    custom_tokenizer: Optional[BaseTokenizer] = None,
 ):
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
