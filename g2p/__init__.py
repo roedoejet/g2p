@@ -23,8 +23,8 @@ Basic Usage:
 from typing import Dict, Optional, Tuple, Union
 
 import g2p.deprecation
-from g2p.constants import BaseTokenizer, BaseTransducer
 from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.types import BaseTokenizer, BaseTransducer
 
 _g2p_cache: Dict[Tuple[str, str, Optional[str], bool, int], BaseTransducer] = {}
 

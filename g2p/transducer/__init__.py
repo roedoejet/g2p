@@ -11,7 +11,6 @@ from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode
 
-from g2p.constants import BaseTokenizer, BaseTransducer, BaseTransductionGraph
 from g2p.log import LOGGER
 from g2p.mappings import MAPPING_TYPE, Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
@@ -25,6 +24,7 @@ from g2p.mappings.utils import (
     strip_index_notation,
     unicode_escape,
 )
+from g2p.types import BaseTokenizer, BaseTransducer, BaseTransductionGraph
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
