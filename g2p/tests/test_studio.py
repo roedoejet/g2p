@@ -20,9 +20,12 @@ from unittest import IsolatedAsyncioTestCase, main
 
 from playwright.async_api import async_playwright
 
-from g2p.app import APP, SOCKETIO
+from g2p.app import SOCKETIO
+from g2p.cli import create_app
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
+
+APP = create_app()  # instead of importing APP, we use create_app, just to exercise it.
 
 
 class StudioTest(IsolatedAsyncioTestCase):
@@ -89,7 +92,6 @@ class StudioTest(IsolatedAsyncioTestCase):
             self.assertEqual(await page.locator("#link-0").count(), 0)
 
     async def test_langs(self):
-
         langs_to_test = load_public_test_data()
         # Doing the whole test set takes a long time, so let's use a 10% random sample,
         # knowing that all cases always get exercised in test_cli.py and test_langs.py.
