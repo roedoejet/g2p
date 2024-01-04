@@ -46,6 +46,28 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"
+      - name: Make sure the CLI stays fast
+        id: cli-load-time
+        run: |
+          PYTHONPROFILEIMPORTTIME=1 g2p -h 2> importtime.txt > /dev/null
+          CLI_LOAD_TIME="$((/usr/bin/time --format=%E g2p -h > /dev/null) 2>&1)"
+          echo "CLI load time: $CLI_LOAD_TIME"
+          cat importtime.txt
+          echo "CLI load time: $CLI_LOAD_TIME" > import-message.txt
+          echo "PR head ${{ github.event.pull_request.head.sha }}" >> import-message.txt
+          echo "Imports that take more than 0.1 s:" >> import-message.txt
+          grep -E 'cumulative|[0-9]{6}' importtime.txt >> import-message.txt
+          if [[ "$CLI_LOAD_TIME" > "0:01.00" ]]; then \
+            echo "ERROR: g2p --help is too slow."; \
+            echo "Please run 'PYTHONPROFILEIMPORTTIME=1 g2p -h 2> importtime.txt; tuna importtime.txt' and tuck away expensive imports so that the CLI doesn't load them until it uses them."; \
+            false; \
+          fi
+      - name: Report help speed in PR
+        if: github.event_name == 'pull_request'
+        uses: mshick/add-pr-comment@v2
+        with:
+          preformatted: true
+          message-path: import-message.txt
 
   test-on-windows:
     # Make sure stuff stays compatible with Windows by testing there too.
