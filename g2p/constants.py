@@ -23,7 +23,7 @@ class BaseTransducer(ABC):
 
     @abstractmethod
     def __call__(self, to_convert: str):
-        pass
+        """Transduce to_convert."""
 
 
 class BaseTransductionGraph(ABC):
@@ -32,7 +32,7 @@ class BaseTransductionGraph(ABC):
     @property
     @abstractmethod
     def tiers(self):
-        pass
+        """A list of BaseTransductionGraph objects for each tier in the graph."""
 
 
 class BaseTokenizer(ABC):
@@ -40,4 +40,4 @@ class BaseTokenizer(ABC):
 
     @abstractmethod
     def tokenize_text(self, text):
-        pass
+        """Tokenize text."""
