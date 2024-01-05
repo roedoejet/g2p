@@ -15,6 +15,7 @@ mappings:
     out_lang: kwk-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
+    norm_form: 'NFD'
     authors:
       - Patrick Littell
       - Fineen Davis
@@ -26,6 +27,7 @@ mappings:
     rule_ordering: apply-longest-first
     case_sensitive: false
     prevent_feeding: true
+    norm_form: 'NFD'
     authors:
       - Patrick Littell
       - Eric Joanis
@@ -38,6 +40,7 @@ mappings:
     case_sensitive: false
     preserve_case: true
     prevent_feeding: true
+    norm_form: 'NFD'
     authors:
       - Fineen Davis
       - Eric Joanis
@@ -49,6 +52,7 @@ mappings:
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
+    norm_form: 'NFD'
     authors:
       - Fineen Davis
     <<: *shared
@@ -59,6 +63,7 @@ mappings:
     rule_ordering: apply-longest-first
     case_sensitive: false
     preserve_case: true
+    norm_form: 'NFD'
     authors:
       - Fineen Davis
     <<: *shared
@@ -70,6 +75,7 @@ mappings:
     prevent_feeding: true
     case_sensitive: false
     preserve_case: true
+    norm_form: 'NFD'
     authors:
       - Fineen Davis
       - Olivia Chen
