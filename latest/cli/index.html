@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.3">
     
     
       
@@ -22,10 +22,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4b4a2bd9.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.50c56a3b.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.356b1318.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -63,7 +63,6 @@
     
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
   
-    
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
@@ -123,6 +122,7 @@
     
     
     
+    
   </nav>
   
 </header>
@@ -164,6 +164,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href=".." class="md-nav__link">
         
@@ -183,6 +184,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../installation/" class="md-nav__link">
         
@@ -199,6 +201,7 @@
     
       
       
+  
   
   
   
@@ -238,6 +241,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../start/" class="md-nav__link">
         
@@ -258,6 +262,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../contributing/" class="md-nav__link">
         
@@ -275,6 +280,7 @@
             
               
                 
+  
   
   
   
@@ -305,6 +311,7 @@
   
   
     
+  
   
   
     
@@ -343,6 +350,7 @@
   
   
   
+  
     <li class="md-nav__item">
       <a href="../package/" class="md-nav__link">
         
@@ -363,6 +371,7 @@
   
   
     
+  
   
   
     <li class="md-nav__item md-nav__item--active">
@@ -436,17 +445,8 @@
 <div class="highlight"><pre><span></span><code>cli [OPTIONS] COMMAND [ARGS]...
 </code></pre></div>
 <p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -e, --env-file FILE   Load environment variables from this file. python-
-                        dotenv must be installed.
-  -A, --app IMPORT      The Flask application or factory function to load, in
-                        the form &#39;module:name&#39;. Module can be a dotted import
-                        or file path. Name is not required if it is &#39;app&#39;,
-                        &#39;application&#39;, &#39;create_app&#39;, or &#39;make_app&#39;, and can be
-                        &#39;name(args)&#39; to pass arguments.
-  --debug / --no-debug  Set debug mode.
-  --version             Show the Flask version.
-  --version             Show the version and exit.
-  --help                Show this message and exit.
+<div class="highlight"><pre><span></span><code>  --version  Show the version and exit.
+  --help     Show this message and exit.
 </code></pre></div>
 <h2 id="convert">convert<a class="headerlink" href="#convert" title="Permanent link">&para;</a></h2>
 <p>Convert INPUT_TEXT through g2p mapping(s) from IN_LANG to OUT_LANG.</p>
@@ -587,66 +587,12 @@ visiting http://g2p-studio.herokuapp.com/api/v1/langs .</p>
                                   global &quot;generated&quot; directory.
   --help                          Show this message and exit.
 </code></pre></div>
-<h2 id="routes">routes<a class="headerlink" href="#routes" title="Permanent link">&para;</a></h2>
-<p>Show all registered routes with endpoints and methods.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli routes [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  -s, --sort [endpoint|methods|rule|match]
-                                  Method to sort routes by. &quot;match&quot; is the
-                                  order that Flask will match routes when
-                                  dispatching a request.
-  --all-methods                   Show HEAD and OPTIONS methods.
-  --help                          Show this message and exit.
-</code></pre></div>
-<h2 id="run">run<a class="headerlink" href="#run" title="Permanent link">&para;</a></h2>
-<p>Run a local development server.</p>
-<p>This server is for development purposes only. It does not provide
-the stability, security, or performance of production WSGI servers.</p>
-<p>The reloader and debugger are enabled by default with the '--debug'
-option.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli run [OPTIONS]
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --debug / --no-debug            Set debug mode.
-  -h, --host TEXT                 The interface to bind to.
-  -p, --port INTEGER              The port to bind to.
-  --cert PATH                     Specify a certificate file to use HTTPS.
-  --key FILE                      The key file to use when specifying a
-                                  certificate.
-  --reload / --no-reload          Enable or disable the reloader. By default
-                                  the reloader is active if debug is enabled.
-  --debugger / --no-debugger      Enable or disable the debugger. By default
-                                  the debugger is active if debug is enabled.
-  --with-threads / --without-threads
-                                  Enable or disable multithreading.
-  --extra-files PATH              Extra files that trigger a reload on change.
-                                  Multiple paths are separated by &#39;:&#39;.
-  --exclude-patterns PATH         Files matching these fnmatch patterns will
-                                  not trigger a reload on change. Multiple
-                                  patterns are separated by &#39;:&#39;.
-  --help                          Show this message and exit.
-</code></pre></div>
 <h2 id="scan">scan<a class="headerlink" href="#scan" title="Permanent link">&para;</a></h2>
 <p>Scan a document for non target language characters.</p>
 <p>Displays the set of un-mapped characters in a document.
 Accounts for case sensitivity in the configuration.</p>
 <p><strong>Usage:</strong></p>
 <div class="highlight"><pre><span></span><code>cli scan [OPTIONS] LANG PATH
-</code></pre></div>
-<p><strong>Options:</strong></p>
-<div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
-</code></pre></div>
-<h2 id="shell">shell<a class="headerlink" href="#shell" title="Permanent link">&para;</a></h2>
-<p>Run an interactive Python shell in the context of a given
-Flask application.  The application will populate the default
-namespace of this shell according to its configuration.</p>
-<p>This is useful for executing small snippets of management code
-without having to manually configure the application.</p>
-<p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli shell [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
@@ -690,6 +636,16 @@ Changes to the schema should result in a minor version bump.</p>
                            mappings/langs/../.schema).
   --help                   Show this message and exit.
 </code></pre></div>
+
+
+
+
+
+
+
+  
+  
+
 
 
 
@@ -740,6 +696,7 @@ Changes to the schema should result in a minor version bump.</p>
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
       </main>
@@ -795,7 +752,7 @@ Changes to the schema should result in a minor version bump.</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "announce.dismiss", "navigation.footer"], "search": "../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7c377c4.min.js"></script>
       
     
   </body>
