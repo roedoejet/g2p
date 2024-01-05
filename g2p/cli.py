@@ -32,13 +32,6 @@ if "pytest" not in sys.modules:  # pragma: no cover
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf8")
 
 
-def create_app():
-    """Return the flask app for g2p"""
-    from g2p.app import APP
-
-    return APP
-
-
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 

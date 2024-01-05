@@ -20,12 +20,9 @@ from unittest import IsolatedAsyncioTestCase, main
 
 from playwright.async_api import async_playwright
 
-from g2p.app import SOCKETIO
-from g2p.cli import create_app
+from g2p.app import APP, SOCKETIO
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
-
-APP = create_app()  # instead of importing APP, we use create_app, just to exercise it.
 
 
 class StudioTest(IsolatedAsyncioTestCase):
