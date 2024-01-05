@@ -89,7 +89,6 @@ class StudioTest(IsolatedAsyncioTestCase):
             self.assertEqual(await page.locator("#link-0").count(), 0)
 
     async def test_langs(self):
-
         langs_to_test = load_public_test_data()
         # Doing the whole test set takes a long time, so let's use a 10% random sample,
         # knowing that all cases always get exercised in test_cli.py and test_langs.py.

@@ -15,9 +15,10 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
+from g2p.types import BaseTokenizer
 
 
-class Tokenizer:
+class Tokenizer(BaseTokenizer):
     """Base class for all g2p tokenizers; implements the default tokenizing behaviour.
 
     By default, a token is defined as a sequence of letters, numbers and

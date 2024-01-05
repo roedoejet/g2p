@@ -7,12 +7,11 @@ import os
 
 import networkx
 
+from g2p.constants import LANGS_DIR, LANGS_FILE_NAME, NETWORK_FILE_NAME
 from g2p.log import LOGGER
 
-LANGS_DIR = os.path.dirname(__file__)
-LANGS_FILE_NAME = "langs.json.gz"
+assert LANGS_DIR == os.path.dirname(__file__)
 LANGS_PKL = os.path.join(LANGS_DIR, LANGS_FILE_NAME)
-NETWORK_FILE_NAME = "network.json.gz"
 LANGS_NWORK_PATH = os.path.join(LANGS_DIR, NETWORK_FILE_NAME)
 
 
