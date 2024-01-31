@@ -7,9 +7,9 @@ oka,eng-arpabet,tmxʷúlaʔxʷ,T M K W UW L AE HH K W
 oka,oka-ipa,sḱʷĺḱʷalt,skʼʷlˀkʼʷalt
 oka,eng-ipa,sḱʷĺḱʷalt,skwlkwælt
 oka,eng-arpabet,sḱʷĺḱʷalt,S K W L K W AE L T
-oka,oka-ipa,x̌iyáɬnx̌ʷ,χiyˈaɬnχʷ
-oka,eng-ipa,x̌iyáɬnx̌ʷ,ʃiuæsnʃw
-oka,eng-arpabet,x̌iyáɬnx̌ʷ,SH IY UW AE S N SH W
+oka,oka-ipa,x̌iyáɬnx̌ʷ,χijˈaɬnχʷ
+oka,eng-ipa,x̌iyáɬnx̌ʷ,ʃijæsnʃw
+oka,eng-arpabet,x̌iyáɬnx̌ʷ,SH IY Y AE S N SH W
 oka,oka-ipa,sṕaʔxʷáwlm,spʼaʔxʷˈawlm
 oka,eng-ipa,sṕaʔxʷáwlm,spæʔkwæwlm
 oka,eng-arpabet,sṕaʔxʷáwlm,S P AE HH K W AE W L M
@@ -31,9 +31,12 @@ oka,eng-arpabet,aksck̓ʷulʔ,AE K S T S K W UW L HH
 oka,oka-ipa,sqilxʷ,sqilxʷ
 oka,eng-ipa,sqilxʷ,skilkw
 oka,eng-arpabet,sqilxʷ,S K IY L K W
-oka,oka-ipa,ntytytix,ntytytix
-oka,eng-ipa,ntytytix,ntututik
-oka,eng-arpabet,ntytytix,N T UW T UW T IY K
+oka,oka-ipa,ntytytix,ntjtjtix
+oka,eng-ipa,ntytytix,ntjtjtik
+oka,eng-arpabet,ntytytix,N T Y T Y T IY K
+oka,oka-ipa,ntityíx,ntitjˈix
+oka,eng-ipa,ntityíx,ntitjik
+oka,eng-arpabet,ntityíx,N T IY T Y IY K
 oka,oka-ipa,chaʔstim’,tshaʔstimˀ
 oka,eng-ipa,chaʔstim’,tshæʔstim
 oka,eng-arpabet,chaʔstim’,T S HH AE HH S T IY M
