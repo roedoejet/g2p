@@ -1,5 +1,5 @@
 <<: &shared
-  language_name: Southern East Cree
+  language_name: East Cree, Southern
 mappings:
   - display_name: Northern East Cree Equivalencies
     in_lang: crj
