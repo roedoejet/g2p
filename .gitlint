@@ -6,4 +6,4 @@ contrib=contrib-title-conventional-commits
 ignore-stdin=true
 
 # We don't require a body, just a title, even though a body is also a good idea
-ignore=body-is-missing
+ignore=body-is-missing,body-min-length
