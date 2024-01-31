@@ -1,5 +1,5 @@
 <<: &shared
-  language_name: Northern East Cree
+  language_name: East Cree, Northern
 mappings:
   - display_name: Northern East Cree Equivalencies
     in_lang: crl
