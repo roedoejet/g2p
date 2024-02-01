@@ -126,7 +126,7 @@ def create_multi_mapping(
     map_2_names = get_sorted_unique_names(tgt_mappings)
 
     src_inventory = []
-    for (mapping, io) in src_mappings:
+    for mapping, io in src_mappings:
         name = getattr(mapping, f"{io}_lang")
         if not is_ipa(name):
             LOGGER.warning(
@@ -136,7 +136,7 @@ def create_multi_mapping(
     src_inventory = deduplicate(src_inventory)
 
     tgt_inventory = []
-    for (mapping, io) in tgt_mappings:
+    for mapping, io in tgt_mappings:
         name = getattr(mapping, f"{io}_lang")
         if not is_ipa(name):
             LOGGER.warning(

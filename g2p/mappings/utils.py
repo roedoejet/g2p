@@ -12,7 +12,7 @@ from collections import defaultdict
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Pattern, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union
 
 import regex as re
 import yaml
@@ -21,10 +21,10 @@ from pydantic import (
     ConfigDict,
     DirectoryPath,
     Field,
+    ValidationInfo,
     field_serializer,
     field_validator,
     model_validator,
-    validator,
 )
 
 from g2p import exceptions
@@ -803,30 +803,34 @@ class _MappingModelDefinition(BaseModel):
             )
         return self
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("rules_path", "abbreviations_path", "alignments_path", pre=True)
-    def add_parent_dir(cls, path, values):
-        if isinstance(path, str):
-            path = Path(path)
-        # Append the parent directory to the path
-        if isinstance(path, Path) and "parent_dir" in values and values["parent_dir"]:
-            path = Path(values["parent_dir"]) / path
-        return path
+    @field_validator(
+        "rules_path", "abbreviations_path", "alignments_path", mode="before"
+    )
+    @classmethod
+    def add_parent_dir(cls, value: Any, info: ValidationInfo):
+        """If there is a parent directory, prepend it to all path fields."""
+        parent_dir = info.data.get("parent_dir", None)
+        if value is not None and parent_dir:
+            value = Path(parent_dir) / value
+        return value
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("language_name", always=True)
-    def create_language_name(cls, language_name, values):
-        # Default language name to in_lang
-        if language_name is None:
-            language_name = values["in_lang"]
-        return language_name
+    @model_validator(mode="before")
+    @classmethod
+    def create_language_name(cls, data: Any):
+        """When missing, default language_name to in_lang"""
+        if isinstance(data, dict) and data.get("language_name", None) is None:
+            data["language_name"] = data.get("in_lang", None)
+        return data
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("display_name", always=True)
-    def create_display_name(cls, display_name, values):
-        if display_name is None:
-            display_name = f"{values['in_lang']} {find_mapping_type(values['in_lang'])} to {values['out_lang']} {find_mapping_type(values['out_lang'])}"
-        return display_name
+    @model_validator(mode="before")
+    @classmethod
+    def create_display_name(cls, data: Any):
+        """When missing, create a default display_name from in_lang and out_lang"""
+        if isinstance(data, dict) and data.get("display_name", None) is None:
+            in_lang = data.get("in_lang", "")
+            out_lang = data.get("out_lang", "")
+            data["display_name"] = (
+                f"{in_lang} {find_mapping_type(in_lang)} to "
+                f"{out_lang} {find_mapping_type(out_lang)}"
+            )
+        return data
