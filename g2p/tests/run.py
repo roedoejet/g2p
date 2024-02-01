@@ -111,15 +111,22 @@ def describe_suite(suite: TestSuite):
     )
 
 
+SUITES = ("all", "dev", "integ", "langs", "mappings", "trans")
+
+
 def run_tests(suite: str, describe: bool = False) -> bool:
     """Run the test suite specified in suite.
 
     Args:
-        suite: one of "all", "dev", etc specifying which suite to run
+        suite: one of SUITES, "dev" if the empty string
         describe: if True, list all the test cases instead of running them.
 
     Returns: Bool: True iff success
     """
+    if not suite:
+        LOGGER.info("No test suite specified, defaulting to dev.")
+        suite = "dev"
+
     if suite == "all":
         test_suite = LOADER.discover(os.path.dirname(__file__))
     elif suite == "trans":
@@ -133,7 +140,7 @@ def run_tests(suite: str, describe: bool = False) -> bool:
     elif suite == "dev":
         test_suite = TestSuite(DEV_TESTS)
     else:
-        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+        LOGGER.error("Please specify a test suite to run among: " + ", ".join(SUITES))
         return False
 
     if describe:
@@ -141,19 +148,17 @@ def run_tests(suite: str, describe: bool = False) -> bool:
         return True
     else:
         runner = TextTestRunner(verbosity=3)
-        return runner.run(test_suite).wasSuccessful()
+        success = runner.run(test_suite).wasSuccessful()
+        if not success:
+            LOGGER.error("Some tests failed. Please see log above.")
+        return success
 
 
 if __name__ == "__main__":
-    describe = "--describe" in sys.argv
-    if describe:
+    describe_opt = "--describe" in sys.argv
+    if describe_opt:
         sys.argv.remove("--describe")
 
-    try:
-        result = run_tests(sys.argv[1], describe)
-        if not result:
-            LOGGER.error("Some tests failed. Please see log above.")
-            sys.exit(1)
-    except IndexError:
-        LOGGER.error("Please specify a test suite to run: i.e. 'dev' or 'all'")
+    result = run_tests("" if len(sys.argv) <= 1 else sys.argv[1], describe_opt)
+    if not result:
         sys.exit(1)
