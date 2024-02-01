@@ -432,8 +432,11 @@ class MappingConfig(BaseModel):
                     mapping["parent_dir"] = parent_dir
         try:
             return MappingConfig(**loaded_config)
+        except exceptions.MalformedMapping as e:
+            e.message = f"{e.message}\nProblem in config file: {path}"
+            raise e
         except TypeError as e:
-            raise exceptions.MalformedMapping from e
+            raise exceptions.MalformedMapping("Config file: {path}") from e
 
 
 LANGS: Dict[str, MappingConfig] = {k: MappingConfig(**v) for k, v in _LANGS.items()}

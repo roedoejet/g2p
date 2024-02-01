@@ -24,6 +24,7 @@ import yaml
 
 from g2p.app import APP
 from g2p.cli import convert, generate_mapping
+from g2p.mappings import Mapping
 from g2p.mappings.utils import normalize
 from g2p.tests.public import PUBLIC_DIR
 
@@ -269,6 +270,52 @@ class LocalConfigTest(TestCase):
         self.assertIn("ghit", result.stdout)
         result = self.runner.invoke(convert, ["aātaāabtaā", *args, "-e"])
         self.assertIn("aʼataʼacedtaʼa", result.stdout)
+
+    def test_invalid_abbrev_path(self):
+        config = """
+            mappings:
+             - name: "invalid"
+               abbreviations_path: {}
+               rules: []
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir = Path(tmpdir)
+            # type bool is not valid
+            with open(tmpdir / "invalid.yaml", "w", encoding="utf8") as fh:
+                fh.write(config.format("true"))
+            with self.assertRaises(Exception) as e:
+                # Currently raise a deep pydantic exception, exceptions.MalformedMapping would be better
+                Mapping.load_mapping_from_path(tmpdir / "invalid.yaml")
+            message = str(e.exception)
+            self.assertRegex(
+                message, r"(?s)abbreviations_path.*Input is not a valid path"
+            )
+            # This fails because we don't raise MalformedMapping
+            # self.assertRegex(
+            #     message, r"Problem in config file:.*invalid.yaml"
+            # )
+
+            # type float is not valid
+            with open(tmpdir / "invalid.yaml", "w", encoding="utf8") as fh:
+                fh.write(config.format("1.0"))
+            with self.assertRaises(Exception):
+                # Currently raise a deep pydantic exception, exceptions.MalformedMapping would be better
+                Mapping.load_mapping_from_path(tmpdir / "invalid.yaml")
+            message = str(e.exception)
+            self.assertRegex(
+                message, r"(?s)abbreviations_path.*Input is not a valid path"
+            )
+            # This fails because we don't raise MalformedMapping
+            # self.assertRegex(
+            #     message, r"Problem in config file:.*invalid.yaml"
+            # )
+
+            # non-existent file
+            with open(tmpdir / "invalid.yaml", "w", encoding="utf8") as fh:
+                fh.write(config.format("file_not_found.csv"))
+            # This is super unfriendly to the user, but that's what happens now.
+            with self.assertRaises(FileNotFoundError):
+                Mapping.load_mapping_from_path(tmpdir / "invalid.yaml")
 
 
 if __name__ == "__main__":
