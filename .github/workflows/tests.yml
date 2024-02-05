@@ -1,8 +1,7 @@
 name: Run all tests
 on:
-  pull_request:
-      types: [review_requested]
-  push:
+  - pull_request
+  - push
 
 jobs:
   test-all-on-linux:
