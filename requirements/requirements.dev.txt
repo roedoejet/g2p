@@ -1,4 +1,4 @@
-black~=22.0
+black~=23.0
 flake8>=4.0.1
 gitlint-core==0.17.0
 isort>=5.10.1
