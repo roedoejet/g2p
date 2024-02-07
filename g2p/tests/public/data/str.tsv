@@ -1,1 +1,5 @@
 str	eng-arpabet	X̱I¸ÁM¸	SH W IY HH EY M HH
+
+# Variants for cedilla: comma, space+combining cedilla, space+combining comma below
+str	eng-arpabet	X̱I,ÁM ̧	SH W IY HH EY M HH
+str	eng-arpabet	X̱I,ÁM ̦	SH W IY HH EY M HH
