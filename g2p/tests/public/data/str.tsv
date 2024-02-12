@@ -3,3 +3,10 @@ str	eng-arpabet	X̱I¸ÁM¸	SH W IY HH EY M HH
 # Variants for cedilla: comma, space+combining cedilla, space+combining comma below
 str	eng-arpabet	X̱I,ÁM ̧	SH W IY HH EY M HH
 str	eng-arpabet	X̱I,ÁM ̦	SH W IY HH EY M HH
+
+# 2024 update: cedilla stays as such in equiv, but is turned into glottal stop in IPA
+# TODO: for comma, disambituate between glottal stop and punctuation
+str	str-equiv	X̱I¸ÁM ̦	X̱I¸ÁM¸
+str	str-equiv	X̱I,ÁM ̧	X̱I,ÁM¸
+str	str-ipa	X̱I¸ÁM ̦	χʷiʔemʔ
+str	str-ipa	X̱I,ÁM ̧	χʷiʔemʔ

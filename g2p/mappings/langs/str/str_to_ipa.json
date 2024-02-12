@@ -38,6 +38,7 @@
     {"in": "X", "out": "χ"},
     {"in": "Y", "out": "j"},
     {"in": "Z", "out": "d͡z"},
-    {"in": ",", "out": "ʔ"},
+    {"in": "¸", "out": "ʔ", "comment": "cedilla is now the community standard for glottal stop"},
+    {"in": ",", "out": "ʔ", "comment": "comma still occurs, though. TODO: disambiguate punctuation vs glottal stop"},
     {"in": "s", "out": "s"}
 ]
