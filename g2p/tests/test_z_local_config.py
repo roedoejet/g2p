@@ -22,6 +22,7 @@ from unittest import TestCase, main
 
 import yaml
 
+from g2p import exceptions
 from g2p.app import APP
 from g2p.cli import convert, generate_mapping
 from g2p.mappings import Mapping
@@ -131,14 +132,14 @@ class LocalConfigTest(TestCase):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "abbrev-file-not-found.yaml")
-            with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
-                pass
+            with open(os.path.join(tmpdir, "tiny.csv"), "wt", encoding="utf8") as f:
+                f.write("a,b\n")
             with open(config_file, "wt", encoding="utf8") as f:
                 yaml.dump(
                     {
                         "mappings": [
                             {
-                                "rules_path": "empty.csv",
+                                "rules_path": "tiny.csv",
                                 "abbreviations_path": "no-such-file.csv",
                             }
                         ]
@@ -151,6 +152,26 @@ class LocalConfigTest(TestCase):
             self.assertNotEqual(results.exit_code, 0)
             self.assertIn(
                 "No such file or directory",
+                results.output + str(results.exception),
+            )
+
+    def test_empty_rules(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            config_file = os.path.join(tmpdir, "empty-rules-file.yaml")
+            with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
+                pass
+            with open(config_file, "wt", encoding="utf8") as f:
+                yaml.dump({"mappings": [{"rules_path": "empty.csv"}]}, f)
+            with self.assertRaises(exceptions.MalformedMapping) as e:
+                # This is a deep pydantic exception, we should raise MalformedMapping
+                Mapping.load_mapping_from_path(config_file)
+            self.assertIn("empty.csv does not contain any rules", str(e.exception))
+            results = self.runner.invoke(
+                convert, ["--config", config_file, "a", "b", "c"]
+            )
+            self.assertNotEqual(results.exit_code, 0)
+            self.assertIn(
+                "empty.csv does not contain any rules",
                 results.output + str(results.exception),
             )
 

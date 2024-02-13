@@ -347,7 +347,10 @@ class Mapping(_MappingModelDefinition):
                 exclude_none=True,
                 exclude={"parent_dir": True},
             )
-        model_dict["rules_path"] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
+        if not model_dict.get("rules_path"):
+            model_dict[
+                "rules_path"
+            ] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
         return model_dict
 
     def config_to_file(

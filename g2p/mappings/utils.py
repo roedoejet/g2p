@@ -389,6 +389,10 @@ def load_from_file(path: Union[Path, str]) -> list:
         raise exceptions.IncorrectFileType(
             f"File {path} is not a valid mapping filetype."
         )
+    if not mapping:
+        raise exceptions.MalformedMapping(
+            f"Sorry, the file {path} does not contain any rules."
+        )
     return mapping
 
 
