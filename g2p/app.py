@@ -13,6 +13,7 @@ from networkx import shortest_path
 
 from g2p import make_g2p
 from g2p.api import g2p_api
+from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import (
@@ -144,9 +145,12 @@ def convert(message):
             mapping["abbreviations"]
         )
         mapping_args["rules"] = mapping["rules"]
-        mappings_obj = Mapping(**mapping_args)
-        transducer = Transducer(mappings_obj)
-        transducers.append(transducer)
+        try:
+            mappings_obj = Mapping(**mapping_args)
+            transducer = Transducer(mappings_obj)
+            transducers.append(transducer)
+        except Exception as e:
+            LOGGER.warning("Skipping invalid mapping: %s", e)
     if len(transducers) == 0:
         emit("conversion response", {"output_string": message["data"]["input_string"]})
         return
