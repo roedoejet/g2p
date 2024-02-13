@@ -28,18 +28,23 @@ jobs:
         run: |
           coverage run --parallel-mode \
               -m gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
-          sleep 5
       - name: Run dev suite
         run: coverage run --parallel-mode run_tests.py dev
       - name: Run test-studio
         run: coverage run --parallel-mode g2p/tests/test_studio.py
+      - name: Run generate-mapping
+        shell: bash
+        run: |
+          coverage run --parallel-mode $(which g2p) generate-mapping --from crg --to eng
+          git status --porcelain=v1 | grep 'M g2p/mappings/langs/generated/config-g2p.yaml' || { echo 'g2p generate-mapping did not update generated/config-g2p.yaml as expected'; false; }
       - name: Post test analyses
         run: |
           pkill coverage
           sleep 5
           coverage combine
+          coverage report
           coverage xml
-          if git status | grep -E 'static.*json|mapping.*pkl|mapping.*langs.json.gz'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
+          if git status | grep -E 'static.*json|mapping.*pkl|mapping.*.json.gz'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
       - name: Upload coverage information
         uses: codecov/codecov-action@v3
         with:
