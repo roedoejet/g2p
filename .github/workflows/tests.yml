@@ -8,9 +8,9 @@ jobs:
     # This is our main test job, exercising everything and uploading to coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.8"
       - name: Install dependencies
@@ -46,7 +46,7 @@ jobs:
           coverage xml
           if git status | grep -E 'static.*json|mapping.*pkl|mapping.*.json.gz'; then echo 'g2p databases out of date, please run "g2p update" and commit the results.'; false; else echo OK; fi
       - name: Upload coverage information
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"
@@ -78,9 +78,9 @@ jobs:
     runs-on: windows-latest
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.7"
       - name: Install dependencies
