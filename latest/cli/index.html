@@ -14,7 +14,7 @@
       
       
       <link rel="icon" href="../favicon-32x32.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.10">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.12">
     
     
       
@@ -435,10 +435,10 @@
 
 <h1 id="command-line-interface">Command line interface<a class="headerlink" href="#command-line-interface" title="Permanent link">&para;</a></h1>
 <p>There is a command line interface bundled with g2p that allows both basic and advanced functionality to be accessed from your command line. After <a href="../installation/">installing g2p</a>, you can get information about how to use the command line by running <code>g2p --help</code></p>
-<h1 id="cli">cli<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h1>
+<h1 id="g2p">g2p<a class="headerlink" href="#g2p" title="Permanent link">&para;</a></h1>
 <p>Management script for G2P</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli [OPTIONS] COMMAND [ARGS]...
+<div class="highlight"><pre><span></span><code>g2p [OPTIONS] COMMAND [ARGS]...
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  --version  Show the version and exit.
@@ -451,7 +451,7 @@
 For example, mapping from fra to eng-arpabet will successively apply
 fra-&gt;fra-ipa, fra-ipa-&gt;eng-ipa and eng-ipa-&gt;eng-arpabet.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli convert [OPTIONS] INPUT_TEXT IN_LANG OUT_LANG
+<div class="highlight"><pre><span></span><code>g2p convert [OPTIONS] INPUT_TEXT IN_LANG OUT_LANG
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  --config FILE                   A path to a mapping configuration file to
@@ -479,7 +479,7 @@ fra-&gt;fra-ipa, fra-ipa-&gt;eng-ipa and eng-ipa-&gt;eng-arpabet.</p>
 <p>You can list available mappings with --list-all or --list-ipa, or by visiting
 http://g2p-studio.herokuapp.com/api/v1/langs .</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli doctor [OPTIONS]
+<div class="highlight"><pre><span></span><code>g2p doctor [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -m, --mapping TEXT  Check specified IPA mapping(s) (default: check all IPA
@@ -564,7 +564,7 @@ required.</p>
 <p>You can list available mappings with "g2p doctor --list-ipa", or by
 visiting http://g2p-studio.herokuapp.com/api/v1/langs .</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli generate-mapping [OPTIONS] [IN_LANG] [OUT_LANG]
+<div class="highlight"><pre><span></span><code>g2p generate-mapping [OPTIONS] [IN_LANG] [OUT_LANG]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  --distance [weighted_feature_edit_distance|hamming_feature_edit_distance|feature_edit_distance|dolgo_prime_distance|fast_levenshtein_distance|levenshtein_distance]
@@ -588,7 +588,7 @@ visiting http://g2p-studio.herokuapp.com/api/v1/langs .</p>
 <p>Displays the set of un-mapped characters in a document.
 Accounts for case sensitivity in the configuration.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli scan [OPTIONS] LANG PATH
+<div class="highlight"><pre><span></span><code>g2p scan [OPTIONS] LANG PATH
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  --help  Show this message and exit.
@@ -599,7 +599,7 @@ Accounts for case sensitivity in the configuration.</p>
 If only LANG1 is used, all mappings to or from LANG1 are displayed.
 With no LANG, all cached mappings are included.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli show-mappings [OPTIONS] [LANG1] [LANG2]
+<div class="highlight"><pre><span></span><code>g2p show-mappings [OPTIONS] [LANG1] [LANG2]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -v, --verbose  Display mapping configs and all rules too.
@@ -609,7 +609,7 @@ With no LANG, all cached mappings are included.</p>
 <h2 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h2>
 <p>Update cached language files.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli update [OPTIONS]
+<div class="highlight"><pre><span></span><code>g2p update [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -o, --out-dir DIRECTORY  Output results in DIRECTORY instead of the
@@ -624,7 +624,7 @@ With no LANG, all cached mappings are included.</p>
 <p>Generate a schema for the model configuration - this should only be done once for each Minor version.
 Changes to the schema should result in a minor version bump.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight"><pre><span></span><code>cli update-schema [OPTIONS]
+<div class="highlight"><pre><span></span><code>g2p update-schema [OPTIONS]
 </code></pre></div>
 <p><strong>Options:</strong></p>
 <div class="highlight"><pre><span></span><code>  -o, --out-dir DIRECTORY  Output results in DIRECTORY instead of the
@@ -748,7 +748,7 @@ Changes to the schema should result in a minor version bump.</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "announce.dismiss", "navigation.footer"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.8fd75fb4.min.js"></script>
+      <script src="../assets/javascripts/bundle.c8d2eff1.min.js"></script>
       
     
   </body>
