@@ -10,3 +10,4 @@ There is a command line interface bundled with g2p that allows both basic and ad
 ::: mkdocs-click
     :module: g2p.cli
     :command: cli
+    :prog_name: g2p

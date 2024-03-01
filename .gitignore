@@ -32,3 +32,6 @@ docs/_build/
 
 # vim temp files
 *~
+
+# mkdocs build
+site
