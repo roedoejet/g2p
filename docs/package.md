@@ -30,4 +30,5 @@ A Mapping object is a list of defined rules. A `Rule` has the following permitte
     options:
         show_root_heading: true
         show_source: false
-        heading_level: 4
+        heading_level: 3
+        members_order: source
