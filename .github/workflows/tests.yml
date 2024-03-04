@@ -2,6 +2,7 @@ name: Run all tests
 on:
   - pull_request
   - push
+  - workflow_call
 
 jobs:
   test-all-on-linux:
