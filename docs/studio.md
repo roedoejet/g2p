@@ -17,19 +17,23 @@ The basic use of the g2p studio shows two text areas where the left one is input
 
 ### Settings
 
-There are four settings:
+There are seven settings:
 
-- Leave order as is
-    * This leaves the rules in the order you wrote them. Otherwise, they are reverse sorted by the length of their input.
 - Rules are case sensitive
 - Escape special characters
     * This setting escapes special Regular Expression characters like slashes and dollar signs
+- Rule Ordering Approach
+    - "As written" - rules are evaluated in the order they are written
+    - "Longest first" - rules are first sorted according to length
 - Reverse the rules
+- Prevent all rules from feeding - this makes it so that after a rule has applied on one or more characters, those characters cannot be affected by any rule that follows. This can also be specified on a per-rule basis.
+- Unicode Normalization - choose from "none", "NFC", "NFD", "NKFC", or "NKFD"
+- Output delimiter - specify a delimiter to be inserted after a rule is applied
 
 ## Custom rules
 
 Rules are added by adding a row of data for each rule. For example, to make a rule that turns all instances of 'a' into 'b', you would put 'a' in the 'in' column and 'b' in the 'out' column.
-Context before and context after declares if there is any context required for the rule to apply. For example to turn 'a' into 'b' only when it is followed by 'c' you would put 'a' in the 'in' column, 'b', in the 'out' column and 'c' in the 'context_after' column.
+Context before and context after declares if there is any context required for the rule to apply. For example to turn 'a' into 'b' only when it is followed by 'c' you would put 'a' in the 'in' column, 'b', in the 'out' column and 'c' in the 'context_after' column. You can also select "prevent feeding" for a rule to prevent any subsequent rules from applying after the rule in-question has been applied.
 
 ![Basic Demonstration of g2p studio rules](./_static/rules.png)
 
