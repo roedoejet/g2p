@@ -102,8 +102,10 @@ class CliTest(TestCase):
         self.assertIn("FileExistsError", str(result))
         with tempfile.TemporaryDirectory() as tmpdir:
             result = self.runner.invoke(update_schema, ["-o", tmpdir])
+            MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
             with open(
-                Path(tmpdir) / f"g2p-config-schema-{VERSION}.json", encoding="utf8"
+                Path(tmpdir) / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json",
+                encoding="utf8",
             ) as f:
                 schema = json.load(f)
         for config in tqdm(

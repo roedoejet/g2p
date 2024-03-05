@@ -1,6 +1,7 @@
 """
 Command line interface to the g2p system
 """
+
 import io
 import json
 import os
@@ -684,17 +685,21 @@ def update_schema(out_dir):
     # Defer expensive imports
     from g2p.mappings import MappingConfig
 
+    # We should not be changing the schema for patches, so only include major/minor version
+    MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
+
     # Determine path
     if out_dir is None:
         schema_path = (
-            Path(LANGS_DIR) / ".." / ".schema" / f"g2p-config-schema-{VERSION}.json"
+            Path(LANGS_DIR) / f"../.schema/g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
         )
     else:
-        schema_path = Path(out_dir) / f"g2p-config-schema-{VERSION}.json"
+        schema_path = Path(out_dir) / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
     # Generate schema
     if schema_path.exists():
         raise FileExistsError(
-            f"Sorry a schema already exists for version {VERSION}. Please bump the minor version number and generate the schema again."
+            f"Sorry a schema already exists for version {MAJOR_MINOR_VERSION}. "
+            "Please bump the minor version number and generate the schema again."
         )
     json_schema = MappingConfig.model_json_schema()
     # Add explicit schema dialect for SchemaStore
