@@ -1,2 +1,3 @@
 playwright>=1.26.1
 jsonschema>=4.17.3
+pep440>=0.1.2
