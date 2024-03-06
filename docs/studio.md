@@ -17,18 +17,19 @@ The basic use of the g2p studio shows two text areas where the left one is input
 
 ### Settings
 
-There are seven settings:
+There are nine settings:
 
-- Rules are case sensitive
-- Escape special characters
-    * This setting escapes special Regular Expression characters like slashes and dollar signs
-- Rule Ordering Approach
+- **Include rules in output** - unchecking this disables the mapping
+- **Rules are case sensitive** - unchecking this drops everything to lower case
+- **Preserve input case in output** - transfer the case pattern from the input to the output
+- **Escape special characters** - this setting escapes special Regular Expression characters like slashes and dollar signs
+- **Reverse the rules** - swap the role of In and Out in each rule
+- **Prevent all rules from feeding** - this makes it so that after a rule has applied on one or more characters, those characters cannot be affected by any rule that follows. This can also be specified on a per-rule basis.
+- **Rule Ordering Approach**
     - "As written" - rules are evaluated in the order they are written
     - "Longest first" - rules are first sorted according to length
-- Reverse the rules
-- Prevent all rules from feeding - this makes it so that after a rule has applied on one or more characters, those characters cannot be affected by any rule that follows. This can also be specified on a per-rule basis.
-- Unicode Normalization - choose from "none", "NFC", "NFD", "NKFC", or "NKFD"
-- Output delimiter - specify a delimiter to be inserted after a rule is applied
+- **Normalization** - choose a Unicode normalization from "none", "NFC", "NFD", "NKFC", or "NKFD"
+- **Output delimiter** - specify a delimiter to be inserted after a rule is applied
 
 ## Custom rules
 
