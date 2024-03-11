@@ -1,8 +1,7 @@
 name: Run full matrix Tests before Releases
 on:
+  workflow_call:
   workflow_dispatch:
-  pull_request:
-    branches: [ release ]
 jobs:
   pre-release-matrix-test:
     strategy:
