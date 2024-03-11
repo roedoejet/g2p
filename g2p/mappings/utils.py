@@ -295,36 +295,39 @@ def load_from_workbook(language):
     """Parse mapping from Excel workbook"""
     from openpyxl import load_workbook  # Expensive import, do it only when needed
 
-    work_book = load_workbook(language)
-    work_sheet = work_book.active
-    # Create wordlist
-    mapping = []
-    # Loop through rows in worksheet, create if statements for different columns
-    # and append mappings to self.mapping.
-    for entry in work_sheet:
-        new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
-        for col in entry:
-            if col.column in ["A", 1]:
-                value = col.value
-                if isinstance(value, (float, int)):
-                    value = str(value)
-                new_io["in"] = value
-            if col.column in ["B", 2]:
-                value = col.value
-                if isinstance(value, (float, int)):
-                    value = str(value)
-                new_io["out"] = value
-            if col.column in ["C", 3] and col.value is not None:
-                value = col.value
-                if isinstance(value, (float, int)):
-                    value = str(value)
-                new_io["context_before"] = value
-            if col.column in ["D", 4] and col.value is not None:
-                value = col.value
-                if isinstance(value, (float, int)):
-                    value = str(value)
-                new_io["context_after"] = value
-        mapping.append(new_io)
+    try:
+        work_book = load_workbook(language, read_only=True)
+        work_sheet = work_book.active
+        # Create wordlist
+        mapping = []
+        # Loop through rows in worksheet, create if statements for different columns
+        # and append mappings to self.mapping.
+        for entry in work_sheet:
+            new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
+            for col in entry:
+                if col.column in ["A", 1]:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["in"] = value
+                if col.column in ["B", 2]:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["out"] = value
+                if col.column in ["C", 3] and col.value is not None:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["context_before"] = value
+                if col.column in ["D", 4] and col.value is not None:
+                    value = col.value
+                    if isinstance(value, (float, int)):
+                        value = str(value)
+                    new_io["context_after"] = value
+            mapping.append(new_io)
+    finally:
+        work_book.close()
 
     return mapping
 
