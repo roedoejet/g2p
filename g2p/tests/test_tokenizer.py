@@ -126,7 +126,7 @@ class TokenizerTest(TestCase):
 
     def test_deprecated_warning(self):
         with self.assertLogs(LOGGER, level="WARNING") as cm:
-            self.assertEquals(tok.get_tokenizer("fra"), tok.make_tokenizer("fra"))
+            self.assertEqual(tok.get_tokenizer("fra"), tok.make_tokenizer("fra"))
         self.assertIn("deprecated", "".join(cm.output))
 
 
