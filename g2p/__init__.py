@@ -15,7 +15,11 @@ Basic Usage:
 
     from g2p import make_tokenizer
     tokenizer = make_tokenizer(lang)
-    list_of_tokens = tokenizer.tokenize_text(input_text)
+    for token in tokenizer.tokenize_text(input_text):
+        if token["is_word"]:
+            word = token["text"]
+        else:
+            interword_punctuation_and_spaces = token["text"]
 
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
