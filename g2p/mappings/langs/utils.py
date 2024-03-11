@@ -7,7 +7,7 @@ Utilities used by other classes
 import gzip
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import networkx
 from networkx.algorithms.dag import ancestors, descendants
@@ -188,7 +188,7 @@ def write_json_gz(path: str, data: Any):
         )
 
 
-def network_to_echart(outfile: str = None, layout: bool = False):
+def network_to_echart(outfile: Optional[str] = None, layout: bool = False):
     nodes = []
     no_nodes = len(LANGS_NETWORK.nodes)
     for node in LANGS_NETWORK.nodes:

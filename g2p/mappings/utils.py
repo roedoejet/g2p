@@ -302,29 +302,19 @@ def load_from_workbook(language):
         mapping = []
         # Loop through rows in worksheet, create if statements for different columns
         # and append mappings to self.mapping.
-        for entry in work_sheet:
+        for row in work_sheet:
             new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
-            for col in entry:
-                if col.column in ["A", 1]:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["in"] = value
-                if col.column in ["B", 2]:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["out"] = value
-                if col.column in ["C", 3] and col.value is not None:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["context_before"] = value
-                if col.column in ["D", 4] and col.value is not None:
-                    value = col.value
-                    if isinstance(value, (float, int)):
-                        value = str(value)
-                    new_io["context_after"] = value
+            for cell in row:
+                if cell.value is None:  # avoid tripping on empty cells
+                    continue
+                if cell.column in ["A", 1]:
+                    new_io["in"] = str(cell.value)
+                elif cell.column in ["B", 2]:
+                    new_io["out"] = str(cell.value)
+                elif cell.column in ["C", 3] and cell.value is not None:
+                    new_io["context_before"] = str(cell.value)
+                elif cell.column in ["D", 4] and cell.value is not None:
+                    new_io["context_after"] = str(cell.value)
             mapping.append(new_io)
     finally:
         work_book.close()
