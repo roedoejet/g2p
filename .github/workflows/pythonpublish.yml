@@ -16,6 +16,10 @@ jobs:
     uses: ./.github/workflows/tests.yml
     secrets: inherit
 
+  matrix-tests:
+    uses: ./.github/workflows/matrix-tests.yml
+    secrets: inherit
+
   build-docs:
     uses: ./.github/workflows/docs.yml
     needs: tests
@@ -44,6 +48,7 @@ jobs:
     name: Make a signed GitHub release
     needs:
       - tests
+      - matrix-tests
       - build
       - build-docs
     runs-on: ubuntu-latest
