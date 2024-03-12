@@ -583,22 +583,25 @@ using the <code>run_studio.py</code> script in the root directory (<code>python 
 <p>The basic use of the g2p studio shows two text areas where the left one is input and the right one is output. If you type in the left text area, the rules of your chosen mapping will be applied and printed in the right text area.</p>
 <p><img alt="Basic Demonstration of g2p studio" src="../_static/basic.gif" /></p>
 <h3 id="settings">Settings<a class="headerlink" href="#settings" title="Permanent link">&para;</a></h3>
-<p>There are four settings:</p>
+<p>There are nine settings:</p>
 <ul>
-<li>Leave order as is<ul>
-<li>This leaves the rules in the order you wrote them. Otherwise, they are reverse sorted by the length of their input.</li>
+<li><strong>Include rules in output</strong> - unchecking this disables the mapping</li>
+<li><strong>Rules are case sensitive</strong> - unchecking this drops everything to lower case</li>
+<li><strong>Preserve input case in output</strong> - transfer the case pattern from the input to the output</li>
+<li><strong>Escape special characters</strong> - this setting escapes special Regular Expression characters like slashes and dollar signs</li>
+<li><strong>Reverse the rules</strong> - swap the role of In and Out in each rule</li>
+<li><strong>Prevent all rules from feeding</strong> - this makes it so that after a rule has applied on one or more characters, those characters cannot be affected by any rule that follows. This can also be specified on a per-rule basis.</li>
+<li><strong>Rule Ordering Approach</strong><ul>
+<li>"As written" - rules are evaluated in the order they are written</li>
+<li>"Longest first" - rules are first sorted according to length</li>
 </ul>
 </li>
-<li>Rules are case sensitive</li>
-<li>Escape special characters<ul>
-<li>This setting escapes special Regular Expression characters like slashes and dollar signs</li>
-</ul>
-</li>
-<li>Reverse the rules</li>
+<li><strong>Normalization</strong> - choose a Unicode normalization from "none", "NFC", "NFD", "NKFC", or "NKFD"</li>
+<li><strong>Output delimiter</strong> - specify a delimiter to be inserted after a rule is applied</li>
 </ul>
 <h2 id="custom-rules">Custom rules<a class="headerlink" href="#custom-rules" title="Permanent link">&para;</a></h2>
 <p>Rules are added by adding a row of data for each rule. For example, to make a rule that turns all instances of 'a' into 'b', you would put 'a' in the 'in' column and 'b' in the 'out' column.
-Context before and context after declares if there is any context required for the rule to apply. For example to turn 'a' into 'b' only when it is followed by 'c' you would put 'a' in the 'in' column, 'b', in the 'out' column and 'c' in the 'context_after' column.</p>
+Context before and context after declares if there is any context required for the rule to apply. For example to turn 'a' into 'b' only when it is followed by 'c' you would put 'a' in the 'in' column, 'b', in the 'out' column and 'c' in the 'context_after' column. You can also select "prevent feeding" for a rule to prevent any subsequent rules from applying after the rule in-question has been applied.</p>
 <p><img alt="Basic Demonstration of g2p studio rules" src="../_static/rules.png" /></p>
 <h2 id="custom-abbreviations">Custom Abbreviations<a class="headerlink" href="#custom-abbreviations" title="Permanent link">&para;</a></h2>
 <p>Sometimes you might want to write more complicated rules like, turn 'a' into 'b' when it is followed by a vowel. Here you could put 'a|e|i|o|u' in the 'context_after' column of that rule, or you could simply declare an 'abbreviation' or variable.
