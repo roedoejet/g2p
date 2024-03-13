@@ -396,6 +396,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#make_g2p" class="md-nav__link">
+    <span class="md-ellipsis">
+      make_g2p
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#make_tokenizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      make_tokenizer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-look-under-the-hood" class="md-nav__link">
     <span class="md-ellipsis">
       A look under the hood
@@ -570,6 +588,24 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#make_g2p" class="md-nav__link">
+    <span class="md-ellipsis">
+      make_g2p
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#make_tokenizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      make_tokenizer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#a-look-under-the-hood" class="md-nav__link">
     <span class="md-ellipsis">
       A look under the hood
@@ -696,16 +732,33 @@
 
 
 <h1 id="python-package">Python package<a class="headerlink" href="#python-package" title="Permanent link">&para;</a></h1>
+<h2 id="make_g2p"><code>make_g2p</code><a class="headerlink" href="#make_g2p" title="Permanent link">&para;</a></h2>
 <p>The easiest way to create a transducer programmatically is to use the <code>g2p.make_g2p</code> function.</p>
 <p>To use it, first import the function:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_g2p</span>
 </code></pre></div>
 <p>Then, call it with an argument for <code>in_lang</code> and <code>out_lang</code>. Both must be strings equal to the name of a particular mapping.</p>
-<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span> <span class="o">=</span> <span class="n">make_g2p</span><span class="p">(</span><span class="s1">&#39;dan&#39;</span><span class="p">,</span> <span class="s1">&#39;eng-arpabet&#39;</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span><span class="p">(</span><span class="s1">&#39;hej&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">output_string</span>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span> <span class="o">=</span> <span class="n">make_g2p</span><span class="p">(</span><span class="s2">&quot;dan&quot;</span><span class="p">,</span> <span class="s2">&quot;eng-arpabet&quot;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span><span class="p">(</span><span class="s2">&quot;hej&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">output_string</span>
 <span class="s1">&#39;HH EH Y&#39;</span>
 </code></pre></div>
 <p>There must be a valid path between the <code>in_lang</code> and <code>out_lang</code> in order for this to work. If you've edited a mapping or added a custom mapping, you must update g2p to include it: <code>g2p update</code></p>
+<h2 id="make_tokenizer"><code>make_tokenizer</code><a class="headerlink" href="#make_tokenizer" title="Permanent link">&para;</a></h2>
+<p>Basic usage for the language-aware tokenizer:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_tokenizer</span>
+<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;dan&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Åh, hvordan har du det, Åbenrå?&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;is_word&quot;</span><span class="p">]:</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">interword_punctuation_and_spaces</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+</code></pre></div>
+<p>Note that selecting the tokenizer language is important to make sure punctuation-like letters are handled correctly. For example <code>:</code> and <code>'</code> are punctuation in English but they will be part of the word tokens in Kanien'kéha (moh):</p>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;moh&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Kanien&#39;kéha&quot;</span><span class="p">))</span>
+<span class="p">[{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s2">&quot;Kanien&#39;kéha&quot;</span><span class="p">,</span> <span class="s1">&#39;is_word&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;eng&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Kanien&#39;kéha&quot;</span><span class="p">))</span>
+<span class="p">[{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;Kanien&#39;</span><span class="p">,</span> <span class="s1">&#39;is_word&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;is_word&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="s1">&#39;kéha&#39;</span><span class="p">,</span> <span class="s1">&#39;is_word&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}]</span>
+</code></pre></div>
 <h2 id="a-look-under-the-hood">A look under the hood<a class="headerlink" href="#a-look-under-the-hood" title="Permanent link">&para;</a></h2>
 <p>A Mapping object is a list of defined rules. A <code>Rule</code> has the following permitted fields:</p>
 
