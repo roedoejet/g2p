@@ -17,7 +17,7 @@ plugins:
         python:
           paths: [g2p]
 extra:
-  homepage: https://docs.mothertongues.org
+  homepage: https://roedoejet.github.io/g2p/
   version:
     provider: mike
     default: stable
