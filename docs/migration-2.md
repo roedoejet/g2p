@@ -17,9 +17,12 @@ Schema](https://raw.githubusercontent.com/roedoejet/g2p/main/g2p/mappings/.schem
 If you use an editor like [Visual Studio
 Code](https://code.visualstudio.com/), the names of fields will be
 autocompleted and some warnings will be shown for possible values.
-This also works with GNU Emacs using
-[lsp-mode](https://emacs-lsp.github.io/lsp-mode/) and probably other
-editors.
+This also works with [GNU Emacs](https://www.gnu.org/software/emacs/)
+using [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) and any other
+editor that supports the [Language Server
+Protocol](https://microsoft.github.io/language-server-protocol/) and
+[SchemaStore](https://www.schemastore.org/json/).  Some varieties of
+VIM are known to work, for instance.
 
 In order for this magic to work, we needed to give the configuration
 files a somewhat more meaningful name than `config.yaml`, so they must
