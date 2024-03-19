@@ -19,7 +19,6 @@ Code](https://code.visualstudio.com/), the names of fields will be
 autocompleted and some warnings will be shown for possible values.
 This also works with [GNU Emacs](https://www.gnu.org/software/emacs/)
 using [Eglot](https://joaotavora.github.io/eglot/) or
-
 [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) and any other editor
 that supports the [Language Server
 Protocol](https://microsoft.github.io/language-server-protocol/)
