@@ -35,6 +35,7 @@ nav:
     - Getting started: start.md
     - How to contribute: contributing.md
     - Using the g2p studio: studio.md
+    - Migrating from g2p 1.0: migration-2.md
   - Reference:
     - Package: package.md
     - Command Line: cli.md
