@@ -2,7 +2,7 @@
 comments: true
 ---
 
-# Migrating from `g2p` 1.0
+# Migrating from `g2p` 1.x
 
 The `g2p` 2.0 release introduces a number of improvements and changes
 which, unfortunately, are incompatible with mappings and Python code
@@ -19,6 +19,7 @@ Code](https://code.visualstudio.com/), the names of fields will be
 autocompleted and some warnings will be shown for possible values.
 This also works with [GNU Emacs](https://www.gnu.org/software/emacs/)
 using [Eglot](https://joaotavora.github.io/eglot/) or
+
 [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) and any other editor
 that supports the [Language Server
 Protocol](https://microsoft.github.io/language-server-protocol/)
@@ -43,17 +44,17 @@ Previously, when you called `import g2p`, it imported absolutely
 everything, which caused the command-line interface (and probably your
 program too) to start up very, very slowly.
 
-If you simply use the public and documented `make_g2p` API, this will
-not change anything, but if you relied on internal classes and
-functions from `g2p.mappings`, `g2p.transducer`, etc, then you can no
-longer depend on them being also accessible in the top-level `g2p`
-package.  For example, you will need to make this sort of change:
+If you simply use the public and documented `make_g2p` and
+`make_tokenizer` APIs, this will not change anything, but if you
+relied on internal classes and functions from `g2p.mappings`,
+`g2p.transducer`, etc, then you can no longer depend on them being
+also accessible in the top-level `g2p` package.  For example, you will
+need to make this sort of change:
 
 ```diff
-- from g2p import Mapping, Transducer, make_tokenizer
+- from g2p import Mapping, Transducer
 + from g2p.mappings import Mapping
 + from g2p.transducer import Transducer
-+ from g2p.mappings.tokenizer import make_tokenizer
 ```
 
 > **NOTE** These are not public APIs, and are subject to further

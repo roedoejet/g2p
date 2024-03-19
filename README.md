@@ -204,10 +204,11 @@ You can also run the `g2p Studio` which is a web interface for creating custom l
 ## API for Developers
 
 There is also a REST API available for use in your own applications.
-To launch it from the command-line use `flask --app g2p.app run`.  The
-API documentation will be viewable (with the ability to use it
-interactively) at http://localhost:5000/docs - an OpenAPI definition
-is also available at http://localhost:5000/static/swagger.json .
+To launch it from the command-line use `python run_studio.py` or
+`flask --app g2p.app run`.  The API documentation will be viewable
+(with the ability to use it interactively) at
+http://localhost:5000/docs - an OpenAPI definition is also available
+at http://localhost:5000/static/swagger.json .
 
 You can see the list of URLs served by the API using `flask --app
 g2p.app routes`.
