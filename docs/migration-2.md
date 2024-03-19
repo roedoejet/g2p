@@ -15,10 +15,12 @@ The configurations for mappings (which you'll find in
 `g2p/mappings/langs/*/config-g2p.yaml`) are now validated with a [YAML
 Schema](https://raw.githubusercontent.com/roedoejet/g2p/main/g2p/mappings/.schema/g2p-config-schema-2.0.json).
 If you use an editor like [Visual Studio
-Code](https://code.visualstudio.com/), the names of fields will be
-autocompleted and some warnings will be shown for possible values.
-This also works with [GNU Emacs](https://www.gnu.org/software/emacs/)
-using [Eglot](https://joaotavora.github.io/eglot/) or
+Code](https://code.visualstudio.com/) with the [YAML
+extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml),
+the names of fields will be autocompleted and some warnings will be
+shown for possible values.  This also works with [GNU
+Emacs](https://www.gnu.org/software/emacs/) using
+[Eglot](https://joaotavora.github.io/eglot/) or
 [lsp-mode](https://emacs-lsp.github.io/lsp-mode/) and any other editor
 that supports the [Language Server
 Protocol](https://microsoft.github.io/language-server-protocol/)
@@ -81,7 +83,7 @@ print("Case sensitive?", mapping.case_sensitive)
 To iterate over the rules in a mapping, you now use the `rules`
 property instead of the `mapping_data` field.  The rules themselves
 now also use properties for access, which do not entirely correspond
-to the names used in the JSON definition, because `in`, for example,
+to the names used in the JSON/YAML definition, because `in`, for example,
 is a reserved word in Python.  So for instance you would make this
 change:
 
