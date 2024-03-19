@@ -1,6 +1,5 @@
 name: Deploy docs
 on:
-  workflow_call:
   push:
     branches:
       - main
@@ -29,10 +28,4 @@ jobs:
             git config user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Deploy docs with mike 🚀
         run: |
-          mkdocs build
-          mike deploy --push --update-aliases latest
-      - name: Store the docs
-        uses: actions/upload-artifact@v4
-        with:
-          name: latest-docs
-          path: site/
+          mike deploy --push --update-aliases dev latest
