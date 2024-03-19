@@ -52,7 +52,7 @@ package.  For example, you will need to make this sort of change:
 + from g2p.mappings.tokenizer import make_tokenizer
 ```
 
-**NOTE** These are not public APIs, and are subject to further
+> **NOTE** These are not public APIs, and are subject to further
 changes.  This guide is provided as a courtesy to anyone who may have
 been using them and should not be construed as public API documentation.
 
@@ -88,7 +88,7 @@ change:
 +     print("Rule maps", rule.rule_input, "to", rule.rule_output)
 ```
 
-**NOTE** These are not public APIs, and are subject to further
+> **NOTE**: These are not public APIs, and are subject to further
 changes.  This guide is provided as a courtesy to anyone who may have
 been using them and should not be construed as public API documentation.
 
@@ -100,3 +100,16 @@ were duplicates of other functionality:
 - run
 - routes
 - shell
+
+To run the `g2p` API server, you can use:
+
+    flask --app g2p.app run
+
+Likewise, for `routes` and `shell`, you can use:
+
+    flask --app g2p.app routes
+    flask --app g2p.app shell
+
+To run G2P Studio, use:
+
+    python run_studio.py
