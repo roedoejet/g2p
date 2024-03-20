@@ -4,7 +4,7 @@ on:
     branches:
       - main
 jobs:
- docs:
+  docs:
     # Create latest docs
     runs-on: ubuntu-latest
     steps:
