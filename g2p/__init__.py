@@ -24,6 +24,7 @@ Basic Usage:
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
 """
+
 from typing import Dict, Optional, Tuple, Union
 
 import g2p.deprecation
@@ -131,9 +132,9 @@ def make_g2p(  # noqa: C901
             tokenizer = make_tokenizer(in_lang=tok_lang)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
-    _g2p_cache[
-        (in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))
-    ] = transducer
+    _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))] = (
+        transducer
+    )
     return transducer
 
 

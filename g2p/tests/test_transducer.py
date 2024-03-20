@@ -197,12 +197,8 @@ class TransducerTest(TestCase):
     def test_case_sensitive(self):
         self.assertEqual(self.test_case_sensitive_transducer("'N").output_string, "'N")
         self.assertEqual(self.test_case_sensitive_transducer("'n").output_string, "n̓")
-        self.assertEqual(
-            self.test_case_insensitive_transducer("'N").output_string, "n̓"
-        )
-        self.assertEqual(
-            self.test_case_insensitive_transducer("'n").output_string, "n̓"
-        )
+        self.assertEqual(self.test_case_insensitive_transducer("'N").output_string, "n̓")
+        self.assertEqual(self.test_case_insensitive_transducer("'n").output_string, "n̓")
 
     def test_regex_set(self):
         # https://github.com/roedoejet/g2p/issues/15

@@ -1,5 +1,6 @@
 """ Setup for g2p
 """
+
 from os import path
 
 from setuptools import find_packages, setup

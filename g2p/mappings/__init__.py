@@ -159,9 +159,11 @@ class Mapping(_MappingModelDefinition):
             self.rules = sorted(
                 # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
                 self.rules,
-                key=lambda x: len(normalize(strip_index_notation(x.rule_input), "NFD"))
-                if isinstance(x, Rule)
-                else len(normalize(x["in"], "NFD")),
+                key=lambda x: (
+                    len(normalize(strip_index_notation(x.rule_input), "NFD"))
+                    if isinstance(x, Rule)
+                    else len(normalize(x["in"], "NFD"))
+                ),
                 reverse=True,
             )
 
@@ -348,9 +350,9 @@ class Mapping(_MappingModelDefinition):
                 exclude={"parent_dir": True},
             )
         if not model_dict.get("rules_path"):
-            model_dict[
-                "rules_path"
-            ] = f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
+            model_dict["rules_path"] = (
+                f"{self.in_lang}_to_{self.out_lang}.{mapping_type}"
+            )
         return model_dict
 
     def config_to_file(

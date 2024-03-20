@@ -5,6 +5,7 @@ A token is defined as a sequence of characters that are either part of the
 language's input mapping or that are unicode letters, numbers and diacritics.
 
 """
+
 import re
 from typing import List
 
