@@ -3,6 +3,7 @@
 Views and config to the g2p Studio web app
 
 """
+
 import json
 from typing import List, Union
 

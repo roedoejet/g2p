@@ -1,6 +1,7 @@
 """
 Language mappings for g2p.
 """
+
 import gzip
 import json
 import os
