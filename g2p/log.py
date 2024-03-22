@@ -5,7 +5,7 @@
 
 import logging
 
-import coloredlogs
+import coloredlogs  # type: ignore
 
 FIELD_STYLES = dict(
     levelname=dict(color="green"),

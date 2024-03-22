@@ -9,7 +9,7 @@ language's input mapping or that are unicode letters, numbers and diacritics.
 import re
 from typing import List
 
-from networkx.exception import NetworkXError
+from networkx.exception import NetworkXError  # type: ignore
 
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
