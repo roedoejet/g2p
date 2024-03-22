@@ -44,13 +44,26 @@ The initial version of this package was developed by [Patrick Littell](https://g
 The best thing to do is install with pip `pip install g2p`.
 This command will install the latest release published on [PyPI g2p releases](https://pypi.org/project/g2p/).
 
-You can also clone the repo and pip install it locally:
+You can also use [hatch](https://hatch.pypa.io/latest/) to set up an
+isolated local development environment, which may be useful if you
+wish to contribute new mappings:
+
+```sh
+$ git clone https://github.com/roedoejet/g2p.git
+$ cd g2p
+$ hatch shell
+```
+
+You can also simply install an "editable" version with `pip` (but it
+is recommended to do this in a [virtual
+environment](https://docs.python.org/3/library/venv.html)):
 
 ```sh
 $ git clone https://github.com/roedoejet/g2p.git
 $ cd g2p
 $ pip install -e .
 ```
+
 
 ## Usage
 
@@ -251,7 +264,7 @@ mappings:
 
 4. Add a mapping file. Look at the other mappings for examples, or visit the [g2p studio](https://g2p-studio.herokuapp.com) to practise your mappings.
 Mappings are defined in either a CSV or json file. See [writing mapping files](#writing-mapping-files) for more info.
-5. After installing your local version (`pip3 install -e .`), update with `g2p update`
+5. Start a development shell with `hatch shell` (or install an editable version with `pip install -e .`) then update with `g2p update`
 6. Add some tests in `g2p/testspublic/data/<YourIsoCode>.psv`. Each line in the file will run a test with the following structure: `<in_lang>|<out_lang>|<input_string>|<expected_output>`
 7. Run `python3 run_tests.py langs` to make sure your tests pass.
 8. Make sure you have [checked all the boxes](https://github.com/roedoejet/g2p/blob/main/.github/pull_request_template.md) and make a [pull request]((https://github.com/roedoejet/g2p/pulls)!
