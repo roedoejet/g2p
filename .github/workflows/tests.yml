@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -81,6 +83,8 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '#no-ci') }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
