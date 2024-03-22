@@ -1,6 +1,6 @@
 import datetime as dt
 
-from text_unidecode import unidecode
+from text_unidecode import unidecode  # type: ignore
 
 from g2p import make_g2p
 from g2p.log import LOGGER

@@ -6,7 +6,7 @@ import gzip
 import json
 import os
 
-import networkx
+import networkx  # type: ignore
 
 from g2p.constants import LANGS_DIR, LANGS_FILE_NAME, NETWORK_FILE_NAME
 from g2p.log import LOGGER

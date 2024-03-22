@@ -6,9 +6,9 @@ import os
 
 from flask import Blueprint, abort
 from flask_cors import CORS
-from flask_restful import Api, Resource, inputs, reqparse
-from networkx.algorithms.dag import ancestors, descendants
-from networkx.exception import NetworkXError
+from flask_restful import Api, Resource, inputs, reqparse  # type: ignore
+from networkx.algorithms.dag import ancestors, descendants  # type: ignore
+from networkx.exception import NetworkXError  # type: ignore
 
 from g2p import make_g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath

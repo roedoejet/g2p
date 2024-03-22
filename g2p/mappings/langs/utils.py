@@ -9,8 +9,8 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-import networkx
-from networkx.algorithms.dag import ancestors, descendants
+import networkx  # type: ignore
+from networkx.algorithms.dag import ancestors, descendants  # type: ignore
 
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
@@ -32,7 +32,8 @@ _PANPHON_DISTANCE_SINGLETON = None
 def getPanphonDistanceSingleton():
     global _PANPHON_DISTANCE_SINGLETON
     if _PANPHON_DISTANCE_SINGLETON is None:
-        import panphon.distance  # Expensive import, only do it when actually needed
+        # Expensive import, only do it when actually needed
+        import panphon.distance  # type: ignore
 
         _PANPHON_DISTANCE_SINGLETON = panphon.distance.Distance()
     return _PANPHON_DISTANCE_SINGLETON
