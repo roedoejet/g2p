@@ -35,3 +35,4 @@ docs/_build/
 
 # mkdocs build
 site
+g2p/_version.py
