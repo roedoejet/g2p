@@ -14,7 +14,7 @@ if sys.version_info < (3, 7, 0):  # pragma: no cover
 from g2p.app import APP, SOCKETIO
 from g2p.log import LOGGER
 
-host = "0.0.0.0"
+host = "127.0.0.1"
 port = 5000
 LOGGER.info(f"g2p-studio listening on http://{host}:{port}")
 
