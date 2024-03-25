@@ -108,6 +108,8 @@ class StudioTest(IsolatedAsyncioTestCase):
                 sample(range(len(langs_to_test)), k=len(langs_to_test) // 10)
             )
         ]
+        # Make sure we test at least one lexicon-based example
+        langs_to_test.append(["eng", "eng-arpabet", "hello", "HH AH L OW "])
 
         error_count = 0
 
