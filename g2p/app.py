@@ -4,7 +4,6 @@ Views and config to the g2p Studio web app
 
 """
 
-import json
 from typing import List, Union
 
 from flask import Flask, render_template
@@ -145,13 +144,24 @@ def convert(message):
         mapping_args["abbreviations"] = flatten_abbreviations_format(
             mapping["abbreviations"]
         )
-        mapping_args["rules"] = mapping["rules"]
-        try:
-            mappings_obj = Mapping(**mapping_args)
-            transducer = Transducer(mappings_obj)
+        if mapping_args["type"] == "lexicon":
+            transducer = make_g2p(mapping_args["in_lang"],
+                                  mapping_args["out_lang"],
+                                  tokenize=False)
             transducers.append(transducer)
-        except Exception as e:
-            LOGGER.warning("Skipping invalid mapping: %s", e)
+        else:
+            mapping_args["rules"] = mapping["rules"]
+            try:
+                mappings_obj = Mapping(**mapping_args)
+                transducer = Transducer(mappings_obj)
+                transducers.append(transducer)
+            except Exception as e:
+                LOGGER.warning(
+                    "Skipping invalid mapping %s->%s:\n%s",
+                    mapping_args["in_lang"],
+                    mapping_args["out_lang"],
+                    e,
+                )
     if len(transducers) == 0:
         emit("conversion response", {"output_string": message["data"]["input_string"]})
         return
@@ -216,7 +226,7 @@ def change_table(message):
                 {
                     "mappings": x.plain_mapping(),
                     "abbs": expand_abbreviations_format(x.abbreviations),
-                    "kwargs": json.loads(x.model_dump_json()),
+                    "kwargs": x.model_dump(exclude=["alignments"]),
                 }
                 for x in mappings
             ],
