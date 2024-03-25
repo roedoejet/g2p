@@ -10,6 +10,7 @@ mappings:
       - David Huggins-Daines
       - Patrick Littell
     rules_path: atj_to_ipa.json
+    rule_ordering: apply-longest-first
     <<: *shared
   - display_name: Atikamekw IPA to English IPA
     in_lang: atj-ipa
