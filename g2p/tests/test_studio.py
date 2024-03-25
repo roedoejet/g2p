@@ -54,9 +54,9 @@ class StudioTest(IsolatedAsyncioTestCase):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
-            await page.goto(f"http://localhost:{self.port}/docs")
+            await page.goto(f"http://127.0.0.1:{self.port}/docs")
             await page.wait_for_timeout(self.timeout_delay)
-            await page.goto(f"http://localhost:{self.port}")
+            await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
             input_el = page.locator("#input")
             output_el = page.locator("#output")
@@ -78,7 +78,7 @@ class StudioTest(IsolatedAsyncioTestCase):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
-            await page.goto(f"http://localhost:{self.port}")
+            await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
             in_lang_selector = page.locator("#input-langselect")
             # Switch to a language
@@ -128,7 +128,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                 LOGGER.info("Loading page")
                 page = await browser.new_page()
                 await page.goto(
-                    f"http://localhost:{self.port}", wait_until="networkidle"
+                    f"http://127.0.0.1:{self.port}", wait_until="networkidle"
                 )
 
                 # Define element locators
