@@ -9,9 +9,10 @@ import warnings
 
 import g2p._version
 
-if sys.version_info < (3, 6):  # pragma: no cover
+if sys.version_info < (3, 7):  # pragma: no cover
     sys.exit(
-        f"Python 3.6 or more recent is required by g2p. You are using {sys.version}.\n"
+        "Python 3.7 or more recent is required by g2p.\n"
+        f"You are using Python {sys.version}.\n"
         "Please use a newer version of Python."
     )
 
