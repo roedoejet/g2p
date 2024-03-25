@@ -145,23 +145,22 @@ def convert(message):
             mapping["abbreviations"]
         )
         if mapping_args["type"] == "lexicon":
-            transducer = make_g2p(mapping_args["in_lang"],
-                                  mapping_args["out_lang"],
-                                  tokenize=False)
-            transducers.append(transducer)
+            lexicon = Mapping.find_mapping(mapping_args["in_lang"],
+                                           mapping_args["out_lang"])
+            mapping_args["alignments"] = lexicon.alignments
         else:
             mapping_args["rules"] = mapping["rules"]
-            try:
-                mappings_obj = Mapping(**mapping_args)
-                transducer = Transducer(mappings_obj)
-                transducers.append(transducer)
-            except Exception as e:
-                LOGGER.warning(
-                    "Skipping invalid mapping %s->%s:\n%s",
-                    mapping_args["in_lang"],
-                    mapping_args["out_lang"],
-                    e,
-                )
+        try:
+            mappings_obj = Mapping(**mapping_args)
+            transducer = Transducer(mappings_obj)
+            transducers.append(transducer)
+        except Exception as e:
+            LOGGER.warning(
+                "Skipping invalid mapping %s->%s:\n%s",
+                mapping_args["in_lang"],
+                mapping_args["out_lang"],
+                e,
+            )
     if len(transducers) == 0:
         emit("conversion response", {"output_string": message["data"]["input_string"]})
         return
