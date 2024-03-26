@@ -3,7 +3,7 @@
 """
 Test suite for the g2p-studio web app.
 
-Requirements: python 3.8 and requirements/requirements.test.txt
+Requirements: python 3.8 and `test` dependencies
 
 Before running this test suite, launch the g2p-studio server:
 minimal dev mode:
@@ -27,7 +27,7 @@ if sys.version_info < (3, 8):  # pragma: no cover
 # flake8: noqa: C901
 from unittest import IsolatedAsyncioTestCase, main
 
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright  # type: ignore
 
 from g2p.app import APP, SOCKETIO
 from g2p.log import LOGGER

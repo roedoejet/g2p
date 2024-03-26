@@ -39,6 +39,34 @@ dependencies = [
     "tqdm",
 ]
 
+[project.optional-dependencies]
+test = [
+  "coverage[toml]>=6.5",
+  "playwright>=1.26.1",
+  "jsonschema>=4.17.3",
+  "pep440>=0.1.2",
+]
+dev = [
+  "black>=23; python_version < '3.8'",
+  "black>24.2; python_version >= '3.8'",
+  "flake8>=4.0.1",
+  "gitlint-core==0.17.0",
+  "isort>=5.10.1",
+  "mypy>=1; python_version < '3.8'",
+  "mypy>=1.8.0; python_version >= '3.8'",
+  "pre-commit>=2.6.0",
+]
+prod = [
+  "gunicorn>=21.1.0",
+]
+docs = [
+  "mkdocs>=1.5.2",
+  "mkdocs-click>=0.8.0",
+  "mkdocs-material>=9.2.5",
+  "mkdocstrings[python]>=0.22.0",
+  "mike>=1.1.2",
+]
+
 [project.scripts]
 g2p = "g2p.cli:cli"
 
@@ -88,29 +116,13 @@ requires = [
 type = "pip-compile"
 python = "3.10"
 lock-filename = "requirements.txt"
-dependencies = [
-  "gunicorn>=21.1.0",
-]
+features = [ "prod" ]
 
 [tool.hatch.envs.test]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "playwright>=1.26.1",
-  "jsonschema>=4.17.3",
-  "pep440>=0.1.2",
-]
+features = [ "test" ]
 
 [tool.hatch.envs.dev]
-dependencies = [
-  "black>=23; python_version < '3.8'",
-  "black>24.2; python_version >= '3.8'",
-  "flake8>=4.0.1",
-  "gitlint-core==0.17.0",
-  "isort>=5.10.1",
-  "mypy>=1; python_version < '3.8'",
-  "mypy>=1.8.0; python_version >= '3.8'",
-  "pre-commit>=2.6.0",
-]
+features = [ "dev" ]
 
 [tool.hatch.envs.dev.scripts]
 check = "mypy --install-types --non-interactive {args:g2p}"

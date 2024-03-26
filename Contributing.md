@@ -25,6 +25,15 @@ hatch run dev:setup
 hatch -e dev shell
 ```
 
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
+pre-commit install
+gitlint install-hook
+```
+
 ## Pre-commit hooks
 
 The g2p team has agreed to systematically use a number of pre-commit hooks to
@@ -59,7 +68,26 @@ We've added all the developper dependencies for the project to the
 hatch -e dev run pre-commit install
 ```
 
-Note that you have to run the second command in every g2p sandbox you create.
+Note that you will have to use the `dev` environment when committing
+since pre-commit is installed there.  You can either start a shell:
+
+```sh
+hatch -e dev shell
+```
+
+Or run commands in the environment:
+
+```sh
+hatch -e dev run git commit -m 'chore: foo bar baz'
+```
+
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
+pre-commit install
+```
 
 ## commitlint
 
@@ -113,10 +141,31 @@ These rules are inspired by these commit formatting guides:
 We run commitlint on each commit message that you write by enabling the commit-msg hook in
 Git.
 
-Run this command in your g2p sandbox to install and enable the commit-msg hook:
+You can install and enable the commit-msg hook in the `dev` environment:
 
 ```sh
 hatch -e dev run gitlint install-hook
+```
+
+Note that you will have to use the `dev` environment when committing
+since pre-commit is installed there.  You can either start a shell:
+
+```sh
+hatch -e dev shell
+```
+
+Or run commands in the environment:
+
+```sh
+hatch -e dev run git commit -m 'chore: foo bar baz'
+```
+
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
+gitlint install-hook
 ```
 
 - Now, next time you make a change and commit it, your commit log will be checked:
