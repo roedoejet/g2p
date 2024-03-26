@@ -122,7 +122,7 @@ features = [ "prod" ]
 features = [ "test" ]
 
 [tool.hatch.envs.dev]
-features = [ "dev" ]
+features = [ "dev", "test" ]
 
 [tool.hatch.envs.dev.scripts]
 check = "mypy --install-types --non-interactive {args:g2p}"
