@@ -50,7 +50,7 @@ dev = [
   "black>=23; python_version < '3.8'",
   "black>24.2; python_version >= '3.8'",
   "flake8>=4.0.1",
-  "gitlint-core==0.17.0",
+  "gitlint>=0.17.0",
   "isort>=5.10.1",
   "mypy>=1; python_version < '3.8'",
   "mypy>=1.8.0; python_version >= '3.8'",
