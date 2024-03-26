@@ -54,9 +54,9 @@ class StudioTest(IsolatedAsyncioTestCase):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
-            await page.goto(f"http://localhost:{self.port}/docs")
+            await page.goto(f"http://127.0.0.1:{self.port}/docs")
             await page.wait_for_timeout(self.timeout_delay)
-            await page.goto(f"http://localhost:{self.port}")
+            await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
             input_el = page.locator("#input")
             output_el = page.locator("#output")
@@ -78,7 +78,7 @@ class StudioTest(IsolatedAsyncioTestCase):
         async with async_playwright() as p:
             browser = await p.chromium.launch(channel="chrome", headless=True)
             page = await browser.new_page()
-            await page.goto(f"http://localhost:{self.port}")
+            await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
             in_lang_selector = page.locator("#input-langselect")
             # Switch to a language
@@ -108,6 +108,8 @@ class StudioTest(IsolatedAsyncioTestCase):
                 sample(range(len(langs_to_test)), k=len(langs_to_test) // 10)
             )
         ]
+        # Make sure we test at least one lexicon-based example
+        langs_to_test.append(["eng", "eng-arpabet", "hello", "HH AH L OW "])
 
         error_count = 0
 
@@ -128,7 +130,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                 LOGGER.info("Loading page")
                 page = await browser.new_page()
                 await page.goto(
-                    f"http://localhost:{self.port}", wait_until="networkidle"
+                    f"http://127.0.0.1:{self.port}", wait_until="networkidle"
                 )
 
                 # Define element locators
