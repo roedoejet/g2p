@@ -10,10 +10,10 @@ from unittest import TestCase, main
 
 import jsonschema
 import yaml
+from click.testing import CliRunner
 from tqdm import tqdm
 
 from g2p._version import VERSION
-from g2p.app import APP
 from g2p.cli import (
     convert,
     doctor,
@@ -39,7 +39,7 @@ class CliTest(TestCase):
     """Test suite for the g2p Command Line Interface"""
 
     def setUp(self):
-        self.runner = APP.test_cli_runner()
+        self.runner = CliRunner()
 
     def test_update(self):
         result = self.runner.invoke(update)
