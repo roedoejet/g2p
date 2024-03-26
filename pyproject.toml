@@ -98,8 +98,8 @@ __version__: str
 __version_tuple__: VERSION_TUPLE
 version_tuple: VERSION_TUPLE
 
-VERSION = __version__ = version = '2.0.1.dev1+gcfddb1c.d20240322'
-__version_tuple__ = version_tuple = (2, 0, 1, 'dev1', 'gcfddb1c.d20240322')
+VERSION = __version__ = version = {version!r}
+__version_tuple__ = version_tuple = {version_tuple!r}
 """
 
 [tool.hatch.build.targets.sdist]
