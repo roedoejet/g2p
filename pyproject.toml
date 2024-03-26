@@ -79,12 +79,29 @@ include = [
     "/g2p",
 ]
 
-[tool.hatch.envs.default]
+[tool.hatch.env]
+requires = [
+    "hatch-pip-compile"
+]
+
+[tool.hatch.envs.prod]
+type = "pip-compile"
+python = "3.10"
+lock-filename = "requirements.txt"
+dependencies = [
+  "gunicorn>=21.1.0",
+]
+
+[tool.hatch.envs.test]
 dependencies = [
   "coverage[toml]>=6.5",
   "playwright>=1.26.1",
   "jsonschema>=4.17.3",
   "pep440>=0.1.2",
+]
+
+[tool.hatch.envs.dev]
+dependencies = [
   "black>=23; python_version < '3.8'",
   "black>24.2; python_version >= '3.8'",
   "flake8>=4.0.1",
@@ -95,13 +112,7 @@ dependencies = [
   "pre-commit>=2.6.0",
 ]
 
-[tool.hatch.envs.default.scripts]
-serve = "flask --app g2p.app run"
-routes = "flask --app g2p.app routes"
-serve-cov = "coverage run -m flask --app g2p.app run"
-test = "python run_tests.py dev"
-test-cov = "coverage run run_tests.py dev"
-test-studio = "python g2p/tests/test_studio.py"
+[tool.hatch.envs.dev.scripts]
 check = "mypy --install-types --non-interactive {args:g2p}"
 cov-report = [
   "- coverage combine",
@@ -111,14 +122,23 @@ cov = [
   "test-cov",
   "cov-report",
 ]
-
-[tool.hatch.envs.prod]
-dependencies = [
-  "gunicorn>=21.1.0",
+setup = [
+  "pre-commit install",
+  "gitlint install-hook",
 ]
 
-[[tool.hatch.envs.all.matrix]]
+[tool.hatch.envs.default.scripts]
+serve = "flask --app g2p.app run"
+routes = "flask --app g2p.app routes"
+
+[[tool.hatch.envs.test.matrix]]
 python = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.test.scripts]
+serve-cov = "coverage run -m flask --app g2p.app run"
+test = "python run_tests.py dev"
+test-cov = "coverage run run_tests.py dev"
+test-studio = "python g2p/tests/test_studio.py"
 
 [tool.coverage.run]
 source_pkgs = ["g2p"]

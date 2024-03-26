@@ -1,9 +1,0 @@
-black~=24.3; python_version >= "3.8"
-flake8>=4.0.1
-gitlint-core==0.17.0
-isort>=5.10.1
-mypy>=1.4.1
-mypy>=1.8.0; python_version >= "3.8"
-pre-commit>=2.6.0
-types-PyYAML
--r requirements.test.txt

@@ -17,13 +17,12 @@ them in.
 
 ## TL;DR
 
-Please considering running these commands in each of your sandboxes to enable our
-pre-commit hooks and commitlint:
+Please consider using the `dev` environment with `hatch` to do
+development, which enables some checking of Git commits and messages:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
-pre-commit install
-gitlint install-hook
+hatch run dev:setup
+hatch -e dev shell
 ```
 
 ## Pre-commit hooks
@@ -53,12 +52,11 @@ All the pre-commit hooks are executed using a tool called
 [pre-commit](https://pre-commit.com/). Once you enable pre-commit, it will run all the
 hooks each time you try to commit anything in this repo.
 
-We've listed all the developper dependencies for the project in
-[requirements/requirements.dev.txt](requirements/requirements.dev.txt) to make them easy to install:
+We've added all the developper dependencies for the project to the
+`dev` environment to make them easy to install with `hatch`:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
-pre-commit install
+hatch -e dev run pre-commit install
 ```
 
 Note that you have to run the second command in every g2p sandbox you create.
@@ -118,8 +116,7 @@ Git.
 Run this command in your g2p sandbox to install and enable the commit-msg hook:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
-gitlint install-hook
+hatch -e dev run gitlint install-hook
 ```
 
 - Now, next time you make a change and commit it, your commit log will be checked:
