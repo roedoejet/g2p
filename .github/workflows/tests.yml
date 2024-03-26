@@ -4,6 +4,13 @@ on:
   - push
   - workflow_call
 
+# Since we don't checkout the full history, set a default version so
+# certain tests (pep440, update_schema) will still function.  NOTE:
+# This **must** match the version of the JSON schema file in
+# g2p/mappings/.schema!!!
+env:
+  SETUPTOOLS_SCM_PRETEND_VERSION: "2.0"
+
 jobs:
   test-all-on-linux:
     # This is our main test job, exercising everything and uploading to coverage
