@@ -20,6 +20,18 @@ classifiers = [
 dependencies = [
     "click>=8.0.4",
     "coloredlogs>=15.0.1",
+    "networkx>=2.6",
+    "openpyxl",
+    "panphon>=0.19",
+    "pydantic>=2.3",
+    "pyyaml>=5.2",
+    "regex",
+    "text_unidecode",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+api = [
     "eventlet>=0.33.0,!=0.36.0",
     "flask-cors>=3.0.9",
     "flask-restful>=0.3.9",
@@ -27,16 +39,37 @@ dependencies = [
     "flask<2.3; python_version < '3.8'",
     "flask; python_version >= '3.8'",
     "flask_socketio>=5.0.0",
-    "networkx>=2.6",
-    "openpyxl",
-    "panphon>=0.19",
-    "pydantic>=2.3",
     "python-engineio>=4.0.0",
     "python-socketio>=5.0.0",
-    "pyyaml>=5.2",
-    "regex",
-    "text_unidecode",
-    "tqdm",
+]
+test = [
+  "g2p[api]",
+  "coverage[toml]>=6.5",
+  "playwright>=1.26.1",
+  "jsonschema>=4.17.3",
+  "pep440>=0.1.2",
+]
+dev = [
+  "g2p[test]",
+  "black>=23; python_version < '3.8'",
+  "black>24.2; python_version >= '3.8'",
+  "flake8>=4.0.1",
+  "gitlint-core==0.17.0",
+  "isort>=5.10.1",
+  "mypy>=1; python_version < '3.8'",
+  "mypy>=1.8.0; python_version >= '3.8'",
+  "pre-commit>=2.6.0",
+]
+prod = [
+  "g2p[api]",
+  "gunicorn>=21.1.0",
+]
+docs = [
+  "mkdocs>=1.5.2",
+  "mkdocs-click>=0.8.0",
+  "mkdocs-material>=9.2.5",
+  "mkdocstrings[python]>=0.22.0",
+  "mike>=1.1.2",
 ]
 
 [project.scripts]
@@ -84,32 +117,24 @@ requires = [
     "hatch-pip-compile"
 ]
 
+[tool.hatch.envs.api]
+features = [ "api" ]
+
 [tool.hatch.envs.prod]
+template = "api"
 type = "pip-compile"
 python = "3.10"
 lock-filename = "requirements.txt"
-dependencies = [
-  "gunicorn>=21.1.0",
-]
+features = [ "prod" ]
 
 [tool.hatch.envs.test]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "playwright>=1.26.1",
-  "jsonschema>=4.17.3",
-  "pep440>=0.1.2",
-]
+features = [ "test" ]
 
 [tool.hatch.envs.dev]
-dependencies = [
-  "black>=23; python_version < '3.8'",
-  "black>24.2; python_version >= '3.8'",
-  "flake8>=4.0.1",
-  "gitlint-core==0.17.0",
-  "isort>=5.10.1",
-  "mypy>=1; python_version < '3.8'",
-  "mypy>=1.8.0; python_version >= '3.8'",
-  "pre-commit>=2.6.0",
+features = [ "dev" ]
+post-install-commands = [
+  "pre-commit install",
+  "gitlint install-hook || true",
 ]
 
 [tool.hatch.envs.dev.scripts]
@@ -122,14 +147,13 @@ cov = [
   "test-cov",
   "cov-report",
 ]
-setup = [
-  "pre-commit install",
-  "gitlint install-hook",
-]
 
-[tool.hatch.envs.default.scripts]
+[tool.hatch.envs.api.scripts]
 serve = "flask --app g2p.app run"
 routes = "flask --app g2p.app routes"
+
+[tool.hatch.envs.prod.scripts]
+serve = "gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile"
 
 [[tool.hatch.envs.test.matrix]]
 python = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
