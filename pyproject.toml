@@ -20,19 +20,10 @@ classifiers = [
 dependencies = [
     "click>=8.0.4",
     "coloredlogs>=15.0.1",
-    "eventlet>=0.33.0,!=0.36.0",
-    "flask-cors>=3.0.9",
-    "flask-restful>=0.3.9",
-    "flask-talisman>=0.7.0",
-    "flask<2.3; python_version < '3.8'",
-    "flask; python_version >= '3.8'",
-    "flask_socketio>=5.0.0",
     "networkx>=2.6",
     "openpyxl",
     "panphon>=0.19",
     "pydantic>=2.3",
-    "python-engineio>=4.0.0",
-    "python-socketio>=5.0.0",
     "pyyaml>=5.2",
     "regex",
     "text_unidecode",
@@ -40,13 +31,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+api = [
+    "eventlet>=0.33.0,!=0.36.0",
+    "flask-cors>=3.0.9",
+    "flask-restful>=0.3.9",
+    "flask-talisman>=0.7.0",
+    "flask<2.3; python_version < '3.8'",
+    "flask; python_version >= '3.8'",
+    "flask_socketio>=5.0.0",
+    "python-engineio>=4.0.0",
+    "python-socketio>=5.0.0",
+]
 test = [
+  "g2p[api]",
   "coverage[toml]>=6.5",
   "playwright>=1.26.1",
   "jsonschema>=4.17.3",
   "pep440>=0.1.2",
 ]
 dev = [
+  "g2p[test]",
   "black>=23; python_version < '3.8'",
   "black>24.2; python_version >= '3.8'",
   "flake8>=4.0.1",
@@ -57,6 +61,7 @@ dev = [
   "pre-commit>=2.6.0",
 ]
 prod = [
+  "g2p[api]",
   "gunicorn>=21.1.0",
 ]
 docs = [
@@ -112,7 +117,11 @@ requires = [
     "hatch-pip-compile"
 ]
 
+[tool.hatch.envs.api]
+features = [ "api" ]
+
 [tool.hatch.envs.prod]
+template = "api"
 type = "pip-compile"
 python = "3.10"
 lock-filename = "requirements.txt"
@@ -122,7 +131,7 @@ features = [ "prod" ]
 features = [ "test" ]
 
 [tool.hatch.envs.dev]
-features = [ "dev", "test" ]
+features = [ "dev" ]
 
 [tool.hatch.envs.dev.scripts]
 check = "mypy --install-types --non-interactive {args:g2p}"
@@ -139,7 +148,7 @@ setup = [
   "gitlint install-hook",
 ]
 
-[tool.hatch.envs.default.scripts]
+[tool.hatch.envs.api.scripts]
 serve = "flask --app g2p.app run"
 routes = "flask --app g2p.app routes"
 

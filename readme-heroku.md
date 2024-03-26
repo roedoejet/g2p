@@ -8,4 +8,6 @@ Our production Heroku deployment is controlled by the following files:
    the Python version in the `[tool.hatch.envs.prod]` section matches
    the one in `runtime.txt`.  Now you can update the requirements with:
 
-        hatch env run --env prod -- true
+        hatch env remove prod
+        rm -f requirements.txt
+        hatch env create prod
