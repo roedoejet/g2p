@@ -134,10 +134,11 @@ features = [ "dev" ]
 post-install-commands = [
   "pre-commit install",
   "gitlint install-hook || true",
+  "mypy --install-types --non-interactive g2p",
 ]
 
 [tool.hatch.envs.dev.scripts]
-check = "mypy --install-types --non-interactive {args:g2p}"
+check = "mypy --non-interactive {args:g2p}"
 cov-report = [
   "- coverage combine",
   "coverage report",
