@@ -41,6 +41,7 @@ api = [
     "flask_socketio>=5.0.0",
     "python-engineio>=4.0.0",
     "python-socketio>=5.0.0",
+    "fastapi",
 ]
 test = [
   "g2p[api]",
@@ -52,16 +53,20 @@ test = [
 dev = [
   "g2p[test]",
   "black>=23; python_version < '3.8'",
-  "black>24.2; python_version >= '3.8'",
-  "flake8>=4.0.1",
-  "gitlint-core==0.17.0",
+  "black~=24.3; python_version >= '3.8'",
+  "gitlint>=0.17.0",
   "isort>=5.10.1",
   "mypy>=1; python_version < '3.8'",
   "mypy>=1.8.0; python_version >= '3.8'",
   "pre-commit>=2.6.0",
 ]
+# This one is a bit special and cannot depend on other features,
+# because if it depends on `g2p[api]` then we end up with
+# `g2p==SOMEVERSION` in requirements.txt and we DO NOT want that to
+# happen.
+# See https://github.com/jazzband/pip-tools/issues/2002
+# See https://github.com/juftin/hatch-pip-compile/issues/78
 prod = [
-  "g2p[api]",
   "gunicorn>=21.1.0",
 ]
 docs = [
@@ -120,15 +125,40 @@ requires = [
 [tool.hatch.envs.api]
 features = [ "api" ]
 
+[tool.hatch.envs.api.scripts]
+serve = "flask --app g2p.app run"
+routes = "flask --app g2p.app routes"
+
 [tool.hatch.envs.prod]
 template = "api"
+features = [ "api", "prod" ]
 type = "pip-compile"
 python = "3.10"
 lock-filename = "requirements.txt"
-features = [ "prod" ]
+pip-compile-verbose = false
+
+[tool.hatch.envs.prod.scripts]
+serve = "gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile"
 
 [tool.hatch.envs.test]
 features = [ "test" ]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.test.scripts]
+serve-cov = "coverage run -m flask --app g2p.app run"
+test = "python run_tests.py dev"
+test-cov = "coverage run run_tests.py dev"
+test-studio = "python g2p/tests/test_studio.py"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
 
 [tool.hatch.envs.dev]
 features = [ "dev" ]
@@ -139,30 +169,6 @@ post-install-commands = [
 
 [tool.hatch.envs.dev.scripts]
 check = "mypy --install-types --non-interactive {args:g2p}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
-
-[tool.hatch.envs.api.scripts]
-serve = "flask --app g2p.app run"
-routes = "flask --app g2p.app routes"
-
-[tool.hatch.envs.prod.scripts]
-serve = "gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile"
-
-[[tool.hatch.envs.test.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
-
-[tool.hatch.envs.test.scripts]
-serve-cov = "coverage run -m flask --app g2p.app run"
-test = "python run_tests.py dev"
-test-cov = "coverage run run_tests.py dev"
-test-studio = "python g2p/tests/test_studio.py"
 
 [tool.coverage.run]
 source_pkgs = ["g2p"]
@@ -170,7 +176,7 @@ branch = true
 parallel = true
 omit = [
   "g2p/_version.py",
-  "g2p/tests",
+  "g2p/tests/**/*.py",
 ]
 
 [tool.coverage.report]
@@ -181,3 +187,27 @@ plugins = ["pydantic.mypy"]
 
 [tool.isort]
 profile = "black"
+
+[tool.pylint.main]
+# Unsure how to make pylint recursively ignore
+ignore = [
+       "g2p/tests",
+       "g2p/tests/public",
+       "g2p/tests/public/data",
+]
+
+[tool.pylint.messages_control]
+# This is TOO LONG but the code is that way for the moment
+max-line-length = 120
+good-names = [
+    # We use single letter e for exception, f for file handles
+    "e", "f",
+]
+disable = [
+    # We do this to speed loading time, sorry pylint but not sorry
+    "import-outside-toplevel",
+    # We use isort for sorting our imports, so nevermind what pylint thinks
+    "wrong-import-order",
+    # I find the "unnecessary" else makes code more readable
+    "no-else-return",
+]

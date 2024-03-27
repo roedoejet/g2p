@@ -3,6 +3,14 @@
 #
 # - click>=8.0.4
 # - coloredlogs>=15.0.1
+# - networkx>=2.6
+# - openpyxl
+# - panphon>=0.19
+# - pydantic>=2.3
+# - pyyaml>=5.2
+# - regex
+# - text-unidecode
+# - tqdm
 # - eventlet!=0.36.0,>=0.33.0
 # - flask-cors>=3.0.9
 # - flask-restful>=0.3.9
@@ -10,16 +18,8 @@
 # - flask-talisman>=0.7.0
 # - flask; python_version >= "3.8"
 # - flask<2.3; python_version < "3.8"
-# - networkx>=2.6
-# - openpyxl
-# - panphon>=0.19
-# - pydantic>=2.3
 # - python-engineio>=4.0.0
 # - python-socketio>=5.0.0
-# - pyyaml>=5.2
-# - regex
-# - text-unidecode
-# - tqdm
 # - gunicorn>=21.1.0
 #
 
@@ -43,7 +43,7 @@ editdistance==0.8.1
     # via panphon
 et-xmlfile==1.1.0
     # via openpyxl
-eventlet==0.35.2
+eventlet==0.36.1
     # via hatch.envs.prod
 flask==3.0.2 ; python_version >= "3.8"
     # via

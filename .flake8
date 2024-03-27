@@ -1,3 +1,7 @@
+# NOTE: This is actually ignored by flake8 in pre-commit for some
+# reason but it will get used in editors.  How to make flake8 read it?
+# Who knows? flake8 is a mystery.
+
 [flake8]
-extend-ignore = E203, E704
-max-line-length = 88
+max-line-length = 120
+extend-ignore = E203,E704
