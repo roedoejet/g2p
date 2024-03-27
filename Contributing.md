@@ -17,11 +17,18 @@ them in.
 
 ## TL;DR
 
-Please considering running these commands in each of your sandboxes to enable our
-pre-commit hooks and commitlint:
+Please consider using the `dev` environment with `hatch` to do
+development, which enables some checking of Git commits and messages:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
+hatch -e dev shell
+```
+
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
 pre-commit install
 gitlint install-hook
 ```
@@ -53,15 +60,30 @@ All the pre-commit hooks are executed using a tool called
 [pre-commit](https://pre-commit.com/). Once you enable pre-commit, it will run all the
 hooks each time you try to commit anything in this repo.
 
-We've listed all the developper dependencies for the project in
-[requirements/requirements.dev.txt](requirements/requirements.dev.txt) to make them easy to install:
+We've added all the developer dependencies for the project to the
+`dev` environment to make them easy to install with `hatch`.  In
+addition, `pre-commit` and `gitlint` hooks will be installed on
+creation of this environment.  Note that you will have to use the
+`dev` environment when committing since pre-commit is installed there.
+You can either start a shell:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
-pre-commit install
+hatch -e dev shell
 ```
 
-Note that you have to run the second command in every g2p sandbox you create.
+Or run commands in the environment:
+
+```sh
+hatch -e dev run git commit -m 'chore: foo bar baz'
+```
+
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
+pre-commit install
+```
 
 ## commitlint
 
@@ -115,10 +137,26 @@ These rules are inspired by these commit formatting guides:
 We run commitlint on each commit message that you write by enabling the commit-msg hook in
 Git.
 
-Run this command in your g2p sandbox to install and enable the commit-msg hook:
+The commit-msg hook is enabled on creation of the `dev` environment
+with `hatch`.  Note that you will have to use the `dev` environment
+when committing since pre-commit is installed there.  You can either
+start a shell:
 
 ```sh
-pip install -r requirements/requirements.dev.txt
+hatch -e dev shell
+```
+
+Or run commands in the environment:
+
+```sh
+hatch -e dev run git commit -m 'chore: foo bar baz'
+```
+
+If you have a pre-existing virtual environment (sandbox), you can also
+install the required packages with `pip`:
+
+```sh
+pip install -e .[dev]
 gitlint install-hook
 ```
 
