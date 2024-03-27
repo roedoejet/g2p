@@ -21,7 +21,6 @@ Please consider using the `dev` environment with `hatch` to do
 development, which enables some checking of Git commits and messages:
 
 ```sh
-hatch run dev:setup
 hatch -e dev shell
 ```
 
@@ -61,15 +60,12 @@ All the pre-commit hooks are executed using a tool called
 [pre-commit](https://pre-commit.com/). Once you enable pre-commit, it will run all the
 hooks each time you try to commit anything in this repo.
 
-We've added all the developper dependencies for the project to the
-`dev` environment to make them easy to install with `hatch`:
-
-```sh
-hatch -e dev run pre-commit install
-```
-
-Note that you will have to use the `dev` environment when committing
-since pre-commit is installed there.  You can either start a shell:
+We've added all the developer dependencies for the project to the
+`dev` environment to make them easy to install with `hatch`.  In
+addition, `pre-commit` and `gitlint` hooks will be installed on
+creation of this environment.  Note that you will have to use the
+`dev` environment when committing since pre-commit is installed there.
+You can either start a shell:
 
 ```sh
 hatch -e dev shell
@@ -141,14 +137,10 @@ These rules are inspired by these commit formatting guides:
 We run commitlint on each commit message that you write by enabling the commit-msg hook in
 Git.
 
-You can install and enable the commit-msg hook in the `dev` environment:
-
-```sh
-hatch -e dev run gitlint install-hook
-```
-
-Note that you will have to use the `dev` environment when committing
-since pre-commit is installed there.  You can either start a shell:
+The commit-msg hook is enabled on creation of the `dev` environment
+with `hatch`.  Note that you will have to use the `dev` environment
+when committing since pre-commit is installed there.  You can either
+start a shell:
 
 ```sh
 hatch -e dev shell
