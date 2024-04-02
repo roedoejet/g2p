@@ -445,11 +445,13 @@ class CliTest(TestCase):
         self.assertNotEqual(results.exit_code, 0)
 
     def test_convert_from_file(self):
-        results = self.runner.invoke(
-            convert, [os.path.join(DATA_DIR, "fra_simple.txt"), "fra", "fra-ipa"]
-        )
+        input_file = os.path.join(DATA_DIR, "fra_simple.txt")
+        results = self.runner.invoke(convert, [input_file, "fra", "fra-ipa"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("fʁɑ̃sɛ", results.output)
+        with open(input_file, "r", encoding="utf8") as f:
+            lines_in = len(list(f))
+        self.assertEqual(lines_in, len(results.output.splitlines()))
 
     def test_convert_errors(self):
         """Exercise code handling error situations in g2p convert"""
