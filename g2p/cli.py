@@ -177,14 +177,14 @@ def generate_mapping(  # noqa: C901
       g2p generate-mapping [--dummy|--ipa] IN_LANG [OUT_LANG]
 
       For specified IN_LANG, generate a mapping from IN_LANG-ipa to eng-ipa,
-      or from IN_LANG-ipa to a dummy minimalist phone inventory. This assumes
-      the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping from its
-      output inventory.
+    or from IN_LANG-ipa to a dummy minimalist phone inventory. This assumes
+    the mapping IN_LANG -> IN_LANG-ipa exists and creates a mapping from its
+    output inventory.
 
       To generate a mapping from IN_LANG-ipa to eng-ipa from a mapping
-      following a different patterns, e.g., from crl-equiv -> crl-ipa, specify
-      both IN_LANG (crl-equiv in this example) and OUT_LANG (crl-ipa in this
-      example).
+    following a different patterns, e.g., from crl-equiv -> crl-ipa, specify
+    both IN_LANG (crl-equiv in this example) and OUT_LANG (crl-ipa in this
+    example).
 
       \b
       Sample usage:
@@ -207,10 +207,10 @@ def generate_mapping(  # noqa: C901
       g2p generate-mapping --from FROM_L1:FROM_L2:... --to TO_L1:TO_L2:...
 
       Generate an IPA mapping from the union of FROM_L1-ipa, FROM-L2-ipa, etc to
-      the union of TO_L1-ipa, TO-L2-ipa, etc. One or more from/to language
-      code(s) can be specified in colon- or comma-separated lists. Note, by default
-      we use Panphon's weighted_feature_edit_distance, but you can change this with
-      the --distance argument
+    the union of TO_L1-ipa, TO-L2-ipa, etc. One or more from/to language
+    code(s) can be specified in colon- or comma-separated lists. Note, by default
+    we use Panphon's weighted_feature_edit_distance, but you can change this with
+    the --distance argument
 
     \b
       Sample usage:
