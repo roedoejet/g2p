@@ -507,13 +507,8 @@ def convert(  # noqa: C901
         # This isn't that DRY - copied from g2p/mappings/langs/__init__.py
         mappings_legal_pairs = []
         mapping_config = MappingConfig.load_mapping_config_from_path(config)
-        for index in range(len(mapping_config.mappings)):
-            mappings_legal_pairs.append(
-                (
-                    mapping_config.mappings[index].in_lang,
-                    mapping_config.mappings[index].out_lang,
-                )
-            )
+        for index, mapping in enumerate(mapping_config.mappings):
+            mappings_legal_pairs.append((mapping.in_lang, mapping.out_lang))
             mapping_config.mappings[index] = Mapping.load_mapping_from_path(
                 config, index
             )
@@ -536,7 +531,8 @@ def convert(  # noqa: C901
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
-    if os.path.exists(input_text) and input_text.endswith("txt"):
+    input_text_is_a_file = os.path.exists(input_text) and input_text.endswith("txt")
+    if input_text_is_a_file:
         with open(input_text, encoding="utf8") as f:
             input_text = f.read()
     # Determine which tokenizer to use, if any
@@ -563,7 +559,7 @@ def convert(  # noqa: C901
     if len(outputs) > 1:
         click.echo(pprint.pformat(outputs, indent=4))
     else:
-        click.echo(tg.output_string)
+        click.echo(tg.output_string, nl=not input_text_is_a_file)
 
 
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
