@@ -24,6 +24,7 @@ from g2p.cli import (
     update_schema,
 )
 from g2p.log import LOGGER
+from g2p.mappings import MappingConfig
 from g2p.mappings.langs import (
     LANGS_DIR,
     LANGS_FILE_NAME,
@@ -281,13 +282,43 @@ class CliTest(TestCase):
         result = self.runner.invoke(convert, "--tok-lang fra e\\'i oji oji-ipa")
         self.assertIn("eː'i", result.stdout)
 
+    def test_generate_mapping_config(self):
+        """Ensure that generate-mapping creates valid configuration."""
+        # The underlying create_mapping() function is tested in
+        # test_create_mapping.py, and align_to_dummy_fallback() in
+        # test_fallback.py, with less expensive inputs than our real
+        # g2p mappings, and with predictable results.  However, we do
+        # need to ensure that it creates/updates a correct
+        # configuration, so we test that here.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            results = self.runner.invoke(
+                generate_mapping, ["--ipa", "atj", "--out-dir", tmpdir]
+            )
+            self.assertEqual(results.exit_code, 0)
+            rulespath = os.path.join(tmpdir, "atj-ipa_to_eng-ipa.json")
+            self.assertTrue(os.path.exists(rulespath))
+            confpath = os.path.join(tmpdir, "config-g2p.yaml")
+            config = MappingConfig.load_mapping_config_from_path(confpath)
+            self.assertEqual(len(config.mappings), 1)
+            self.assertEqual(config.mappings[0].rules_path, Path(rulespath))
+            # Run it again, should get the same result
+            results = self.runner.invoke(
+                generate_mapping, ["--ipa", "atj", "--out-dir", tmpdir]
+            )
+            self.assertEqual(results.exit_code, 0)
+            config = MappingConfig.load_mapping_config_from_path(confpath)
+            self.assertEqual(len(config.mappings), 1)
+            self.assertEqual(config.mappings[0].rules_path, Path(rulespath))
+            # Run it with a different language, should get more config
+            results = self.runner.invoke(
+                generate_mapping, ["--ipa", "alq", "--out-dir", tmpdir]
+            )
+            self.assertEqual(results.exit_code, 0)
+            config = MappingConfig.load_mapping_config_from_path(confpath)
+            self.assertEqual(len(config.mappings), 2)
+
     def test_generate_mapping_errors(self):
         """Exercise various error situations with the g2p generate-mapping CLI command"""
-
-        # We don't exercise valid calls to generate_mapping here. The underlying
-        # create_mapping() function is tested in test_create_mapping.py, and
-        # align_to_dummy_fallback() in test_fallback.py, with less expensive
-        # inputs than our real g2p mappings, and with predictable results.
 
         results = self.runner.invoke(generate_mapping)
         self.assertNotEqual(results.exit_code, 0)

@@ -199,8 +199,8 @@ def create_mapping(
     )
 
     # Initialize mapping with input language parameters (as_is,
-    # case_sensitive, prevent_feeding, etc)
-    config = mapping_1.model_copy().model_dump()
+    # case_sensitive, prevent_feeding, etc) but *not* the same filename!
+    config = mapping_1.model_copy().model_dump(exclude={"rules_path"})
     config = {
         **config,
         "authors": [f"Generated {dt.datetime.now()}"],
