@@ -32,9 +32,9 @@ from typing import Dict, List, Tuple, Union
 
 from fastapi import Body, FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
-from networkx import shortest_path
-from networkx.algorithms.dag import ancestors, descendants
-from networkx.exception import NetworkXNoPath
+from networkx import shortest_path  # type: ignore
+from networkx.algorithms.dag import ancestors, descendants  # type: ignore
+from networkx.exception import NetworkXNoPath  # type: ignore
 from pydantic import BaseModel, Field
 
 import g2p
@@ -87,11 +87,11 @@ class SupportedLanguage(BaseModel):
 
     code: str = Field(
         description="Language, writing, or phonetic system code as passed to /convert",
-        example="eng",
+        examples=["eng"],
     )
     name: Union[str, None] = Field(
         description="Display name (not internationalized) for language, may be None",
-        example="English",
+        examples=["English"],
     )
 
 
@@ -109,6 +109,11 @@ def langs(
     given, return all nodes in the conversion network (which may or
     may not correspond to languages).
     """
+    # FIXME: Need to update this for the new way that mappings/langs are organized
+    return []
+
+
+"""
     if allnodes:
         return [
             SupportedLanguage(
@@ -122,18 +127,19 @@ def langs(
             for code in sorted(g2p_langs.LANGS.keys())
             if "language_name" in g2p_langs.LANGS[code] and code != "generated"
         ]
+"""
 
 
 class ConvertRequest(BaseModel):
     """Request conversion from one writing or phonetic system to another."""
 
     in_lang: LanguageNode = Field(
-        description="Name of input language", example="eng-ipa"
+        description="Name of input language", examples=["eng-ipa"]
     )
     out_lang: LanguageNode = Field(
-        description="Name of output language", example="eng-arpabet"
+        description="Name of output language", examples=["eng-arpabet"]
     )
-    text: str = Field(description="Text to convert", example="hɛloʊ")
+    text: str = Field(description="Text to convert", examples=["hɛloʊ"])
     tokenize: Union[bool, None] = Field(
         True,
         description="Tokenize input and return a list of segments.  This is "
@@ -158,50 +164,54 @@ class Conversion(BaseModel):
     in_lang: Union[None, LanguageNode] = Field(
         None,
         description="Name of input language, absent if no conversion was done",
-        example="eng-ipa",
+        examples=["eng-ipa"],
     )
     out_lang: Union[None, LanguageNode] = Field(
         None,
         description="Name of output language, absent if no conversion was done",
-        example="eng-arpabet",
+        examples=["eng-arpabet"],
     )
     input_nodes: Union[None, List[str]] = Field(
         None,
         description="Characters in input, which can be safely indexed by alignments, "
         "present only if `indices` was True in request.",
-        example=["h", "i", "🙂", "🙂", "🙂"],
+        examples=[["h", "i", "🙂", "🙂", "🙂"]],
     )
     output_nodes: Union[None, List[str]] = Field(
         None,
         description="Characters in output, which can be safely indexed by alignments, "
         "present only if `indices` was True in request.",
-        example=["H", "H", " ", "I", "Y", " ", "🙂", "🙂", "🙂"],
+        examples=[["H", "H", " ", "I", "Y", " ", "🙂", "🙂", "🙂"]],
     )
-    alignments: Union[None, List[Tuple[int, int]]] = Field(
+    alignments: Union[None, List[Tuple[int, Union[int, None]]]] = Field(
         None,
         description="Alignments from input to output indices, "
         "present only if `indices` was True in request.",
-        example=[
-            [0, 0],
-            [0, 1],
-            [0, 2],
-            [1, 3],
-            [1, 4],
-            [1, 5],
-            [2, 6],
-            [2, 7],
-            [3, 8],
-            [3, 9],
-            [3, 10],
+        examples=[
+            [
+                [0, 0],
+                [0, 1],
+                [0, 2],
+                [1, 3],
+                [1, 4],
+                [1, 5],
+                [2, 6],
+                [2, 7],
+                [3, 8],
+                [3, 9],
+                [3, 10],
+            ]
         ],
     )
     substring_alignments: List[Tuple[str, str]] = Field(
         description="Minimal montonic substring alignments from input to output substrings",
-        example=[
-            ["h", "HH "],
-            ["ɛ", "EH "],
-            ["l", "L "],
-            ["oʊ", "OW "],
+        examples=[
+            [
+                ["h", "HH "],
+                ["ɛ", "EH "],
+                ["l", "L "],
+                ["oʊ", "OW "],
+            ]
         ],
     )
 
@@ -212,17 +222,19 @@ class Segment(BaseModel):
 
     conversions: List[Conversion] = Field(
         description="Sequence of conversions in reverse order.",
-        example=[
-            {
-                "in_lang": "eng-ipa",
-                "out_lang": "eng-arpabet",
-                "substring_alignments": [
-                    ["h", "HH "],
-                    ["ɛ", "EH "],
-                    ["l", "L "],
-                    ["oʊ", "OW "],
-                ],
-            }
+        examples=[
+            [
+                {
+                    "in_lang": "eng-ipa",
+                    "out_lang": "eng-arpabet",
+                    "substring_alignments": [
+                        ["h", "HH "],
+                        ["ɛ", "EH "],
+                        ["l", "L "],
+                        ["oʊ", "OW "],
+                    ],
+                }
+            ]
         ],
     )
 
@@ -230,7 +242,7 @@ class Segment(BaseModel):
 @api.post("/convert")
 def convert(  # noqa: C901
     request: ConvertRequest = Body(
-        examples={
+        openapi_examples={
             "eng-ipa to eng-arpabet": {
                 "summary": "Convert English IPA to ARPABET",
                 "description": "G2P can do simple conversions between equivalent phonetic notations",
