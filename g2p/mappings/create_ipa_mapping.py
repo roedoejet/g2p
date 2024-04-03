@@ -190,8 +190,8 @@ def create_mapping(
         )
     l1_is_xsampa, l2_is_xsampa = is_xsampa(map_1_name), is_xsampa(map_2_name)
     rules = align_inventories(
-        mapping_1.inventory(mapping_1_io),
-        mapping_2.inventory(mapping_2_io),
+        mapping_1.inventory(mapping_1_io, non_empty=True),
+        mapping_2.inventory(mapping_2_io, non_empty=True),
         l1_is_xsampa,
         l2_is_xsampa,
         distance=distance,

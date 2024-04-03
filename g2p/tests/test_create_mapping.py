@@ -4,6 +4,8 @@
 Test all Mappings
 """
 
+import io
+from contextlib import redirect_stderr
 from unittest import TestCase, main
 
 from g2p.log import LOGGER
@@ -154,6 +156,24 @@ class MappingCreationTest(TestCase):
             self.assertTrue(isinstance(mapping, Mapping))
             set_of_mappings.add(tuple(rule.rule_output for rule in mapping.rules))
         self.assertGreater(len(set_of_mappings), 3)
+
+    def test_deletion_mapping(self):
+        """Ensure that deletion rules do not lead to spurious warnings."""
+        src_mappings = [
+            {"in": "foo", "out": ""},
+            {"in": "ᐃ", "out": "i"},
+            {"in": "ᐅ", "out": "u"},
+            {"in": "ᐊ", "out": "a"},
+        ]
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-ipa")
+        log_output = io.StringIO()
+        with redirect_stderr(log_output):
+            mapping = create_mapping(src_mapping, self.target_mapping)
+        self.assertFalse("WARNING" in log_output.getvalue())
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer("a").output_string, "ɑ")
+        self.assertEqual(transducer("i").output_string, "i")
+        self.assertEqual(transducer("u").output_string, "u")
 
 
 if __name__ == "__main__":
