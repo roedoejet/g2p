@@ -44,7 +44,9 @@ class Mapping(_MappingModelDefinition):
     """Class for lookup tables"""
 
     def model_post_init(self, *_args, **_kwargs) -> None:
-        """After the model is constructed, we process the model specs by applying all the configuration to the rules (ie prevent feeding, unicode normalization etc..)"""
+        """After the model is constructed, we process the model specs by
+        applying all the configuration to the rules (ie prevent feeding,
+        unicode normalization etc..)"""
         if self.type == MAPPING_TYPE.mapping or self.type is None:
             # load abbreviations from path
             if self.abbreviations_path is not None and not self.abbreviations:
@@ -81,7 +83,8 @@ class Mapping(_MappingModelDefinition):
 
     @staticmethod
     def find_mapping_by_id(map_id: str) -> "Mapping":
-        """Find the mapping with a given ID, i.e., the "id" found in the mapping, like in the "panphon_preprocessor" mapping."""
+        """Find the mapping with a given ID, i.e., the "id" found in the
+        mapping, like in the "panphon_preprocessor" mapping."""
         for mapping in MAPPINGS_AVAILABLE:
             if mapping.id == map_id:
                 return deepcopy(mapping)
@@ -89,9 +92,9 @@ class Mapping(_MappingModelDefinition):
 
     @staticmethod
     def load_mapping_from_path(path_to_mapping_config: Union[str, Path], index=0):
-        """Loads a mapping from a path, if there is more than one mapping, then it loads based on the int
-        provided to the 'index' argument. Default is 0.
-        """
+        """Loads a mapping from a path, if there is more than one mapping,
+        then it loads based on the int provided to the 'index'
+        argument. Default is 0."""
         mapping_config = MappingConfig.load_mapping_config_from_path(
             path_to_mapping_config
         )
@@ -122,13 +125,17 @@ class Mapping(_MappingModelDefinition):
         """Find the location of an item in self"""
         return self.rules.index(item)
 
-    def inventory(self, in_or_out: str = "in"):
+    def inventory(self, in_or_out: str = "in", non_empty: bool = False):
         """Return just inputs or outputs as inventory of mapping"""
         if in_or_out == "in":
             in_or_out = "rule_input"
         if in_or_out == "out":
             in_or_out = "rule_output"
-        return [getattr(x, in_or_out) for x in self.rules]
+        inv = [getattr(x, in_or_out) for x in self.rules]
+        if non_empty:
+            return [sym for sym in inv if sym != ""]
+        else:
+            return inv
 
     def plain_mapping(self):
         """Return the plain mapping for displaying or saving to disk.
@@ -274,7 +281,8 @@ class Mapping(_MappingModelDefinition):
             )
             raise exceptions.MalformedMapping(
                 f"Your regex in mapping between {in_lang} and {out_lang} is malformed.  "
-                f"Do you have un-escaped regex characters in your input {inp}, contexts {rule.context_before}, {rule.context_after}?"
+                f"Do you have un-escaped regex characters in your input {inp}, "
+                f"contexts {rule.context_before}, {rule.context_after}?"
             ) from e
         return rule_regex
 

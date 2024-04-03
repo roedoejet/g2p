@@ -190,8 +190,8 @@ def create_mapping(
         )
     l1_is_xsampa, l2_is_xsampa = is_xsampa(map_1_name), is_xsampa(map_2_name)
     rules = align_inventories(
-        mapping_1.inventory(mapping_1_io),
-        mapping_2.inventory(mapping_2_io),
+        mapping_1.inventory(mapping_1_io, non_empty=True),
+        mapping_2.inventory(mapping_2_io, non_empty=True),
         l1_is_xsampa,
         l2_is_xsampa,
         distance=distance,
@@ -199,8 +199,8 @@ def create_mapping(
     )
 
     # Initialize mapping with input language parameters (as_is,
-    # case_sensitive, prevent_feeding, etc)
-    config = mapping_1.model_copy().model_dump()
+    # case_sensitive, prevent_feeding, etc) but *not* the same filename!
+    config = mapping_1.model_copy().model_dump(exclude={"rules_path"})
     config = {
         **config,
         "authors": [f"Generated {dt.datetime.now()}"],
