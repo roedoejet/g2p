@@ -531,10 +531,13 @@ def convert(  # noqa: C901
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
+    # Figure if the input text is on the command line or in a file
     input_text_is_a_file = os.path.exists(input_text) and input_text.endswith("txt")
     if input_text_is_a_file:
         with open(input_text, encoding="utf8") as f:
-            input_text = f.read()
+            lines = f.readlines()
+    else:
+        lines = [input_text]
     # Determine which tokenizer to use, if any
     if tok is not None and not tok and tok_lang is not None:
         raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
@@ -546,20 +549,21 @@ def convert(  # noqa: C901
     transducer = make_g2p(
         in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
     )
-    tg = transducer(input_text)
-    if check:
-        transducer.check(tg, display_warnings=True)
-    outputs = [tg.output_string]
-    if substring_alignments:
-        outputs += [tg.substring_alignments()]
-    if pretty_edges:
-        outputs += [tg.pretty_edges()]
-    if debugger:
-        outputs += [tg.edges, tg.debugger]
-    if len(outputs) > 1:
-        click.echo(pprint.pformat(outputs, indent=4))
-    else:
-        click.echo(tg.output_string, nl=not input_text_is_a_file)
+    for line in lines:
+        tg = transducer(line)
+        if check:
+            transducer.check(tg, display_warnings=True)
+        outputs = [tg.output_string]
+        if substring_alignments:
+            outputs += [tg.substring_alignments()]
+        if pretty_edges:
+            outputs += [tg.pretty_edges()]
+        if debugger:
+            outputs += [tg.edges, tg.debugger]
+        if len(outputs) > 1:
+            click.echo(pprint.pformat(outputs, indent=4))
+        else:
+            click.echo(tg.output_string, nl=not input_text_is_a_file)
 
 
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
