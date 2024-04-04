@@ -20,7 +20,7 @@ class TestAPIV2(unittest.TestCase):
         self.assertTrue("Finnish" in names)
 
     def test_langs_allcodes(self):
-        response = API_CLIENT.get("/langs?allnodes=true")
+        response = API_CLIENT.get("/nodes")
         self.assertEqual(response.status_code, 200)
         codes = {x["code"] for x in response.json()}
         self.assertTrue("eng-arpabet" in codes)
@@ -393,7 +393,7 @@ class TestAPIV2(unittest.TestCase):
             },
         )
         self.assertEqual(response.status_code, 422)
-        self.assertIn("not a valid enumeration", response.json()["detail"][0]["msg"])
+        self.assertIn("Input should be", response.json()["detail"][0]["msg"])
 
     def test_path(self):
         response = API_CLIENT.get("/path/fin/eng-arpabet")
