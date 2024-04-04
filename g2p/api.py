@@ -4,10 +4,13 @@ from enum import Enum
 from typing import List
 
 from fastapi import FastAPI, HTTPException, Path, Query
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, PlainTextResponse
 from networkx.algorithms.dag import ancestors, descendants  # type: ignore
 
 from g2p import make_g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.log import LOGGER
 from g2p.mappings.langs import LANGS_NETWORK
 
 # Create the v1 version of the API
@@ -37,6 +40,22 @@ api = FastAPI(
 # Get the langs
 LANGS = sorted(LANGS_NETWORK.nodes)
 Lang = Enum("Lang", [(name, name) for name in LANGS])  # type: ignore
+
+
+# Be compatible with previous API which returned 404 on an unknown node
+@api.exception_handler(RequestValidationError)
+async def validation_exception_handler(request, exc: RequestValidationError):
+    error = exc.errors()[0]
+    LOGGER.error("%s", error.get("msg", "Unknown Error"))
+    if error.get("type") == "enum":
+        return PlainTextResponse(
+            "Unknown input or output language code", status_code=404
+        )
+    else:
+        return JSONResponse(
+            status_code=422,
+            content={"detail": exc.errors(), "body": exc.body},
+        )
 
 
 @api.get(
@@ -80,16 +99,17 @@ def g2p(
     out_lang: Lang = Query(alias="out-lang", description="output lang of string"),
     text: str = Query(description="string to convert"),
     index: bool = Query(False, description="return indices"),
-    debug: bool = Query(False, description="return debugging information"),
+    debugger: bool = Query(False, description="return debugging information"),
+    tokenize: bool = Query(False, description="tokenize before transducing"),
 ) -> dict:
     """Get the converted version of a string, given an input and output lang"""
     try:
-        transducer = make_g2p(in_lang.name, out_lang.name)
+        transducer = make_g2p(in_lang.name, out_lang.name, tokenize=tokenize)
         tg = transducer(text)
         return {
             "input-text": tg.input_string,
             "output-text": tg.output_string,
-            "debugger": tg.debugger if debug else debug,
+            "debugger": tg.debugger if debugger else debugger,
             "index": tg.edges if index else index,
         }
     except NoPath:

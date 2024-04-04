@@ -642,7 +642,7 @@ $(document).ready(function() {
                 changeTable()
             },
             error: function(xhr, ajaxOptions, thrownError) {
-                if (xhr.status == 404 || xhr.status == 422) {
+                if (xhr.status == 404) {
                     $('#input-langselect option[value=custom]').attr('selected', 'selected');
                     $("#output-langselect").empty();
                     $("#output-langselect").append("<option value='custom' selected>Custom</option>");
