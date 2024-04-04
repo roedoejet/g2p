@@ -30,7 +30,7 @@ import os
 from enum import Enum
 from typing import Dict, List, Tuple, Union
 
-from fastapi import Body, FastAPI, HTTPException, Path, Query
+from fastapi import Body, FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from networkx import shortest_path  # type: ignore
 from networkx.algorithms.dag import ancestors, descendants  # type: ignore
@@ -38,6 +38,7 @@ from networkx.exception import NetworkXNoPath  # type: ignore
 from pydantic import BaseModel, Field
 
 import g2p
+import g2p.mappings as g2p_mappings
 import g2p.mappings.langs as g2p_langs
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.log import LOGGER
@@ -95,49 +96,51 @@ class SupportedLanguage(BaseModel):
     )
 
 
+MAPPING_NAMES: Dict[str, Union[str, None]] = {}
+for mapping in g2p_mappings.MAPPINGS_AVAILABLE:
+    MAPPING_NAMES[mapping.in_lang] = mapping.language_name
+LANGS = []
+for code, config in g2p_mappings.LANGS.items():
+    if code not in ("generated", "font-encodings"):
+        language_name = config.mappings[0].language_name
+        if MAPPING_NAMES.get(code) is None:
+            MAPPING_NAMES[code] = language_name
+        LANGS.append(SupportedLanguage(code=code, name=language_name))
+LANGS.sort(key=lambda x: str(x.name).lower())
+CODES = []
+for code in g2p_langs.LANGS_NETWORK.nodes:
+    CODES.append(SupportedLanguage(code=code, name=MAPPING_NAMES.get(code, None)))
+CODES.sort(key=lambda x: x.code)
+
+
 @api.get(
     "/langs",
+    response_description="Supported languages for conversion",
+)
+def get_supported_input_languages() -> List[SupportedLanguage]:
+    """Return a list of language codes (possible inputs for /convert) and their names."""
+    return LANGS
+
+
+@api.get(
+    "/nodes",
     response_description="Supported writing or phonetic systems for conversion",
 )
-def langs(
-    allnodes: bool = Query(
-        False,
-        description="Return all nodes in the conversion network rather than just top-level languages.",
-    )
-) -> List[SupportedLanguage]:
-    """Return a list of language codes and their names.  If `allnodes` is
-    given, return all nodes in the conversion network (which may or
-    may not correspond to languages).
+def get_all_writing_or_phonetic_systems() -> List[SupportedLanguage]:
+    """Return a list of all possible inputs for /convert and
+    associated language names, if any.
     """
-    # FIXME: Need to update this for the new way that mappings/langs are organized
-    return []
-
-
-"""
-    if allnodes:
-        return [
-            SupportedLanguage(
-                code=code, name=g2p_langs.LANGS.get(code, {}).get("language_name", None)
-            )
-            for code in sorted(g2p_langs.LANGS_NETWORK.nodes)
-        ]
-    else:
-        return [
-            SupportedLanguage(code=code, name=g2p_langs.LANGS[code]["language_name"])
-            for code in sorted(g2p_langs.LANGS.keys())
-            if "language_name" in g2p_langs.LANGS[code] and code != "generated"
-        ]
-"""
+    return CODES
 
 
 class ConvertRequest(BaseModel):
     """Request conversion from one writing or phonetic system to another."""
 
     in_lang: LanguageNode = Field(
-        description="Name of input language", examples=["eng-ipa"]
+        description="Name of input node", examples=["eng-ipa"]
     )
     out_lang: LanguageNode = Field(
-        description="Name of output language", examples=["eng-arpabet"]
+        description="Name of output node", examples=["eng-arpabet"]
     )
     text: str = Field(description="Text to convert", examples=["hɛloʊ"])
     tokenize: Union[bool, None] = Field(
@@ -240,7 +243,7 @@ class Segment(BaseModel):
 
 
 @api.post("/convert")
-def convert(  # noqa: C901
+def convert_one_writing_or_phonetic_system_to_another(  # noqa: C901
     request: ConvertRequest = Body(
         openapi_examples={
             "eng-ipa to eng-arpabet": {
@@ -377,7 +380,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     "/outputs_for/{lang}",
     response_description="List of language codes into which {lang} can be converted",
 )
-def outputs_for(
+def get_possible_output_conversions_for_a_writing_system(
     lang: LanguageNode = Path(description="Input language name"),
 ) -> List[str]:
     """Get the possible output languages for a given input language. These
@@ -391,7 +394,7 @@ def outputs_for(
     "/inputs_for/{lang}",
     response_description="List of language codes which can be converted into {lang}",
 )
-def inputs_for(
+def get_writing_systems_that_can_be_converted_to_an_output(
     lang: LanguageNode = Path(description="Output language name"),
 ) -> List[str]:
     """Get the possible input languages for a given output language. These
@@ -405,7 +408,7 @@ def inputs_for(
     "/path/{in_lang}/{out_lang}",
     response_description="Path from {in_lang} to {out_lang}",
 )
-def path(
+def get_path_from_one_language_to_another(
     in_lang: LanguageNode = Path(description="Input language name"),
     out_lang: LanguageNode = Path(description="Output language name"),
 ) -> List[str]:
