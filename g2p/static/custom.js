@@ -1,5 +1,3 @@
-localStorage.debug = '*';
-
 var TABLES = []
 var ABBS = []
 
@@ -428,10 +426,10 @@ var setKwargs = function(index, kwargs) {
     convert()
 }
 
-var socket = ({path: "/ws/socket.io"});
-var conversionSocket = io('/convert', {path: "/ws/socket.io"});
-var connectionSocket = io('/connect', {path: "/ws/socket.io"});
-var tableSocket = io('/table', {path: "/ws/socket.io"});
+var magicalMysteryOptions = { path: '/ws/socket.io', transports: ['websocket', 'polling', 'flashsocket']};
+var conversionSocket = io('/convert', magicalMysteryOptions)
+var connectionSocket = io('/connect', magicalMysteryOptions)
+var tableSocket = io('/table', magicalMysteryOptions)
 
 var trackIndex = function() {
     return $('#animated-radio').is(":checked")
@@ -644,7 +642,7 @@ $(document).ready(function() {
                 changeTable()
             },
             error: function(xhr, ajaxOptions, thrownError) {
-                if (xhr.status == 404) {
+                if (xhr.status == 404 || xhr.status == 422) {
                     $('#input-langselect option[value=custom]').attr('selected', 'selected');
                     $("#output-langselect").empty();
                     $("#output-langselect").append("<option value='custom' selected>Custom</option>");
