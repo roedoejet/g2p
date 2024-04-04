@@ -3,22 +3,18 @@
 from enum import Enum
 from typing import List
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Path, Query
 from networkx.algorithms.dag import ancestors, descendants  # type: ignore
-from networkx.exception import NetworkXError  # type: ignore
 
 from g2p import make_g2p
 from g2p.exceptions import InvalidLanguageCode, NoPath
-from g2p.log import LOGGER
-from g2p.mappings import MAPPINGS_AVAILABLE
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.static import __file__ as static_file
 
 # Create the v1 version of the API
 api = FastAPI(
     title="Simple G2P API",
     description="A simple API for the G2P module",
-    version="1.1.0",
+    version="1.1.1",
     contact={"email": "hello@aidanpine.ca"},
     license_info={
         "name": "MIT",
@@ -50,7 +46,9 @@ Lang = Enum("Lang", [(name, name) for name in LANGS])  # type: ignore
     operation_id="getAncestors",
     response_description="The valid ancestors of a node",
 )
-def get_all_ancestors_of_node(node: Lang = Query(description="language node name")) -> List[str]:
+def get_all_ancestors_of_node(
+    node: Lang = Path(description="language node name"),
+) -> List[str]:
     """Get the valid ancestors in the network's path to a given node. These
     are all the mappings that you can convert from in order to get the
     given node."""
@@ -65,7 +63,7 @@ def get_all_ancestors_of_node(node: Lang = Query(description="language node name
     response_description="The valid descendants of a node",
 )
 def get_all_descendants_of_node(
-    node: Lang = Query(description="language node name"),
+    node: Lang = Path(description="language node name"),
 ) -> List[str]:
     return sorted(descendants(LANGS_NETWORK, node.name))
 
