@@ -9,7 +9,7 @@ Before running this test suite, launch the g2p-studio server:
 minimal dev mode:
     python run_studio.py
 or robust server mode (*nix only, gunicorn does not work on Windows):
-    gunicorn --worker-class eventlet  -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
+    gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000 --daemon
 """
 
 import sys

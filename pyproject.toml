@@ -137,13 +137,13 @@ lock-filename = "requirements.txt"
 pip-compile-verbose = false
 
 [tool.hatch.envs.prod.scripts]
-serve = "gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile"
+serve = "gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:5000"
 
 [tool.hatch.envs.test]
 features = [ "test" ]
 
 [[tool.hatch.envs.test.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 [tool.hatch.envs.test.scripts]
 serve-cov = "coverage run run_studio.py"
