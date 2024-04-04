@@ -33,9 +33,28 @@ class MappingCreationTest(TestCase):
             {"in": "ɡ", "out": "G"},
             {"in": "ʒ", "out": "ZH"},
         ]
+        self.mappings_xsampa = [
+            {"in": "A", "out": "AA"},
+            {"in": "e:", "out": "EY"},
+            {"in": "i", "out": "IY"},
+            {"in": "u", "out": "UW"},
+            {"in": "tS", "out": "CH"},
+            {"in": "p", "out": "P"},
+            {"in": "t", "out": "T"},
+            {"in": "k", "out": "K"},
+            {"in": "w", "out": "W"},
+            {"in": "g", "out": "G"},
+            {"in": "Z", "out": "ZH"},
+        ]
         self.target_mapping = Mapping(
             rules=self.mappings,
             in_lang="eng-ipa",
+            out_lang="eng-arpabet",
+            out_delimiter=" ",
+        )
+        self.target_mapping_xsampa = Mapping(
+            rules=self.mappings_xsampa,
+            in_lang="eng-xsampa",
             out_lang="eng-arpabet",
             out_delimiter=" ",
         )
@@ -78,6 +97,19 @@ class MappingCreationTest(TestCase):
         self.assertEqual(transducer("t͡ʃi").output_string, "tʃi")
         self.assertEqual(transducer("t͡ʃu").output_string, "tʃu")
         self.assertEqual(transducer("t͡ʃa").output_string, "tʃɑ")
+
+    def test_trigram_mappings_xsampa(self):
+        src_mappings = [
+            {"in": "ᒋ", "out": "tSi"},
+            {"in": "ᒍ", "out": "tSu"},
+            {"in": "ᒐ", "out": "tSa"},
+        ]
+        src_mapping = Mapping(rules=src_mappings, in_lang="crj", out_lang="crj-xsampa")
+        mapping = create_mapping(src_mapping, self.target_mapping_xsampa, quiet=True)
+        transducer = Transducer(mapping)
+        self.assertEqual(transducer("tSi").output_string, "tSi")
+        self.assertEqual(transducer("tSu").output_string, "tSu")
+        self.assertEqual(transducer("tSa").output_string, "tSA")
 
     def test_long_mappings(self):
         src_mappings = [

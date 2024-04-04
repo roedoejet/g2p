@@ -65,8 +65,8 @@ def make_g2p(  # noqa: C901
         NoPath: if there is path between in_lang and out_lang
     """
     # Defer expensive imports
-    from networkx import shortest_path
-    from networkx.exception import NetworkXNoPath
+    from networkx import shortest_path  # type: ignore
+    from networkx.exception import NetworkXNoPath  # type: ignore
 
     from g2p.log import LOGGER
     from g2p.mappings import Mapping

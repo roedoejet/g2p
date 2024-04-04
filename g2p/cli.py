@@ -493,7 +493,7 @@ def convert(  # noqa: C901
     fra->fra-ipa, fra-ipa->eng-ipa and eng-ipa->eng-arpabet.
     """
     # Defer expensive imports
-    from networkx import has_path
+    from networkx import has_path  # type: ignore
 
     from g2p.log import LOGGER
     from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig

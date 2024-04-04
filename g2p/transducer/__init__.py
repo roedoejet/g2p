@@ -9,7 +9,7 @@ import unicodedata
 from collections import OrderedDict, defaultdict
 from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
-import text_unidecode
+import text_unidecode  # type: ignore
 
 from g2p.log import LOGGER
 from g2p.mappings import MAPPING_TYPE, Mapping

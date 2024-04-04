@@ -8,8 +8,8 @@ from typing import List, Union
 
 from flask import Flask, render_template
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from networkx import shortest_path
+from flask_socketio import SocketIO, emit  # type: ignore
+from networkx import shortest_path  # type: ignore
 
 from g2p import make_g2p
 from g2p.api import g2p_api

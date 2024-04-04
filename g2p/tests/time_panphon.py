@@ -15,8 +15,8 @@ was incurred.
 
 """
 
-import panphon.distance
-from linetimer import CodeTimer
+import panphon.distance  # type: ignore
+from linetimer import CodeTimer  # type: ignore
 
 from g2p.mappings import Mapping
 from g2p.mappings.langs.utils import is_panphon
