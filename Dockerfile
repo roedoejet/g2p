@@ -35,4 +35,4 @@ COPY Dockerfile /g2p
 RUN pip3 install -e /g2p
 
 # Comment this out if you just want to install g2p in the container without running the studio.
-CMD gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --no-sendfile --bind 0.0.0.0:8000
+CMD gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --bind 0.0.0.0:8000
