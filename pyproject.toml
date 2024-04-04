@@ -34,9 +34,11 @@ dependencies = [
 api = [
     # See https://github.com/encode/starlette/discussions/2413
     "fastapi>=0.109.0",
-    # This maybe will get fixed at some point?
+    # This maybe will get fixed at some point?  See
+    # https://github.com/pyropy/fastapi-socketio/issues/52
     "fastapi_socketio<=0.0.10",
     "uvicorn",
+    "jinja2",
 ]
 test = [
   "g2p[api]",
