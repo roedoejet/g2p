@@ -19,3 +19,10 @@ cd g2p
 
 pip install -e .
 ```
+
+To install in an isolated environment (recommended for development)
+you may use [hatch](https://hatch.pypa.io/latest/):
+
+```
+hatch shell
+```

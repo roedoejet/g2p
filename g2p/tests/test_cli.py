@@ -10,10 +10,10 @@ from unittest import TestCase, main
 
 import jsonschema
 import yaml
+from click.testing import CliRunner
 from tqdm import tqdm
 
 from g2p._version import VERSION
-from g2p.app import APP
 from g2p.cli import (
     convert,
     doctor,
@@ -39,7 +39,7 @@ class CliTest(TestCase):
     """Test suite for the g2p Command Line Interface"""
 
     def setUp(self):
-        self.runner = APP.test_cli_runner()
+        self.runner = CliRunner()
 
     def test_update(self):
         result = self.runner.invoke(update)
@@ -96,6 +96,19 @@ class CliTest(TestCase):
             bad_langs_dir = os.path.join(DATA_DIR, "..", "mappings", "bad_langs2")
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
+
+    def test_schema_ci_version(self):
+        """Make sure that the version (possibly a fake version - see
+        .github/workflows/tests.yml) matches the one in the schema."""
+        MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
+        self.assertTrue(
+            (
+                Path(__file__).parent.parent
+                / "mappings"
+                / ".schema"
+                / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
+            ).exists()
+        )
 
     def test_update_schema(self):
         result = self.runner.invoke(update_schema)
