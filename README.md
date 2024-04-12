@@ -57,7 +57,8 @@ $ hatch shell
 
 You can also simply install an "editable" version with `pip` (but it
 is recommended to do this in a [virtual
-environment](https://docs.python.org/3/library/venv.html)):
+environment](https://docs.python.org/3/library/venv.html) or a [conda
+environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)):
 
 ```sh
 $ git clone https://github.com/roedoejet/g2p.git
