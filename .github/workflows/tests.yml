@@ -6,8 +6,8 @@ on:
 
 # Since we don't checkout the full history, set a default version so
 # certain tests (pep440, update_schema) will still function.  NOTE:
-# This **must** match the version of the JSON schema file in
-# g2p/mappings/.schema!!!
+# This **must** match the Major.Minor version of the JSON schema file
+# in g2p/mappings/.schema!!!
 env:
   SETUPTOOLS_SCM_PRETEND_VERSION: "2.0"
 

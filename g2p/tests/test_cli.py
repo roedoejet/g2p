@@ -97,6 +97,19 @@ class CliTest(TestCase):
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
 
+    def test_schema_ci_version(self):
+        """Make sure that the version (possibly a fake version - see
+        .github/workflows/tests.yml) matches the one in the schema."""
+        MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
+        self.assertTrue(
+            (
+                Path(__file__).parent.parent
+                / "mappings"
+                / ".schema"
+                / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
+            ).exists()
+        )
+
     def test_update_schema(self):
         result = self.runner.invoke(update_schema)
         self.assertNotEqual(result.exit_code, 0)
