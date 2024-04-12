@@ -44,9 +44,10 @@ The initial version of this package was developed by [Patrick Littell](https://g
 The best thing to do is install with pip `pip install g2p`.
 This command will install the latest release published on [PyPI g2p releases](https://pypi.org/project/g2p/).
 
-You can also use [hatch](https://hatch.pypa.io/latest/) to set up an
-isolated local development environment, which may be useful if you
-wish to contribute new mappings:
+You can also use [hatch](https://hatch.pypa.io/latest/) (see [hatch
+installation instructions](https://hatch.pypa.io/latest/install/)) to
+set up an isolated local development environment, which may be useful
+if you wish to contribute new mappings:
 
 ```sh
 $ git clone https://github.com/roedoejet/g2p.git
