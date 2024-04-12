@@ -32,7 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 api = [
-    "eventlet>=0.33.0,!=0.36.0",
+    "eventlet>=0.36.1",
     "flask-cors>=3.0.9",
     "flask-restful>=0.3.9",
     "flask-talisman>=0.7.0",
