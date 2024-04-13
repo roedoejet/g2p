@@ -80,7 +80,6 @@ INTEGRATION_TESTS = [
         CliTest,
         DoctorTest,
         ExpensiveDoctorTest,
-        TestAPIV2,
     ]
     + API_TEST_CLASSES
 ]

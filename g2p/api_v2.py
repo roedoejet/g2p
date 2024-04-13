@@ -2,7 +2,7 @@
 
 You can run the API app for development purposes on any platform with:
     pip install uvicorn fastapi
-    DEVELOPMENT=1 uvicorn g2p.api_v2:app --reload --port 5000
+    DEVELOPMENT=1 uvicorn g2p.api_v2:api --reload --port 5000
 - The --reload switch will watch for changes under the directory where it's
   running and reload the code whenever it changes.
 - DEVELOPMENT=1 tells the API to accept cross-origin requests (i.e. by sending the
@@ -19,10 +19,10 @@ hosting environment.
 
 You can also spin up the API server grade (on Linux, not Windows) with gunicorn:
     pip install -r requirements.api.txt
-    gunicorn -b 127.0.0.1:5000 -w 4 -k uvicorn.workers.UvicornWorker g2p.api_v2:app
+    gunicorn -b 127.0.0.1:5000 -w 4 -k uvicorn.workers.UvicornWorker g2p.api_v2:api
 
 Once spun up, the API will be visible at
-http://localhost:5000/api/v2/docs
+http://localhost:5000/docs
 
 """
 
@@ -55,29 +55,27 @@ api = FastAPI(
         "url": "https://github.com/roedoejet/g2p/blob/main/LICENSE",
     },
 )
-
-# Create an "app" that mounts it in the appropriate place
-app = FastAPI()
-app.mount("/api/v2", api)
-middleware_args: Dict[str, Union[str, List[str]]]
+# Allow for development/non-g2p-studio deployments
+middleware_args: Dict[str, Union[str, List[str]]] = {}
 if os.getenv("DEVELOPMENT", False):  # pragma: no cover
     LOGGER.info(
         "Running in development mode, will allow requests from http://localhost:*"
     )
     # Allow requests from localhost dev servers
-    middleware_args = dict(
-        allow_origin_regex="http://localhost(:.*)?",
-    )
+    middleware_args["allow_origin_regex"] = "http://localhost(:.*)?"
 else:
-    # Allow requests *only* from mt app (or otherwise configured site name)
-    middleware_args = dict(
-        allow_origins=[
-            os.getenv("ORIGIN", "https://readalong-studio.mothertongues.org"),
-        ],
+    # Allow requests from a configured site name
+    origin = os.getenv("ORIGIN")
+    if origin is not None:
+        middleware_args["allow_origins"] = origin.split()
+        LOGGER.info("Allowing requests from the following sites:")
+        for site in middleware_args["allow_origins"]:
+            LOGGER.info("   %s", site)
+# If DEVELOPMENT or ORIGIN are not specified then same-origin only
+if middleware_args:
+    api.add_middleware(
+        CORSMiddleware, allow_methods=["GET", "POST", "OPTIONS"], **middleware_args
     )
-app.add_middleware(
-    CORSMiddleware, allow_methods=["GET", "POST", "OPTIONS"], **middleware_args
-)
 
 # All possible language codes
 LanguageNode = Enum("LanguageNode", [(name, name) for name in g2p_langs.LANGS_NETWORK.nodes])  # type: ignore

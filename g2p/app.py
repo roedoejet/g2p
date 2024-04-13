@@ -28,6 +28,7 @@ from starlette.templating import Jinja2Templates
 
 from g2p import make_g2p
 from g2p.api import api as api_v1
+from g2p.api_v2 import api as api_v2
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, Rule
 from g2p.mappings.langs import LANGS_NETWORK
@@ -72,6 +73,7 @@ APP = Starlette(
         Route("/", home),
         Mount("/ws", SIO_APP),
         Mount("/api/v1", api_v1),
+        Mount("/api/v2", api_v2),
         Route("/static/swagger.json", redirect_to_openapi),
         Mount("/static", StaticFiles(directory="g2p/static"), name="static"),
         Route("/docs", redirect_to_docs),
