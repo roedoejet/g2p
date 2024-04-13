@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Heroku has no understanding of dynamic versioning so we have to hack this to make things work
+export SETUPTOOLS_SCM_PRETEND_VERSION=2.0
+# Also it expects to run your app in place, but doesn't actually do this for you because it's old
+pip install -e .
