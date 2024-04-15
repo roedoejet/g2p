@@ -25,19 +25,25 @@ Basic Usage:
     LANGS, LANG_NAMES = get_arpabet_langs()
 """
 
+import sys
 from typing import Dict, Optional, Tuple, Union
 
-import g2p.deprecation
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.types import BaseTokenizer, BaseTransducer
 
-_g2p_cache: Dict[Tuple[str, str, Optional[str], bool, int], BaseTransducer] = {}
+if sys.version_info < (3, 7):  # pragma: no cover
+    sys.exit(
+        "Python 3.7 or more recent is required by g2p.\n"
+        f"You are using Python {sys.version}.\n"
+        "Please use a newer version of Python."
+    )
+
+_g2p_cache: Dict[Tuple[str, str, bool, int], BaseTransducer] = {}
 
 
 def make_g2p(  # noqa: C901
     in_lang: str,
     out_lang: str,
-    tok_lang: Optional[str] = None,  # DEPRECATED
     *,
     tokenize: bool = True,
     custom_tokenizer: Optional[BaseTokenizer] = None,
@@ -52,7 +58,6 @@ def make_g2p(  # noqa: C901
     Args:
         in_lang (str): input language code
         out_lang (str): output language code
-        tok_lang (Optional[str]): DEPRECATED language for tokenization
         tokenize (bool): whether tokenization should happen (default: True)
         custom_tokenizer (Tokenizer): the tokenizer to use (default: a tokenizer
                                       built on the path from in_lang and out_lang)
@@ -71,13 +76,10 @@ def make_g2p(  # noqa: C901
     from g2p.log import LOGGER
     from g2p.mappings import Mapping
     from g2p.mappings.langs import LANGS_NETWORK
-    from g2p.mappings.tokenizer import make_tokenizer
     from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
-    if (in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
-        return _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))]
-
-    g2p.deprecation.handle_tok_lang_deprecation(tok_lang)
+    if (in_lang, out_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
+        return _g2p_cache[(in_lang, out_lang, tokenize, id(custom_tokenizer))]
 
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
@@ -125,16 +127,11 @@ def make_g2p(  # noqa: C901
     # If tokenization was requested, return a TokenizingTransducer
     if custom_tokenizer:
         transducer = TokenizingTransducer(transducer, custom_tokenizer)
-    elif tokenize or tok_lang:
-        if (tok_lang == "path") or (tokenize and not tok_lang):
-            tokenizer = make_tokenizer(in_lang=in_lang, tok_path=path)
-        else:
-            tokenizer = make_tokenizer(in_lang=tok_lang)
+    elif tokenize:
+        tokenizer = make_tokenizer(in_lang=in_lang, tok_path=path)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
-    _g2p_cache[(in_lang, out_lang, tok_lang, tokenize, id(custom_tokenizer))] = (
-        transducer
-    )
+    _g2p_cache[(in_lang, out_lang, tokenize, id(custom_tokenizer))] = transducer
     return transducer
 
 
