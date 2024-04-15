@@ -15,7 +15,6 @@ from unittest import TestLoader, TestSuite, TextTestRunner
 
 # Unit tests
 from g2p.log import LOGGER
-from g2p.tests.test_api_resources import ResourceIntegrationTest
 from g2p.tests.test_check_ipa_arpabet import CheckIpaArpabetTest
 from g2p.tests.test_cli import CliTest
 from g2p.tests.test_create_mapping import MappingCreationTest
@@ -33,6 +32,13 @@ from g2p.tests.test_transducer import TransducerTest
 from g2p.tests.test_unidecode_transducer import UnidecodeTransducerTest
 from g2p.tests.test_utils import UtilsTest
 from g2p.tests.test_z_local_config import LocalConfigTest
+
+if sys.version_info >= (3, 8, 0):
+    from g2p.tests.test_api_resources import ResourceIntegrationTest
+
+    API_TEST_CLASSES = [ResourceIntegrationTest]
+else:
+    API_TEST_CLASSES = []
 
 LOADER = TestLoader()
 
@@ -71,10 +77,10 @@ INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
         CliTest,
-        ResourceIntegrationTest,
         DoctorTest,
         ExpensiveDoctorTest,
     ]
+    + API_TEST_CLASSES
 ]
 
 # LocalConfigTest has to get run last, to avoid interactions with other test

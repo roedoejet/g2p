@@ -40,11 +40,10 @@ api = [
     "jinja2",
 ]
 test = [
-  "g2p[api]",
+  "g2p[api]; python_version >= '3.8'",
   "coverage[toml]>=6.5",
   "playwright>=1.26.1",
   "jsonschema>=4.17.3",
-  "pep440>=0.1.2",
   "httpx",
   # Kind of bogus that we need both httpx and aiohttp, but socketio
   # wants this
