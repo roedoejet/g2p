@@ -21,7 +21,7 @@ import socketio  # type: ignore
 from networkx import shortest_path  # type: ignore
 from starlette.applications import Starlette
 from starlette.requests import Request
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -56,13 +56,25 @@ async def home(request: Request) -> HTMLResponse:
     return TEMPLATES.TemplateResponse(request, "index.html")
 
 
+async def redirect_to_docs(request: Request) -> RedirectResponse:
+    """Redirect to v1 API docs for backward compatibility"""
+    return RedirectResponse(url="/api/v1/docs/")
+
+
+async def redirect_to_openapi(request: Request) -> RedirectResponse:
+    """Redirect to v1 API JSON for backward compatibility"""
+    return RedirectResponse(url="/api/v1/openapi.json")
+
+
 APP = Starlette(
     debug=True,
     routes=[
         Route("/", home),
         Mount("/ws", SIO_APP),
         Mount("/api/v1", api_v1),
+        Route("/static/swagger.json", redirect_to_openapi),
         Mount("/static", StaticFiles(directory="g2p/static"), name="static"),
+        Route("/docs", redirect_to_docs),
     ],
 )
 
