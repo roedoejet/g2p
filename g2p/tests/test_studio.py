@@ -55,6 +55,8 @@ class StudioTest(IsolatedAsyncioTestCase):
             page = await browser.new_page()
             await page.goto(f"http://127.0.0.1:{self.port}/docs")
             await page.wait_for_timeout(self.timeout_delay)
+            await page.goto(f"http://127.0.0.1:{self.port}/static/swagger.json")
+            await page.wait_for_timeout(self.timeout_delay)
             await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
             input_el = page.locator("#input")

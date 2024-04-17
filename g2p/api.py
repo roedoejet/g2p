@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from networkx.algorithms.dag import ancestors, descendants  # type: ignore
 
 from g2p import make_g2p
-from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.exceptions import NoPath
 from g2p.log import LOGGER
 from g2p.mappings.langs import LANGS_NETWORK
 
@@ -115,11 +115,6 @@ def g2p(
     except NoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
-        )
-    except InvalidLanguageCode:
-        # Actually should never happen!
-        raise HTTPException(
-            status_code=404, detail="Unknown input or output language code"
         )
 
 
