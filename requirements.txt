@@ -13,10 +13,10 @@
 # - tqdm
 # - fastapi>=0.109.0
 # - jinja2
-# - python-socketio>=5
+# - python-socketio>=5.9.0
 # - starlette>=0.35.1
 # - uvicorn
-# - gunicorn>=21.2.0
+# - gunicorn>=22.0.0
 #
 
 annotated-types==0.6.0
@@ -39,7 +39,7 @@ exceptiongroup==1.2.0
     # via anyio
 fastapi==0.110.1
     # via hatch.envs.prod
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via hatch.envs.prod
 h11==0.14.0
     # via
