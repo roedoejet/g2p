@@ -100,22 +100,14 @@ been using them and should not be construed as public API documentation.
 
 ## Some CLI commands no longer exist
 
-Several commands for the `g2p` command-line have been removed as they
-were duplicates of other functionality:
+Several commands for the `g2p` command-line have been removed:
 
 - run
 - routes
 - shell
 
-To run the `g2p` API server, you can use:
-
-    flask --app g2p.app run
-
-Likewise, for `routes` and `shell`, you can use:
-
-    flask --app g2p.app routes
-    flask --app g2p.app shell
-
-To run G2P Studio, use:
+To run the `g2p` API server and G2P Studio, you can use:
 
     python run_studio.py
+
+It does not seem that any equivalents of `routes` or `shell` exist.

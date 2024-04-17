@@ -4,6 +4,7 @@
 """
 
 import logging
+import os
 
 import coloredlogs  # type: ignore
 
@@ -17,7 +18,7 @@ def setup_logger(name):
 
     logger = logging.getLogger(name)
     coloredlogs.install(
-        level="INFO",
+        level=os.environ.get("G2P_LOGLEVEL", "INFO").upper(),
         fmt="%(levelname)s - %(message)s",
         logger=logger,
         field_styles=FIELD_STYLES,

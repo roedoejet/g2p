@@ -25,30 +25,26 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e .[test]
-          pip install gunicorn
           pip install pip-licenses
           if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
           pip install coverage
       - name: Ensure browser is installed
         run: python -m playwright install --with-deps chromium
       - name: Launch the API
-        run: |
-          coverage run --parallel-mode \
-              -m gunicorn --worker-class eventlet -w 1 g2p.app:APP --no-sendfile --bind 127.0.0.1:5000 --daemon
+        run: coverage run run_studio.py &
       - name: Run dev suite
-        run: coverage run --parallel-mode run_tests.py dev
+        run: coverage run run_tests.py dev
       - name: Run test-studio
-        run: |
-          coverage run --parallel-mode g2p/tests/test_studio.py
+        run: coverage run g2p/tests/test_studio.py
       - name: Run generate-mapping
         shell: bash
         run: |
-          coverage run --parallel-mode $(which g2p) generate-mapping --from crg --to eng
+          coverage run $(which g2p) generate-mapping --from crg --to eng
           git status --porcelain=v1 | grep 'M g2p/mappings/langs/generated/config-g2p.yaml' || { echo 'g2p generate-mapping did not update generated/config-g2p.yaml as expected'; false; }
       - name: Post test analyses
         run: |
-          pkill coverage
-          sleep 5
+          pkill -INT coverage
+          sleep 10
           coverage combine
           coverage report
           coverage xml
@@ -92,6 +88,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
+          # Note: this is where we also test that the g2p library still works on 3.7
           python-version: "3.7"
       - name: Install dependencies
         run: |

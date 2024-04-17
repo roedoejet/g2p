@@ -648,7 +648,6 @@ def doctor(mapping, list_all, list_ipa):
 def update(in_dir, out_dir):
     """Update cached language files."""
     # Defer expensive imports
-    from g2p.api import update_docs
     from g2p.mappings.langs import reload_db
     from g2p.mappings.langs.utils import cache_langs, network_to_echart
 
@@ -665,7 +664,6 @@ def update(in_dir, out_dir):
     if in_dir == LANGS_DIR and out_dir is None:
         # We only update the documentation when updating using the default directories
         reload_db()
-        update_docs()  # updates g2p/static/swagger.json
         network_to_echart(
             outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
         )  # updates g2p/status/languages-network.json

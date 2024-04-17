@@ -1,20 +1,35 @@
 """
+The g2p Studio web app.
 
-Views and config to the g2p Studio web app
+You can run the app (and API) for development purposes on any platform with:
+    pip install uvicorn
+    uvicorn g2p.app:APP --reload --port 5000
+- The --reload switch will watch for changes under the directory where it's
+  running and reload the code whenever it changes.
+
+You can also spin up the app server grade (on Linux, not Windows) with gunicorn:
+    gunicorn -w 4 -k uvicorn.workers.UvicornWorker g2p.app:APP --port 5000
+
+Once spun up, the application will be visible at
+http://localhost:5000/ and the API at http://localhost:5000/api/v1/docs
 
 """
 
 from typing import List, Union
 
-from flask import Flask, render_template
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit  # type: ignore
+import socketio  # type: ignore
 from networkx import shortest_path  # type: ignore
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 from g2p import make_g2p
-from g2p.api import g2p_api
+from g2p.api import api as api_v1
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, Rule
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import (
     _MappingModelDefinition,
@@ -28,11 +43,40 @@ from g2p.transducer import (
     TransductionGraph,
 )
 
-APP = Flask(__name__)
-APP.register_blueprint(g2p_api, url_prefix="/api/v1")
-CORS(APP)
-SOCKETIO = SocketIO(APP)
 DEFAULT_N = 10
+
+TEMPLATES = Jinja2Templates(directory="g2p/templates")
+# FIXME: CORS
+SIO = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
+SIO_APP = socketio.ASGIApp(socketio_server=SIO, socketio_path="/ws/socket.io")
+
+
+async def home(request: Request) -> HTMLResponse:
+    """Return homepage of g2p studio"""
+    return TEMPLATES.TemplateResponse(request, "index.html")
+
+
+async def redirect_to_docs(request: Request) -> RedirectResponse:
+    """Redirect to v1 API docs for backward compatibility"""
+    return RedirectResponse(url="/api/v1/docs/")
+
+
+async def redirect_to_openapi(request: Request) -> RedirectResponse:
+    """Redirect to v1 API JSON for backward compatibility"""
+    return RedirectResponse(url="/api/v1/openapi.json")
+
+
+APP = Starlette(
+    debug=True,
+    routes=[
+        Route("/", home),
+        Mount("/ws", SIO_APP),
+        Mount("/api/v1", api_v1),
+        Route("/static/swagger.json", redirect_to_openapi),
+        Mount("/static", StaticFiles(directory="g2p/static"), name="static"),
+        Route("/docs", redirect_to_docs),
+    ],
+)
 
 
 def shade_colour(colour, percent, r=0, g=0, b=0):
@@ -123,30 +167,20 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
     return nodes, edges
 
 
-@APP.route("/")
-def home():
-    """Return homepage of g2p studio"""
-    return render_template("index.html")
-
-
-@APP.route("/docs")
-def docs():
-    """Return swagger docs of g2p studio API"""
-    return render_template("docs.html")
-
-
-@SOCKETIO.on("conversion event", namespace="/convert")
-def convert(message):
+@SIO.on("conversion event", namespace="/convert")  # type: ignore
+async def convert(sid, message):
     """Convert input text and return output"""
     transducers = []
+    LOGGER.debug("/convert: %s", message)
     for mapping in message["data"]["mappings"]:
         mapping_args = {**mapping["kwargs"]}
         mapping_args["abbreviations"] = flatten_abbreviations_format(
             mapping["abbreviations"]
         )
         if mapping_args["type"] == "lexicon":
-            lexicon = Mapping.find_mapping(mapping_args["in_lang"],
-                                           mapping_args["out_lang"])
+            lexicon = Mapping.find_mapping(
+                mapping_args["in_lang"], mapping_args["out_lang"]
+            )
             mapping_args["alignments"] = lexicon.alignments
         else:
             mapping_args["rules"] = mapping["rules"]
@@ -162,30 +196,48 @@ def convert(message):
                 e,
             )
     if len(transducers) == 0:
-        emit("conversion response", {"output_string": message["data"]["input_string"]})
+        await SIO.emit(
+            "conversion response",
+            {"output_string": message["data"]["input_string"]},
+            sid,
+            namespace="/convert",
+        )
         return
     transducer = CompositeTransducer(transducers)
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
         data, links = return_echart_data(tg)
-        emit(
+        await SIO.emit(  # type: ignore
             "conversion response",
             {
                 "output_string": tg.output_string,
                 "index_data": data,
                 "index_links": links,
             },
+            sid,
+            namespace="/convert",
         )
     else:
         output_string = transducer(message["data"]["input_string"]).output_string
-        emit("conversion response", {"output_string": output_string})
+        await SIO.emit(  # type: ignore
+            "conversion response",
+            {"output_string": output_string},
+            sid,
+            namespace="/convert",
+        )
 
 
-@SOCKETIO.on("table event", namespace="/table")
-def change_table(message):
+@SIO.on("table event", namespace="/table")  # type: ignore
+async def change_table(sid, message):
     """Change the lookup table"""
+    LOGGER.debug("/table: %s", message)
     if "in_lang" not in message or "out_lang" not in message:
-        emit("table response", [])
+        await SIO.emit(
+            "table response",
+            [],
+            sid,
+            namespace="/table",
+        )
     elif message["in_lang"] == "custom" or message["out_lang"] == "custom":
         # These are only used to generate JSON to send to the client,
         # so it's safe to create a list of references to the same thing.
@@ -201,9 +253,13 @@ def change_table(message):
             out_lang="custom",
             type="mapping",
             norm_form="NFC",
+            # Put something here to silence a warning
+            rules=[Rule(rule_input="a", rule_output="a")],
         ).model_dump()
+        kwargs["rules"] = []
+        # Remove the bogus rule we used to silence the validator
         kwargs["include"] = False
-        emit(
+        await SIO.emit(
             "table response",
             [
                 {
@@ -212,6 +268,8 @@ def change_table(message):
                     "kwargs": kwargs,
                 }
             ],
+            sid,
+            namespace="/table",
         )
     else:
         path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
@@ -219,7 +277,7 @@ def change_table(message):
         for lang1, lang2 in zip(path[:-1], path[1:]):
             transducer = make_g2p(lang1, lang2, tokenize=False)
             mappings.append(transducer.mapping)
-        emit(
+        await SIO.emit(
             "table response",
             [
                 {
@@ -229,16 +287,22 @@ def change_table(message):
                 }
                 for x in mappings
             ],
+            sid,
+            namespace="/table",
         )
 
 
-@SOCKETIO.on("connect", namespace="/connect")
-def test_connect():
+@SIO.on("connect", namespace="/connect")  # type: ignore
+async def test_connect(sid, message):
     """Let client know disconnected"""
-    emit("connection response", {"data": "Connected"})
+    await SIO.emit(  # type: ignore
+        "connection response", {"data": "Connected"}, sid, namespace="/connect"
+    )
 
 
-@SOCKETIO.on("disconnect", namespace="/connect")
-def test_disconnect():
+@SIO.on("disconnect", namespace="/connect")  # type: ignore
+async def test_disconnect(sid):
     """Let client know disconnected"""
-    emit("connection response", {"data": "Disconnected"})
+    await SIO.emit(  # type: ignore
+        "connection response", {"data": "Disconnected"}, sid, namespace="/connect"
+    )

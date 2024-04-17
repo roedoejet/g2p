@@ -11,70 +11,48 @@
 # - regex
 # - text-unidecode
 # - tqdm
-# - eventlet!=0.36.0,>=0.33.0
-# - flask-cors>=3.0.9
-# - flask-restful>=0.3.9
-# - flask-socketio>=5.0.0
-# - flask-talisman>=0.7.0
-# - flask; python_version >= "3.8"
-# - flask<2.3; python_version < "3.8"
-# - python-engineio>=4.0.0
-# - python-socketio>=5.0.0
-# - gunicorn>=21.1.0
+# - fastapi>=0.109.0
+# - jinja2
+# - python-socketio>=5.9.0
+# - starlette>=0.35.1
+# - uvicorn
+# - gunicorn>=22.0.0
 #
 
-aniso8601==9.0.1
-    # via flask-restful
 annotated-types==0.6.0
     # via pydantic
+anyio==4.3.0
+    # via starlette
 bidict==0.23.1
     # via python-socketio
-blinker==1.7.0
-    # via flask
 click==8.1.7
     # via
     #   hatch.envs.prod
-    #   flask
+    #   uvicorn
 coloredlogs==15.0.1
     # via hatch.envs.prod
-dnspython==2.6.1
-    # via eventlet
 editdistance==0.8.1
     # via panphon
 et-xmlfile==1.1.0
     # via openpyxl
-eventlet==0.36.1
+exceptiongroup==1.2.0
+    # via anyio
+fastapi==0.110.1
     # via hatch.envs.prod
-flask==3.0.2 ; python_version >= "3.8"
-    # via
-    #   hatch.envs.prod
-    #   flask-cors
-    #   flask-restful
-    #   flask-socketio
-flask-cors==4.0.0
-    # via hatch.envs.prod
-flask-restful==0.3.10
-    # via hatch.envs.prod
-flask-socketio==5.3.6
-    # via hatch.envs.prod
-flask-talisman==1.1.0
-    # via hatch.envs.prod
-greenlet==3.0.3
-    # via eventlet
 gunicorn==22.0.0
     # via hatch.envs.prod
 h11==0.14.0
-    # via wsproto
+    # via
+    #   uvicorn
+    #   wsproto
 humanfriendly==10.0
     # via coloredlogs
-itsdangerous==2.1.2
-    # via flask
+idna==3.6
+    # via anyio
 jinja2==3.1.3
-    # via flask
+    # via hatch.envs.prod
 markupsafe==2.1.5
-    # via
-    #   jinja2
-    #   werkzeug
+    # via jinja2
 munkres==1.1.4
     # via panphon
 networkx==3.2.1
@@ -88,19 +66,15 @@ packaging==24.0
 panphon==0.20.0
     # via hatch.envs.prod
 pydantic==2.6.4
-    # via hatch.envs.prod
+    # via
+    #   hatch.envs.prod
+    #   fastapi
 pydantic-core==2.16.3
     # via pydantic
 python-engineio==4.9.0
-    # via
-    #   hatch.envs.prod
-    #   python-socketio
+    # via python-socketio
 python-socketio==5.11.2
-    # via
-    #   hatch.envs.prod
-    #   flask-socketio
-pytz==2024.1
-    # via flask-restful
+    # via hatch.envs.prod
 pyyaml==6.0.1
     # via
     #   hatch.envs.prod
@@ -111,20 +85,27 @@ regex==2023.12.25
     #   panphon
 simple-websocket==1.0.0
     # via python-engineio
-six==1.16.0
-    # via flask-restful
+sniffio==1.3.1
+    # via anyio
+starlette==0.37.2
+    # via
+    #   hatch.envs.prod
+    #   fastapi
 text-unidecode==1.3
     # via hatch.envs.prod
 tqdm==4.66.2
     # via hatch.envs.prod
 typing-extensions==4.10.0
     # via
+    #   anyio
+    #   fastapi
     #   pydantic
     #   pydantic-core
+    #   uvicorn
 unicodecsv==0.14.1
     # via panphon
-werkzeug==3.0.1
-    # via flask
+uvicorn==0.29.0
+    # via hatch.envs.prod
 wsproto==1.2.0
     # via simple-websocket
 

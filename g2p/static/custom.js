@@ -426,9 +426,10 @@ var setKwargs = function(index, kwargs) {
     convert()
 }
 
-var conversionSocket = io.connect('//' + document.domain + ':' + location.port + '/convert');
-var connectionSocket = io.connect('//' + document.domain + ':' + location.port + '/connect');
-var tableSocket = io.connect('//' + document.domain + ':' + location.port + '/table');
+var magicalMysteryOptions = { path: '/ws/socket.io', transports: ['websocket', 'polling', 'flashsocket']};
+var conversionSocket = io('/convert', magicalMysteryOptions)
+var connectionSocket = io('/connect', magicalMysteryOptions)
+var tableSocket = io('/table', magicalMysteryOptions)
 
 var trackIndex = function() {
     return $('#animated-radio').is(":checked")
