@@ -319,7 +319,11 @@ class TransductionGraph(BaseTransductionGraph):
                     assert oedge[0] is not None
                     assert iedge[1] is not None
                     iend = max(iend, oedge[0])
-                    oend = max(oend, iedge[1])
+                    # Replace None with not-None
+                    if oend is None:
+                        oend = iedge[1]
+                    elif iedge[1] is not None:
+                        oend = max(oend, iedge[1])
             if istart != -1:
                 assert iend != -1
             # Output a final segment if one exists

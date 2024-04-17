@@ -35,8 +35,9 @@ from g2p.tests.test_z_local_config import LocalConfigTest
 
 if sys.version_info >= (3, 8, 0):
     from g2p.tests.test_api_resources import ResourceIntegrationTest
+    from g2p.tests.test_api_v2 import TestAPIV2
 
-    API_TEST_CLASSES = [ResourceIntegrationTest]
+    API_TEST_CLASSES = [ResourceIntegrationTest, TestAPIV2]
 else:
     API_TEST_CLASSES = []
 
