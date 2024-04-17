@@ -67,7 +67,7 @@ dev = [
 # See https://github.com/jazzband/pip-tools/issues/2002
 # See https://github.com/juftin/hatch-pip-compile/issues/78
 prod = [
-  "gunicorn>=21.1.0",
+  "gunicorn>=21.2.0",
 ]
 docs = [
   "mkdocs>=1.5.2",
