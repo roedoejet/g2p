@@ -647,23 +647,16 @@ changes.  This guide is provided as a courtesy to anyone who may have
 been using them and should not be construed as public API documentation.</p>
 </blockquote>
 <h2 id="some-cli-commands-no-longer-exist">Some CLI commands no longer exist<a class="headerlink" href="#some-cli-commands-no-longer-exist" title="Permanent link">&para;</a></h2>
-<p>Several commands for the <code>g2p</code> command-line have been removed as they
-were duplicates of other functionality:</p>
+<p>Several commands for the <code>g2p</code> command-line have been removed:</p>
 <ul>
 <li>run</li>
 <li>routes</li>
 <li>shell</li>
 </ul>
-<p>To run the <code>g2p</code> API server, you can use:</p>
-<pre><code>flask --app g2p.app run
-</code></pre>
-<p>Likewise, for <code>routes</code> and <code>shell</code>, you can use:</p>
-<pre><code>flask --app g2p.app routes
-flask --app g2p.app shell
-</code></pre>
-<p>To run G2P Studio, use:</p>
+<p>To run the <code>g2p</code> API server and G2P Studio, you can use:</p>
 <pre><code>python run_studio.py
 </code></pre>
+<p>It does not seem that any equivalents of <code>routes</code> or <code>shell</code> exist.</p>
 
 
 
