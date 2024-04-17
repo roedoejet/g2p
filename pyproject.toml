@@ -34,9 +34,8 @@ dependencies = [
 api = [
     # See https://github.com/encode/starlette/discussions/2413
     "fastapi>=0.109.0",
-    # This maybe will get fixed at some point?  See
-    # https://github.com/pyropy/fastapi-socketio/issues/52
-    "fastapi_socketio<=0.0.10",
+    "starlette>=0.35.1",
+    "python-socketio>=5",
     "uvicorn",
     "jinja2",
 ]
@@ -47,7 +46,8 @@ test = [
   "jsonschema>=4.17.3",
   "pep440>=0.1.2",
   "httpx",
-  # Kind of bogus that we need both, but socketio wants this
+  # Kind of bogus that we need both httpx and aiohttp, but socketio
+  # wants this
   "aiohttp",
 ]
 dev = [

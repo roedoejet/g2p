@@ -17,12 +17,14 @@ http://localhost:5000/ and the API at http://localhost:5000/api/v1/docs
 
 from typing import List, Union
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi_socketio import SocketManager  # type: ignore
+import socketio  # type: ignore
 from networkx import shortest_path  # type: ignore
+from starlette.applications import Starlette
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
+from starlette.templating import Jinja2Templates
 
 from g2p import make_g2p
 from g2p.api import api as api_v1
@@ -44,17 +46,25 @@ from g2p.transducer import (
 DEFAULT_N = 10
 
 TEMPLATES = Jinja2Templates(directory="g2p/templates")
-APP = FastAPI()
-SOCKET_MANAGER = SocketManager(
-    app=APP,
-    # This next argument is very important
-    # and requires FastApi>=0.109.0
-    # (and thus Starlette>=0.33.0).
-    # See https://github.com/encode/starlette/discussions/2413
-    socketio_path="/ws/socket.io",
+# FIXME: CORS
+SIO = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
+SIO_APP = socketio.ASGIApp(socketio_server=SIO, socketio_path="/ws/socket.io")
+
+
+async def home(request: Request) -> HTMLResponse:
+    """Return homepage of g2p studio"""
+    return TEMPLATES.TemplateResponse(request, "index.html")
+
+
+APP = Starlette(
+    debug=True,
+    routes=[
+        Route("/", home),
+        Mount("/ws", SIO_APP),
+        Mount("/api/v1", api_v1),
+        Mount("/static", StaticFiles(directory="g2p/static"), name="static"),
+    ],
 )
-APP.mount("/api/v1", api_v1)
-APP.mount("/static", StaticFiles(directory="g2p/static"), name="static")
 
 
 def shade_colour(colour, percent, r=0, g=0, b=0):
@@ -145,13 +155,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
     return nodes, edges
 
 
-@APP.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    """Return homepage of g2p studio"""
-    return TEMPLATES.TemplateResponse("index.html", {"request": request})
-
-
-@APP.sio.on("conversion event", namespace="/convert")  # type: ignore
+@SIO.on("conversion event", namespace="/convert")  # type: ignore
 async def convert(sid, message):
     """Convert input text and return output"""
     transducers = []
@@ -180,7 +184,7 @@ async def convert(sid, message):
                 e,
             )
     if len(transducers) == 0:
-        await APP.sio.emit(
+        await SIO.emit(
             "conversion response",
             {"output_string": message["data"]["input_string"]},
             sid,
@@ -191,7 +195,7 @@ async def convert(sid, message):
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
         data, links = return_echart_data(tg)
-        await APP.sio.emit(  # type: ignore
+        await SIO.emit(  # type: ignore
             "conversion response",
             {
                 "output_string": tg.output_string,
@@ -203,7 +207,7 @@ async def convert(sid, message):
         )
     else:
         output_string = transducer(message["data"]["input_string"]).output_string
-        await APP.sio.emit(  # type: ignore
+        await SIO.emit(  # type: ignore
             "conversion response",
             {"output_string": output_string},
             sid,
@@ -211,12 +215,12 @@ async def convert(sid, message):
         )
 
 
-@APP.sio.on("table event", namespace="/table")  # type: ignore
+@SIO.on("table event", namespace="/table")  # type: ignore
 async def change_table(sid, message):
     """Change the lookup table"""
     LOGGER.debug("/table: %s", message)
     if "in_lang" not in message or "out_lang" not in message:
-        await APP.sio.emit(
+        await SIO.emit(
             "table response",
             [],
             sid,
@@ -243,7 +247,7 @@ async def change_table(sid, message):
         kwargs["rules"] = []
         # Remove the bogus rule we used to silence the validator
         kwargs["include"] = False
-        await APP.sio.emit(
+        await SIO.emit(
             "table response",
             [
                 {
@@ -261,7 +265,7 @@ async def change_table(sid, message):
         for lang1, lang2 in zip(path[:-1], path[1:]):
             transducer = make_g2p(lang1, lang2, tokenize=False)
             mappings.append(transducer.mapping)
-        await APP.sio.emit(
+        await SIO.emit(
             "table response",
             [
                 {
@@ -276,17 +280,17 @@ async def change_table(sid, message):
         )
 
 
-@APP.sio.on("connect", namespace="/connect")  # type: ignore
+@SIO.on("connect", namespace="/connect")  # type: ignore
 async def test_connect(sid, message):
     """Let client know disconnected"""
-    await APP.sio.emit(  # type: ignore
+    await SIO.emit(  # type: ignore
         "connection response", {"data": "Connected"}, sid, namespace="/connect"
     )
 
 
-@APP.sio.on("disconnect", namespace="/connect")  # type: ignore
+@SIO.on("disconnect", namespace="/connect")  # type: ignore
 async def test_disconnect(sid):
     """Let client know disconnected"""
-    await APP.sio.emit(  # type: ignore
+    await SIO.emit(  # type: ignore
         "connection response", {"data": "Disconnected"}, sid, namespace="/connect"
     )
