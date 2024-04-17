@@ -35,7 +35,7 @@ api = [
     # See https://github.com/encode/starlette/discussions/2413
     "fastapi>=0.109.0",
     "starlette>=0.35.1",
-    "python-socketio>=5",
+    "python-socketio>=5.9.0",
     "uvicorn",
     "jinja2",
 ]
