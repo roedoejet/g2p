@@ -32,7 +32,6 @@ repos:
         stages: [commit]
 -   repo: https://github.com/pycqa/flake8
     # do flake8 last to avoid duplicate reports
-    rev: 5.0.4
+    rev: 7.0.0
     hooks:
     - id: flake8
-      args: ["--max-line-length=120", "--extend-ignore=E203,E704"]
