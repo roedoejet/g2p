@@ -814,8 +814,8 @@ class _MappingModelDefinition(BaseModel):
     def add_parent_dir(cls, value: Any, info: ValidationInfo):
         """If there is a parent directory, prepend it to all path fields."""
         if isinstance(value, (str, Path)):
-            if info.data.get("parent_dir", None):  # type: ignore[attr-defined]
-                value = Path(info.data["parent_dir"]) / value  # type: ignore[attr-defined]
+            if info.data.get("parent_dir", None):
+                value = Path(info.data["parent_dir"]) / value
         return value
 
     @model_validator(mode="before")
