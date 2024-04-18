@@ -437,23 +437,23 @@ var trackIndex = function() {
 
 var convert = function() {
     // prevent conversion from happening before TABLES, ABBS, and SETTINGS are populated.
-    if (TABLES.length > 0 && ABBS.length > 0) {
-        let index = trackIndex()
-        var input_string = $('#input').val();
-        if (index) {
-            input_string = $('#indexInput').val();
-        }
-        if (input_string) {
-            let mappings = getIncludedMappings()
-            conversionSocket.emit('conversion event', {
-                data: {
-                    index,
-                    input_string,
-                    mappings
-                }
-            });
-        }
+    if (TABLES.length == 0 || ABBS.length == 0)
+        return;
+    let index = trackIndex()
+    var input_string = $('#input').val();
+    if (index) {
+        input_string = $('#indexInput').val();
     }
+    let mappings = getIncludedMappings()
+    // we will still request a conversion if the input is empty (that
+    // way if you delete it you aren't stuck with a phantom output)
+    conversionSocket.emit('conversion event', {
+        data: {
+            index,
+            input_string,
+            mappings
+        }
+    });
 }
 
 document.getElementById('animated-radio').addEventListener('click', function(event) {
