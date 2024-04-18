@@ -86,7 +86,8 @@ def expand_abbreviations(data: str, abbs: Dict[str, List[str]], recursion_depth=
     """
     if recursion_depth > 10:
         raise exceptions.RecursionError(
-            "Too many levels of recursion in your abbreviation expansion. Check your abbreviations for circular references."
+            "Too many levels of recursion in your abbreviation expansion. "
+            "Check your abbreviations for circular references."
         )
     for abb, stands_for in sorted(abbs.items(), key=lambda x: len(x[0]), reverse=True):
         abb_match = re.compile(abb)
@@ -256,10 +257,14 @@ def create_fixed_width_lookbehind(pattern):
     return re.sub(
         re.compile(
             r"""
-    (?<=\(?)              # lookbehind
-    [\\\[\]\p{L}\p{M}|.:'^$]+  # match any number of Unicode characters and diacritics, plus square brackets, and backslash so patterns like \b can be used
-    (?=\)?)               # lookahead
-    """,
+                # lookbehind
+                (?<=\(?)
+                # match any number of Unicode characters and diacritics, plus
+                # square brackets, and backslash so patterns like \b can be used
+                [\\\[\]\p{L}\p{M}|.:'^$]+
+                # lookahead
+                (?=\)?)
+            """,
             re.U | re.VERBOSE,
         ),
         pattern_to_fixed_width_lookbehinds,
@@ -730,7 +735,9 @@ class _MappingModelDefinition(BaseModel):
     """A list of authors responsible for the mapping."""
 
     abbreviations: Dict[str, List[str]] = {}
-    """A list of 'abbreviations' for your mappings. Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information."""
+    """A list of 'abbreviations' for your mappings.
+    Please see https://blog.mothertongues.org/g2p-advanced-mappings/ for more information.
+    """
 
     abbreviations_path: Optional[Path] = None
     """A path to an 'abbreviations' file"""
@@ -751,9 +758,7 @@ class _MappingModelDefinition(BaseModel):
             and self.rules_path is None
         ):
             LOGGER.warning(
-                exceptions.MalformedMapping(
-                    "You have to either specify some rules or a path to a file containing rules."
-                )
+                "Empty mapping: specify some rules or a path to a file containing rules."
             )
         if (
             (self.type == MAPPING_TYPE.lexicon)
@@ -788,7 +793,8 @@ class _MappingModelDefinition(BaseModel):
         for lower_case, upper_case in v.items():
             if len(lower_case) != len(upper_case):
                 raise exceptions.MalformedMapping(
-                    f"Sorry, the case equivalency between {lower_case} and {upper_case} is not valid because it is not the same length, please write rules such that any case equivalent is of equal length."
+                    f"Sorry, the case equivalency between {lower_case} and {upper_case} is not valid because it "
+                    "is not the same length, please write rules such that any case equivalent is of equal length."
                 )
         return v
 
@@ -808,8 +814,8 @@ class _MappingModelDefinition(BaseModel):
     def add_parent_dir(cls, value: Any, info: ValidationInfo):
         """If there is a parent directory, prepend it to all path fields."""
         if isinstance(value, (str, Path)):
-            if info.data.get("parent_dir", None):
-                value = Path(info.data["parent_dir"]) / value
+            if info.data.get("parent_dir", None):  # type: ignore[attr-defined]
+                value = Path(info.data["parent_dir"]) / value  # type: ignore[attr-defined]
         return value
 
     @model_validator(mode="before")

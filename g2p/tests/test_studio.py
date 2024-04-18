@@ -81,12 +81,18 @@ class StudioTest(IsolatedAsyncioTestCase):
             page = await browser.new_page()
             await page.goto(f"http://127.0.0.1:{self.port}")
             await page.wait_for_timeout(self.timeout_delay)
+            await page.type("#input", "a")
             in_lang_selector = page.locator("#input-langselect")
             # Switch to a language
             await in_lang_selector.select_option(value="alq")
             await page.wait_for_timeout(self.timeout_delay)
             settings_title = await page.text_content("#link-0")
             self.assertEqual(settings_title, "Algonquin to IPA")
+            # Switch output language
+            out_lang_selector = page.locator("#output-langselect")
+            await out_lang_selector.select_option("eng-arpabet")
+            settings_title_3 = await page.text_content("#link-2")
+            self.assertEqual(settings_title_3, "English IPA to Arpabet")
             # Switch back to custom
             await in_lang_selector.select_option(value="Custom")
             await page.wait_for_timeout(self.timeout_delay)

@@ -198,6 +198,7 @@ async def convert(sid, message):
                 e,
             )
     if len(transducers) == 0:
+        # This happens when we switch between output langs in g2p-studio
         await SIO.emit(
             "conversion response",
             {"output_string": message["data"]["input_string"]},
