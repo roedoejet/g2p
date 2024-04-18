@@ -15,7 +15,8 @@ http://localhost:5000/ and the API at http://localhost:5000/api/v1/docs
 
 """
 
-from typing import List, Union
+import os
+from typing import Dict, List, Union
 
 import socketio  # type: ignore
 from networkx import shortest_path  # type: ignore
@@ -47,8 +48,10 @@ from g2p.transducer import (
 DEFAULT_N = 10
 
 TEMPLATES = Jinja2Templates(directory="g2p/templates")
-# FIXME: CORS
-SIO = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins="*")
+server_args: Dict[str, Union[bool, str]] = {"async_mode": "asgi"}
+if os.getenv("G2P_STUDIO_DEBUG"):
+    server_args["logger"] = server_args["engineio_logger"] = True
+SIO = socketio.AsyncServer(**server_args)
 SIO_APP = socketio.ASGIApp(socketio_server=SIO, socketio_path="/ws/socket.io")
 
 
