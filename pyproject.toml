@@ -166,7 +166,7 @@ post-install-commands = [
 ]
 
 [tool.hatch.envs.dev.scripts]
-check = "mypy --install-types --non-interactive {args:g2p}"
+check = "mypy {args:g2p}"
 
 [tool.coverage.run]
 source_pkgs = ["g2p"]
@@ -182,6 +182,8 @@ precision = 2
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]
+install_types = true
+non_interactive = true
 
 [tool.isort]
 profile = "black"
