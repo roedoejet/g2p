@@ -10,6 +10,7 @@ on:
 # in g2p/mappings/.schema!!!
 env:
   SETUPTOOLS_SCM_PRETEND_VERSION: "2.0"
+  G2P_STUDIO_DEBUG: 1
 
 jobs:
   test-all-on-linux:
