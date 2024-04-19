@@ -26,29 +26,29 @@ class LangTest(TestCase):
         # running test_langs.py prints all the errors at once, to help debugging a given g2p mapping.
         # Then we call assertEqual on the first failed case, to make unittest register the failure.
         error_count = 0
+        error_prefix = "test_langs.py: mapping error"
         for test in langs_to_test:
             transducer = make_g2p(test[0], test[1])
             output_string = transducer(test[2]).output_string.strip()
             if output_string != test[3].strip():
-                LOGGER.warning(
-                    "test_langs.py: mapping error for {}: {} from {} to {} should be {}, got {}".format(
-                        test[-1], test[2], test[0], test[1], test[3], output_string
+                LOGGER.error(
+                    "{} for {}: {} from {} to {} should be {}, got {}".format(
+                        error_prefix,
+                        test[-1],
+                        test[2],
+                        test[0],
+                        test[1],
+                        test[3],
+                        output_string,
                     )
                 )
-                if error_count == 0:
-                    first_failed_test = test
                 error_count += 1
 
-        if error_count > 0:
-            transducer = make_g2p(first_failed_test[0], first_failed_test[1])
-            self.assertEqual(
-                transducer(first_failed_test[2]).output_string.strip(),
-                first_failed_test[3].strip(),
-            )
-
-        # for test in langs_to_test:
-        #    transducer = make_g2p(test[0], test[1])
-        #    self.assertEqual(transducer(test[2]).output_string, test[3])
+        self.assertEqual(
+            error_count,
+            0,
+            f'Search for "ERROR - {error_prefix}" above to find all the g2p mapping errors.',
+        )
 
 
 if __name__ == "__main__":
