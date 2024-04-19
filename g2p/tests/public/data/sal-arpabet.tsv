@@ -1,0 +1,105 @@
+# some more sample words
+sal-apa	eng-arpabet	nə́c̕uʔ	N AH T S UW HH
+sal-apa	eng-arpabet	čə́saʔ	CH AH S AE HH
+sal-apa	eng-arpabet	ɬixʷ	S IY K W
+sal-apa	eng-arpabet	ŋús	NG UW S
+sal-apa	eng-arpabet	ɬq̕áčš	S K AE CH SH
+sal-apa	eng-arpabet	t̕χə́ŋ	CH AH NG
+sal-apa	eng-arpabet	c̕úʔkʷs	T S UW HH K W S
+sal-apa	eng-arpabet	táʔcs	T AE HH T S S
+sal-apa	eng-arpabet	tə́kʷxʷ	T AH K W K W
+sal-apa	eng-arpabet	ʔúpən	HH UW P AH N
+sal-apa	eng-arpabet	t̕ᶿáʔkʷəs	T AE HH K W AH S
+sal-apa	eng-arpabet	téʔθəs	T AH HH TH AH S
+sal-apa	eng-arpabet	nə́t̕ᶿəʔ	N AH T AH HH
+sal-apa	eng-arpabet	ɬəxʷɬšeʔ	S AH K W S SH AH HH
+
+# Validate the impact of feeding
+sal-apa	eng-arpabet	a	AE
+sal-apa	eng-arpabet	a'	AE
+sal-apa	eng-arpabet	ạ	AE
+sal-apa	eng-arpabet	ạ́	AE
+sal-apa	eng-arpabet	æ	AE
+sal-apa	eng-arpabet	æ'	AE
+sal-apa	eng-arpabet	c	T S
+sal-apa	eng-arpabet	c̣	K
+sal-apa	eng-arpabet	θ	TH
+sal-apa	eng-arpabet	c'	T S
+sal-apa	eng-arpabet	č	CH
+sal-apa	eng-arpabet	č̓	CH
+sal-apa	eng-arpabet	ǰ	JH
+sal-apa	eng-arpabet	ɛ	EH
+sal-apa	eng-arpabet	ɛ́	EH
+sal-apa	eng-arpabet	ʌ	AH
+sal-apa	eng-arpabet	ə	AH
+sal-apa	eng-arpabet	e	AH
+sal-apa	eng-arpabet	ə́	AH
+sal-apa	eng-arpabet	ə̣́	AH
+sal-apa	eng-arpabet	ʌ́	AH
+sal-apa	eng-arpabet	g	G
+sal-apa	eng-arpabet	gʷ	G W
+sal-apa	eng-arpabet	h	HH
+sal-apa	eng-arpabet	ḥ	HH
+sal-apa	eng-arpabet	ḥʷ	HH W
+sal-apa	eng-arpabet	i	IY
+sal-apa	eng-arpabet	i'	IY
+sal-apa	eng-arpabet	ɣ	G
+sal-apa	eng-arpabet	ɣ'	G
+sal-apa	eng-arpabet	k	K
+sal-apa	eng-arpabet	k'	K
+sal-apa	eng-arpabet	kʷ	K W
+sal-apa	eng-arpabet	k'ʷ	K W
+sal-apa	eng-arpabet	l	L
+sal-apa	eng-arpabet	l'	L
+sal-apa	eng-arpabet	ḷ	L
+sal-apa	eng-arpabet	ɬ	S
+sal-apa	eng-arpabet	ł	S
+sal-apa	eng-arpabet	ƛ'	T S
+sal-apa	eng-arpabet	m	M
+sal-apa	eng-arpabet	m'	M
+sal-apa	eng-arpabet	n	N
+sal-apa	eng-arpabet	n'	N
+sal-apa	eng-arpabet	ṇ	N
+sal-apa	eng-arpabet	ŋ	NG
+sal-apa	eng-arpabet	o	AO
+sal-apa	eng-arpabet	o'	AO
+sal-apa	eng-arpabet	ó	AO
+sal-apa	eng-arpabet	ɔ	AO
+sal-apa	eng-arpabet	ɔ́	AO
+sal-apa	eng-arpabet	p	P
+sal-apa	eng-arpabet	p'	P
+sal-apa	eng-arpabet	q	K
+sal-apa	eng-arpabet	q'	K
+sal-apa	eng-arpabet	qʷ	K W
+sal-apa	eng-arpabet	q'ʷ	K W
+sal-apa	eng-arpabet	r	D
+sal-apa	eng-arpabet	r'	D
+sal-apa	eng-arpabet	s	S
+sal-apa	eng-arpabet	ṣ	S
+sal-apa	eng-arpabet	t	T
+sal-apa	eng-arpabet	t'	T
+sal-apa	eng-arpabet	ť	T
+sal-apa	eng-arpabet	ʕ	ZH
+sal-apa	eng-arpabet	ʕ'	ZH
+sal-apa	eng-arpabet	u	UW
+sal-apa	eng-arpabet	u'	UW
+sal-apa	eng-arpabet	ú	UW
+sal-apa	eng-arpabet	ụ	UW
+sal-apa	eng-arpabet	ụ́	UW
+sal-apa	eng-arpabet	ʕʷ	ZH W
+sal-apa	eng-arpabet	ʕ'ʷ	ZH W
+sal-apa	eng-arpabet	x̌	SH
+sal-apa	eng-arpabet	x	K
+sal-apa	eng-arpabet	x̣	K
+sal-apa	eng-arpabet	x̣ʷ	K W
+sal-apa	eng-arpabet	w	W
+sal-apa	eng-arpabet	y	Y
+sal-apa	eng-arpabet	x̌ʷ	SH W
+sal-apa	eng-arpabet	xʷ	K W
+sal-apa	eng-arpabet	w'	W
+sal-apa	eng-arpabet	w	W
+sal-apa	eng-arpabet	y'	Y
+sal-apa	eng-arpabet	ʷ	W
+sal-apa	eng-arpabet	ʡ	HH
+sal-apa	eng-arpabet	ʔ	HH
+sal-apa	eng-arpabet	z'	Z

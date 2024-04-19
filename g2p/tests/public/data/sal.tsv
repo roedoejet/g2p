@@ -1,0 +1,107 @@
+# some more sample words
+sal-apa	sal-ipa	nə́c̕uʔ	nˈətsʼuʔ	clm one
+sal-apa	sal-ipa	čə́saʔ	ʧˈəsaʔ	clm two
+sal-apa	sal-ipa	ɬixʷ	ɬixʷ	clm three
+sal-apa	sal-ipa	ŋús	ŋˈus	clm four
+sal-apa	sal-ipa	ɬq̕áčš	ɬqʼˈaʧʃ	clm five
+sal-apa	sal-ipa	t̕χə́ŋ	tʼχˈəŋ	clm six
+sal-apa	sal-ipa	c̕úʔkʷs	tsʼˈuʔkʷs	clm seven
+sal-apa	sal-ipa	táʔcs	tˈaʔtss	clm eight
+sal-apa	sal-ipa	tə́kʷxʷ	tˈəkʷxʷ	clm nine
+sal-apa	sal-ipa	ʔúpən	ʔˈupən	clm ten
+sal-apa	sal-ipa	t̕ᶿáʔkʷəs	tʼᶿˈaʔkʷəs	Saanich seven
+sal-apa	sal-ipa	téʔθəs	tˈəʔθəs	Saanich eight
+sal-apa	sal-ipa	nə́t̕ᶿəʔ	nˈətʼᶿəʔ	Saanich one
+sal-apa	sal-ipa	ɬəxʷɬšeʔ	ɬəxʷɬʃəʔ	Saanich thirty
+
+# Validate the impact of feeding
+sal-apa	sal-ipa	a	a
+sal-apa	sal-ipa	a'	ˈa
+sal-apa	sal-ipa	ạ	a̠
+sal-apa	sal-ipa	ạ́	ˈa̠
+sal-apa	sal-ipa	æ	æ
+sal-apa	sal-ipa	æ'	ˈæ
+sal-apa	sal-ipa	c	ts
+sal-apa	sal-ipa	c̣	c̠
+sal-apa	sal-ipa	θ	θ
+sal-apa	sal-ipa	c'	tsʼ
+sal-apa	sal-ipa	č	ʧ
+sal-apa	sal-ipa	č̓	ʧʼ
+sal-apa	sal-ipa	ǰ	ʤ
+sal-apa	sal-ipa	ɛ	ɛ
+sal-apa	sal-ipa	ɛ́	ˈɛ
+sal-apa	sal-ipa	ʌ	ʌ
+sal-apa	sal-ipa	ə	ə
+sal-apa	sal-ipa	e	ə
+sal-apa	sal-ipa	ə́	ˈə
+sal-apa	sal-ipa	ə̣́	ˈə̠
+sal-apa	sal-ipa	ʌ́	ˈʌ
+sal-apa	sal-ipa	g	ɡ
+sal-apa	sal-ipa	gʷ	ɡʷ
+sal-apa	sal-ipa	h	h
+sal-apa	sal-ipa	ḥ	h
+sal-apa	sal-ipa	ḥʷ	h̠ʷ
+sal-apa	sal-ipa	i	i
+sal-apa	sal-ipa	i'	ˈi
+sal-apa	sal-ipa	ɣ	ɣ
+sal-apa	sal-ipa	ɣ'	ɣˀ
+sal-apa	sal-ipa	k	k
+sal-apa	sal-ipa	k'	kʼ
+sal-apa	sal-ipa	kʷ	kʷ
+sal-apa	sal-ipa	k'ʷ	kʼʷ
+sal-apa	sal-ipa	l	l
+sal-apa	sal-ipa	l'	lˀ
+sal-apa	sal-ipa	ḷ	l̠
+sal-apa	sal-ipa	ɬ	ɬ
+sal-apa	sal-ipa	ł	ɬ
+sal-apa	sal-ipa	ƛ'	tɬʼ
+sal-apa	sal-ipa	m	m
+sal-apa	sal-ipa	m'	mˀ
+sal-apa	sal-ipa	n	n
+sal-apa	sal-ipa	n'	nˀ
+sal-apa	sal-ipa	ṇ	n̠
+sal-apa	sal-ipa	ŋ	ŋ
+sal-apa	sal-ipa	o	o
+sal-apa	sal-ipa	o'	ˈo
+sal-apa	sal-ipa	ó	ˈo
+sal-apa	sal-ipa	ɔ	ɔ
+sal-apa	sal-ipa	ɔ́	ˈɔ
+sal-apa	sal-ipa	p	p
+sal-apa	sal-ipa	p'	pʼ
+sal-apa	sal-ipa	q	q
+sal-apa	sal-ipa	q'	qʼ
+sal-apa	sal-ipa	qʷ	qʷ
+sal-apa	sal-ipa	q'ʷ	qʼʷ
+sal-apa	sal-ipa	r	ɾ
+sal-apa	sal-ipa	r'	ɾˀ
+sal-apa	sal-ipa	s	s
+sal-apa	sal-ipa	ṣ	s̠
+sal-apa	sal-ipa	t	t
+sal-apa	sal-ipa	t'	tʼ
+sal-apa	sal-ipa	ť	tʼ
+sal-apa	sal-ipa	ʕ	ʕ
+sal-apa	sal-ipa	ʕ'	ʕˀ
+sal-apa	sal-ipa	u	u
+sal-apa	sal-ipa	u'	ˈu
+sal-apa	sal-ipa	ú	ˈu
+sal-apa	sal-ipa	ụ	u̠
+sal-apa	sal-ipa	ụ́	ˈu̠
+sal-apa	sal-ipa	ʕʷ	ʕʷ
+sal-apa	sal-ipa	ʕ'ʷ	ʕˀʷ
+sal-apa	sal-ipa	x̌	χ
+sal-apa	sal-ipa	x	x
+sal-apa	sal-ipa	x̣	x̠
+sal-apa	sal-ipa	x̣ʷ	x̠ʷ
+sal-apa	sal-ipa	w	w
+sal-apa	sal-ipa	y	j
+sal-apa	sal-ipa	x̌ʷ	χʷ
+sal-apa	sal-ipa	xʷ	xʷ
+sal-apa	sal-ipa	w'	wˀ
+sal-apa	sal-ipa	w	w
+sal-apa	sal-ipa	y'	jˀ
+sal-apa	sal-ipa	ʷ	ʷ
+sal-apa	sal-ipa	ʡ	ʡ
+sal-apa	sal-ipa	ʔ	ʔ
+sal-apa	sal-ipa	ˀ	ˀ
+sal-apa	sal-ipa	z'	zˀ
+sal-apa	sal-ipa	z̓	zˀ

@@ -1,5 +1,6 @@
 mappings:
-  - case_sensitive: true
+  - case_equivalencies: {}
+    case_sensitive: true
     display_name: Atikamekw IPA to English IPA
     escape_special: false
     in_lang: atj-ipa
@@ -7,6 +8,7 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
@@ -14,6 +16,7 @@ mappings:
   - author: Generated 2019-09-26 13:48:19.852180
     authors:
       - Generated 2020-07-06 16:39:58.770641
+    case_equivalencies: {}
     case_sensitive: true
     display_name: Danish IPA to English IPA
     escape_special: false
@@ -22,6 +25,7 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
@@ -30,6 +34,7 @@ mappings:
     authors:
       - Generated 2021-04-14 16:34:39.868437
       - Tidied up 2021-04-14 by Eric Joanis
+    case_equivalencies: {}
     case_sensitive: true
     display_name: French IPA to English IPA
     escape_special: false
@@ -38,6 +43,7 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
@@ -45,6 +51,7 @@ mappings:
   - author: Generated 2019-10-24 16:21:41.605592
     authors:
       - Generated 2022-04-12 11:26:30.098188
+    case_equivalencies: {}
     case_sensitive: true
     display_name: SENĆOŦEN IPA to English IPA
     escape_special: false
@@ -53,6 +60,7 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
@@ -60,6 +68,7 @@ mappings:
   - author: Generated 2019-10-24 16:21:41.605592
     authors:
       - Generated 2022-04-12 11:26:30.098188
+    case_equivalencies: {}
     case_sensitive: true
     display_name: SENĆOŦEN IPA to English IPA
     escape_special: false
@@ -68,11 +77,13 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: hamming-eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: str-ipa_to_hamming-eng-ipa.json
   - author: Generated 2019-10-23 11:18:26.278696
+    case_equivalencies: {}
     case_sensitive: true
     display_name: Algonquin IPA to English IPA
     escape_special: false
@@ -81,12 +92,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: alq-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-03-06 00:15:29.676518
+    case_equivalencies: {}
     case_sensitive: true
     display_name: see-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -95,12 +108,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: see-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-03-30 13:17:41.062858
+    case_equivalencies: {}
     case_sensitive: true
     display_name: lml-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -109,12 +124,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: lml-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-04-27 01:30:32.371649
+    case_equivalencies: {}
     case_sensitive: false
     display_name: oji-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -123,12 +140,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
     rules_path: oji-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-07-28 14:28:24.895117
+    case_equivalencies: {}
     case_sensitive: false
     display_name: gla-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -137,12 +156,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: gla-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-08-06 16:06:34.805350
+    case_equivalencies: {}
     case_sensitive: true
     display_name: crk-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -151,12 +172,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: crk-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-07 22:23:34.538427
+    case_equivalencies: {}
     case_sensitive: false
     display_name: tce-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -165,12 +188,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: tce-ipa_to_eng-ipa.json
   - authors:
       - Generated 2023-10-04 19:33:36.891594
+    case_equivalencies: {}
     case_sensitive: false
     display_name: crg-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -179,6 +204,7 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
@@ -187,6 +213,7 @@ mappings:
       - Generated 2020-09-18 10:40:15.289530
       - Updated by hand 2021-02-10 Eric Joanis to handle ejectives
       - Update by hand 2021-05-21 Shankhalika Srikanth reorder rules with aspiration
+    case_equivalencies: {}
     case_sensitive: false
     display_name: Tlingit IPA to English IPA
     escape_special: false
@@ -195,12 +222,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
     rules_path: tli-ipa_to_eng-ipa.json
   - authors:
       - Generated 2020-11-30 22:36:15.639360
+    case_equivalencies: {}
     case_sensitive: false
     display_name: Gwich'in IPA to English IPA
     escape_special: false
@@ -209,12 +238,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: gwi-ipa_to_eng-ipa.json
   - authors:
       - Generated 2022-09-09 13:04:46.128081
+    case_equivalencies: {}
     case_sensitive: false
     display_name: mic-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -223,12 +254,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: as-written
     rules_path: mic-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-08 17:26:16.371203
+    case_equivalencies: {}
     case_sensitive: true
     display_name: iku-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -237,12 +270,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: iku-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-18 14:51:53.222666
+    case_equivalencies: {}
     case_sensitive: false
     display_name: ikt-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -251,12 +286,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: ikt-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-18 16:13:29.007425
+    case_equivalencies: {}
     case_sensitive: false
     display_name: iku-sro-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -265,12 +302,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: iku-sro-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-23 11:55:07.200851
+    case_equivalencies: {}
     case_sensitive: false
     display_name: haa-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -279,12 +318,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: haa-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-03-07 23:35:39.198455
+    case_equivalencies: {}
     case_sensitive: false
     display_name: ttm-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -293,12 +334,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: ttm-ipa_to_eng-ipa.json
   - authors:
       - Generated 2021-08-01 19:37:38.316339
+    case_equivalencies: {}
     case_sensitive: false
     display_name: tau-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -307,12 +350,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: tau-ipa_to_eng-ipa.json
   - authors:
       - Generated 2023-08-15 12:26:00.528774
+    case_equivalencies: {}
     case_sensitive: false
     display_name: moh-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -321,12 +366,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: moh-ipa_to_eng-ipa.json
   - authors:
       - Generated 2022-04-12 11:42:52.894700
+    case_equivalencies: {}
     case_sensitive: false
     display_name: moh-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -335,12 +382,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: hamming-eng-ipa
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: moh-ipa_to_hamming-eng-ipa.json
   - authors:
       - Generated 2022-04-11 16:24:52.967497
+    case_equivalencies: {}
     case_sensitive: true
     display_name: moh-equiv dummy to dummy dummy
     escape_special: false
@@ -349,12 +398,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: moh-equiv_to_dummy.json
   - authors:
       - Generated 2022-04-11 16:24:52.967497
+    case_equivalencies: {}
     case_sensitive: true
     display_name: moh-equiv dummy to hamming dummy
     escape_special: false
@@ -363,12 +414,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: hamming-dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: moh-equiv_to_hamming-dummy.json
   - authors:
       - Generated 2022-04-12 10:47:28.528081
+    case_equivalencies: {}
     case_sensitive: true
     display_name: str-equiv dummy to dummy dummy
     escape_special: false
@@ -377,12 +430,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: str-equiv_to_dummy.json
   - authors:
       - Generated 2022-04-12 10:47:28.528081
+    case_equivalencies: {}
     case_sensitive: true
     display_name: str-equiv dummy to hamming dummy
     escape_special: false
@@ -391,12 +446,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: hamming-dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: str-equiv_to_hamming-dummy.json
   - authors:
       - Generated 2022-04-12 10:57:49.409626
+    case_equivalencies: {}
     case_sensitive: true
     display_name: und-ascii dummy to dummy dummy
     escape_special: false
@@ -405,12 +462,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: und-ascii_to_dummy.json
   - authors:
       - Generated 2022-04-12 10:56:44.604694
+    case_equivalencies: {}
     case_sensitive: true
     display_name: und-ascii dummy to dummy dummy
     escape_special: false
@@ -419,12 +478,14 @@ mappings:
     norm_form: NFD
     out_delimiter: ''
     out_lang: hamming-dummy
+    preserve_case: false
     prevent_feeding: false
     reverse: false
     rule_ordering: as-written
     rules_path: und-ascii_to_hamming-dummy.json
   - authors:
       - Generated 2022-05-20 16:36:31.566493
+    case_equivalencies: {}
     case_sensitive: true
     display_name: iku-ipa to hamming-eng-ipa
     escape_special: false
@@ -433,12 +494,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: hamming-eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: iku-ipa_to_hamming-eng-ipa.json
   - authors:
       - Generated 2022-05-20 16:55:13.188319
+    case_equivalencies: {}
     case_sensitive: true
     display_name: und-ipa to hamming-eng-ipa
     escape_special: false
@@ -447,12 +510,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: hamming-eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: und-ipa_to_hamming-eng-ipa.json
   - authors:
       - Generated 2022-05-20 19:12:51.416268
+    case_equivalencies: {}
     case_sensitive: true
     display_name: ikt-ipa to hamming-eng-ipa
     escape_special: false
@@ -461,12 +526,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: hamming-eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: ikt-ipa_to_hamming-eng-ipa.json
   - authors:
       - Generated 2022-06-07 10:24:54.512807
+    case_equivalencies: {}
     case_sensitive: true
     display_name: moe-ipa to eng-ipa
     escape_special: false
@@ -475,12 +542,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: moe-ipa_to_eng-ipa.json
   - authors:
       - Generated 2022-07-22 13:54:50.454043
+    case_equivalencies: {}
     case_sensitive: false
     display_name: win-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -489,6 +558,7 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
@@ -496,6 +566,7 @@ mappings:
   - authors:
       - Generated 2022-07-20 06:53:42.624015
       - Updated by hand 2021-07-20 David Huggins-Daines to improve vowels
+    case_equivalencies: {}
     case_sensitive: false
     display_name: fin-ipa IPA to eng-ipa IPA
     escape_special: false
@@ -504,12 +575,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: fin-ipa_to_eng-ipa.json
   - authors:
       - Generated 2023-01-13 11:12:51.451010
+    case_equivalencies: {}
     case_sensitive: true
     display_name: oka-ipa to eng-ipa
     escape_special: false
@@ -518,12 +591,14 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: oka-ipa_to_eng-ipa.json
   - authors:
       - Generated 2023-06-26 15:06:13.793560
+    case_equivalencies: {}
     case_sensitive: true
     display_name: clm-ipa to eng-ipa
     escape_special: false
@@ -532,7 +607,25 @@ mappings:
     norm_form: NFC
     out_delimiter: ''
     out_lang: eng-ipa
+    preserve_case: false
     prevent_feeding: true
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: clm-ipa_to_eng-ipa.json
+  - authors:
+      - Generated 2024-04-18 13:30:09.143401
+      - Manual fixes by Eric Joanis
+    case_equivalencies: {}
+    case_sensitive: true
+    display_name: sal-ipa to eng-ipa
+    escape_special: false
+    in_lang: sal-ipa
+    language_name: IPA
+    norm_form: NFC
+    out_delimiter: ''
+    out_lang: eng-ipa
+    preserve_case: false
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
+    rules_path: sal-ipa_to_eng-ipa.json

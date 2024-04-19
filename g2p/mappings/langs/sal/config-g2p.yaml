@@ -1,0 +1,23 @@
+<<: &shared
+  language_name: Salishan languages with APA-based writing systems
+mappings:
+  - display_name: Salishan APA to IPA
+    rules_path: sal_apa_to_ipa.csv
+    in_lang: sal-apa-equiv
+    out_lang: sal-ipa
+    authors:
+      - Tony Mattina
+      - Eric Joanis
+    type: mapping
+    prevent_feeding: true
+    rule_ordering: apply-longest-first
+    norm_form: NFD
+    <<: *shared
+  - display_name: Unicode Equivalencies
+    in_lang: sal-apa
+    out_lang: sal-apa-equiv
+    authors:
+      - Eric Joanis
+    rules_path: sal_equiv.csv
+    norm_form: NFD
+    <<: *shared
