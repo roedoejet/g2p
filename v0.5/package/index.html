@@ -1,0 +1,2209 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../studio/">
+      
+      
+        <link rel="next" href="../cli/">
+      
+      
+      <link rel="icon" href="../favicon-32x32.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.12">
+    
+    
+      
+        <title>Package - Gᵢ2Pᵢ Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.7e359304.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="white" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#python-package" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="https://docs.mothertongues.org" title="Gᵢ2Pᵢ Documentation" class="md-header__button md-logo" aria-label="Gᵢ2Pᵢ Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Gᵢ2Pᵢ Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Package
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://docs.mothertongues.org" title="Gᵢ2Pᵢ Documentation" class="md-nav__button md-logo" aria-label="Gᵢ2Pᵢ Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Gᵢ2Pᵢ Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../installation/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Guides
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Getting started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    How to contribute
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../studio/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Using the g2p studio
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Package
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Package
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-look-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      A look under the hood
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A look under the hood">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapping
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.add_abbreviations" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_abbreviations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.config_to_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      config_to_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.deduplicate" class="md-nav__link">
+    <span class="md-ellipsis">
+      deduplicate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.extend" class="md-nav__link">
+    <span class="md-ellipsis">
+      extend
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.find_mapping_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      find_mapping_by_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      inventory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.mapping_to_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      mapping_to_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.mapping_to_stream" class="md-nav__link">
+    <span class="md-ellipsis">
+      mapping_to_stream
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.plain_mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      plain_mapping
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.process_kwargs" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_kwargs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.process_loaded_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_loaded_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.reverse_mappings" class="md-nav__link">
+    <span class="md-ellipsis">
+      reverse_mappings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.rule_to_regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      rule_to_regex
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.wants_rules_sorted" class="md-nav__link">
+    <span class="md-ellipsis">
+      wants_rules_sorted
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transducer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transducer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.change_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      change_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.delete_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.get_longest_and_shortest" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_longest_and_shortest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.get_match_groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_match_groups
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.insert_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      insert_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.resolve_intermediate_chars" class="md-nav__link">
+    <span class="md-ellipsis">
+      resolve_intermediate_chars
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.update_explicit_indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_explicit_indices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Command Line
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#a-look-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      A look under the hood
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="A look under the hood">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Mapping
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mapping">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.add_abbreviations" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_abbreviations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.config_to_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      config_to_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.deduplicate" class="md-nav__link">
+    <span class="md-ellipsis">
+      deduplicate
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.extend" class="md-nav__link">
+    <span class="md-ellipsis">
+      extend
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.find_mapping_by_id" class="md-nav__link">
+    <span class="md-ellipsis">
+      find_mapping_by_id
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.inventory" class="md-nav__link">
+    <span class="md-ellipsis">
+      inventory
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.mapping_to_file" class="md-nav__link">
+    <span class="md-ellipsis">
+      mapping_to_file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.mapping_to_stream" class="md-nav__link">
+    <span class="md-ellipsis">
+      mapping_to_stream
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.plain_mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      plain_mapping
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.process_kwargs" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_kwargs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.process_loaded_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      process_loaded_config
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.reverse_mappings" class="md-nav__link">
+    <span class="md-ellipsis">
+      reverse_mappings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.rule_to_regex" class="md-nav__link">
+    <span class="md-ellipsis">
+      rule_to_regex
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.mappings.Mapping.wants_rules_sorted" class="md-nav__link">
+    <span class="md-ellipsis">
+      wants_rules_sorted
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transducer
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transducer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.__call__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __call__
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.change_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      change_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.delete_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      delete_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.get_longest_and_shortest" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_longest_and_shortest
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.get_match_groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_match_groups
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.insert_character" class="md-nav__link">
+    <span class="md-ellipsis">
+      insert_character
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.resolve_intermediate_chars" class="md-nav__link">
+    <span class="md-ellipsis">
+      resolve_intermediate_chars
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#g2p.transducer.Transducer.update_explicit_indices" class="md-nav__link">
+    <span class="md-ellipsis">
+      update_explicit_indices
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="python-package">Python package<a class="headerlink" href="#python-package" title="Permanent link">&para;</a></h1>
+<p>The easiest way to create a transducer programmatically is to use the <code>g2p.make_g2p</code> function.</p>
+<p>To use it, first import the function:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_g2p</span>
+</code></pre></div>
+<p>Then, call it with an argument for <code>in_lang</code> and <code>out_lang</code>. Both must be strings equal to the name of a particular mapping.</p>
+<div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span> <span class="o">=</span> <span class="n">make_g2p</span><span class="p">(</span><span class="s1">&#39;dan&#39;</span><span class="p">,</span> <span class="s1">&#39;eng-arpabet&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span><span class="p">(</span><span class="s1">&#39;hej&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">output_string</span>
+<span class="s1">&#39;HH EH Y&#39;</span>
+</code></pre></div>
+<p>There must be a valid path between the <code>in_lang</code> and <code>out_lang</code> in order for this to work. If you've edited a mapping or added a custom mapping, you must update g2p to include it: <code>g2p update</code></p>
+<h2 id="a-look-under-the-hood">A look under the hood<a class="headerlink" href="#a-look-under-the-hood" title="Permanent link">&para;</a></h2>
+<p>A Mapping object is a list of defined rules.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="g2p.mappings.Mapping" class="doc doc-heading">
+          <code>g2p.mappings.Mapping</code>
+
+
+<a href="#g2p.mappings.Mapping" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents first">
+
+  
+      <p>Class for lookup tables</p>
+<p>@param as_is: bool = True
+    Affects whether or not rules are sorted or left as is.
+    Please use <code>rule_ordering</code> instead.
+    If True, Evaluate g2p rules in mapping in the order they are written.
+    If False, rules will be reverse sorted by length.</p>
+<pre><code>.. deprecated:: 0.6
+    use ``rule_ordering`` instead
+</code></pre>
+<p>@param case_sensitive: bool = True
+    Lower all rules and conversion input</p>
+<p>@param escape_special: bool = False
+    Escape special characters in rules</p>
+<p>@param norm_form: str = "NFD"
+    Normalization standard to follow. NFC | NKFC | NFD | NKFD | none</p>
+<p>@param out_delimiter: str = ""
+    Separate output transformations with a delimiter</p>
+<p>@param reverse: bool = False
+    Reverse all mappings</p>
+<p>@param rule_ordering: str = "as-written"
+    Affects in what order the rules are applied.</p>
+<pre><code>If set to ``"as-written"``, rules are applied from top-to-bottom in the order that they
+are written in the source file
+(previously this was accomplished with ``as_is=True``).
+
+If set to ``"apply-longest-first"``, rules are first sorted such that rules with the longest
+input are applied first. Sorting the rules like this prevents shorter rules
+from taking part in feeding relations
+(previously this was accomplished with ``as_is=False``).
+</code></pre>
+<p>@param prevent_feeding: bool = False
+    Converts each rule into an intermediary form</p>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.add_abbreviations" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">add_abbreviations</span><span class="p">(</span><span class="n">abbs</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.add_abbreviations" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return abbreviated forms, given a list of abbreviations.</p>
+<p>{'in': 'a', 'out': 'b', 'context_before': 'V', 'context_after': '' }
+{'abbreviation': 'V', 'stands_for': ['a','b','c']}
+-&gt;
+{'in': 'a', 'out': 'b', 'context_before': 'a|b|c', 'context_after': ''}</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.config_to_file" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">config_to_file</span><span class="p">(</span><span class="n">output_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">GEN_DIR</span><span class="p">,</span> <span class="s1">&#39;config.yaml&#39;</span><span class="p">),</span> <span class="n">mapping_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.config_to_file" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write config to file</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.deduplicate" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">deduplicate</span><span class="p">()</span></code>
+
+<a href="#g2p.mappings.Mapping.deduplicate" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Remove duplicate rules found in self, keeping the first copy found.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.extend" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">extend</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.extend" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Add all the rules from mapping into self, effectively merging two mappings</p>
+<p>Caveat: if self and mapping have contradictory rules, which one will
+"win" is unspecified, and may depend on mapping configuration options.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.find_mapping_by_id" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">find_mapping_by_id</span><span class="p">(</span><span class="n">map_id</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+<a href="#g2p.mappings.Mapping.find_mapping_by_id" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Find the mapping with a given ID</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.inventory" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">inventory</span><span class="p">(</span><span class="n">in_or_out</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.inventory" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return just inputs or outputs as inventory of mapping</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.mapping_to_file" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">mapping_to_file</span><span class="p">(</span><span class="n">output_path</span><span class="o">=</span><span class="n">GEN_DIR</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.mapping_to_file" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write mapping to file</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.mapping_to_stream" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">mapping_to_stream</span><span class="p">(</span><span class="n">out_stream</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.mapping_to_stream" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Write mapping to a stream</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.plain_mapping" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">plain_mapping</span><span class="p">(</span><span class="n">skip_empty_contexts</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.plain_mapping" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Return the plain mapping for displaying or saving to disk.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>skip_empty_contexts</code></td>
+          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>when set, filter out empty context_before/after</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.process_kwargs" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">process_kwargs</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.process_kwargs" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Apply kwargs in the order they are provided. kwargs are ordered as of python 3.6</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.process_loaded_config" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">process_loaded_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.process_loaded_config" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>For a mapping loaded from a file, take the keyword arguments and supply them to the
+Mapping, and get any abbreviations data.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.reverse_mappings" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">reverse_mappings</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.reverse_mappings" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Reverse the mapping</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.rule_to_regex" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">rule_to_regex</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span></code>
+
+<a href="#g2p.mappings.Mapping.rule_to_regex" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Turns an input string (and the context) from an input/output pair
+into a regular expression pattern"</p>
+<p>The 'in' key is the match.
+The 'context_after' key creates a lookahead.
+The 'context_before' key creates a lookbehind.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>rule</code></td>
+          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A dictionary containing 'in', 'out', 'context_before', and 'context_after' keys</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>Exception</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>This is raised when un-supported regex characters or symbols exist in the rule</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>Pattern</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.Pattern">Pattern</span>, None]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>returns a regex pattern (re.Pattern)</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+<td><code>None</code></td>          <td>
+                <code><span title="typing.Union">Union</span>[<span title="typing.Pattern">Pattern</span>, None]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if input is null</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.mappings.Mapping.wants_rules_sorted" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">wants_rules_sorted</span><span class="p">()</span></code>
+
+<a href="#g2p.mappings.Mapping.wants_rules_sorted" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Returns whether the rules will be sorted prior to finalizing the mapping.</p>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>bool</code></td>          <td>
+                <code>bool</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>True if the rules should be sorted.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div><p>A Transducer object is initialized with a Mapping object and when called, applies each rule of the Mapping in sequence
+on the input to produce the resulting output.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="g2p.transducer.Transducer" class="doc doc-heading">
+          <code>g2p.transducer.Transducer</code>
+
+
+<a href="#g2p.transducer.Transducer" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+  <div class="doc doc-contents first">
+
+  
+      <p>This is the fundamental class for performing conversions in the g2p library.</p>
+<p>Each Transducer must be initialized with a Mapping object. The Transducer object can then be called to apply the rules from Mapping on a given input.</p>
+
+
+
+  <p><strong>Attributes:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code><span title="g2p.transducer.Transducer.mapping">mapping</span></code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="g2p.mappings.Mapping" href="#g2p.mappings.Mapping">Mapping</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Formatted input/output pairs using the g2p.mappings.Mapping class.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">to_convert</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debugger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.__call__" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>The basic method to transduce an input. A proxy for self.apply_rules.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>to_convert</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The string to convert.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>TransductionGraph</code></td>          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Returns an object with all the nodes representing input and output characters and their corresponding edges representing the indices of the transformation.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.change_character" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">change_character</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">character</span><span class="p">,</span> <span class="n">index_to_change</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.change_character" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Change character at <code>index_to_change</code> in TransductionGraph output to <code>character</code></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>tg</code></td>
+          <td>
+                <code><span title="g2p.transducer.TransductionGraph">TransductionGraph</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the current Transduction Graph</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>character</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the character to change to</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index_to_change</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>index of character to change</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.delete_character" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">delete_character</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">index_to_delete</span><span class="p">,</span> <span class="n">ahh</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.delete_character" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Delete character at <code>index_to_delete</code> in TransductionGraph output</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>tg</code></td>
+          <td>
+                <code><span title="g2p.transducer.TransductionGraph">TransductionGraph</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the current Transduction Graph</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index_to_delete</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>index of character to delete</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>ahh</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>current value of i in calling loop</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.get_longest_and_shortest" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">get_longest_and_shortest</span><span class="p">(</span><span class="n">in_string_or_matches</span><span class="p">,</span> <span class="n">out_string_or_matches</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.get_longest_and_shortest" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Given two strings or match lists determine the longest and shortest. If
+   the input is longer than the output, the process is to delete,
+   if the output is longer than the input, the process is to insert.
+   If the input and output are the same length, the process is basic.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>in_string_or_matches</code></td>
+          <td>
+                <code>str | <span title="typing.List">List</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>input string</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_string_or_matches</code></td>
+          <td>
+                <code>str | <span title="typing.List">List</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>output string</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.get_match_groups" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">get_match_groups</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">start_end</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">diff_from_input</span><span class="p">,</span> <span class="n">out_string</span><span class="p">,</span> <span class="n">output_start</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.get_match_groups" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Take the inputs to explicit indices matching and create groups of
+    Input and Output matches that are grouped by their explicit indices.</p>
+<pre><code>For example, applying a rule that is defined: a{1}b{2} → b{2}a{1} on the input "ab"
+will return inputs, outputs where:
+
+inputs = {'1': [{'index': 0, 'string': 'a'}], '2': [{'index': 1, 'string': 'b'}] }
+outputs = {'1': [{'index': 0, 'string': 'b'}], '2': [{'index': 1, 'string': 'a'}] }
+
+This allows input match groups to be iterated through in sequence regardless of their character sequence.
+</code></pre>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>tg</code></td>
+          <td>
+                <code><span title="g2p.transducer.TransductionGraph">TransductionGraph</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the graph holding information about the transduction</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>start_end</code></td>
+          <td>
+                <code>Tuple(int, int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>a tuple contianing the start and end of the input match</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>io</code></td>
+          <td>
+                <code><span title="typing.List">List</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>an input/output rule</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>diff_from_input</code></td>
+          <td>
+                <code>DefaultDict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>A dictionary containing the single character distance from a given character index to its input</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>out_string</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the raw output string</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>output_start</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the diff-offset start of the match with respect to the output</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+<th>Name</th>        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+<td><code>inputs</code></td>          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dictionary containing matches grouped by explicit index match</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+<td><code>outputs</code></td>          <td>
+                <code>dict</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>dictionary containing matches grouped by explicit index match</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.insert_character" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">insert_character</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">character_to_insert</span><span class="p">,</span> <span class="n">index_to_insert_character</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.insert_character" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Insert character at <code>index_to_insert_character</code> in TransductionGraph output</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>tg</code></td>
+          <td>
+                <code><span title="g2p.transducer.TransductionGraph">TransductionGraph</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the current Transduction Graph</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>character_to_insert</code></td>
+          <td>
+                <code>str</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>the character to insert</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>index_to_insert_character</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>index of character to insert</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.resolve_intermediate_chars" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">resolve_intermediate_chars</span><span class="p">(</span><span class="n">output_string</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.resolve_intermediate_chars" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Go through all chars and resolve any intermediate characters from the Private Supplementary Use Area
+to their mapped equivalents.</p>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<h5 id="g2p.transducer.Transducer.update_explicit_indices" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">update_explicit_indices</span><span class="p">(</span><span class="n">tg</span><span class="p">,</span> <span class="n">match</span><span class="p">,</span> <span class="n">start_end</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">diff_from_input</span><span class="p">,</span> <span class="n">diff_from_output</span><span class="p">,</span> <span class="n">out_string</span><span class="p">)</span></code>
+
+<a href="#g2p.transducer.Transducer.update_explicit_indices" class="headerlink" title="Permanent link">&para;</a></h5>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Takes an arbitrary number of input &amp; output strings and their corresponding index offsets.
+It then zips them up according to the provided indexing notation.</p>
+
+<details class="example" open>
+  <summary>Example</summary>
+  <p>A rule that turns a sequence of k̓ to 'k might would have a default indexing of k -&gt; ' and ̓ -&gt; k
+It might be desired though to show that k -&gt; k and ̓ -&gt; ' and their indices were transposed.
+For this, the Mapping could be given the following: [{'in': 'k{1}̓{2}', 'out': "'{2}k{1}"}]
+Indices are found with r'(?&lt;={)\d+(?=})' and characters are found with r'[^0-9{}]+(?={\d+})'</p>
+</details>
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script src="https://giscus.app/client.js" data-repo="roedoejet/g2p" data-repo-id="MDEwOlJlcG9zaXRvcnkxODU0NzczMDA=" data-category="Q&A" data-category-id="DIC_kwDOCw4otM4CZIZp" data-mapping="pathname" data-strict="0" data-reactions-enabled="1" data-emit-metadata="1"
+    data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="en" crossorigin="anonymous" async>
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    /* Set palette on initial load */
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+        var theme = palette.color.scheme === "slate" ? "dark" : "light"
+        giscus.setAttribute("data-theme", theme)
+    }
+
+    /* Register event handlers after documented loaded */
+    document.addEventListener("DOMContentLoaded", function() {
+        var ref = document.querySelector("[data-md-component=palette]")
+        ref.addEventListener("change", function() {
+            var palette = __md_get("__palette")
+            if (palette && typeof palette.color === "object") {
+                var theme = palette.color.scheme === "slate" ? "dark" : "light"
+
+                /* Instruct Giscus to change theme */
+                var frame = document.querySelector(".giscus-frame")
+                frame.contentWindow.postMessage({
+                        giscus: {
+                            setConfig: {
+                                theme
+                            }
+                        }
+                    },
+                    "https://giscus.app"
+                )
+            }
+        })
+    })
+</script>
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.code.select", "announce.dismiss"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "stable", "provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.c8d2eff1.min.js"></script>
+      
+    
+  </body>
+</html>
