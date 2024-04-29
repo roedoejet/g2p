@@ -16,5 +16,6 @@
     {"in": "e:", "out": "é:"},
     {"in": "a:", "out": "á:"},
     {"in": "o:", "out": "ó:"},
+    {"in": "ό", "out": "ó"},
     {"in": ":", "out": ":", "comment": "force the tokenizer to recognize colon as a letter"}
 ]
