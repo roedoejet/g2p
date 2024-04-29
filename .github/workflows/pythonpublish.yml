@@ -1,8 +1,8 @@
 # To create a release:
-#  - update the version number in g2p/_version.py
 #  - commit the changes
 #  - create an annotated tag with the version number, e.g.: git tag -a v2.0.1 -m "v2.0.1"
-#  - push the tag, which will trigger this pythonpublish release workflow
+#  - push the tag, which will trigger this pythonpublish release workflow and hatch build will build and publish using the tag version
+#  - note: only builds from tagged commits will have proper release versions, others will have dev versions
 
 name: Publish g2p to PyPI and create a GitHub release
 
