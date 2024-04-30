@@ -1,7 +1,11 @@
 Pull request template for adding a new language
 -----------------------------------------------
 
-*Do not use this for other types of pull requests*
+<!--
+  - Use this template if you are adding a new language or modifying a mapping
+  - For all other PRs, please add  ?expand=1&template=software_pr.md  to the URL above
+    to use the software PR template instead.
+ -->
 
 * **Please check if the PR fulfills these requirements**
 - [ ] Mapping files are added in `g2p/mappings/langs`
