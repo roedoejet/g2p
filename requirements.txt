@@ -93,7 +93,7 @@ starlette==0.37.2
     #   fastapi
 text-unidecode==1.3
     # via hatch.envs.prod
-tqdm==4.66.2
+tqdm==4.66.3
     # via hatch.envs.prod
 typing-extensions==4.10.0
     # via
