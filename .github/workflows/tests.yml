@@ -103,3 +103,35 @@ jobs:
           # Warning: This is PowerShell syntax, not bash!
           g2p convert est fra fra-ipa > out
           if (diff (echo ɛ) (cat out)) { throw "Output did not match reference" }
+
+  test-heroku-env:
+    # Replicate what heroku will run
+    runs-on: ubuntu-22.04  # https://devcenter.heroku.com/articles/heroku-22-stack
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get the Python version from runtime.txt, like Heroku does
+        id: runtime
+        run: echo "PYTHON_VERSION=$(cat runtime.txt | sed 's/python-//')" >> $GITHUB_ENV
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: python -m pip install --upgrade pip
+      - name: Start with requirements.txt
+        # This is for optimization purposes, so that .[test] below doesn't install wrong
+        # versions just to have them replaced by requirements.txt in the next step.
+        run: pip install -r requirements.txt
+      - name: Install all test dependencies
+        run: |
+          pip install -e .[test]
+          python -m playwright install --with-deps chromium
+      - name: Overwrite dependencies and g2p, the Heroku way, to replicate the production env
+        run: |
+          # Possibly redundant, but make sure .[test] did not override anything
+          pip install -r requirements.txt
+          bin/post_compile
+      - name: Launch the API
+        run: python run_studio.py &
+      - name: Run the regular dev suite
+        run: python run_tests.py dev
+      - name: Run test-studio
+        run: python g2p/tests/test_studio.py
