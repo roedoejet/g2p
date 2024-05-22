@@ -16,6 +16,7 @@ import yaml
 from pydantic import BaseModel
 
 from g2p import exceptions
+from g2p._version import version_tuple
 from g2p.log import LOGGER
 from g2p.mappings.langs import _LANGS, _MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
@@ -160,6 +161,15 @@ class Mapping(_MappingModelDefinition):
                 'is using the deprecated parameter "as_is"; '
                 f"replace `as_is: {self.as_is}` with `rule_ordering: {appropriate_setting.value}`"
             )
+            if version_tuple < (3,):
+                LOGGER.warning(
+                    "as_is support will be removed in the next major version, g2p 3."
+                )
+            else:
+                LOGGER.error("The as_is feature has been removed in version 3.0.0")
+                import sys
+
+                sys.exit(1)
 
         # Sorting must happen before the calculation of PUA intermediate forms for proper indexing
         if self.rule_ordering == RULE_ORDERING_ENUM.apply_longest_first:

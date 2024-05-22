@@ -60,7 +60,7 @@ class MappingTest(TestCase):
     def test_json_map(self):
         json_map = Mapping(
             rules=self.json_map["map"],
-            **{k: v for k, v in self.json_map.items() if k != "map"}
+            **{k: v for k, v in self.json_map.items() if k != "map"},
         )
         self.assertEqual(len(json_map.rules), 34)
         # This is a very old version of the config, I'm not even sure these tests should be in here at all.
@@ -83,6 +83,8 @@ class MappingTest(TestCase):
     def test_as_is(self):
         """
         Test deprecated config: as_is.
+
+        This will fail when we release g2p 3.0.0, at which point we can just delete this test.
         """
 
         # explicitly set as_is=False
