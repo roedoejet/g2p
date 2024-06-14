@@ -532,10 +532,16 @@ def convert(  # noqa: C901
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
     # Figure if the input text is on the command line or in a file
-    input_text_is_a_file = os.path.exists(input_text) and input_text.endswith("txt")
+    input_text_is_a_file = (
+        os.path.exists(input_text)
+        and input_text.endswith("txt")
+        or re.match(r"/dev/(fd/[0-9]*|stdin)", input_text)
+    )
     if input_text_is_a_file:
         with open(input_text, encoding="utf8") as f:
             lines = f.readlines()
+    elif input_text == "-":
+        lines = sys.stdin.readlines()
     else:
         lines = [input_text]
     # Determine which tokenizer to use, if any
