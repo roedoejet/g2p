@@ -50,7 +50,8 @@ class ResourceIntegrationTest(TestCase):
         """
         for rt in self.routes_no_args:
             try:
-                r = self.client.get(rt)
+                with self.assertLogs():  # silence the logs by asserting them
+                    r = self.client.get(rt)
                 self.assertEqual(r.status_code, 200)
                 LOGGER.debug("Route " + rt + " returned " + str(r.status_code))
             except Exception as exc:
@@ -64,7 +65,8 @@ class ResourceIntegrationTest(TestCase):
             for node in LANGS_NETWORK.nodes:
                 rt = re.sub(self.arg_match, node, ep)
                 try:
-                    r = self.client.get(rt)
+                    with self.assertLogs():  # silence the logs by asseting them
+                        r = self.client.get(rt)
                     self.assertEqual(r.status_code, 200)
                 except Exception as exc:
                     LOGGER.error("Couldn't connect. Is the API running? %s", exc)
@@ -102,14 +104,18 @@ class ResourceIntegrationTest(TestCase):
             "text": "hej",
         }
         self.maxDiff = None
-        response = self.client.get(self.conversion_route, params=params)
+        with self.assertLogs():
+            response = self.client.get(self.conversion_route, params=params)
         res_json = response.json()
         self.assertEqual(response.status_code, 200)
         with open(os.path.join(PUB_DIR, "sample_response.json")) as f:
             data = json.load(f)
         self.assertEqual(res_json, data)
         # check minimal response
-        minimal_response = self.client.get(self.conversion_route, params=minimal_params)
+        with self.assertLogs():
+            minimal_response = self.client.get(
+                self.conversion_route, params=minimal_params
+            )
         data["debugger"] = False
         data["index"] = False
         self.assertEqual(minimal_response.status_code, 200)
@@ -147,7 +153,8 @@ class ResourceIntegrationTest(TestCase):
             "index": True,
             "tokenize": True,
         }
-        response = self.client.get(self.conversion_route, params=params_with_tok)
+        with self.assertLogs():
+            response = self.client.get(self.conversion_route, params=params_with_tok)
         self.assertEqual(response.status_code, 200)
         res_json_tok = response.json()
         self.assertEqual(res_json_tok["debugger"][0][0][0]["input"], "ceci")
@@ -160,7 +167,8 @@ class ResourceIntegrationTest(TestCase):
             "index": True,
             "tokenize": False,
         }
-        response = self.client.get(self.conversion_route, params=params_no_tok)
+        with self.assertLogs():
+            response = self.client.get(self.conversion_route, params=params_no_tok)
         self.assertEqual(response.status_code, 200)
         res_json_no_tok = response.json()
         self.assertNotEqual(res_json_tok, res_json_no_tok)
