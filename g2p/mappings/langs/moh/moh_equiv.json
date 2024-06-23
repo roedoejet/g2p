@@ -8,7 +8,7 @@
     {"in": "èn", "out": "èn:", "context_after": "(CONSONANT)"},
     {"in": "on:", "out": "ón:"},
     {"in": "en:", "out": "én:"},
-    {"in": "à", "out": "à:", "context_after": "[^:]"},
+    {"in": "à", "out": "à:", "context_after": "[^:]"},
     {"in": "è", "out": "è:", "context_after": "([^:n]|n(VOWEL))"},
     {"in": "ì", "out": "ì:", "context_after": "[^:]"},
     {"in": "ò", "out": "ò:", "context_after": "([^:n]|n(VOWEL))"},
