@@ -24,7 +24,7 @@ from g2p.mappings.utils import (
     strip_index_notation,
     unicode_escape,
 )
-from g2p.types import BaseTokenizer, BaseTransducer, BaseTransductionGraph
+from g2p.shared_types import BaseTokenizer, BaseTransducer, BaseTransductionGraph
 
 # Avoid TypeError in Python < 3.7 (see
 # https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
