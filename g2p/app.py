@@ -16,6 +16,7 @@ http://localhost:5000/ and the API at http://localhost:5000/api/v1/docs
 """
 
 import os
+from pathlib import Path
 from typing import Dict, List, Union
 
 import socketio  # type: ignore
@@ -27,6 +28,7 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
+import g2p
 from g2p import make_g2p
 from g2p.api import api as api_v1
 from g2p.api_v2 import api as api_v2
@@ -47,7 +49,9 @@ from g2p.transducer import (
 
 DEFAULT_N = 10
 
-TEMPLATES = Jinja2Templates(directory="g2p/templates")
+BASE_DIR = Path(g2p.__file__).parent
+
+TEMPLATES = Jinja2Templates(directory=BASE_DIR / "templates")
 server_args: Dict[str, Union[bool, str]] = {"async_mode": "asgi"}
 if os.getenv("G2P_STUDIO_DEBUG"):
     server_args["logger"] = server_args["engineio_logger"] = True
@@ -78,7 +82,7 @@ APP = Starlette(
         Mount("/api/v1", api_v1),
         Mount("/api/v2", api_v2),
         Route("/static/swagger.json", redirect_to_openapi),
-        Mount("/static", StaticFiles(directory="g2p/static"), name="static"),
+        Mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static"),
         Route("/docs", redirect_to_docs),
     ],
 )
