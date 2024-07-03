@@ -16,7 +16,7 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
-from g2p.types import BaseTokenizer
+from g2p.shared_types import BaseTokenizer
 
 
 class Tokenizer(BaseTokenizer):

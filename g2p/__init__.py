@@ -29,7 +29,7 @@ import sys
 from typing import Dict, Optional, Tuple, Union
 
 from g2p.exceptions import InvalidLanguageCode, NoPath
-from g2p.types import BaseTokenizer, BaseTransducer
+from g2p.shared_types import BaseTokenizer, BaseTransducer
 
 if sys.version_info < (3, 7):  # pragma: no cover
     sys.exit(
