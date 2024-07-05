@@ -495,6 +495,10 @@ class CliTest(TestCase):
         self.assertIn("fʁɑ̃sɛ", results.output)
         with open(input_file, "r", encoding="utf8") as f:
             lines_in = len(list(f))
+        # Make sure there is no resource warning about unclosed files
+        self.assertNotIn("ResourceWarning", results.output)
+        self.assertNotIn("unclosed file", results.output)
+        # The output should have the same number of lines as the input
         self.assertEqual(lines_in, len(results.output.splitlines()))
 
     def test_convert_errors(self):

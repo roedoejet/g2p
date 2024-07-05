@@ -537,39 +537,45 @@ def convert(  # noqa: C901
         and input_text.endswith("txt")
         or re.match(r"/dev/(fd/[0-9]*|stdin)", input_text)
     )
-    if input_text_is_a_file:
-        with open(input_text, encoding="utf8") as f:
-            lines = f.readlines()
-    elif input_text == "-":
-        lines = sys.stdin.readlines()
-    else:
-        lines = [input_text]
-    # Determine which tokenizer to use, if any
-    if tok is not None and not tok and tok_lang is not None:
-        raise click.UsageError("Specified conflicting --no-tok and --tok-lang options.")
-    if tok is None:
-        tok = True  # Tokenize by default
-    custom_tokenizer = make_tokenizer(tok_lang) if tok_lang else None
-    # Transduce!!!
-    assert in_lang and out_lang
-    transducer = make_g2p(
-        in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
-    )
-    for line in lines:
-        tg = transducer(line)
-        if check:
-            transducer.check(tg, display_warnings=True)
-        outputs = [tg.output_string]
-        if substring_alignments:
-            outputs += [tg.substring_alignments()]
-        if pretty_edges:
-            outputs += [tg.pretty_edges()]
-        if debugger:
-            outputs += [tg.edges, tg.debugger]
-        if len(outputs) > 1:
-            click.echo(pprint.pformat(outputs, indent=4))
+    to_close = None
+    try:
+        if input_text_is_a_file:
+            to_close = lines = open(input_text, encoding="utf8")
+        elif input_text == "-":
+            lines = sys.stdin
         else:
-            click.echo(tg.output_string, nl=not input_text_is_a_file)
+            lines = [input_text]
+        # Determine which tokenizer to use, if any
+        if tok is not None and not tok and tok_lang is not None:
+            raise click.UsageError(
+                "Specified conflicting --no-tok and --tok-lang options."
+            )
+        if tok is None:
+            tok = True  # Tokenize by default
+        custom_tokenizer = make_tokenizer(tok_lang) if tok_lang else None
+        # Transduce!!!
+        assert in_lang and out_lang
+        transducer = make_g2p(
+            in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
+        )
+        for line in lines:
+            tg = transducer(line)
+            if check:
+                transducer.check(tg, display_warnings=True)
+            outputs = [tg.output_string]
+            if substring_alignments:
+                outputs += [tg.substring_alignments()]
+            if pretty_edges:
+                outputs += [tg.pretty_edges()]
+            if debugger:
+                outputs += [tg.edges, tg.debugger]
+            if len(outputs) > 1:
+                click.echo(pprint.pformat(outputs, indent=4))
+            else:
+                click.echo(tg.output_string, nl=not input_text_is_a_file)
+    finally:
+        if to_close is not None:
+            to_close.close()
 
 
 # Note: with -m eng-ipa, we actually check all the mappings from lang-ipa to eng-ipa.
