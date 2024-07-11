@@ -442,6 +442,13 @@ def generate_mapping(  # noqa: C901
     help="Show all the conversion steps applied.",
 )
 @click.option(
+    "--file",
+    "-f",
+    default=False,
+    is_flag=True,
+    help="Read input from plain-text file INPUT_TEXT.",
+)
+@click.option(
     "--check/--no-check",
     "-c",
     default=False,
@@ -478,6 +485,7 @@ def convert(  # noqa: C901
     input_text,
     tok,
     check,
+    file,
     debugger,
     pretty_edges,
     tok_lang,
@@ -531,20 +539,23 @@ def convert(  # noqa: C901
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
-    # Figure if the input text is on the command line or in a file
-    input_text_is_a_file = (
-        os.path.exists(input_text)
-        and input_text.endswith("txt")
-        or re.match(r"/dev/(fd/[0-9]*|stdin)", input_text)
-    )
     to_close = None
     try:
-        if input_text_is_a_file:
-            to_close = lines = open(input_text, encoding="utf8")
-        elif input_text == "-":
-            lines = sys.stdin
+        if file:
+            if input_text == "-":
+                lines = sys.stdin
+            else:
+                try:
+                    to_close = lines = open(input_text, encoding="utf8")
+                except FileNotFoundError as e:
+                    raise click.UsageError(f"Could not open file {input_text}: {e}")
         else:
             lines = [input_text]
+            if os.path.exists(input_text) and input_text.endswith(".txt"):
+                LOGGER.warning(
+                    "The old heuristic for detecting file input is deprecated, "
+                    f"specify --file if you meant to read your input text from file {input_text}."
+                )
         # Determine which tokenizer to use, if any
         if tok is not None and not tok and tok_lang is not None:
             raise click.UsageError(
@@ -572,7 +583,7 @@ def convert(  # noqa: C901
             if len(outputs) > 1:
                 click.echo(pprint.pformat(outputs, indent=4))
             else:
-                click.echo(tg.output_string, nl=not input_text_is_a_file)
+                click.echo(tg.output_string, nl=not file)
     finally:
         if to_close is not None:
             to_close.close()

@@ -11,7 +11,6 @@ from unittest import TestCase, main
 import jsonschema
 import yaml
 from click.testing import CliRunner
-from tqdm import tqdm
 
 from g2p._version import VERSION
 from g2p.cli import (
@@ -122,13 +121,14 @@ class CliTest(TestCase):
                 encoding="utf8",
             ) as f:
                 schema = json.load(f)
-        for config in tqdm(
-            Path(LANGS_DIR).glob("**/config-g2p.yaml"),
-            desc="Validating all configurations against current schema",
-        ):
+        # Validate all configurations against the current schema, quietly unless there's an error:
+        for config in Path(LANGS_DIR).glob("**/config-g2p.yaml"):
             with open(config, encoding="utf8") as f:
                 config_yaml = yaml.safe_load(f)
-            self.assertIsNone(jsonschema.validate(config_yaml, schema=schema))
+            try:
+                jsonschema.validate(config_yaml, schema=schema)
+            except jsonschema.exceptions.ValidationError:
+                self.fail(f"Error validating {config}")
 
     def test_convert(self):
         langs_to_test = load_public_test_data()
@@ -490,7 +490,7 @@ class CliTest(TestCase):
 
     def test_convert_from_file(self):
         input_file = os.path.join(DATA_DIR, "fra_simple.txt")
-        results = self.runner.invoke(convert, [input_file, "fra", "fra-ipa"])
+        results = self.runner.invoke(convert, [input_file, "fra", "fra-ipa", "--file"])
         self.assertEqual(results.exit_code, 0)
         self.assertIn("fʁɑ̃sɛ", results.output)
         with open(input_file, "r", encoding="utf8") as f:
@@ -500,6 +500,25 @@ class CliTest(TestCase):
         self.assertNotIn("unclosed file", results.output)
         # The output should have the same number of lines as the input
         self.assertEqual(lines_in, len(results.output.splitlines()))
+
+        # - is stdin
+        results = self.runner.invoke(
+            convert, ["--file", "-", "fra", "fra-ipa"], input="français"
+        )
+        self.assertEqual(results.exit_code, 0)
+        self.assertIn("fʁɑ̃sɛ", results.output)
+
+        # warning about deprecated heuristic file detection
+        with self.assertLogs(LOGGER, "WARNING") as cm:
+            self.runner.invoke(convert, [input_file, "fra", "fra-ipa"])
+        self.assertIn("deprecated", "".join(cm.output))
+
+        # Error for --file with non existent file
+        results = self.runner.invoke(
+            convert, ["does_not_exist.txt", "fra", "fra-ipa", "--file"]
+        )
+        self.assertNotEqual(results.exit_code, 0)
+        self.assertIn("No such file or directory", results.output)
 
     def test_convert_errors(self):
         """Exercise code handling error situations in g2p convert"""
