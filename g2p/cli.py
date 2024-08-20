@@ -700,7 +700,9 @@ def update(in_dir, out_dir):
 )
 @cli.command(context_settings=CONTEXT_SETTINGS)
 def update_schema(out_dir):
-    """Generate a schema for the model configuration - this should only be done once for each Minor version.
+    """Generate a schema for the model configuration.
+
+    This should only be done once for each Minor version.
     Changes to the schema should result in a minor version bump.
     """
     # Defer expensive imports

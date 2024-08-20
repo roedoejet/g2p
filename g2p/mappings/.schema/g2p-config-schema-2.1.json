@@ -1,0 +1,340 @@
+{
+  "$defs": {
+    "MAPPING_TYPE": {
+      "enum": [
+        "mapping",
+        "unidecode",
+        "lexicon"
+      ],
+      "title": "MAPPING_TYPE",
+      "type": "string"
+    },
+    "Mapping": {
+      "additionalProperties": true,
+      "description": "Class for lookup tables",
+      "properties": {
+        "parent_dir": {
+          "anyOf": [
+            {
+              "format": "directory-path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Dir"
+        },
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
+        "in_lang": {
+          "default": "standalone",
+          "title": "In Lang",
+          "type": "string"
+        },
+        "out_lang": {
+          "default": "standalone",
+          "title": "Out Lang",
+          "type": "string"
+        },
+        "language_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language Name"
+        },
+        "display_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Display Name"
+        },
+        "as_is": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "As Is"
+        },
+        "case_sensitive": {
+          "default": true,
+          "title": "Case Sensitive",
+          "type": "boolean"
+        },
+        "case_equivalencies": {
+          "default": {},
+          "title": "Case Equivalencies",
+          "type": "object"
+        },
+        "preserve_case": {
+          "default": false,
+          "title": "Preserve Case",
+          "type": "boolean"
+        },
+        "escape_special": {
+          "default": false,
+          "title": "Escape Special",
+          "type": "boolean"
+        },
+        "norm_form": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/NORM_FORM_ENUM"
+            }
+          ],
+          "default": "NFD"
+        },
+        "out_delimiter": {
+          "default": "",
+          "title": "Out Delimiter",
+          "type": "string"
+        },
+        "reverse": {
+          "default": false,
+          "title": "Reverse",
+          "type": "boolean"
+        },
+        "rule_ordering": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/RULE_ORDERING_ENUM"
+            }
+          ],
+          "default": "as-written"
+        },
+        "prevent_feeding": {
+          "default": false,
+          "title": "Prevent Feeding",
+          "type": "boolean"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/MAPPING_TYPE"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "alignments": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Alignments",
+          "type": "array"
+        },
+        "alignments_path": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alignments Path"
+        },
+        "authors": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Authors"
+        },
+        "abbreviations": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "default": {},
+          "title": "Abbreviations",
+          "type": "object"
+        },
+        "abbreviations_path": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Abbreviations Path"
+        },
+        "rules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Rule"
+          },
+          "title": "Rules",
+          "type": "array"
+        },
+        "rules_path": {
+          "anyOf": [
+            {
+              "format": "path",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rules Path"
+        }
+      },
+      "title": "Mapping",
+      "type": "object"
+    },
+    "NORM_FORM_ENUM": {
+      "enum": [
+        "NFC",
+        "NFD",
+        "NKFC",
+        "NKFD",
+        "none"
+      ],
+      "title": "NORM_FORM_ENUM",
+      "type": "string"
+    },
+    "RULE_ORDERING_ENUM": {
+      "enum": [
+        "as-written",
+        "apply-longest-first"
+      ],
+      "title": "RULE_ORDERING_ENUM",
+      "type": "string"
+    },
+    "Rule": {
+      "properties": {
+        "in": {
+          "title": "In",
+          "type": "string"
+        },
+        "out": {
+          "title": "Out",
+          "type": "string"
+        },
+        "context_before": {
+          "default": "",
+          "title": "Context Before",
+          "type": "string"
+        },
+        "context_after": {
+          "default": "",
+          "title": "Context After",
+          "type": "string"
+        },
+        "prevent_feeding": {
+          "default": false,
+          "title": "Prevent Feeding",
+          "type": "boolean"
+        },
+        "match_pattern": {
+          "anyOf": [
+            {
+              "format": "regex",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Match Pattern"
+        },
+        "intermediate_form": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Intermediate Form"
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Comment"
+        }
+      },
+      "required": [
+        "in",
+        "out"
+      ],
+      "title": "Rule",
+      "type": "object"
+    }
+  },
+  "description": "This is the format used by g2p for configuring mappings.",
+  "properties": {
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/Mapping"
+      },
+      "title": "Mappings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "mappings"
+  ],
+  "title": "MappingConfig",
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

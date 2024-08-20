@@ -9,7 +9,7 @@ on:
 # This **must** match the Major.Minor version of the JSON schema file
 # in g2p/mappings/.schema!!!
 env:
-  SETUPTOOLS_SCM_PRETEND_VERSION: "2.0"
+  SETUPTOOLS_SCM_PRETEND_VERSION: "2.1"
   G2P_STUDIO_DEBUG: 1
 
 jobs:
