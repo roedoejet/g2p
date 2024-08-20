@@ -10,8 +10,10 @@ from collections import defaultdict
 from unittest import TestCase, main
 
 import yaml
+from pep440 import is_canonical
 
 from g2p import get_arpabet_langs
+from g2p._version import VERSION
 from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
@@ -296,6 +298,11 @@ class UtilsTest(TestCase):
         LANGS2, LANG_NAMES2 = get_arpabet_langs()
         self.assertIs(LANGS2, LANGS)
         self.assertIs(LANG_NAMES2, LANG_NAMES)
+
+    def test_version_is_pep440_compliant(self):
+        """We test for almost PEP 440 compliance: hatch adds +local_sha1, which is not compliant."""
+        main_version, _, _ = VERSION.partition("+")
+        self.assertTrue(is_canonical(main_version))
 
 
 if __name__ == "__main__":
