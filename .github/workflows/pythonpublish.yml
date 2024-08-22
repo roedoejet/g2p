@@ -56,7 +56,7 @@ jobs:
           name: python-package-distributions
           path: dist/
       - name: Sign the dists with Sigstore
-        uses: sigstore/gh-action-sigstore-python@v1.2.3
+        uses: sigstore/gh-action-sigstore-python@v3.0.0
         with:
           inputs: >-
             ./dist/*.tar.gz
@@ -68,7 +68,7 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
       - name: Create Release
-        uses: ncipollo/release-action@v1.12.0
+        uses: ncipollo/release-action@v1.14.0
         with:
           allowUpdates: true
           name: ${{ github.ref_name }}
