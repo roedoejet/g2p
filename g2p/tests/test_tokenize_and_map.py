@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import warnings
 from unittest import TestCase, main
 
 import g2p
@@ -152,16 +151,6 @@ class TokenizeAndMapTest(TestCase):
             [(0, 0), (1, 1), (2, 2), (2, 3), (2, 4), (3, 5), (4, 6)],
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
-
-    def test_deprecated_tok_langs(self):
-        if g2p._version.VERSION < "2.0":
-            with warnings.catch_warnings(record=True) as w:
-                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
-                self.assertEqual(len(w), 1)
-                self.assertTrue(issubclass(w[-1].category, DeprecationWarning))
-        else:
-            with self.assertRaises(TypeError):
-                _ = g2p.make_g2p("fin", "eng-arpabet", "path")
 
     def test_removed_tok_langs_in_v2(self):
         # monkey patch to make sure we always exercise the TypeError pathway
