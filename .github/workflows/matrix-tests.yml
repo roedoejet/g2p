@@ -2,6 +2,8 @@ name: Run full matrix Tests before Releases
 on:
   workflow_call:
   workflow_dispatch:
+  push:
+    branches: main
 env:
   SETUPTOOLS_SCM_PRETEND_VERSION: "2.1"
 jobs:
