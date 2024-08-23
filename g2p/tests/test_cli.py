@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from unittest import TestCase, main
 
@@ -12,7 +13,7 @@ import jsonschema
 import yaml
 from click.testing import CliRunner
 
-from g2p._version import VERSION
+import g2p._version
 from g2p.cli import (
     convert,
     doctor,
@@ -32,6 +33,29 @@ from g2p.mappings.langs import (
     load_network,
 )
 from g2p.tests.public.data import DATA_DIR, load_public_test_data
+
+
+def set_g2p_version(version_tuple, version_string=None):
+    if version_string is None:
+        version_string = ".".join(str(part) for part in version_tuple)
+    g2p._version.VERSION = g2p._version.__version__ = g2p._version.version = (
+        version_string
+    )
+    g2p._version.__version_tuple__ = g2p._version.version_tuple = tuple(version_tuple)
+
+
+@contextmanager
+def monkey_patch_g2p_version(increment_tuple):
+    saved_version = g2p._version.VERSION
+    saved_version_tuple = g2p._version.version_tuple
+    incremented_version = list(g2p._version.version_tuple)
+    while len(incremented_version) < len(increment_tuple):
+        incremented_version.append(0)
+    for part, increment in enumerate(increment_tuple):
+        incremented_version[part] += increment
+    set_g2p_version(incremented_version)
+    yield
+    set_g2p_version(saved_version_tuple, saved_version)
 
 
 class CliTest(TestCase):
@@ -96,31 +120,54 @@ class CliTest(TestCase):
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
 
-    def test_schema_ci_version(self):
-        """Make sure that the version (possibly a fake version - see
-        .github/workflows/tests.yml) matches the one in the schema."""
-        MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
-        self.assertTrue(
-            (
-                Path(__file__).parent.parent
-                / "mappings"
-                / ".schema"
-                / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
-            ).exists()
-        )
-
     def test_update_schema(self):
+        # It's an error for the currently saved schema to be out of date
         result = self.runner.invoke(update_schema)
-        self.assertNotEqual(result.exit_code, 0)
-        self.assertIn("FileExistsError", str(result))
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("up to date", result.output)
+
         with tempfile.TemporaryDirectory() as tmpdir:
+            # Exercise writing a new schema to disk even if up to date
             result = self.runner.invoke(update_schema, ["-o", tmpdir])
-            MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
+            self.assertEqual(result.exit_code, 0)
+            self.assertIn("Wrote", result.output)
+
+            # Reload the written schema for further unit tests
+            (major, minor, *_rest) = g2p._version.version_tuple
+            major_minor = f"{major}.{minor}"
             with open(
-                Path(tmpdir) / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json",
+                Path(tmpdir) / f"g2p-config-schema-{major_minor}.json",
                 encoding="utf8",
             ) as f:
                 schema = json.load(f)
+
+            # A second run will necessarily already be up to date even if the patch is bumped
+            with monkey_patch_g2p_version((0, 0, +1)):
+                result_rerun = self.runner.invoke(update_schema, ["-o", tmpdir])
+                self.assertEqual(result_rerun.exit_code, 0)
+                self.assertIn("already up to date", result_rerun.output)
+
+            # Monkey patch the version to test a previous version still being up to date
+            with monkey_patch_g2p_version((+0, +1)):
+                result_new = self.runner.invoke(update_schema, ["-o", tmpdir])
+                self.assertEqual(result_new.exit_code, 0)
+                self.assertIn("still up to date", result_new.output)
+
+            # Monkey patch the version and the model to require a schema update
+            with monkey_patch_g2p_version((+1, +0)):
+                saved_doc = MappingConfig.__doc__
+                MappingConfig.__doc__ = "Changed docstring"
+                result_update = self.runner.invoke(update_schema, ["-o", tmpdir])
+                MappingConfig.__doc__ = saved_doc
+                self.assertEqual(result_update.exit_code, 0)
+                self.assertIn("Wrote", result_update.output)
+
+            # Require a schema update when it's already written: that's an error
+            with monkey_patch_g2p_version((+1, +0)):
+                result_bad_update = self.runner.invoke(update_schema, ["-o", tmpdir])
+                self.assertNotEqual(result_bad_update.exit_code, 0)
+                self.assertIn("but is not up to date", result_bad_update.output)
+
         # Validate all configurations against the current schema, quietly unless there's an error:
         for config in Path(LANGS_DIR).glob("**/config-g2p.yaml"):
             with open(config, encoding="utf8") as f:
