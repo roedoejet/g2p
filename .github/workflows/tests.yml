@@ -4,12 +4,11 @@ on:
   - push
   - workflow_call
 
-# Since we don't checkout the full history, set a default version so
-# certain tests (pep440, update_schema) will still function.  NOTE:
-# This **must** match the Major.Minor version of the JSON schema file
-# in g2p/mappings/.schema!!!
+# Since we don't checkout the full history, we use a default version so certain tests
+# (pep440, update_schema) will still function. The fake version is set in file
+# .SETUPTOOLS_SCM_PRETEND_VERSION
+
 env:
-  SETUPTOOLS_SCM_PRETEND_VERSION: "2.1"
   G2P_STUDIO_DEBUG: 1
 
 jobs:
@@ -25,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[test]
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
           pip install pip-licenses
           if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
           pip install coverage
@@ -92,9 +91,10 @@ jobs:
           # Note: this is where we also test that the g2p library still works on 3.7
           python-version: "3.7"
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[test]
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
       - name: Run tests on Windows
         run: python run_tests.py dev
       - name: Make sure the CLI outputs utf8 on Windows
@@ -121,7 +121,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Install all test dependencies
         run: |
-          pip install -e .[test]
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
           python -m playwright install --with-deps chromium
       - name: Overwrite dependencies and g2p, the Heroku way, to replicate the production env
         run: |
