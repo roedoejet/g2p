@@ -9,7 +9,8 @@ name: Publish g2p to PyPI and create a GitHub release
 on:
   push:
     tags:
-      - v[0-9]+.**
+      # We publish only actual releases, not dev, alpha or beta versions
+      - v[0-9]+.[0-9]+.[0-9]+
 
 jobs:
   tests:
