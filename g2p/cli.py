@@ -851,4 +851,4 @@ def show_mappings(lang1, lang2, verbose, csv):
             print()
     else:
         for i, m in enumerate(mappings):
-            print(f"{i+1}: {m.in_lang} → {m.out_lang}")
+            print(f"{i+1}: {m.in_lang} → {m.out_lang}  ({m.display_name})")
