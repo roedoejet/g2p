@@ -167,6 +167,24 @@ class NetworkLiteTest(TestCase):
         graph = node_link_graph(self.data)
         self.assertEqual(node_link_data(graph), self.data)
 
+    def test_node_link_graph_errors(self):
+        with self.assertRaises(ValueError):
+            node_link_graph({**self.data, "directed": False})
+        with self.assertRaises(ValueError):
+            node_link_graph({**self.data, "multigraph": True})
+        with self.assertRaises(ValueError):
+            node_link_graph({**self.data, "nodes": "not a list"})
+        with self.assertRaises(ValueError):
+            node_link_graph({**self.data, "links": "not a list"})
+        with self.assertRaises(ValueError):
+            data = self.data.copy()
+            del data["nodes"]
+            node_link_graph(data)
+        with self.assertRaises(ValueError):
+            data = self.data.copy()
+            del data["links"]
+            node_link_graph(data)
+
     def test_no_duplicates(self):
         graph = DiGraph()
         graph.add_edge("a", "b")
