@@ -27,6 +27,7 @@ dependencies = [
     "regex",
     "text_unidecode",
     "tqdm",
+    "typing_extensions",
 ]
 
 [project.optional-dependencies]
