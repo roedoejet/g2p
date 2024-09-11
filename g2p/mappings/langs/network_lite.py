@@ -133,8 +133,9 @@ class DiGraph(Generic[T]):
         visited: Dict[T, Union[T, None]] = {
             u: None
         }  # dict of {node: predecessor on shortest path from u}
-        queue: deque[T] = deque()
-        while True:
+        queue: deque[T] = deque([u])
+        while queue:
+            u = queue.popleft()
             if u == v:
                 rev_path: List[T] = []
                 nextu: Union[T, None] = u
@@ -146,9 +147,7 @@ class DiGraph(Generic[T]):
                 if neighbour not in visited:
                     visited[neighbour] = u
                     queue.append(neighbour)
-            if len(queue) == 0:
-                raise ValueError(f"No path from {u} to {v}")
-            u = queue.popleft()
+        raise ValueError(f"No path from {u} to {v}")
 
 
 NodeDict = TypedDict("NodeDict", {"id": Any})
