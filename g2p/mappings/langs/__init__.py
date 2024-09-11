@@ -6,10 +6,10 @@ import gzip
 import json
 import os
 
-import networkx  # type: ignore
-
 from g2p.constants import LANGS_DIR, LANGS_FILE_NAME, NETWORK_FILE_NAME
 from g2p.log import LOGGER
+
+from .network_lite import DiGraph, node_link_graph
 
 assert LANGS_DIR == os.path.dirname(__file__)
 LANGS_PKL = os.path.join(LANGS_DIR, LANGS_FILE_NAME)
@@ -25,14 +25,14 @@ def load_langs(path: str = LANGS_PKL):
         return {}
 
 
-def load_network(path: str = LANGS_NWORK_PATH):
+def load_network(path: str = LANGS_NWORK_PATH) -> DiGraph:
     try:
         with gzip.open(path, "rt", encoding="utf8") as f:
             data = json.load(f)
-            return networkx.node_link_graph(data)
+            return node_link_graph(data)
     except Exception as e:
         LOGGER.warning(f"Failed to read language network from {path}: {e}")
-        return networkx.DiGraph()
+        return DiGraph()
 
 
 def get_available_languages(langs: dict) -> list:
@@ -56,7 +56,7 @@ def get_available_mappings(langs: dict) -> list:
     return mappings_available
 
 
-LANGS_NETWORK = load_network()
+LANGS_NETWORK: DiGraph = load_network()
 # Making private because it should be imported from g2p.mappings instead
 _LANGS = load_langs()
 LANGS_AVAILABLE = get_available_languages(_LANGS)

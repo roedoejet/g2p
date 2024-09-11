@@ -32,9 +32,6 @@ from typing import Dict, List, Tuple, Union
 
 from fastapi import Body, FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
-from networkx import shortest_path  # type: ignore
-from networkx.algorithms.dag import ancestors, descendants  # type: ignore
-from networkx.exception import NetworkXNoPath  # type: ignore
 from pydantic import BaseModel, Field
 
 import g2p
@@ -385,7 +382,7 @@ def get_possible_output_conversions_for_a_writing_system(
     are all the phonetic or orthographic systems into which you can convert
     this input.
     """
-    return sorted(descendants(g2p_langs.LANGS_NETWORK, lang.name))
+    return sorted(g2p_langs.LANGS_NETWORK.descendants(lang.name))
 
 
 @api.get(
@@ -399,7 +396,7 @@ def get_writing_systems_that_can_be_converted_to_an_output(
     are all the phonetic or orthographic systems that you can convert
     into this output.
     """
-    return sorted(ancestors(g2p_langs.LANGS_NETWORK, lang.name))
+    return sorted(g2p_langs.LANGS_NETWORK.ancestors(lang.name))
 
 
 @api.get(
@@ -412,8 +409,8 @@ def get_path_from_one_language_to_another(
 ) -> List[str]:
     """Get the sequence of intermediate forms used to convert from {in_lang} to {out_lang}."""
     try:
-        return shortest_path(g2p_langs.LANGS_NETWORK, in_lang.name, out_lang.name)
-    except NetworkXNoPath:
+        return g2p_langs.LANGS_NETWORK.shortest_path(in_lang.name, out_lang.name)
+    except ValueError:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
         )

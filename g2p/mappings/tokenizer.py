@@ -9,8 +9,6 @@ language's input mapping or that are unicode letters, numbers and diacritics.
 import re
 from typing import List
 
-from networkx.exception import NetworkXError  # type: ignore
-
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
@@ -154,8 +152,8 @@ class TokenizerLibrary:
                     out_lang = tok_path[1:3]
             if not out_lang:
                 try:
-                    successors = [x for x in LANGS_NETWORK.successors(in_lang)]
-                except NetworkXError:
+                    successors = list(LANGS_NETWORK.successors(in_lang))
+                except KeyError:
                     successors = []
                 ipa_successors = [x for x in successors if is_ipa(x)]
                 # LOGGER.warning(pprint.pformat([in_lang, "->", successors, ipa_successors]))

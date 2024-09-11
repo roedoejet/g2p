@@ -20,7 +20,6 @@ from pathlib import Path
 from typing import Dict, List, Union
 
 import socketio  # type: ignore
-from networkx import shortest_path  # type: ignore
 from starlette.applications import Starlette
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse
@@ -282,7 +281,7 @@ async def change_table(sid, message):
             namespace="/table",
         )
     else:
-        path = shortest_path(LANGS_NETWORK, message["in_lang"], message["out_lang"])
+        path = LANGS_NETWORK.shortest_path(message["in_lang"], message["out_lang"])
         mappings: List[Mapping] = []
         for lang1, lang2 in zip(path[:-1], path[1:]):
             transducer = make_g2p(lang1, lang2, tokenize=False)
