@@ -3,7 +3,6 @@
 #
 # - click>=8.0.4
 # - coloredlogs>=15.0.1
-# - networkx>=2.6
 # - openpyxl
 # - panphon>=0.19
 # - pydantic>=2.3
@@ -55,8 +54,6 @@ markupsafe==2.1.5
     # via jinja2
 munkres==1.1.4
     # via panphon
-networkx==3.2.1
-    # via hatch.envs.prod
 numpy==1.26.4
     # via panphon
 openpyxl==3.1.2
