@@ -167,7 +167,7 @@ def generate_mapping(  # noqa: C901
     from_langs,
     to_langs,
     distance,
-):
+) -> None:
     """Generate a new mapping from existing mappings in the g2p system.
 
     This command has different modes of operation.
@@ -354,7 +354,7 @@ def generate_mapping(  # noqa: C901
             except MappingMissing as e:
                 raise click.BadParameter(
                     f'Cannot find IPA mapping from "{in_lang}" to "{out_lang}": {e}',
-                    param_hint=["IN_LANG", "OUT_LANG"],
+                    param_hint=("IN_LANG", "OUT_LANG"),  # type: ignore
                 )
             source_mappings.append(source_mapping)
 
@@ -769,7 +769,7 @@ def update_schema(out_dir):
     context_settings=CONTEXT_SETTINGS,
     short_help="Scan a document for unknown characters.",
 )
-def scan(lang, path):
+def scan(lang, path) -> None:
     """Scan a document for non target language characters.
 
     Displays the set of un-mapped characters in a document.

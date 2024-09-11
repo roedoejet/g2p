@@ -44,6 +44,8 @@ GEN_DIR = os.path.join(os.path.dirname(LANGS_FILE), "generated")
 class Mapping(_MappingModelDefinition):
     """Class for lookup tables"""
 
+    rules: list
+
     def model_post_init(self, *_args, **_kwargs) -> None:
         """After the model is constructed, we process the model specs by
         applying all the configuration to the rules (ie prevent feeding,
@@ -146,7 +148,7 @@ class Mapping(_MappingModelDefinition):
         """
         return [rule.export_to_dict() for rule in self.rules]
 
-    def process_model_specs(self):  # noqa: C901
+    def process_model_specs(self) -> List[Rule]:  # noqa: C901
         """Process all model specifications"""
         if self.as_is is not None:
             appropriate_setting = (

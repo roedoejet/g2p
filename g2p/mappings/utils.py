@@ -13,7 +13,7 @@ from collections import defaultdict
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union, cast
 
 import regex as re
 import yaml
@@ -27,6 +27,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from typing_extensions import Literal
 
 from g2p import exceptions
 from g2p.log import LOGGER
@@ -126,26 +127,27 @@ def expand_abbreviations_format(data):
     return lines
 
 
-def normalize(inp: str, norm_form: str):
+def normalize(inp: str, norm_form: Union[str, None]):
     """Normalize to NFC(omposed) or NFD(ecomposed).
 
     Also, find any Unicode Escapes & decode 'em!
     """
-    if norm_form not in ["none", "NFC", "NFD", "NFKC", "NFKD"]:
-        raise exceptions.InvalidNormalization(normalize)
-    elif norm_form is None or norm_form == "none":
+    if norm_form is None or norm_form == "none":
         return unicode_escape(inp)
-    else:
-        normalized = ud.normalize(norm_form, unicode_escape(inp))
-        if normalized != inp:
-            LOGGER.debug(
-                "The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. "
-                "Note that this is not necessarily the final stage of normalization.",
-                inp,
-                normalized,
-                norm_form,
-            )
-        return normalized
+    if norm_form not in ["NFC", "NFD", "NFKC", "NFKD"]:
+        raise exceptions.InvalidNormalization(normalize)
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFC", "NFD", "NFKC", "NFKD"], norm_form)
+    normalized = ud.normalize(norm_form, unicode_escape(inp))
+    if normalized != inp:
+        LOGGER.debug(
+            "The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. "
+            "Note that this is not necessarily the final stage of normalization.",
+            inp,
+            normalized,
+            norm_form,
+        )
+    return normalized
 
 
 # compose_indices is generic because we would like to propagate the
@@ -177,6 +179,8 @@ def normalize_to_NFD_with_indices(
 ) -> Tuple[str, List[Tuple[int, int]]]:
     """Normalize to NFD and return the indices mapping input to output characters"""
     assert norm_form in ("NFD", "NFKD")
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFD", "NFKD"], norm_form)
     result = ""
     indices = []
     for i, c in enumerate(inp):
@@ -192,6 +196,8 @@ def normalize_to_NFC_with_indices(
 ) -> Tuple[str, List[Tuple[int, int]]]:
     """Normalize to NFC and return the indices mapping input to output characters"""
     assert norm_form in ("NFC", "NFKC")
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFC", "NFKC"], norm_form)
     inp_nfc = ud.normalize(norm_form, inp)
     NFD_form = norm_form[:-1] + "D"  # NFC->NFD or NFKC->NFKD
     inp_nfd, indices_to_nfd = normalize_to_NFD_with_indices(inp, NFD_form)

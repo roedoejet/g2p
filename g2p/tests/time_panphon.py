@@ -34,16 +34,16 @@ def getPanphonDistanceSingleton1():
 
 def getPanphonDistanceSingleton2():
     if not hasattr(getPanphonDistanceSingleton2, "value"):
-        setattr(getPanphonDistanceSingleton2, "value", panphon.distance.Distance())
+        getPanphonDistanceSingleton2.value = panphon.distance.Distance()
     return getPanphonDistanceSingleton2.value
 
 
 for iters in (1, 1, 10, 100, 1000, 10000):
     with CodeTimer(f"getPanphonDistanceSingleton1() {iters} times"):
-        for i in range(iters):
+        for _ in range(iters):
             dst = getPanphonDistanceSingleton1()
     with CodeTimer(f"getPanphonDistanceSingleton2() {iters} times"):
-        for i in range(iters):
+        for _ in range(iters):
             dst = getPanphonDistanceSingleton2()
 
 for words in (1, 10):
@@ -53,14 +53,14 @@ for words in (1, 10):
 
     with CodeTimer(f"is_panphon() on 1 word {words} times"):
         string = "ei"
-        for i in range(words):
+        for _ in range(words):
             is_panphon(string)
 
 for iters in (1, 10):
     with CodeTimer(f"dst init {iters} times"):
-        for i in range(iters):
+        for _ in range(iters):
             dst = panphon.distance.Distance()
 
 for iters in (1, 10, 100, 1000):
     with CodeTimer(f"Transducer(Mapping(id='panphon_preprocessor')) {iters} times"):
-        panphon_preprocessor = Transducer(Mapping(id="panphon_preprocessor"))
+        panphon_preprocessor = Transducer(Mapping(id="panphon_preprocessor", rules=[]))
