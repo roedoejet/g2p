@@ -169,7 +169,7 @@ def cache_langs(
         langs[code] = mapping_config.export_to_dict()
 
     # Save as a Directional Graph
-    lang_network = DiGraph()
+    lang_network: DiGraph[str] = DiGraph()
     lang_network.add_edges_from(mappings_legal_pairs)
     write_json_gz(network_path, node_link_data(lang_network))
     write_json_gz(langs_path, langs)

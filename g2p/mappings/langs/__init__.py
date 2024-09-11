@@ -25,7 +25,7 @@ def load_langs(path: str = LANGS_PKL):
         return {}
 
 
-def load_network(path: str = LANGS_NWORK_PATH) -> DiGraph:
+def load_network(path: str = LANGS_NWORK_PATH) -> DiGraph[str]:
     try:
         with gzip.open(path, "rt", encoding="utf8") as f:
             data = json.load(f)
@@ -56,7 +56,7 @@ def get_available_mappings(langs: dict) -> list:
     return mappings_available
 
 
-LANGS_NETWORK: DiGraph = load_network()
+LANGS_NETWORK = load_network()
 # Making private because it should be imported from g2p.mappings instead
 _LANGS = load_langs()
 LANGS_AVAILABLE = get_available_languages(_LANGS)
