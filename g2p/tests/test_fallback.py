@@ -72,16 +72,20 @@ class FallbackTest(TestCase):
             ],
         )
         test_ipa = align_to_dummy_fallback(ipa_mapping, "out", quiet=True)
-        self.assertEqual(
-            test_ipa.rules,
-            [
-                Rule(rule_input="æ", rule_output="ɑ", match_pattern="æ"),
-                Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
-                Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
-                Rule(rule_input="β", rule_output="s", match_pattern="β"),
-                Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
-            ],
-        )
+        panphon_021_ref = [
+            Rule(rule_input="æ", rule_output="ɑ", match_pattern="æ"),
+            Rule(rule_input="ɐ", rule_output="i", match_pattern="ɐ"),
+            Rule(rule_input="ɑ̃", rule_output="ɑ", match_pattern="ɑ̃"),
+            Rule(rule_input="β", rule_output="s", match_pattern="β"),
+            Rule(rule_input="ɡ", rule_output="t", match_pattern="ɡ"),
+        ]
+        panphon_020_ref = [
+            panphon_021_ref[0],
+            Rule(rule_input="ɐ", rule_output="ɑ", match_pattern="ɐ"),
+            *panphon_021_ref[2:],
+        ]
+        if test_ipa.rules != panphon_021_ref:
+            self.assertEqual(test_ipa.rules, panphon_020_ref)
 
 
 if __name__ == "__main__":
