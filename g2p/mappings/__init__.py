@@ -9,8 +9,9 @@ import json
 import os
 import re
 from copy import deepcopy
+from functools import partial
 from pathlib import Path
-from typing import Dict, List, Pattern, Union
+from typing import Callable, Dict, List, Pattern, Union
 
 import yaml
 from pydantic import BaseModel
@@ -56,8 +57,11 @@ class Mapping(_MappingModelDefinition):
                 )
             # load rules from path
             if self.rules_path is not None and not self.rules:
-                self.rules = load_from_file(self.rules_path)
-            # This is required so that we don't keep escaping special characters for example
+                # make sure self.rules is always a List[Rule] like we say it is!
+                self.rules = [Rule(**obj) for obj in load_from_file(self.rules_path)]
+            # Process the rules, keeping only non-empty ones, and
+            # expanding abbreviations.  This is also required so that
+            # we don't keep escaping special characters for example
             self.rules = self.process_model_specs()
         elif self.type == MAPPING_TYPE.lexicon:
             # load alignments from path
@@ -146,7 +150,7 @@ class Mapping(_MappingModelDefinition):
         """
         return [rule.export_to_dict() for rule in self.rules]
 
-    def process_model_specs(self):  # noqa: C901
+    def process_model_specs(self) -> List[Rule]:
         """Process all model specifications"""
         if self.as_is is not None:
             appropriate_setting = (
@@ -176,34 +180,36 @@ class Mapping(_MappingModelDefinition):
             self.rules = sorted(
                 # Temporarily normalize to NFD for heuristic sorting of NFC-defined rules
                 self.rules,
-                key=lambda x: (
-                    len(normalize(strip_index_notation(x.rule_input), "NFD"))
-                    if isinstance(x, Rule)
-                    else len(normalize(x["in"], "NFD"))
-                ),
+                key=lambda x: len(normalize(strip_index_notation(x.rule_input), "NFD")),
                 reverse=True,
             )
 
+        def apply_to_attributes(rule: Rule, func: Callable, *attrs):
+            for k in attrs:
+                value = getattr(rule, k)
+                if value:  # won't be None since default is ""
+                    setattr(rule, k, func(value))
+
         non_empty_mappings: List[Rule] = []
         for i, rule in enumerate(self.rules):
-            if isinstance(rule, dict):
-                rule = Rule(**rule)
+            # We explicitly exclude match_pattern and
+            # intermediate_form when saving rules.  Seeing either of
+            # them is a programmer error.
+            assert (
+                rule.match_pattern is None
+            ), "Either match_pattern was specified explicitly or process_model_specs was called more than once"
+            assert (
+                rule.intermediate_form is None
+            ), "Either intermediate_form was specified explicitly or process_model_specs was called more than once"
             # Expand Abbreviations
-            if (
-                self.abbreviations
-                and self.rules
-                and "match_pattern" not in self.rules[0]
-            ):
-                for key in [
+            if self.abbreviations:
+                apply_to_attributes(
+                    rule,
+                    partial(expand_abbreviations, abbs=self.abbreviations),
                     "rule_input",
                     "context_before",
                     "context_after",
-                ]:
-                    setattr(
-                        rule,
-                        key,
-                        expand_abbreviations(getattr(rule, key), self.abbreviations),
-                    )
+                )
             # Reverse Rule
             if self.reverse:
                 rule.rule_input, rule.rule_output = rule.rule_output, rule.rule_input
@@ -214,19 +220,14 @@ class Mapping(_MappingModelDefinition):
                 rule = escape_special_characters(rule)
             # Unicode Normalization
             if self.norm_form != NORM_FORM_ENUM.none:
-                for k in [
+                apply_to_attributes(
+                    rule,
+                    partial(normalize, norm_form=self.norm_form.value),
                     "rule_input",
                     "rule_output",
                     "context_before",
                     "context_after",
-                ]:
-                    value = getattr(rule, k)
-                    if value:
-                        setattr(
-                            rule,
-                            k,
-                            normalize(value, self.norm_form.value),
-                        )
+                )
             # Prevent Feeding
             if self.prevent_feeding or rule.prevent_feeding:
                 rule.intermediate_form = self._string_to_pua(rule.rule_output, i)
@@ -439,7 +440,9 @@ class MappingConfig(BaseModel):
         return {"mappings": [mapping.export_to_dict() for mapping in self.mappings]}
 
     @staticmethod
-    def load_mapping_config_from_path(path_to_mapping_config: Union[str, Path]):
+    def load_mapping_config_from_path(
+        path_to_mapping_config: Union[str, Path]
+    ) -> "MappingConfig":
         """Loads a mapping configuration from a path, if you just want one specific mapping
         from the config, you can try Mapping.load_mapping_from_path instead.
         """

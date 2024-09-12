@@ -237,7 +237,7 @@ async def convert(sid, message):
 
 
 @SIO.on("table event", namespace="/table")  # type: ignore
-async def change_table(sid, message):
+async def change_table(sid, message) -> None:
     """Change the lookup table"""
     LOGGER.debug("/table: %s", message)
     if "in_lang" not in message or "out_lang" not in message:
@@ -250,7 +250,7 @@ async def change_table(sid, message):
     elif message["in_lang"] == "custom" or message["out_lang"] == "custom":
         # These are only used to generate JSON to send to the client,
         # so it's safe to create a list of references to the same thing.
-        mappings = [
+        mapping_dicts = [
             {"in": "", "out": "", "context_before": "", "context_after": ""}
         ] * DEFAULT_N
         abbs = [[""] * 6] * DEFAULT_N
@@ -272,7 +272,7 @@ async def change_table(sid, message):
             "table response",
             [
                 {
-                    "mappings": mappings,
+                    "mappings": mapping_dicts,
                     "abbs": abbs,
                     "kwargs": kwargs,
                 }
@@ -292,7 +292,7 @@ async def change_table(sid, message):
                 {
                     "mappings": x.plain_mapping(),
                     "abbs": expand_abbreviations_format(x.abbreviations),
-                    "kwargs": x.model_dump(exclude=["alignments"]),
+                    "kwargs": x.model_dump(exclude={"alignments"}),
                 }
                 for x in mappings
             ],

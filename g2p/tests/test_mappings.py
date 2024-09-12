@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import re
 import unicodedata as ud
 from contextlib import redirect_stderr
 from tempfile import NamedTemporaryFile
@@ -12,9 +13,10 @@ from unittest import TestCase, main
 from pydantic import ValidationError
 
 from g2p import exceptions
+from g2p.exceptions import InvalidNormalization
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, Rule
-from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM
+from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM, normalize
 from g2p.tests.public import __file__ as public_data
 from g2p.transducer import Transducer
 
@@ -56,6 +58,14 @@ class MappingTest(TestCase):
         self.assertEqual(self.test_mapping_no_norm.rules[0].rule_output, "\u00e1")
         self.assertEqual(self.test_mapping_no_norm.rules[1].rule_input, "\u0061\u0301")
         self.assertEqual(self.test_mapping_no_norm.rules[1].rule_output, "\u0061\u0301")
+
+    def test_utils_normalize(self):
+        """Explicitly test our custom normalize function."""
+        self.assertEqual(normalize(r"\u0061", None), "a")
+        self.assertEqual(normalize("\u010d", "NFD"), "\u0063\u030c")
+        self.assertEqual(normalize("\u0063\u030c", "NFC"), "\u010d")
+        with self.assertRaises(InvalidNormalization):
+            normalize("FOOBIE", "BLETCH")
 
     def test_json_map(self):
         json_map = Mapping(
@@ -396,6 +406,25 @@ class MappingTest(TestCase):
             transducer("tee on herkullista").output_string, "teː on herkullistɑ"
         )
         os.unlink(tf.name)
+
+    def test_no_reprocess(self):
+        """Ensure that attempting to reprocess a mapping is an error."""
+        with self.assertRaises(AssertionError):
+            self.test_mapping_norm.process_model_specs()
+        with self.assertRaises(ValidationError):
+            _ = Mapping(
+                rules=[{"in": "a", "out": "b", "match_pattern": re.compile("XOR OTA")}]
+            )
+        with self.assertRaises(ValidationError):
+            _ = Mapping(
+                rules=[
+                    {
+                        "in": "a",
+                        "out": "b",
+                        "intermediate_form": re.compile("HACKEM MUCHE"),
+                    }
+                ]
+            )
 
 
 if __name__ == "__main__":

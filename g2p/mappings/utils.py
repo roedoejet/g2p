@@ -13,7 +13,7 @@ from collections import defaultdict
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union, cast
 
 import regex as re
 import yaml
@@ -27,6 +27,7 @@ from pydantic import (
     field_validator,
     model_validator,
 )
+from typing_extensions import Literal
 
 from g2p import exceptions
 from g2p.log import LOGGER
@@ -53,12 +54,19 @@ class Rule(BaseModel):
     prevent_feeding: bool = False
     """Whether to prevent the rule from feeding other rules"""
 
-    match_pattern: Optional[Pattern] = None
-    """An automatically generated match_pattern based on the rule_input, context_before and context_after"""
+    match_pattern: Optional[Pattern] = Field(
+        None,
+        exclude=True,
+        # Don't include this in the docs because it's generated, and would require a schema update
+        # description="""An automatically generated match_pattern based on the rule_input, context_before and context_after""",
+    )
 
-    intermediate_form: Optional[str] = None
-    """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
-
+    intermediate_form: Optional[str] = Field(
+        None,
+        exclude=True,
+        # Don't include this in the docs because it's generated, and would require a schema update
+        # description="""An intermediate form, automatically generated only when prevent_feeding is True""",
+    )
     comment: Optional[str] = None
     """An optional comment about the rule."""
 
@@ -68,8 +76,6 @@ class Rule(BaseModel):
         self, exclude=None, exclude_none=True, exclude_defaults=True, by_alias=True
     ):
         """All the options for exporting are tedious to keep track of so this is a helper function"""
-        if exclude is None:
-            exclude = {"match_pattern": True, "intermediate_form": True}
         return self.model_dump(
             exclude=exclude,
             exclude_none=exclude_none,
@@ -126,26 +132,27 @@ def expand_abbreviations_format(data):
     return lines
 
 
-def normalize(inp: str, norm_form: str):
+def normalize(inp: str, norm_form: Union[str, None]):
     """Normalize to NFC(omposed) or NFD(ecomposed).
 
     Also, find any Unicode Escapes & decode 'em!
     """
-    if norm_form not in ["none", "NFC", "NFD", "NFKC", "NFKD"]:
-        raise exceptions.InvalidNormalization(normalize)
-    elif norm_form is None or norm_form == "none":
+    if norm_form is None or norm_form == "none":
         return unicode_escape(inp)
-    else:
-        normalized = ud.normalize(norm_form, unicode_escape(inp))
-        if normalized != inp:
-            LOGGER.debug(
-                "The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. "
-                "Note that this is not necessarily the final stage of normalization.",
-                inp,
-                normalized,
-                norm_form,
-            )
-        return normalized
+    if norm_form not in ["NFC", "NFD", "NFKC", "NFKD"]:
+        raise exceptions.InvalidNormalization(normalize)
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFC", "NFD", "NFKC", "NFKD"], norm_form)
+    normalized = ud.normalize(norm_form, unicode_escape(inp))
+    if normalized != inp:
+        LOGGER.debug(
+            "The string %s was normalized to %s using the %s standard and by decoding any Unicode escapes. "
+            "Note that this is not necessarily the final stage of normalization.",
+            inp,
+            normalized,
+            norm_form,
+        )
+    return normalized
 
 
 # compose_indices is generic because we would like to propagate the
@@ -177,6 +184,8 @@ def normalize_to_NFD_with_indices(
 ) -> Tuple[str, List[Tuple[int, int]]]:
     """Normalize to NFD and return the indices mapping input to output characters"""
     assert norm_form in ("NFD", "NFKD")
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFD", "NFKD"], norm_form)
     result = ""
     indices = []
     for i, c in enumerate(inp):
@@ -192,6 +201,8 @@ def normalize_to_NFC_with_indices(
 ) -> Tuple[str, List[Tuple[int, int]]]:
     """Normalize to NFC and return the indices mapping input to output characters"""
     assert norm_form in ("NFC", "NFKC")
+    # Sadly mypy doesn't do narrowing to literals properly
+    norm_form = cast(Literal["NFC", "NFKC"], norm_form)
     inp_nfc = ud.normalize(norm_form, inp)
     NFD_form = norm_form[:-1] + "D"  # NFC->NFD or NFKC->NFKD
     inp_nfd, indices_to_nfd = normalize_to_NFD_with_indices(inp, NFD_form)
