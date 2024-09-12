@@ -57,13 +57,15 @@ class Rule(BaseModel):
     match_pattern: Optional[Pattern] = Field(
         None,
         exclude=True,
-        description="""An automatically generated match_pattern based on the rule_input, context_before and context_after""",
+        # Don't include this in the docs because it's generated, and would require a schema update
+        # description="""An automatically generated match_pattern based on the rule_input, context_before and context_after""",
     )
 
     intermediate_form: Optional[str] = Field(
         None,
         exclude=True,
-        description="""An intermediate form, automatically generated only when prevent_feeding is True""",
+        # Don't include this in the docs because it's generated, and would require a schema update
+        # description="""An intermediate form, automatically generated only when prevent_feeding is True""",
     )
     comment: Optional[str] = None
     """An optional comment about the rule."""
