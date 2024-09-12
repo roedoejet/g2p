@@ -89,6 +89,8 @@ Homepage = "https://github.com/roedoejet/g2p"
 packages = ["g2p"]
 include-package-data = true
 
+[tool.setuptools_scm]
+
 [tool.hatch.version]
 source = "vcs"
 
