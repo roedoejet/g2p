@@ -501,8 +501,6 @@ def convert(  # noqa: C901
     fra->fra-ipa, fra-ipa->eng-ipa and eng-ipa->eng-arpabet.
     """
     # Defer expensive imports
-    from networkx import has_path  # type: ignore
-
     from g2p.log import LOGGER
     from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
     from g2p.mappings.langs import LANGS_NETWORK
@@ -535,7 +533,7 @@ def convert(  # noqa: C901
     if out_lang not in LANGS_NETWORK.nodes:
         raise click.UsageError(f"'{out_lang}' is not a valid value for 'OUT_LANG'")
     # Check if path exists
-    if not has_path(LANGS_NETWORK, in_lang, out_lang):
+    if not LANGS_NETWORK.has_path(in_lang, out_lang):
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
@@ -689,7 +687,7 @@ def update(in_dir, out_dir):
         reload_db()
         network_to_echart(
             outfile=os.path.join(os.path.dirname(static_file), "languages-network.json")
-        )  # updates g2p/status/languages-network.json
+        )  # updates g2p/static/languages-network.json
 
 
 @click.option(
@@ -851,4 +849,4 @@ def show_mappings(lang1, lang2, verbose, csv):
             print()
     else:
         for i, m in enumerate(mappings):
-            print(f"{i+1}: {m.in_lang} → {m.out_lang}")
+            print(f"{i+1}: {m.in_lang} → {m.out_lang}  ({m.display_name})")

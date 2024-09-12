@@ -20,7 +20,6 @@ classifiers = [
 dependencies = [
     "click>=8.0.4",
     "coloredlogs>=15.0.1",
-    "networkx>=2.6",
     "openpyxl",
     "panphon>=0.19",
     "panphon<0.21; python_version<'3.9'",
@@ -30,6 +29,7 @@ dependencies = [
     "regex",
     "text_unidecode",
     "tqdm",
+    "typing_extensions",
 ]
 
 [project.optional-dependencies]

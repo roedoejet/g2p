@@ -70,9 +70,6 @@ def make_g2p(  # noqa: C901
         NoPath: if there is path between in_lang and out_lang
     """
     # Defer expensive imports
-    from networkx import shortest_path  # type: ignore
-    from networkx.exception import NetworkXNoPath  # type: ignore
-
     from g2p.log import LOGGER
     from g2p.mappings import Mapping
     from g2p.mappings.langs import LANGS_NETWORK
@@ -100,13 +97,13 @@ def make_g2p(  # noqa: C901
 
     # Try to find the shortest path between the nodes
     try:
-        path = shortest_path(LANGS_NETWORK, in_lang, out_lang)
-    except NetworkXNoPath as e:
+        path = LANGS_NETWORK.shortest_path(in_lang, out_lang)
+    except ValueError:
         LOGGER.error(
             f"Sorry, we couldn't find a way to convert {in_lang} to {out_lang}. "
             "Please update your langs by running `g2p update` and try again."
         )
-        raise NoPath(in_lang, out_lang) from e
+        raise NoPath(in_lang, out_lang)
 
     # Find all mappings needed
     mappings_needed = []
@@ -162,8 +159,6 @@ def get_arpabet_langs():
             LANG_NAMES maps each code to its full language name and is ordered by codes
     """
     # Defer expensive imports
-    from networkx import has_path
-
     from g2p.mappings import LANGS
     from g2p.mappings.langs import LANGS_NETWORK
 
@@ -203,8 +198,8 @@ def get_arpabet_langs():
             and not x.endswith("-equiv")
             and not x.endswith("-no-symbols")
             and x not in ["und-ascii", "moh-festival"]
-            and LANGS_NETWORK.has_node(x)
-            and has_path(LANGS_NETWORK, x, "eng-arpabet")
+            and x in LANGS_NETWORK
+            and LANGS_NETWORK.has_path(x, "eng-arpabet")
         ]
 
         # Sort LANGS so the -h messages list them alphabetically

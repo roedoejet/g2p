@@ -6,7 +6,6 @@ from typing import List
 from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, PlainTextResponse
-from networkx.algorithms.dag import ancestors, descendants  # type: ignore
 
 from g2p import make_g2p
 from g2p.exceptions import NoPath
@@ -71,7 +70,7 @@ def get_all_ancestors_of_node(
     """Get the valid ancestors in the network's path to a given node. These
     are all the mappings that you can convert from in order to get the
     given node."""
-    return sorted(ancestors(LANGS_NETWORK, node.name))
+    return sorted(LANGS_NETWORK.ancestors(node.name))
 
 
 @api.get(
@@ -84,7 +83,7 @@ def get_all_ancestors_of_node(
 def get_all_descendants_of_node(
     node: Lang = Path(description="language node name"),
 ) -> List[str]:
-    return sorted(descendants(LANGS_NETWORK, node.name))
+    return sorted(LANGS_NETWORK.descendants(node.name))
 
 
 @api.get(

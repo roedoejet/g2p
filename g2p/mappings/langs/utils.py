@@ -9,13 +9,12 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-import networkx  # type: ignore
-from networkx.algorithms.dag import ancestors, descendants  # type: ignore
-
 from g2p.log import LOGGER
 from g2p.mappings import MAPPINGS_AVAILABLE, Mapping, MappingConfig
 from g2p.mappings.langs import LANGS_DIR, LANGS_NETWORK, LANGS_NWORK_PATH, LANGS_PKL
 from g2p.mappings.utils import MAPPING_TYPE, is_ipa
+
+from .network_lite import DiGraph, node_link_data
 
 # panphon.distance.Distance() takes a long time to initialize, so...
 # a) we don't want to load it if we don't need it, i.e., don't use a constant
@@ -170,9 +169,9 @@ def cache_langs(
         langs[code] = mapping_config.export_to_dict()
 
     # Save as a Directional Graph
-    lang_network = networkx.DiGraph()
+    lang_network: DiGraph[str] = DiGraph()
     lang_network.add_edges_from(mappings_legal_pairs)
-    write_json_gz(network_path, networkx.node_link_data(lang_network))
+    write_json_gz(network_path, node_link_data(lang_network))
     write_json_gz(langs_path, langs)
     return langs
 
@@ -194,8 +193,8 @@ def network_to_echart(outfile: Optional[str] = None, layout: bool = False):
     no_nodes = len(LANGS_NETWORK.nodes)
     for node in LANGS_NETWORK.nodes:
         lang_name = node.split("-")[0]
-        no_ancestors = len(ancestors(LANGS_NETWORK, node))
-        no_descendants = len(descendants(LANGS_NETWORK, node))
+        no_ancestors = len(LANGS_NETWORK.ancestors(node))
+        no_descendants = len(LANGS_NETWORK.descendants(node))
         size = min(
             20,
             max(
