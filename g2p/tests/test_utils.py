@@ -7,13 +7,15 @@ import doctest
 import os
 import re
 from collections import defaultdict
+from pathlib import Path
 from unittest import TestCase, main
 
 import yaml
 from pep440 import is_canonical
 
+import g2p
 from g2p import get_arpabet_langs
-from g2p._version import VERSION
+from g2p._version import VERSION, version_tuple
 from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
@@ -303,6 +305,23 @@ class UtilsTest(TestCase):
         """We test for almost PEP 440 compliance: hatch adds +local_sha1, which is not compliant."""
         main_version, _, _ = VERSION.partition("+")
         self.assertTrue(is_canonical(main_version))
+
+    def test_scm_pretend_version_is_up_to_date(self):
+        """.SETUPTOOLS_SCM_PRETEND_VERSION is set to the version in pyproject.toml"""
+        filename = Path(g2p.__file__).parent.parent / ".SETUPTOOLS_SCM_PRETEND_VERSION"
+        try:
+            with open(filename) as f:
+                pretend_version = f.read().strip()
+            (major, minor, *_rest) = version_tuple
+            major_minor = f"{major}.{minor}"
+            self.assertEqual(
+                major_minor,
+                pretend_version,
+                "Mismatch between .SETUPTOOLS_SCM_PRETEND_VERSION and the version setuptools_scm determined dynamically. Try: 1) fetch recent tags from GitHub, 2) rerun \"pip install -e .\", 3) if you're working on the next major or minor release, update .SETUPTOOLS_SCM_PRETEND_VERSION to match the dynamic version's major.minor.",
+            )
+        except FileNotFoundError:
+            # This is fine, it's only used in development
+            pass
 
 
 if __name__ == "__main__":

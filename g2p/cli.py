@@ -9,12 +9,13 @@ import pprint
 import re
 import sys
 from pathlib import Path
+from textwrap import dedent
 from typing import List, Tuple
 
 import click
 
+import g2p._version
 from g2p import make_g2p, make_tokenizer
-from g2p._version import VERSION
 from g2p.constants import (
     DISTANCE_METRICS,
     LANGS_DIR,
@@ -104,7 +105,7 @@ def parse_from_or_to_lang_spec(lang_spec):
             return mappings
 
 
-@click.version_option(version=VERSION, prog_name="g2p")
+@click.version_option(version=g2p._version.VERSION, prog_name="g2p")
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     """Management script for G2P"""
@@ -700,34 +701,66 @@ def update(in_dir, out_dir):
 def update_schema(out_dir):
     """Generate a schema for the model configuration.
 
-    This should only be done once for each Minor version.
+    This should be done every time the model changes in a way that affects the schema.
     Changes to the schema should result in a minor version bump.
+    But not every minor or major version bump requires a schema update.
     """
     # Defer expensive imports
     from g2p.mappings import MappingConfig
 
-    # We should not be changing the schema for patches, so only include major/minor version
-    MAJOR_MINOR_VERSION = ".".join(VERSION.split(".")[:2])
+    # We shall not change the schema for patches, so only include major/minor version
+    (major, minor, *_rest) = g2p._version.version_tuple
+    major_minor = f"{major}.{minor}"
 
     # Determine path
     if out_dir is None:
-        schema_path = (
-            Path(LANGS_DIR) / f"../.schema/g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
-        )
+        out_dir = Path(LANGS_DIR).parent / ".schema"
     else:
-        schema_path = Path(out_dir) / f"g2p-config-schema-{MAJOR_MINOR_VERSION}.json"
+        out_dir = Path(out_dir)
+    schema_path = out_dir / f"g2p-config-schema-{major_minor}.json"
+
     # Generate schema
-    if schema_path.exists():
-        raise FileExistsError(
-            f"Sorry a schema already exists for version {MAJOR_MINOR_VERSION}. "
-            "Please bump the minor version number and generate the schema again."
-        )
     json_schema = MappingConfig.model_json_schema()
-    # Add explicit schema dialect for SchemaStore
-    # Note that pydantic actually targets
+    # Add explicit schema dialect for SchemaStore that pydantic actually targets
     json_schema["$schema"] = "http://json-schema.org/draft-07/schema#"
-    with open(schema_path, "w") as f:
-        json.dump(json_schema, f, indent=2)
+
+    if schema_path.exists():
+        with open(schema_path, encoding="utf8") as f:
+            old_schema = json.load(f)
+        if old_schema == json_schema:
+            print(f"Schema {schema_path} is already up to date.")
+        else:
+            print(
+                dedent(
+                    f"""
+                    Schema {schema_path}
+                    exists for version {major_minor} but is not up to date.  If it was already published to
+                    the SchemaStore (see
+                    https://github.com/SchemaStore/schemastore/blob/master/src/api/json/catalog.json)
+                    then you must bump the minor or major version number of g2p and generate the
+                    schema again.  If not and you want to overwrite it, please delete the existing
+                    schema and try again.
+                    """
+                ),
+                file=sys.stderr,
+            )
+            raise click.UsageError("Schema already exists but is not up to date.")
+    else:
+        prev_schema_files = sorted(out_dir.glob("g2p-config-schema-*.json"))
+        if prev_schema_files:
+            with open(prev_schema_files[-1], encoding="utf8") as f:
+                old_schema = json.load(f)
+        else:
+            old_schema = None
+        if old_schema == json_schema:
+            print(f"Schema {prev_schema_files[-1]}")
+            print(
+                f"is still up to date.  No need to generate a new schema for version {major_minor}."
+            )
+        else:
+            with open(schema_path, "w", encoding="ascii") as f:
+                json.dump(json_schema, f, indent=2)
+            print(f"Wrote {schema_path}.")
 
 
 @click.argument("path", type=click.Path(exists=True, file_okay=True, dir_okay=False))
