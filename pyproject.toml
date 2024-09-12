@@ -24,7 +24,7 @@ dependencies = [
     "panphon>=0.19",
     "panphon<0.21; python_version<'3.9'",
     "panphon<0.21; platform_system=='Windows'",
-    "pydantic>=2.4",
+    "pydantic>=2.4, <2.9",  # pydantic 2.9.0 changes our schema
     "pyyaml>=5.2",
     "regex",
     "text_unidecode",
