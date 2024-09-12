@@ -644,8 +644,9 @@ With no LANG, all cached mappings are included.</p>
 </code></pre></div>
 <h2 id="update-schema">update-schema<a class="headerlink" href="#update-schema" title="Permanent link">&para;</a></h2>
 <p>Generate a schema for the model configuration.</p>
-<p>This should only be done once for each Minor version.
-Changes to the schema should result in a minor version bump.</p>
+<p>This should be done every time the model changes in a way that affects the schema.
+Changes to the schema should result in a minor version bump.
+But not every minor or major version bump requires a schema update.</p>
 <p><strong>Usage:</strong></p>
 <div class="highlight"><pre><span></span><code>g2p update-schema [OPTIONS]
 </code></pre></div>
