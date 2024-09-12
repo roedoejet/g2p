@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import re
 import unicodedata as ud
 from contextlib import redirect_stderr
 from tempfile import NamedTemporaryFile
@@ -405,6 +406,25 @@ class MappingTest(TestCase):
             transducer("tee on herkullista").output_string, "teː on herkullistɑ"
         )
         os.unlink(tf.name)
+
+    def test_no_reprocess(self):
+        """Ensure that attempting to reprocess a mapping is an error."""
+        with self.assertRaises(AssertionError):
+            self.test_mapping_norm.process_model_specs()
+        with self.assertRaises(ValidationError):
+            _ = Mapping(
+                rules=[{"in": "a", "out": "b", "match_pattern": re.compile("XOR OTA")}]
+            )
+        with self.assertRaises(ValidationError):
+            _ = Mapping(
+                rules=[
+                    {
+                        "in": "a",
+                        "out": "b",
+                        "intermediate_form": re.compile("HACKEM MUCHE"),
+                    }
+                ]
+            )
 
 
 if __name__ == "__main__":

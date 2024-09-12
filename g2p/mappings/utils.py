@@ -54,12 +54,17 @@ class Rule(BaseModel):
     prevent_feeding: bool = False
     """Whether to prevent the rule from feeding other rules"""
 
-    match_pattern: Optional[Pattern] = None
-    """An automatically generated match_pattern based on the rule_input, context_before and context_after"""
+    match_pattern: Optional[Pattern] = Field(
+        None,
+        exclude=True,
+        description="""An automatically generated match_pattern based on the rule_input, context_before and context_after""",
+    )
 
-    intermediate_form: Optional[str] = None
-    """An optional intermediate form. Should be automatically generated only when prevent_feeding is True"""
-
+    intermediate_form: Optional[str] = Field(
+        None,
+        exclude=True,
+        description="""An intermediate form, automatically generated only when prevent_feeding is True""",
+    )
     comment: Optional[str] = None
     """An optional comment about the rule."""
 
@@ -69,8 +74,6 @@ class Rule(BaseModel):
         self, exclude=None, exclude_none=True, exclude_defaults=True, by_alias=True
     ):
         """All the options for exporting are tedious to keep track of so this is a helper function"""
-        if exclude is None:
-            exclude = {"match_pattern": True, "intermediate_form": True}
         return self.model_dump(
             exclude=exclude,
             exclude_none=exclude_none,

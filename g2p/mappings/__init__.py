@@ -59,7 +59,9 @@ class Mapping(_MappingModelDefinition):
             if self.rules_path is not None and not self.rules:
                 # make sure self.rules is always a List[Rule] like we say it is!
                 self.rules = [Rule(**obj) for obj in load_from_file(self.rules_path)]
-            # This is required so that we don't keep escaping special characters for example
+            # Process the rules, keeping only non-empty ones, and
+            # expanding abbreviations.  This is also required so that
+            # we don't keep escaping special characters for example
             self.rules = self.process_model_specs()
         elif self.type == MAPPING_TYPE.lexicon:
             # load alignments from path
@@ -190,6 +192,15 @@ class Mapping(_MappingModelDefinition):
 
         non_empty_mappings: List[Rule] = []
         for i, rule in enumerate(self.rules):
+            # We explicitly exclude match_pattern and
+            # intermediate_form when saving rules.  Seeing either of
+            # them is a programmer error.
+            assert (
+                rule.match_pattern is None
+            ), "Either match_pattern was specified explicitly or process_model_specs was called more than once"
+            assert (
+                rule.intermediate_form is None
+            ), "Either intermediate_form was specified explicitly or process_model_specs was called more than once"
             # Expand Abbreviations
             if self.abbreviations:
                 apply_to_attributes(
