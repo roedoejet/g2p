@@ -13,7 +13,18 @@ from collections import defaultdict
 from copy import deepcopy
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Pattern, Tuple, TypeVar, Union, cast
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Pattern,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import regex as re
 import yaml
@@ -495,16 +506,34 @@ def get_alignment_sequence(alignment: str, delimiter="") -> List[Tuple[int, str]
 # The joiner between key and value must be 0 so that it sorts before all
 # characters and thus won't break bisect_left()
 _JOINER = "\0"
+# For compacting a group of lexicon entries into one string.
+# This just has to be somethign that does not occur in the lexicon data
+_BLOCK_JOINER = "\1"
 
 
 def find_alignment(alignments: List[str], word: str) -> List[Tuple[int, str]]:
     """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
     i = bisect_left(alignments, word)
-    if i != len(alignments):
-        k, v = alignments[i].split(_JOINER, maxsplit=1)
-        if k == word:
-            return get_alignment_sequence(v)
+    alignment_entry = _JOINER
+    if i != len(alignments) and alignments[i].startswith(word + _JOINER):
+        alignment_entry, _, _ = alignments[i].partition(_BLOCK_JOINER)
+    elif i > 0:
+        alignment_block = alignments[i - 1].split(_BLOCK_JOINER)
+        j = bisect_left(alignment_block, word)
+        if j != len(alignment_block):
+            alignment_entry = alignment_block[j]
+    k, _, v = alignment_entry.partition(_JOINER)
+    if k == word:
+        return get_alignment_sequence(v)
     return []
+
+
+def compact_alignments(alignments: Sequence[str]) -> List[str]:
+    _BLOCK_SIZE = 16
+    return [
+        _BLOCK_JOINER.join(alignments[i : i + _BLOCK_SIZE])
+        for i in range(0, len(alignments), _BLOCK_SIZE)
+    ]
 
 
 def load_alignments_from_file(path, delimiter="") -> List[str]:
@@ -526,7 +555,7 @@ def load_alignments_from_file(path, delimiter="") -> List[str]:
                 continue
             word = get_alignment_input_string(spam)
             alignments.append(word + _JOINER + spam)
-    return sorted(alignments)
+    return compact_alignments(sorted(alignments))
 
 
 def is_ipa(lang: str) -> bool:
