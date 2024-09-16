@@ -200,8 +200,7 @@ class LexiconTransducerTest(TestCase):
         )
 
     def test_eng_transducer(self):
-        """Test the cached eng to eng-ipa lexicon from make_g2p
-        ."""
+        """Test the cached eng to eng-ipa lexicon from make_g2p."""
         transducer = make_g2p("eng", "eng-arpabet")
         tg = transducer("hello")
         self.assertEqual(tg.output_string, "HH AH L OW ")
@@ -210,6 +209,66 @@ class LexiconTransducerTest(TestCase):
         self.assertEqual(
             transducer("hello my friend").output_string, "HH AH L OW  M AY  F R EH N D "
         )
+
+    def test_eng_lexicon_corner_cases(self):
+        """White-box testing for compact storage of lexicon mappings."""
+        test_cases = (
+            ("'bout", "baʊt"),  # first entry in eng->eng-ipa
+            ("'cause", "kʌz"),  # second entry
+            ("'course", "kɔɹs"),  # third
+            ("'tis", "tɪz"),  # 15th entry
+            ("'twas", "twʌz"),  # 16th entry
+            ("a", "ʌ"),  # 17th entry
+            ("buttering", "bʌtɜ˞ɪŋ"),  # 15998th, which is -2 mod 16
+            ("buttermilk", "bʌtɜ˞mɪlk"),  # 15999th, -1 mod 16
+            ("buttermore", "bʌtɜ˞mɔɹ"),  # 16000th, 0 mod 16
+            ("butters", "bʌtɜ˞z"),  # 16001th, 1 mod 16
+            ("butterscotch", "bʌtɜ˞skɑtʃ"),
+            ("butterworth", "bʌtɜ˞wɜ˞θ"),
+            ("buttery", "bʌtɜ˞i"),
+            ("butthead", "bʌthɛd"),
+            ("butting", "bʌtɪŋ"),
+            ("buttitta", "butitʌ"),
+            ("buttke", "bʌtki"),
+            ("buttler", "bʌtlɜ˞"),
+            ("buttner", "bʌtnɜ˞"),
+            ("buttock", "bʌtʌk"),
+            ("buttocks", "bʌtʌks"),
+            ("button", "bʌtʌn"),
+            ("buttoned", "bʌtʌnd"),
+            ("buttonhole", "bʌtʌnhoʊl"),
+            ("buttonholed", "bʌtʌnhoʊld"),
+            ("buttonholes", "bʌtʌnhoʊlz"),
+            ("buttons", "bʌtʌnz"),  # 16018th
+            ("zwieg", "zwiɡ"),  # last block of the lexicon
+            ("zwilling", "zwɪlɪŋ"),
+            ("zwolinski", "zvʌlɪnski"),
+            ("zycad", "zɪkæd"),
+            ("zych", "zaɪtʃ"),
+            ("zycher", "zɪkɜ˞"),
+            ("zydeco", "zaɪdʌkoʊ"),
+            ("zygmunt", "zɪɡmʌnt"),
+            ("zygote", "zaɪɡoʊt"),
+            ("zyla", "zɪlʌ"),
+            ("zylka", "zɪlkʌ"),
+            ("zylstra", "zɪlstɹʌ"),
+            ("zyman", "zaɪmʌn"),
+            ("zynda", "zɪndʌ"),
+            ("zysk", "zaɪsk"),
+            ("zyskowski", "zɪskɔfski"),
+            ("zyuganov", "zjuɡɑnɑv"),
+            ("zyuganov's", "zjuɡɑnɑvz"),
+            ("zywicki", "zɪwɪki"),
+        )
+
+        transducer = make_g2p("eng", "eng-ipa", tokenize=False)
+        for word, expected in test_cases:
+            tg = transducer(word)
+            self.assertEqual(tg.output_string, expected)
+            before = word[:-1] + chr(ord(word[-1]) - 1) + "z"
+            self.assertEqual(transducer(before).output_string, "", f"word={word} before={before}")
+            after = word[:-1] + chr(ord(word[-1]) + 1) + "z"
+            self.assertEqual(transducer(after).output_string, "", f"word={word} after={after}")
 
 
 if __name__ == "__main__":
