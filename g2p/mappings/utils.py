@@ -512,23 +512,39 @@ _BLOCK_JOINER = "\1"
 
 
 def find_alignment(alignments: List[str], word: str) -> List[Tuple[int, str]]:
-    """Given a sorted list of (word, alignment), find word and return its parsed alignment."""
+    """Given a sorted list of (word, alignment), find word and return its parsed alignment.
+
+    Algorithm: double bisect over blocks and then entries within blocks.
+    """
     i = bisect_left(alignments, word)
-    alignment_entry = _JOINER
     if i != len(alignments) and alignments[i].startswith(word + _JOINER):
+        # Looking for the first entry of a block bisects to the correct block
         alignment_entry, _, _ = alignments[i].partition(_BLOCK_JOINER)
     elif i > 0:
+        # Looking for the remaining entries of a block bisects one block too far:
+        # bisect again within the previous block
         alignment_block = alignments[i - 1].split(_BLOCK_JOINER)
         j = bisect_left(alignment_block, word)
         if j != len(alignment_block):
             alignment_entry = alignment_block[j]
+        else:
+            return []  # word not found: would have been between this and next block
+    else:
+        return []  # word not found: would have been before the first block
+
     k, _, v = alignment_entry.partition(_JOINER)
     if k == word:
-        return get_alignment_sequence(v)
-    return []
+        return get_alignment_sequence(v)  # word found
+    else:
+        return []  # word not found: key in bisected location does not match word
 
 
 def compact_alignments(alignments: Sequence[str]) -> List[str]:
+    """Memory footprint optimization: compact the list of alignments into blocks.
+
+    Each Python string has a significant overhead: grouping them into blocks of 16
+    saves 15MB of RAM for the cmudict English lexicon, at no significant speed cost.
+    """
     _BLOCK_SIZE = 16
     return [
         _BLOCK_JOINER.join(alignments[i : i + _BLOCK_SIZE])
