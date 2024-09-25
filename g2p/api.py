@@ -17,7 +17,7 @@ api = FastAPI(
     title="Simple G2P API",
     description="A simple API for the G2P module",
     version="1.1.1",
-    contact={"email": "hello@aidanpine.ca"},
+    contact={"email": "readalong.studio@gmail.com"},
     license_info={
         "name": "MIT",
         "url": "https://github.com/roedoejet/g2p/blob/main/LICENSE",
