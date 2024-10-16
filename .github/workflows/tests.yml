@@ -108,9 +108,10 @@ jobs:
     runs-on: ubuntu-22.04  # https://devcenter.heroku.com/articles/heroku-22-stack
     steps:
       - uses: actions/checkout@v4
-      - name: Get the Python version from runtime.txt, like Heroku does
-        id: runtime
-        run: echo "PYTHON_VERSION=$(cat runtime.txt | sed 's/python-//')" >> $GITHUB_ENV
+      - name: Read the Heroku run time env and cmd
+        run: |
+          echo "PYTHON_VERSION=$(cat runtime.txt | sed 's/python-//')" >> $GITHUB_ENV
+          echo "RUNTIME_CMD=$(cat Procfile | sed 's/web: *//')" >> $GITHUB_ENV
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
@@ -129,7 +130,7 @@ jobs:
           pip install -r requirements.txt
           bin/post_compile
       - name: Launch the API
-        run: python run_studio.py &
+        run: ${{ env.RUNTIME_CMD }} --bind localhost:5000 &
       - name: Run the regular dev suite
         run: python run_tests.py dev
       - name: Run test-studio
