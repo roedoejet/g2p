@@ -17,19 +17,19 @@ repos:
         entry: isort
         language: system
         types: [python]
-        stages: [commit]
+        stages: [pre-commit]
     -   id: black
         name: black
         entry: black
         language: system
         types: [python]
-        stages: [commit]
+        stages: [pre-commit]
     -   id: mypy
         name: mypy
         entry: mypy
         language: system
         types: [python]
-        stages: [commit]
+        stages: [pre-commit]
 -   repo: https://github.com/pycqa/flake8
     # do flake8 last to avoid duplicate reports
     rev: 7.0.0

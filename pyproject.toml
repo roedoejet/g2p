@@ -60,7 +60,7 @@ dev = [
   "isort>=5.10.1",
   "mypy>=1; python_version < '3.8'",
   "mypy>=1.8.0; python_version >= '3.8'",
-  "pre-commit>=2.6.0",
+  "pre-commit>=3.2.0",
 ]
 # This one is a bit special and cannot depend on other features,
 # because if it depends on `g2p[api]` then we end up with
