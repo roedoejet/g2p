@@ -44,6 +44,24 @@ class TokenizerTest(TestCase):
         self.assertFalse(tokens[1]["is_word"])
         self.assertEqual(tokens[1]["text"], " ")
 
+    def test_lexicon_tokenizer(self):
+        tokenizer = tok.make_tokenizer("eng")
+        tests = [
+            ("It's", ["It's"]),
+            ("'cause", ["'cause"]),
+            ('"\'cause"', ['"', "'cause", '"']),
+            ("aardvark's", ["aardvark", "'s"]),
+            ("'aardvark's'", ["'", "aardvark", "'s", "'"]),
+            ("ten a.m.", ["ten", " ", "a.m."]),
+            ('ten "a.m.,!"', ["ten", ' "', "a.m.", ',!"']),
+            ("all-out war", ["all-out", " ", "war"]),  # all-out is in the lexicon
+            ("all-in: nonsense", ["all", "-", "in", ": ", "nonsense"]),  # all-in is not
+        ]
+        for input_text, expected_tokens in tests:
+            with self.subTest(input_text=input_text):
+                tokens = tokenizer.tokenize_text(input_text)
+                self.assertEqual([x["text"] for x in tokens], expected_tokens)
+
     def test_tokenize_win(self):
         """win is easy to tokenize because win -> win-ipa exists and has ' in its inventory"""
         input = "p'ōį̄ą"
