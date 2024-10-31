@@ -10,7 +10,6 @@ import os
 import unicodedata as ud
 from bisect import bisect_left
 from collections import defaultdict
-from copy import deepcopy
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -597,16 +596,39 @@ class IndentDumper(yaml.Dumper):
 
 
 def merge_same_type_tokens(tokens: list) -> list:
-    """Merge tokens that have the same type.
-
-    Destroys tokens in the process.
-    Tokens are represented as dicts {"text": str, "is_word": bool}.
-    """
+    """Merge tokens that have the same type.  Destroys tokens in the process.
+    Tokens are represented as dicts {"text": str, "is_word": bool}."""
     if not tokens:
-        return
+        return []
     merged_tokens = [tokens[0]]
     for token in tokens[1:]:
         if token["is_word"] == merged_tokens[-1]["is_word"]:
+            merged_tokens[-1]["text"] += token["text"]
+        else:
+            merged_tokens.append(token)
+    return merged_tokens
+
+
+def split_non_word_tokens(tokens: list) -> list:
+    """Split non-word units into characters. Destroys tokens in the process."""
+    new_tokens = []
+    for token in tokens:
+        if not token["is_word"]:
+            new_tokens.extend(
+                [{"text": char, "is_word": False} for char in token["text"]]
+            )
+        else:
+            new_tokens.append(token)
+    return new_tokens
+
+
+def merge_non_word_tokens(tokens: list) -> list:
+    """Merge consecutive non-word units into a single token. Destroys tokens in the process."""
+    if not tokens:
+        return tokens
+    merged_tokens = [tokens[0]]
+    for token in tokens[1:]:
+        if not token["is_word"] and not merged_tokens[-1]["is_word"]:
             merged_tokens[-1]["text"] += token["text"]
         else:
             merged_tokens.append(token)
