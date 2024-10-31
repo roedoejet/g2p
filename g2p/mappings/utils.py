@@ -596,22 +596,21 @@ class IndentDumper(yaml.Dumper):
         return True
 
 
-def merge_if_same_label(lst_of_dicts, text_key, label_key):
-    results = []
-    current_item = None
-    for dct in lst_of_dicts:
-        if label_key not in dct:
-            dct[label_key] = None
-        if not current_item:
-            current_item = deepcopy(dct)
-        elif dct[label_key] == current_item[label_key]:
-            current_item[text_key] += dct[text_key]
+def merge_same_type_tokens(tokens: list) -> list:
+    """Merge tokens that have the same type.
+
+    Destroys tokens in the process.
+    Tokens are represented as dicts {"text": str, "is_word": bool}.
+    """
+    if not tokens:
+        return
+    merged_tokens = [tokens[0]]
+    for token in tokens[1:]:
+        if token["is_word"] == merged_tokens[-1]["is_word"]:
+            merged_tokens[-1]["text"] += token["text"]
         else:
-            results.append(current_item)
-            current_item = deepcopy(dct)
-    if current_item:
-        results.append(current_item)
-    return results
+            merged_tokens.append(token)
+    return merged_tokens
 
 
 CATEGORIES = {

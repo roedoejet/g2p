@@ -13,7 +13,7 @@ from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
 from g2p.mappings import Mapping
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
+from g2p.mappings.utils import get_unicode_category, is_ipa, merge_same_type_tokens
 from g2p.shared_types import BaseTokenizer
 
 
@@ -57,8 +57,7 @@ class Tokenizer(BaseTokenizer):
                     and units[i + 1]["is_word"]
                 ):
                     unit["is_word"] = True
-        units = merge_if_same_label(units, "text", "is_word")
-        return units
+        return merge_same_type_tokens(units)
 
 
 class SpecializedTokenizer(Tokenizer):
