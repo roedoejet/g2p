@@ -18,7 +18,9 @@ from g2p.mappings.utils import (
     find_alignment,
     get_unicode_category,
     is_ipa,
+    merge_non_word_tokens,
     merge_same_type_tokens,
+    split_non_word_tokens,
 )
 from g2p.shared_types import BaseTokenizer
 
@@ -114,61 +116,38 @@ class LexiconTokenizer(Tokenizer):
         self.mapping = mapping
         self.lang = mapping.language_name
 
-    def _recursive_helper(self, units: list, output_units: list):
-        """Emit the long prefix found in the lexicon, if any, as a token.
+    def _recursive_helper(self, tokens: list, output_tokens: list):
+        """Emit the longest prefix found in the lexicon, if any, as a token.
         If None, emit the first unit as a token.
         Recursively process the rest of the units.
         """
-        if not units:
+        if not tokens:
             return
-        if len(units) == 1:
-            output_units.append(units[0])
+        if len(tokens) == 1:
+            output_tokens.append(tokens[0])
             return
-        for i in range(len(units), 0, -1):
-            candidate = "".join([u["text"] for u in units[:i]])
+        for i in range(len(tokens), 0, -1):
+            candidate = "".join([u["text"] for u in tokens[:i]])
             if find_alignment(self.mapping.alignments, candidate.lower()):
-                output_units.append({"text": candidate, "is_word": True})
-                return self._recursive_helper(units[i:], output_units)
+                output_tokens.append({"text": candidate, "is_word": True})
+                return self._recursive_helper(tokens[i:], output_tokens)
         # No prefix found, emit the first unit as a token
-        output_units.append(units[0])
-        self._recursive_helper(units[1:], output_units)
-
-    def split_non_word_units(self, units):
-        """Split non-word units into characters, to be able to match them in the lexicon."""
-        new_units = []
-        for unit in units:
-            if not unit["is_word"]:
-                new_units.extend(
-                    [{"text": char, "is_word": False} for char in unit["text"]]
-                )
-            else:
-                new_units.append(unit)
-        return new_units
-
-    def merge_non_word_units(self, units):
-        """Merge consecutive non-word units into a single token."""
-        if not units:
-            return units
-        merged_units = [units[0]]
-        for unit in units[1:]:
-            if not unit["is_word"] and not merged_units[-1]["is_word"]:
-                merged_units[-1]["text"] += unit["text"]
-            else:
-                merged_units.append(unit)
-        return merged_units
+        output_tokens.append(tokens[0])
+        self._recursive_helper(tokens[1:], output_tokens)
 
     def tokenize_text(self, text):
         blocks = re.split(r"(\s+)", text)
-        output_units = []
+        output_tokens = []
         for i, block in enumerate(blocks):
             if i % 2 == 1 and block:
-                output_units.append({"text": block, "is_word": False})
+                output_tokens.append({"text": block, "is_word": False})
             else:
-                default_units = super().tokenize_text(block)
-                candidate_units = self.split_non_word_units(default_units)
-                self._recursive_helper(candidate_units, output_units)
+                default_tokens = super().tokenize_text(block)
+                # Split non-word tokens into smaller parts for lexicon lookup
+                candidate_tokens = split_non_word_tokens(default_tokens)
+                self._recursive_helper(candidate_tokens, output_tokens)
 
-        return self.merge_non_word_units(output_units)
+        return merge_non_word_tokens(output_tokens)
 
 
 class MultiHopTokenizer(SpecializedTokenizer):
