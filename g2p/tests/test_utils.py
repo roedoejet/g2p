@@ -14,9 +14,9 @@ import yaml
 from pep440 import is_canonical
 
 import g2p
+import g2p.exceptions
 from g2p import get_arpabet_langs
 from g2p._version import VERSION, version_tuple
-from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
 from g2p.mappings.utils import RULE_ORDERING_ENUM, Rule
@@ -60,7 +60,7 @@ class UtilsTest(TestCase):
         )  # shouldn't allow self-referential abbreviations
         expanded_plain = utils.expand_abbreviations("test", test_dict)
         expanded_bad_plain = utils.expand_abbreviations("test", bad_dict)
-        with self.assertRaises(RecursionError):
+        with self.assertRaises(g2p.exceptions.RecursionError):
             utils.expand_abbreviations("HIGH_VOWELS", bad_dict)
         expanded_non_recursive = utils.expand_abbreviations("HIGH_VOWELS", test_dict)
         expanded_recursive = utils.expand_abbreviations("VOWELS", test_dict)
@@ -156,7 +156,7 @@ class UtilsTest(TestCase):
         )
 
     def test_load_abbs(self):
-        with self.assertRaises(IncorrectFileType):
+        with self.assertRaises(g2p.exceptions.IncorrectFileType):
             utils.load_abbreviations_from_file(
                 os.path.join(PUBLIC_DIR, "mappings", "abbreviations.json")
             )
@@ -211,6 +211,10 @@ class UtilsTest(TestCase):
         self.assertEqual(
             test_config_added.display_name, "test custom to test-out custom"
         )
+
+    def test_bad_normalization(self):
+        with self.assertRaises(g2p.exceptions.InvalidNormalization):
+            utils.normalize_with_indices("test", "bad")
 
     def test_normalize_to_NFD_with_indices(self):
         # Usefull site to get combining character code points:
