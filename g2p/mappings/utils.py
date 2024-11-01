@@ -150,7 +150,7 @@ def normalize(inp: str, norm_form: Union[str, None]):
     if norm_form is None or norm_form == "none":
         return unicode_escape(inp)
     if norm_form not in ["NFC", "NFD", "NFKC", "NFKD"]:
-        raise exceptions.InvalidNormalization(normalize)
+        raise exceptions.InvalidNormalization(norm_form)
     # Sadly mypy doesn't do narrowing to literals properly
     norm_form = cast(Literal["NFC", "NFD", "NFKC", "NFKD"], norm_form)
     normalized = ud.normalize(norm_form, unicode_escape(inp))
@@ -177,8 +177,8 @@ def compose_indices(
     """Compose indices1 + indices2 into direct arcs from the inputs of indices1
     to the outputs of indices 2.
 
-    E.g., [(0,1), (1,4)] composed with [(0,0), (1,2), (1,3), (4,2)] is
-    [(0,2), (0,3), (1,2)]
+    >>> compose_indices([(0,1), (1,4)], [(0,0), (1,2), (1,3), (4,2)])
+    [(0, 2), (0, 3), (1, 2)]
     """
     # for O(1) lookup of arcs leaving indices2
     indices2_as_dict = defaultdict(dict)  # type: ignore
@@ -238,7 +238,7 @@ def normalize_with_indices(
         return normalize_to_NFD_with_indices(inp, norm_form)
     if norm_form in ("none", None):
         return inp, [(i, i) for i in range(len(inp))]
-    raise exceptions.InvalidNormalization(normalize)
+    raise exceptions.InvalidNormalization(norm_form)
 
 
 def unicode_escape(text):
@@ -597,7 +597,13 @@ class IndentDumper(yaml.Dumper):
 
 def merge_same_type_tokens(tokens: list) -> list:
     """Merge tokens that have the same type.  Destroys tokens in the process.
-    Tokens are represented as dicts {"text": str, "is_word": bool}."""
+    Tokens are represented as dicts {"text": str, "is_word": bool}.
+
+    >>> merge_same_type_tokens([{"text": "test", "is_word": True}, {"text": "b", "is_word": True}, {"text": ":", "is_word": False}, {"text": ",", "is_word": False}])
+    [{'text': 'testb', 'is_word': True}, {'text': ':,', 'is_word': False}]
+    >>> merge_same_type_tokens([])
+    []
+    """
     if not tokens:
         return []
     merged_tokens = [tokens[0]]
@@ -610,7 +616,13 @@ def merge_same_type_tokens(tokens: list) -> list:
 
 
 def split_non_word_tokens(tokens: list) -> list:
-    """Split non-word units into characters. Destroys tokens in the process."""
+    """Split non-word units into characters. Destroys tokens in the process.
+
+    >>> split_non_word_tokens([{"text": "test", "is_word": True}, {"text": ":,- ", "is_word": False}, {"text": "", "is_word": False}])
+    [{'text': 'test', 'is_word': True}, {'text': ':', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '-', 'is_word': False}, {'text': ' ', 'is_word': False}]
+    >>> split_non_word_tokens([])
+    []
+    """
     new_tokens = []
     for token in tokens:
         if not token["is_word"]:
@@ -623,7 +635,13 @@ def split_non_word_tokens(tokens: list) -> list:
 
 
 def merge_non_word_tokens(tokens: list) -> list:
-    """Merge consecutive non-word units into a single token. Destroys tokens in the process."""
+    """Merge consecutive non-word units into a single token. Destroys tokens in the process.
+
+    >>> merge_non_word_tokens([{"text": "test", "is_word": True}, {"text": ":", "is_word": False}, {"text": ",", "is_word": False}])
+    [{'text': 'test', 'is_word': True}, {'text': ':,', 'is_word': False}]
+    >>> merge_non_word_tokens([])
+    []
+    """
     if not tokens:
         return tokens
     merged_tokens = [tokens[0]]
