@@ -11,17 +11,9 @@ from typing import List
 
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, utils
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.utils import (
-    MAPPING_TYPE,
-    find_alignment,
-    get_unicode_category,
-    is_ipa,
-    merge_non_word_tokens,
-    merge_same_type_tokens,
-    split_non_word_tokens,
-)
+from g2p.mappings.utils import is_ipa
 from g2p.shared_types import BaseTokenizer
 
 
@@ -50,7 +42,7 @@ class Tokenizer(BaseTokenizer):
         if self.delim and c == self.delim:
             return True
         assert len(c) <= 1
-        if get_unicode_category(c) in ["letter", "number", "diacritic"]:
+        if utils.get_unicode_category(c) in ["letter", "number", "diacritic"]:
             return True
         return False
 
@@ -65,7 +57,7 @@ class Tokenizer(BaseTokenizer):
                     and units[i + 1]["is_word"]
                 ):
                     unit["is_word"] = True
-        return merge_same_type_tokens(units)
+        return utils.merge_same_type_tokens(units)
 
 
 class SpecializedTokenizer(Tokenizer):
@@ -128,7 +120,7 @@ class LexiconTokenizer(Tokenizer):
             return
         for i in range(len(tokens), 0, -1):
             candidate = "".join([u["text"] for u in tokens[:i]])
-            if find_alignment(self.mapping.alignments, candidate.lower()):
+            if utils.find_alignment(self.mapping.alignments, candidate.lower()):
                 output_tokens.append({"text": candidate, "is_word": True})
                 return self._recursive_helper(tokens[i:], output_tokens)
         # No prefix found, emit the first unit as a token
@@ -144,10 +136,10 @@ class LexiconTokenizer(Tokenizer):
             else:
                 default_tokens = super().tokenize_text(block)
                 # Split non-word tokens into smaller parts for lexicon lookup
-                candidate_tokens = split_non_word_tokens(default_tokens)
+                candidate_tokens = utils.split_non_word_tokens(default_tokens)
                 self._recursive_helper(candidate_tokens, output_tokens)
 
-        return merge_non_word_tokens(output_tokens)
+        return utils.merge_non_word_tokens(output_tokens)
 
 
 class MultiHopTokenizer(SpecializedTokenizer):
@@ -254,7 +246,7 @@ class TokenizerLibrary:
                 # Build a one-hop tokenizer
                 try:
                     mapping = Mapping.find_mapping(in_lang=in_lang, out_lang=out_lang)
-                    if mapping.type == MAPPING_TYPE.lexicon:
+                    if mapping.type == utils.MAPPING_TYPE.lexicon:
                         self.tokenizers[tokenizer_key] = LexiconTokenizer(mapping)
                     else:
                         self.tokenizers[tokenizer_key] = SpecializedTokenizer(mapping)
