@@ -616,19 +616,34 @@ def merge_same_type_tokens(tokens: list) -> list:
 
 
 def split_non_word_tokens(tokens: list) -> list:
-    """Split non-word units into characters. Destroys tokens in the process.
+    """Split non-word units into characters. Reuses the word tokens.
+
+    Generates a maximum of 5 units per non-word token: if the input token is
+    more than 5 non-word characters, the output will be the first two
+    individually, the middle as a block, and the last two individually, because
+    lexicon-based tokenization does not need more granularity than that.
+    This prevents degerate input like a large number of consecutive punctuation
+    marks from taking quadratic time in lexicon-based tokenization.
 
     >>> split_non_word_tokens([{"text": "test", "is_word": True}, {"text": ":,- ", "is_word": False}, {"text": "", "is_word": False}])
     [{'text': 'test', 'is_word': True}, {'text': ':', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '-', 'is_word': False}, {'text': ' ', 'is_word': False}]
     >>> split_non_word_tokens([])
     []
+    >>> split_non_word_tokens([{"text": ".,.,.,.", "is_word": False}])
+    [{'text': '.', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '.,.', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '.', 'is_word': False}]
     """
     new_tokens = []
     for token in tokens:
         if not token["is_word"]:
-            new_tokens.extend(
-                [{"text": char, "is_word": False} for char in token["text"]]
-            )
+            text = token["text"]
+            if len(text) > 5:
+                new_tokens.append({"text": text[0], "is_word": False})
+                new_tokens.append({"text": text[1], "is_word": False})
+                new_tokens.append({"text": text[2:-2], "is_word": False})
+                new_tokens.append({"text": text[-2], "is_word": False})
+                new_tokens.append({"text": text[-1], "is_word": False})
+            else:
+                new_tokens.extend([{"text": char, "is_word": False} for char in text])
         else:
             new_tokens.append(token)
     return new_tokens
