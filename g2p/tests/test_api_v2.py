@@ -1,4 +1,6 @@
 import unittest
+from contextlib import redirect_stderr
+from io import StringIO
 
 from fastapi.testclient import TestClient
 
@@ -9,7 +11,8 @@ API_CLIENT = TestClient(api)
 
 class TestAPIV2(unittest.TestCase):
     def test_langs(self):
-        response = API_CLIENT.get("/langs")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/langs")
         self.assertEqual(response.status_code, 200)
         codes = {x["code"] for x in response.json()}
         self.assertTrue("fin" in codes)
@@ -20,7 +23,8 @@ class TestAPIV2(unittest.TestCase):
         self.assertTrue("Finnish" in names)
 
     def test_langs_allcodes(self):
-        response = API_CLIENT.get("/nodes")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/nodes")
         self.assertEqual(response.status_code, 200)
         codes = {x["code"] for x in response.json()}
         self.assertTrue("eng-arpabet" in codes)
@@ -29,26 +33,29 @@ class TestAPIV2(unittest.TestCase):
         self.assertFalse("generated" in codes)
 
     def test_outputs_for(self):
-        response = API_CLIENT.get("/outputs_for/fin")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/outputs_for/fin")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("eng-arpabet" in response.json())
         self.assertTrue("eng-ipa" in response.json())
 
     def test_inputs_for(self):
-        response = API_CLIENT.get("/inputs_for/eng-arpabet")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/inputs_for/eng-arpabet")
         self.assertEqual(response.status_code, 200)
         self.assertTrue("fin" in response.json())
         self.assertTrue("eng-ipa" in response.json())
 
     def test_convert(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "fin",
-                "out_lang": "eng-arpabet",
-                "text": "hyvää yötä",
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "fin",
+                    "out_lang": "eng-arpabet",
+                    "text": "hyvää yötä",
+                },
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -156,15 +163,16 @@ class TestAPIV2(unittest.TestCase):
         )
 
     def test_convert_composed(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "fin",
-                "out_lang": "eng-arpabet",
-                "text": "hyvää yötä",
-                "compose_from": "fin",
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "fin",
+                    "out_lang": "eng-arpabet",
+                    "text": "hyvää yötä",
+                    "compose_from": "fin",
+                },
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -219,15 +227,16 @@ class TestAPIV2(unittest.TestCase):
         )
 
     def test_convert_compose_from(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "fin",
-                "out_lang": "eng-arpabet",
-                "text": "hyvää yötä",
-                "compose_from": "fin-ipa",
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "fin",
+                    "out_lang": "eng-arpabet",
+                    "text": "hyvää yötä",
+                    "compose_from": "fin-ipa",
+                },
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -309,16 +318,17 @@ class TestAPIV2(unittest.TestCase):
         )
 
     def test_convert_surrogates(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "eng-ipa",
-                "out_lang": "eng-arpabet",
-                "text": "hi🙂hi",
-                "indices": True,
-                "tokenize": False,
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "eng-ipa",
+                    "out_lang": "eng-arpabet",
+                    "text": "hi🙂hi",
+                    "indices": True,
+                    "tokenize": False,
+                },
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.json(),
@@ -373,36 +383,40 @@ class TestAPIV2(unittest.TestCase):
         )
 
     def test_convert_no_path(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "fin",
-                "out_lang": "fra",
-                "text": "hyvää yötä",
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "fin",
+                    "out_lang": "fra",
+                    "text": "hyvää yötä",
+                },
+            )
         self.assertEqual(response.status_code, 400)
 
     def test_convert_invalid(self):
-        response = API_CLIENT.post(
-            "/convert",
-            json={
-                "in_lang": "Finnish",
-                "out_lang": "eng-arpabet",
-                "text": "hyvää yötä",
-            },
-        )
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.post(
+                "/convert",
+                json={
+                    "in_lang": "Finnish",
+                    "out_lang": "eng-arpabet",
+                    "text": "hyvää yötä",
+                },
+            )
         self.assertEqual(response.status_code, 422)
         self.assertIn("Input should be", response.json()["detail"][0]["msg"])
 
     def test_path(self):
-        response = API_CLIENT.get("/path/fin/eng-arpabet")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/path/fin/eng-arpabet")
         self.assertEqual(response.status_code, 200)
         path = response.json()
         self.assertEqual(path, ["fin", "fin-ipa", "eng-ipa", "eng-arpabet"])
 
     def test_no_path(self):
-        response = API_CLIENT.get("/path/fin/fra")
+        with redirect_stderr(StringIO()):
+            response = API_CLIENT.get("/path/fin/fra")
         self.assertEqual(response.status_code, 400)
         self.assertIn("No path", response.json()["detail"])
 
