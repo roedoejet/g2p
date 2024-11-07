@@ -1,207 +1,207 @@
 {
     "out_metadata": {
-        "lang": "eng-ipa", 
-        "delimiter": "", 
+        "lang": "eng-ipa",
+        "delimiter": "",
         "format": "ipa"
-    }, 
+    },
     "in_metadata": {
-        "lang": "kwk-xsampa", 
-        "delimiter": " ", 
+        "lang": "kwk-xsampa",
+        "delimiter": " ",
         "format": "x-sampa",
         "escape_special_characters": true
-    }, 
-    "type": "mapping", 
+    },
+    "type": "mapping",
     "map": [
         {
-            "out": "ej", 
+            "out": "ej",
             "in": "ej"
-        }, 
+        },
         {
-            "out": "ɡw", 
+            "out": "ɡw",
             "in": "g_w"
-        }, 
+        },
         {
-            "out": "ɡj", 
+            "out": "ɡj",
             "in": "g_j"
-        }, 
+        },
         {
-            "out": "ts", 
+            "out": "ts",
             "in": "ts_>"
-        }, 
+        },
         {
-            "out": "kw", 
+            "out": "kw",
             "in": "q_w"
-        }, 
+        },
         {
-            "out": "kw", 
+            "out": "kw",
             "in": "x_w"
-        }, 
+        },
         {
-            "out": "ts", 
+            "out": "ts",
             "in": "tK"
-        }, 
+        },
         {
-            "out": "ʃ", 
+            "out": "ʃ",
             "in": "X"
-        }, 
+        },
         {
-            "out": "u", 
+            "out": "u",
             "in": "u"
-        }, 
+        },
         {
-            "out": "ʔw", 
+            "out": "ʔw",
             "in": "? w"
-        }, 
+        },
         {
-            "out": "ɡw", 
+            "out": "ɡw",
             "in": "G_w"
-        }, 
+        },
         {
-            "out": "ts", 
+            "out": "ts",
             "in": "ts"
-        }, 
+        },
         {
-            "out": "ʃw", 
+            "out": "ʃw",
             "in": "X_w"
-        }, 
+        },
         {
-            "out": "kw", 
+            "out": "kw",
             "in": "k_w_>"
-        }, 
+        },
         {
-            "out": "ts", 
+            "out": "ts",
             "in": "tK_>"
-        }, 
+        },
         {
-            "out": "kw", 
+            "out": "kw",
             "in": "q_w_>"
-        }, 
+        },
         {
-            "out": "ʔl", 
+            "out": "ʔl",
             "in": "? l"
-        }, 
+        },
         {
-            "out": "ʔm", 
+            "out": "ʔm",
             "in": "? m"
-        }, 
+        },
         {
-            "out": "ʔn", 
+            "out": "ʔn",
             "in": "? n"
-        }, 
+        },
         {
-            "out": "j", 
+            "out": "j",
             "in": "ʔ j"
-        }, 
+        },
         {
-            "out": "ʔ", 
+            "out": "ʔ",
             "in": "?"
-        }, 
+        },
         {
-            "out": "ə", 
+            "out": "ə",
             "in": "@"
-        }, 
+        },
         {
-            "out": "ɡ", 
+            "out": "ɡ",
             "in": "G"
-        }, 
+        },
         {
-            "out": "kj", 
+            "out": "kj",
             "in": "x_j"
-        }, 
+        },
         {
-            "out": "s", 
+            "out": "s",
             "in": "K"
-        }, 
+        },
         {
-            "out": "p", 
+            "out": "p",
             "in": "p_>"
-        }, 
+        },
         {
-            "out": "dz", 
+            "out": "dz",
             "in": "dz"
-        }, 
+        },
         {
-            "out": "kj", 
+            "out": "kj",
             "in": "k_j_>"
-        }, 
+        },
         {
-            "out": "k", 
+            "out": "k",
             "in": "q_>"
-        }, 
+        },
         {
-            "out": "ds", 
+            "out": "ds",
             "in": "dK"
-        }, 
+        },
         {
-            "out": "ɑ", 
+            "out": "ɑ",
             "in": "a"
-        }, 
+        },
         {
-            "out": "b", 
+            "out": "b",
             "in": "b"
-        }, 
+        },
         {
-            "out": "d", 
+            "out": "d",
             "in": "d"
-        }, 
+        },
         {
-            "out": "i", 
+            "out": "i",
             "in": "i"
-        }, 
+        },
         {
-            "out": "h", 
+            "out": "h",
             "in": "h"
-        }, 
+        },
         {
-            "out": "j", 
+            "out": "j",
             "in": "j"
-        }, 
+        },
         {
-            "out": "m", 
+            "out": "m",
             "in": "m"
-        }, 
+        },
         {
-            "out": "l", 
+            "out": "l",
             "in": "l"
-        }, 
+        },
         {
-            "out": "kw", 
+            "out": "kw",
             "in": "k_w"
-        }, 
+        },
         {
-            "out": "n", 
+            "out": "n",
             "in": "n"
-        }, 
+        },
         {
-            "out": "k", 
+            "out": "k",
             "in": "q"
-        }, 
+        },
         {
-            "out": "p", 
+            "out": "p",
             "in": "p"
-        }, 
+        },
         {
-            "out": "s", 
+            "out": "s",
             "in": "s"
-        }, 
+        },
         {
-            "out": "kj", 
+            "out": "kj",
             "in": "k_j"
-        }, 
+        },
         {
-            "out": "t", 
+            "out": "t",
             "in": "t_>"
-        }, 
+        },
         {
-            "out": "t", 
+            "out": "t",
             "in": "t"
-        }, 
+        },
         {
-            "out": "w", 
+            "out": "w",
             "in": "w"
-        }, 
+        },
         {
-            "out": "ow", 
+            "out": "ow",
             "in": "ow"
         }
     ]

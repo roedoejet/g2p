@@ -75,4 +75,3 @@ where the accent was, we can use this set of rules in panphon_preprocessor.csv:
 \u1dc8,˧˦˧
 but I'm not activating this yet, since it doesn't place the tone bars where Panphon 0.19
 likes them.
-
