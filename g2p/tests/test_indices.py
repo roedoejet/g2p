@@ -536,7 +536,7 @@ class IndicesTest(TestCase):
 
     def test_case_twelve(self):
         # Empty inputs are not allowed (should it actually throw an exception?)
-        with self.assertLogs() as cm:
+        with self.assertLogs(LOGGER) as cm:
             self.test_mapping_twelve = Mapping(
                 rules=[{"in": "", "out": "aa", "context_before": "b"}]
             )

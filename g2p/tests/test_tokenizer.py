@@ -113,9 +113,9 @@ class TokenizerTest(TestCase):
         tokenizer = tok.make_tokenizer("fn-unicode-font")
         self.assertNotEqual(tokenizer, tok.make_tokenizer())
 
-    def test_tokenize_lang_does_not_exit(self):
+    def test_tokenize_lang_does_not_exist(self):
         self.assertEqual(tok.make_tokenizer("not_a_language"), tok.make_tokenizer())
-        with self.assertLogs():
+        with self.assertLogs(LOGGER):
             self.assertEqual(
                 tok.make_tokenizer("fra", "not_a_language"), tok.make_tokenizer()
             )

@@ -178,10 +178,8 @@ class CliTest(TestCase):
                 self.fail(f"Error validating {config}")
 
     def test_convert(self):
+        """Running all g2p convert test cases found in g2p/tests/public/data"""
         langs_to_test = load_public_test_data()
-        LOGGER.info(
-            f"Running {len(langs_to_test)} g2p convert test cases found in public/data"
-        )
         error_count = 0
         for tok_option in [["--tok", "--check"], ["--no-tok"]]:
             for (

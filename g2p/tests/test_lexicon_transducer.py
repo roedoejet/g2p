@@ -266,9 +266,13 @@ class LexiconTransducerTest(TestCase):
             tg = transducer(word)
             self.assertEqual(tg.output_string, expected)
             before = word[:-1] + chr(ord(word[-1]) - 1) + "z"
-            self.assertEqual(transducer(before).output_string, "", f"word={word} before={before}")
+            self.assertEqual(
+                transducer(before).output_string, "", f"word={word} before={before}"
+            )
             after = word[:-1] + chr(ord(word[-1]) + 1) + "z"
-            self.assertEqual(transducer(after).output_string, "", f"word={word} after={after}")
+            self.assertEqual(
+                transducer(after).output_string, "", f"word={word} after={after}"
+            )
 
 
 if __name__ == "__main__":
