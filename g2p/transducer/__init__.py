@@ -1219,11 +1219,11 @@ class TokenizingTransducer(BaseTransducer):
         tg.clear_debugger()  # clear the meaningless initial debugger
 
         for token in self._tokenizer.tokenize_text(to_convert):
-            if token["is_word"]:
-                word_tg = self._transducer(token["text"])
+            if token.is_word:
+                word_tg = self._transducer(token.text)
                 tg += word_tg
             else:
-                non_word_tg = TransductionGraph(token["text"])
+                non_word_tg = TransductionGraph(token.text)
                 tg += non_word_tg
         return tg
 
@@ -1256,8 +1256,8 @@ class TokenizingTransducer(BaseTransducer):
         # by step. I don't like this solution, but I don't see how to get around it.
         result = True
         for token in self._tokenizer.tokenize_text(tg.input_string):
-            if token["is_word"] and not self._transducer.check(
-                self._transducer(token["text"]),
+            if token.is_word and not self._transducer.check(
+                self._transducer(token.text),
                 shallow,
                 display_warnings=display_warnings,
             ):

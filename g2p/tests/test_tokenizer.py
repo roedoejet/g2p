@@ -17,32 +17,32 @@ class TokenizerTest(TestCase):
         tokenizer = tok.make_tokenizer("fra")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 8)
-        self.assertTrue(tokens[0]["is_word"])
-        self.assertEqual(tokens[0]["text"], "ceci")
-        self.assertFalse(tokens[1]["is_word"])
-        self.assertEqual(tokens[1]["text"], " ")
-        self.assertTrue(tokens[2]["is_word"])
-        self.assertEqual(tokens[2]["text"], "était")
-        self.assertFalse(tokens[3]["is_word"])
-        self.assertEqual(tokens[3]["text"], " '")
-        self.assertTrue(tokens[4]["is_word"])
-        self.assertEqual(tokens[4]["text"], "un")
-        self.assertFalse(tokens[5]["is_word"])
-        self.assertEqual(tokens[5]["text"], "' ")
-        self.assertTrue(tokens[6]["is_word"])
-        self.assertEqual(tokens[6]["text"], "test")
-        self.assertFalse(tokens[7]["is_word"])
-        self.assertEqual(tokens[7]["text"], ".")
+        self.assertTrue(tokens[0].is_word)
+        self.assertEqual(tokens[0].text, "ceci")
+        self.assertFalse(tokens[1].is_word)
+        self.assertEqual(tokens[1].text, " ")
+        self.assertTrue(tokens[2].is_word)
+        self.assertEqual(tokens[2].text, "était")
+        self.assertFalse(tokens[3].is_word)
+        self.assertEqual(tokens[3].text, " '")
+        self.assertTrue(tokens[4].is_word)
+        self.assertEqual(tokens[4].text, "un")
+        self.assertFalse(tokens[5].is_word)
+        self.assertEqual(tokens[5].text, "' ")
+        self.assertTrue(tokens[6].is_word)
+        self.assertEqual(tokens[6].text, "test")
+        self.assertFalse(tokens[7].is_word)
+        self.assertEqual(tokens[7].text, ".")
 
     def test_tokenize_eng(self):
         input = "This is éçà test."
         tokenizer = tok.make_tokenizer("eng")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 8)
-        self.assertTrue(tokens[0]["is_word"])
-        self.assertEqual(tokens[0]["text"], "This")
-        self.assertFalse(tokens[1]["is_word"])
-        self.assertEqual(tokens[1]["text"], " ")
+        self.assertTrue(tokens[0].is_word)
+        self.assertEqual(tokens[0].text, "This")
+        self.assertFalse(tokens[1].is_word)
+        self.assertEqual(tokens[1].text, " ")
 
     def test_lexicon_tokenizer(self):
         tokenizer = tok.make_tokenizer("eng")
@@ -60,7 +60,7 @@ class TokenizerTest(TestCase):
         for input_text, expected_tokens in tests:
             with self.subTest(input_text=input_text):
                 tokens = tokenizer.tokenize_text(input_text)
-                self.assertEqual([x["text"] for x in tokens], expected_tokens)
+                self.assertEqual([x.text for x in tokens], expected_tokens)
 
     def test_tokenize_win(self):
         """win is easy to tokenize because win -> win-ipa exists and has ' in its inventory"""
@@ -70,8 +70,8 @@ class TokenizerTest(TestCase):
         tokenizer = tok.make_tokenizer("win")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 1)
-        self.assertTrue(tokens[0]["is_word"])
-        self.assertEqual(tokens[0]["text"], "p'ōį̄ą")
+        self.assertTrue(tokens[0].is_word)
+        self.assertEqual(tokens[0].text, "p'ōį̄ą")
 
     def test_tokenize_tce(self):
         """tce is hard to tokenize correctly because we have tce -> tce-equiv -> tce-ipa, and ' is
@@ -89,14 +89,14 @@ class TokenizerTest(TestCase):
         tokenizer = tok.make_tokenizer("tce")
         tokens = tokenizer.tokenize_text(input)
         self.assertEqual(len(tokens), 1)
-        self.assertTrue(tokens[0]["is_word"])
-        self.assertEqual(tokens[0]["text"], "ts'nj")
+        self.assertTrue(tokens[0].is_word)
+        self.assertEqual(tokens[0].text, "ts'nj")
 
     def test_tokenize_tce_equiv(self):
         input = "ts'e ts`e ts‘e ts’"
         self.assertEqual(len(tok.make_tokenizer("fra").tokenize_text(input)), 14)
         # tce_tokens = tok.make_tokenizer("tce").tokenize_text(input)
-        # LOGGER.warning([x["text"] for x in tce_tokens])
+        # LOGGER.warning([x.text for x in tce_tokens])
         self.assertEqual(len(tok.make_tokenizer("tce").tokenize_text(input)), 7)
 
     def test_tokenizer_identity_tce(self):

@@ -42,6 +42,7 @@ from typing_extensions import Literal
 from g2p import exceptions
 from g2p.log import LOGGER
 from g2p.mappings import langs
+from g2p.shared_types import Token
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
@@ -595,12 +596,11 @@ class IndentDumper(yaml.Dumper):
         return True
 
 
-def merge_same_type_tokens(tokens: list) -> list:
+def merge_same_type_tokens(tokens: List[Token]) -> List[Token]:
     """Merge tokens that have the same type.  Destroys tokens in the process.
-    Tokens are represented as dicts {"text": str, "is_word": bool}.
 
-    >>> merge_same_type_tokens([{"text": "test", "is_word": True}, {"text": "b", "is_word": True}, {"text": ":", "is_word": False}, {"text": ",", "is_word": False}])
-    [{'text': 'testb', 'is_word': True}, {'text': ':,', 'is_word': False}]
+    >>> merge_same_type_tokens([Token("test", True), Token("b", True), Token(":", False), Token(",", False)])
+    [Token(text='testb', is_word=True), Token(text=':,', is_word=False)]
     >>> merge_same_type_tokens([])
     []
     """
@@ -608,14 +608,14 @@ def merge_same_type_tokens(tokens: list) -> list:
         return []
     merged_tokens = [tokens[0]]
     for token in tokens[1:]:
-        if token["is_word"] == merged_tokens[-1]["is_word"]:
-            merged_tokens[-1]["text"] += token["text"]
+        if token.is_word == merged_tokens[-1].is_word:
+            merged_tokens[-1].text += token.text
         else:
             merged_tokens.append(token)
     return merged_tokens
 
 
-def split_non_word_tokens(tokens: list) -> list:
+def split_non_word_tokens(tokens: List[Token]) -> List[Token]:
     """Split non-word units into characters. Reuses the word tokens.
 
     Generates a maximum of 5 units per non-word token: if the input token is
@@ -625,35 +625,35 @@ def split_non_word_tokens(tokens: list) -> list:
     This prevents degerate input like a large number of consecutive punctuation
     marks from taking quadratic time in lexicon-based tokenization.
 
-    >>> split_non_word_tokens([{"text": "test", "is_word": True}, {"text": ":,- ", "is_word": False}, {"text": "", "is_word": False}])
-    [{'text': 'test', 'is_word': True}, {'text': ':', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '-', 'is_word': False}, {'text': ' ', 'is_word': False}]
+    >>> split_non_word_tokens([Token("test", True), Token(":,- ", False), Token("", False)])
+    [Token(text='test', is_word=True), Token(text=':', is_word=False), Token(text=',', is_word=False), Token(text='-', is_word=False), Token(text=' ', is_word=False)]
     >>> split_non_word_tokens([])
     []
-    >>> split_non_word_tokens([{"text": ".,.,.,.", "is_word": False}])
-    [{'text': '.', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '.,.', 'is_word': False}, {'text': ',', 'is_word': False}, {'text': '.', 'is_word': False}]
+    >>> split_non_word_tokens([Token(".,.,.,.", False)])
+    [Token(text='.', is_word=False), Token(text=',', is_word=False), Token(text='.,.', is_word=False), Token(text=',', is_word=False), Token(text='.', is_word=False)]
     """
     new_tokens = []
     for token in tokens:
-        if not token["is_word"]:
-            text = token["text"]
+        if not token.is_word:
+            text = token.text
             if len(text) > 5:
-                new_tokens.append({"text": text[0], "is_word": False})
-                new_tokens.append({"text": text[1], "is_word": False})
-                new_tokens.append({"text": text[2:-2], "is_word": False})
-                new_tokens.append({"text": text[-2], "is_word": False})
-                new_tokens.append({"text": text[-1], "is_word": False})
+                new_tokens.append(Token(text[0], False))
+                new_tokens.append(Token(text[1], False))
+                new_tokens.append(Token(text[2:-2], False))
+                new_tokens.append(Token(text[-2], False))
+                new_tokens.append(Token(text[-1], False))
             else:
-                new_tokens.extend([{"text": char, "is_word": False} for char in text])
+                new_tokens.extend([Token(char, False) for char in text])
         else:
             new_tokens.append(token)
     return new_tokens
 
 
-def merge_non_word_tokens(tokens: list) -> list:
+def merge_non_word_tokens(tokens: List[Token]) -> List[Token]:
     """Merge consecutive non-word units into a single token. Destroys tokens in the process.
 
-    >>> merge_non_word_tokens([{"text": "test", "is_word": True}, {"text": ":", "is_word": False}, {"text": ",", "is_word": False}])
-    [{'text': 'test', 'is_word': True}, {'text': ':,', 'is_word': False}]
+    >>> merge_non_word_tokens([Token("test", True), Token(":", False), Token(",", False)])
+    [Token(text='test', is_word=True), Token(text=':,', is_word=False)]
     >>> merge_non_word_tokens([])
     []
     """
@@ -661,8 +661,8 @@ def merge_non_word_tokens(tokens: list) -> list:
         return tokens
     merged_tokens = [tokens[0]]
     for token in tokens[1:]:
-        if not token["is_word"] and not merged_tokens[-1]["is_word"]:
-            merged_tokens[-1]["text"] += token["text"]
+        if not token.is_word and not merged_tokens[-1].is_word:
+            merged_tokens[-1].text += token.text
         else:
             merged_tokens.append(token)
     return merged_tokens

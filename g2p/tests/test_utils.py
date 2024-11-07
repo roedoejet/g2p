@@ -4,9 +4,11 @@
 """
 
 import doctest
+import io
 import os
 import re
 from collections import defaultdict
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest import TestCase, main
 
@@ -326,6 +328,34 @@ class UtilsTest(TestCase):
         except FileNotFoundError:
             # This is fine, it's only used in development
             pass
+
+    def test_token_class(self):
+        from g2p.shared_types import Token
+
+        t1 = Token("test", True)
+        t2 = Token(":", False)
+
+        f = io.StringIO()
+        with redirect_stderr(f):
+            # Current usage and deprecated usage
+            for t in t1, t2:
+                self.assertEqual(t.text, t["text"])
+                self.assertEqual(t.is_word, t["is_word"])
+            # new way to set
+            t1.text = "test2"
+            t1.is_word = False
+            self.assertEqual(t1.text, "test2")
+            self.assertEqual(t1.is_word, False)
+            # deprecated way to set
+            t1["text"] = "test3"
+            t1["is_word"] = True
+            self.assertEqual(t1.text, "test3")
+            self.assertEqual(t1.is_word, True)
+
+            with self.assertRaises(KeyError):
+                t1["bad_key"] = "test"
+            with self.assertRaises(KeyError):
+                _ = t2["bad_key"]
 
 
 if __name__ == "__main__":
