@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" Organize tests into Test Suites
+"""Organize tests into Test Suites
 
 Run with "python run.py <suite>" where <suite> can be all, dev, or a few other
 options (see run_tests() for the full list).
@@ -8,6 +8,7 @@ options (see run_tests() for the full list).
 Add --describe to list the contents of the selected suite instead of running it.
 """
 
+import argparse
 import os
 import re
 import sys
@@ -122,7 +123,7 @@ def describe_suite(suite: TestSuite):
 SUITES = ("all", "dev", "integ", "langs", "mappings", "trans")
 
 
-def run_tests(suite: str, describe: bool = False) -> bool:
+def run_tests(suite: str, describe: bool = False, verbosity: int = 3) -> bool:
     """Run the test suite specified in suite.
 
     Args:
@@ -155,18 +156,31 @@ def run_tests(suite: str, describe: bool = False) -> bool:
         describe_suite(test_suite)
         return True
     else:
-        runner = TextTestRunner(verbosity=3)
+        runner = TextTestRunner(verbosity=verbosity)
         success = runner.run(test_suite).wasSuccessful()
         if not success:
             LOGGER.error("Some tests failed. Please see log above.")
         return success
 
 
-if __name__ == "__main__":
-    describe_opt = "--describe" in sys.argv
-    if describe_opt:
-        sys.argv.remove("--describe")
-
-    result = run_tests("" if len(sys.argv) <= 1 else sys.argv[1], describe_opt)
+def main():
+    parser = argparse.ArgumentParser(description="Run g2p test suites.")
+    parser.add_argument("--quiet", "-q", action="store_true", help="reduce output")
+    parser.add_argument(
+        "--describe", action="store_true", help="describe the selected test suite"
+    )
+    parser.add_argument(
+        "suite",
+        nargs="?",
+        default="dev",
+        help="the test suite to run [dev]",
+        choices=SUITES,
+    )
+    args = parser.parse_args()
+    result = run_tests(args.suite, args.describe, 1 if args.quiet else 3)
     if not result:
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
