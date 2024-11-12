@@ -14,7 +14,7 @@ from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
 from g2p.mappings.langs import LANGS_NETWORK
 from g2p.mappings.utils import is_ipa
-from g2p.shared_types import BaseTokenizer
+from g2p.shared_types import BaseTokenizer, Token
 
 
 class Tokenizer(BaseTokenizer):
@@ -46,17 +46,13 @@ class Tokenizer(BaseTokenizer):
             return True
         return False
 
-    def tokenize_text(self, text):
+    def tokenize_text(self, text: str) -> List[Token]:
         matches = self.tokenize_aux(text)
-        units = [{"text": m, "is_word": self.is_word_character(m)} for m in matches]
+        units = [Token(m, self.is_word_character(m)) for m in matches]
         if self.dot_is_letter:
             for i, unit in enumerate(units):
-                if (
-                    unit["text"] == "."
-                    and i + 1 < len(units)
-                    and units[i + 1]["is_word"]
-                ):
-                    unit["is_word"] = True
+                if unit.text == "." and i + 1 < len(units) and units[i + 1].is_word:
+                    unit.is_word = True
         return utils.merge_same_type_tokens(units)
 
 
@@ -119,20 +115,20 @@ class LexiconTokenizer(Tokenizer):
             output_tokens.append(tokens[0])
             return
         for i in range(len(tokens), 0, -1):
-            candidate = "".join([u["text"] for u in tokens[:i]])
+            candidate = "".join([u.text for u in tokens[:i]])
             if utils.find_alignment(self.mapping.alignments, candidate.lower()):
-                output_tokens.append({"text": candidate, "is_word": True})
+                output_tokens.append(Token(candidate, True))
                 return self._recursive_helper(tokens[i:], output_tokens)
         # No prefix found, emit the first unit as a token
         output_tokens.append(tokens[0])
         self._recursive_helper(tokens[1:], output_tokens)
 
-    def tokenize_text(self, text):
+    def tokenize_text(self, text: str) -> List[Token]:
         blocks = re.split(r"(\s+)", text)
         output_tokens = []
         for i, block in enumerate(blocks):
             if i % 2 == 1 and block:
-                output_tokens.append({"text": block, "is_word": False})
+                output_tokens.append(Token(block, False))
             else:
                 default_tokens = super().tokenize_text(block)
                 # Split non-word tokens into smaller parts for lexicon lookup

@@ -16,10 +16,10 @@ Basic Usage:
     from g2p import make_tokenizer
     tokenizer = make_tokenizer(lang)
     for token in tokenizer.tokenize_text(input_text):
-        if token["is_word"]:
-            word = token["text"]
+        if token.is_word:
+            word = token.text
         else:
-            interword_punctuation_and_spaces = token["text"]
+            interword_punctuation_and_spaces = token.text
 
     from g2p import get_arpabet_langs
     LANGS, LANG_NAMES = get_arpabet_langs()
@@ -29,7 +29,7 @@ import sys
 from typing import Dict, Optional, Tuple, Union
 
 from g2p.exceptions import InvalidLanguageCode, NoPath
-from g2p.shared_types import BaseTokenizer, BaseTransducer
+from g2p.shared_types import BaseTokenizer, BaseTransducer, Token
 
 if sys.version_info < (3, 7):  # pragma: no cover
     sys.exit(
@@ -47,7 +47,7 @@ def make_g2p(  # noqa: C901
     *,
     tokenize: bool = True,
     custom_tokenizer: Optional[BaseTokenizer] = None,
-):
+) -> BaseTransducer:
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
 
@@ -132,13 +132,13 @@ def make_g2p(  # noqa: C901
     return transducer
 
 
-def tokenize_and_map(tokenizer, transducer, input: str):
+def tokenize_and_map(tokenizer: BaseTokenizer, transducer: BaseTransducer, input: str):
     result = ""
     for token in tokenizer.tokenize_text(input):
-        if token["is_word"]:
-            result += transducer(token["text"]).output_string
+        if token.is_word:
+            result += transducer(token.text).output_string
         else:
-            result += token["text"]
+            result += token.text
     return result
 
 
@@ -213,7 +213,7 @@ def get_arpabet_langs():
         return _langs_cache, _lang_names_cache
 
 
-def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
+def make_tokenizer(in_lang=None, out_lang=None, tok_path=None) -> BaseTokenizer:
     """Make the tokenizer for input in language in_lang
 
     Logic used when only in_lang is provided:
@@ -234,3 +234,18 @@ def make_tokenizer(in_lang=None, out_lang=None, tok_path=None):
     from g2p.mappings.tokenizer import make_tokenizer as _make_tokenizer
 
     return _make_tokenizer(in_lang, out_lang, tok_path)
+
+
+# Declare what's actually part of g2p's programmatic API.
+# Please don't import anything else from g2p directly.
+__all__ = [
+    "BaseTokenizer",
+    "BaseTransducer",
+    "InvalidLanguageCode",
+    "NoPath",
+    "Token",
+    "get_arpabet_langs",
+    "make_g2p",
+    "make_tokenizer",
+    "tokenize_and_map",
+]
