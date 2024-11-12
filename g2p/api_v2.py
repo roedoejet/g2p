@@ -300,7 +300,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
             tokenizer = g2p.make_tokenizer(in_lang)
             tokens = tokenizer.tokenize_text(request.text)
         else:
-            tokens = [{"text": request.text, "is_word": True}]
+            tokens = [g2p.Token(request.text, is_word=True)]
     except NoPath:
         raise HTTPException(
             status_code=400, detail=f"No path from {in_lang} to {out_lang}"
@@ -314,8 +314,8 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
     segments: List[Segment] = []
     for token in tokens:
         conversions: List[Conversion] = []
-        if not token["is_word"]:  # non-word, has no in_lang/out_lang
-            tg = TransductionGraph(token["text"])
+        if not token.is_word:  # non-word, has no in_lang/out_lang
+            tg = TransductionGraph(token.text)
             conv = Conversion(substring_alignments=tg.substring_alignments())
             if request.indices:
                 conv.alignments = tg.alignments()
@@ -323,7 +323,7 @@ To find out possible output languages for an input, use the 'outputs_for' endpoi
                 conv.output_nodes = list(tg.output_string)
             conversions.append(conv)
         else:
-            tg = transducer(token["text"])
+            tg = transducer(token.text)
             if request.compose_from:
                 composed_tiers: List[TransductionGraph] = []
                 for tr, tier in zip(transducer.transducers, tg.tiers):

@@ -4,9 +4,11 @@
 """
 
 import doctest
+import io
 import os
 import re
 from collections import defaultdict
+from contextlib import redirect_stderr
 from pathlib import Path
 from unittest import TestCase, main
 
@@ -14,9 +16,9 @@ import yaml
 from pep440 import is_canonical
 
 import g2p
+import g2p.exceptions
 from g2p import get_arpabet_langs
 from g2p._version import VERSION, version_tuple
-from g2p.exceptions import IncorrectFileType, RecursionError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, utils
 from g2p.mappings.utils import RULE_ORDERING_ENUM, Rule
@@ -60,7 +62,7 @@ class UtilsTest(TestCase):
         )  # shouldn't allow self-referential abbreviations
         expanded_plain = utils.expand_abbreviations("test", test_dict)
         expanded_bad_plain = utils.expand_abbreviations("test", bad_dict)
-        with self.assertRaises(RecursionError):
+        with self.assertRaises(g2p.exceptions.RecursionError):
             utils.expand_abbreviations("HIGH_VOWELS", bad_dict)
         expanded_non_recursive = utils.expand_abbreviations("HIGH_VOWELS", test_dict)
         expanded_recursive = utils.expand_abbreviations("VOWELS", test_dict)
@@ -156,7 +158,7 @@ class UtilsTest(TestCase):
         )
 
     def test_load_abbs(self):
-        with self.assertRaises(IncorrectFileType):
+        with self.assertRaises(g2p.exceptions.IncorrectFileType):
             utils.load_abbreviations_from_file(
                 os.path.join(PUBLIC_DIR, "mappings", "abbreviations.json")
             )
@@ -211,6 +213,10 @@ class UtilsTest(TestCase):
         self.assertEqual(
             test_config_added.display_name, "test custom to test-out custom"
         )
+
+    def test_bad_normalization(self):
+        with self.assertRaises(g2p.exceptions.InvalidNormalization):
+            utils.normalize_with_indices("test", "bad")
 
     def test_normalize_to_NFD_with_indices(self):
         # Usefull site to get combining character code points:
@@ -322,6 +328,34 @@ class UtilsTest(TestCase):
         except FileNotFoundError:
             # This is fine, it's only used in development
             pass
+
+    def test_token_class(self):
+        from g2p.shared_types import Token
+
+        t1 = Token("test", True)
+        t2 = Token(":", False)
+
+        f = io.StringIO()
+        with redirect_stderr(f):
+            # Current usage and deprecated usage
+            for t in t1, t2:
+                self.assertEqual(t.text, t["text"])
+                self.assertEqual(t.is_word, t["is_word"])
+            # new way to set
+            t1.text = "test2"
+            t1.is_word = False
+            self.assertEqual(t1.text, "test2")
+            self.assertEqual(t1.is_word, False)
+            # deprecated way to set
+            t1["text"] = "test3"
+            t1["is_word"] = True
+            self.assertEqual(t1.text, "test3")
+            self.assertEqual(t1.is_word, True)
+
+            with self.assertRaises(KeyError):
+                t1["bad_key"] = "test"
+            with self.assertRaises(KeyError):
+                _ = t2["bad_key"]
 
 
 if __name__ == "__main__":

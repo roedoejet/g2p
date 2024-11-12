@@ -32,10 +32,10 @@ Basic usage for the language-aware tokenizer:
 from g2p import make_tokenizer
 tokenizer = make_tokenizer("dan")
 for token in tokenizer.tokenize_text("Åh, hvordan har du det, Åbenrå?"):
-    if token["is_word"]:
-        word = token["text"]
+    if token.is_word
+        word = token.text
     else:
-        interword_punctuation_and_spaces = token["text"]
+        interword_punctuation_and_spaces = token.text
 ```
 
 Note that selecting the tokenizer language is important to make sure punctuation-like letters are handled correctly. For example `:` and `'` are punctuation in English but they will be part of the word tokens in Kanien'kéha (moh):

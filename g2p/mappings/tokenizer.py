@@ -11,10 +11,10 @@ from typing import List
 
 from g2p.exceptions import MappingMissing
 from g2p.log import LOGGER
-from g2p.mappings import Mapping
+from g2p.mappings import Mapping, utils
 from g2p.mappings.langs import LANGS_NETWORK
-from g2p.mappings.utils import get_unicode_category, is_ipa, merge_if_same_label
-from g2p.shared_types import BaseTokenizer
+from g2p.mappings.utils import is_ipa
+from g2p.shared_types import BaseTokenizer, Token
 
 
 class Tokenizer(BaseTokenizer):
@@ -42,23 +42,18 @@ class Tokenizer(BaseTokenizer):
         if self.delim and c == self.delim:
             return True
         assert len(c) <= 1
-        if get_unicode_category(c) in ["letter", "number", "diacritic"]:
+        if utils.get_unicode_category(c) in ["letter", "number", "diacritic"]:
             return True
         return False
 
-    def tokenize_text(self, text):
+    def tokenize_text(self, text: str) -> List[Token]:
         matches = self.tokenize_aux(text)
-        units = [{"text": m, "is_word": self.is_word_character(m)} for m in matches]
+        units = [Token(m, self.is_word_character(m)) for m in matches]
         if self.dot_is_letter:
             for i, unit in enumerate(units):
-                if (
-                    unit["text"] == "."
-                    and i + 1 < len(units)
-                    and units[i + 1]["is_word"]
-                ):
-                    unit["is_word"] = True
-        units = merge_if_same_label(units, "text", "is_word")
-        return units
+                if unit.text == "." and i + 1 < len(units) and units[i + 1].is_word:
+                    unit.is_word = True
+        return utils.merge_same_type_tokens(units)
 
 
 class SpecializedTokenizer(Tokenizer):
@@ -96,6 +91,51 @@ class SpecializedTokenizer(Tokenizer):
 
     def tokenize_aux(self, text):
         return self.regex.findall(text)
+
+
+class LexiconTokenizer(Tokenizer):
+    """Lexicon-based tokenizer will consider any entry in the lexicon a token,
+    even if it contains punctuation characters. For text not in the lexicon,
+    falls back to the default tokenization.
+    """
+
+    def __init__(self, mapping: Mapping):
+        super().__init__()
+        self.mapping = mapping
+        self.lang = mapping.language_name
+
+    def _recursive_helper(self, tokens: list, output_tokens: list):
+        """Emit the longest prefix found in the lexicon, if any, as a token.
+        If None, emit the first unit as a token.
+        Recursively process the rest of the units.
+        """
+        if not tokens:
+            return
+        if len(tokens) == 1:
+            output_tokens.append(tokens[0])
+            return
+        for i in range(len(tokens), 0, -1):
+            candidate = "".join([u.text for u in tokens[:i]])
+            if utils.find_alignment(self.mapping.alignments, candidate.lower()):
+                output_tokens.append(Token(candidate, True))
+                return self._recursive_helper(tokens[i:], output_tokens)
+        # No prefix found, emit the first unit as a token
+        output_tokens.append(tokens[0])
+        self._recursive_helper(tokens[1:], output_tokens)
+
+    def tokenize_text(self, text: str) -> List[Token]:
+        blocks = re.split(r"(\s+)", text)
+        output_tokens = []
+        for i, block in enumerate(blocks):
+            if i % 2 == 1 and block:
+                output_tokens.append(Token(block, False))
+            else:
+                default_tokens = super().tokenize_text(block)
+                # Split non-word tokens into smaller parts for lexicon lookup
+                candidate_tokens = utils.split_non_word_tokens(default_tokens)
+                self._recursive_helper(candidate_tokens, output_tokens)
+
+        return utils.merge_non_word_tokens(output_tokens)
 
 
 class MultiHopTokenizer(SpecializedTokenizer):
@@ -202,7 +242,10 @@ class TokenizerLibrary:
                 # Build a one-hop tokenizer
                 try:
                     mapping = Mapping.find_mapping(in_lang=in_lang, out_lang=out_lang)
-                    self.tokenizers[tokenizer_key] = SpecializedTokenizer(mapping)
+                    if mapping.type == utils.MAPPING_TYPE.lexicon:
+                        self.tokenizers[tokenizer_key] = LexiconTokenizer(mapping)
+                    else:
+                        self.tokenizers[tokenizer_key] = SpecializedTokenizer(mapping)
                 except MappingMissing:
                     self.tokenizers[tokenizer_key] = self.tokenizers[None]
                     LOGGER.warning(

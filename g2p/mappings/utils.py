@@ -10,7 +10,6 @@ import os
 import unicodedata as ud
 from bisect import bisect_left
 from collections import defaultdict
-from copy import deepcopy
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -43,6 +42,7 @@ from typing_extensions import Literal
 from g2p import exceptions
 from g2p.log import LOGGER
 from g2p.mappings import langs
+from g2p.shared_types import Token
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
@@ -151,7 +151,7 @@ def normalize(inp: str, norm_form: Union[str, None]):
     if norm_form is None or norm_form == "none":
         return unicode_escape(inp)
     if norm_form not in ["NFC", "NFD", "NFKC", "NFKD"]:
-        raise exceptions.InvalidNormalization(normalize)
+        raise exceptions.InvalidNormalization(norm_form)
     # Sadly mypy doesn't do narrowing to literals properly
     norm_form = cast(Literal["NFC", "NFD", "NFKC", "NFKD"], norm_form)
     normalized = ud.normalize(norm_form, unicode_escape(inp))
@@ -178,8 +178,8 @@ def compose_indices(
     """Compose indices1 + indices2 into direct arcs from the inputs of indices1
     to the outputs of indices 2.
 
-    E.g., [(0,1), (1,4)] composed with [(0,0), (1,2), (1,3), (4,2)] is
-    [(0,2), (0,3), (1,2)]
+    >>> compose_indices([(0,1), (1,4)], [(0,0), (1,2), (1,3), (4,2)])
+    [(0, 2), (0, 3), (1, 2)]
     """
     # for O(1) lookup of arcs leaving indices2
     indices2_as_dict = defaultdict(dict)  # type: ignore
@@ -239,7 +239,7 @@ def normalize_with_indices(
         return normalize_to_NFD_with_indices(inp, norm_form)
     if norm_form in ("none", None):
         return inp, [(i, i) for i in range(len(inp))]
-    raise exceptions.InvalidNormalization(normalize)
+    raise exceptions.InvalidNormalization(norm_form)
 
 
 def unicode_escape(text):
@@ -596,22 +596,76 @@ class IndentDumper(yaml.Dumper):
         return True
 
 
-def merge_if_same_label(lst_of_dicts, text_key, label_key):
-    results = []
-    current_item = None
-    for dct in lst_of_dicts:
-        if label_key not in dct:
-            dct[label_key] = None
-        if not current_item:
-            current_item = deepcopy(dct)
-        elif dct[label_key] == current_item[label_key]:
-            current_item[text_key] += dct[text_key]
+def merge_same_type_tokens(tokens: List[Token]) -> List[Token]:
+    """Merge tokens that have the same type.  Destroys tokens in the process.
+
+    >>> merge_same_type_tokens([Token("test", True), Token("b", True), Token(":", False), Token(",", False)])
+    [Token(text='testb', is_word=True), Token(text=':,', is_word=False)]
+    >>> merge_same_type_tokens([])
+    []
+    """
+    if not tokens:
+        return []
+    merged_tokens = [tokens[0]]
+    for token in tokens[1:]:
+        if token.is_word == merged_tokens[-1].is_word:
+            merged_tokens[-1].text += token.text
         else:
-            results.append(current_item)
-            current_item = deepcopy(dct)
-    if current_item:
-        results.append(current_item)
-    return results
+            merged_tokens.append(token)
+    return merged_tokens
+
+
+def split_non_word_tokens(tokens: List[Token]) -> List[Token]:
+    """Split non-word units into characters. Reuses the word tokens.
+
+    Generates a maximum of 5 units per non-word token: if the input token is
+    more than 5 non-word characters, the output will be the first two
+    individually, the middle as a block, and the last two individually, because
+    lexicon-based tokenization does not need more granularity than that.
+    This prevents degenerate input like a large number of consecutive punctuation
+    marks from taking quadratic time in lexicon-based tokenization.
+
+    >>> split_non_word_tokens([Token("test", True), Token(":,- ", False), Token("", False)])
+    [Token(text='test', is_word=True), Token(text=':', is_word=False), Token(text=',', is_word=False), Token(text='-', is_word=False), Token(text=' ', is_word=False)]
+    >>> split_non_word_tokens([])
+    []
+    >>> split_non_word_tokens([Token(".,.,.,.", False)])
+    [Token(text='.', is_word=False), Token(text=',', is_word=False), Token(text='.,.', is_word=False), Token(text=',', is_word=False), Token(text='.', is_word=False)]
+    """
+    new_tokens = []
+    for token in tokens:
+        if not token.is_word:
+            text = token.text
+            if len(text) > 5:
+                new_tokens.append(Token(text[0], False))
+                new_tokens.append(Token(text[1], False))
+                new_tokens.append(Token(text[2:-2], False))
+                new_tokens.append(Token(text[-2], False))
+                new_tokens.append(Token(text[-1], False))
+            else:
+                new_tokens.extend([Token(char, False) for char in text])
+        else:
+            new_tokens.append(token)
+    return new_tokens
+
+
+def merge_non_word_tokens(tokens: List[Token]) -> List[Token]:
+    """Merge consecutive non-word units into a single token. Destroys tokens in the process.
+
+    >>> merge_non_word_tokens([Token("test", True), Token(":", False), Token(",", False)])
+    [Token(text='test', is_word=True), Token(text=':,', is_word=False)]
+    >>> merge_non_word_tokens([])
+    []
+    """
+    if not tokens:
+        return tokens
+    merged_tokens = [tokens[0]]
+    for token in tokens[1:]:
+        if not token.is_word and not merged_tokens[-1].is_word:
+            merged_tokens[-1].text += token.text
+        else:
+            merged_tokens.append(token)
+    return merged_tokens
 
 
 CATEGORIES = {
