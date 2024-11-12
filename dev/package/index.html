@@ -733,10 +733,10 @@
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_tokenizer</span>
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;dan&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Åh, hvordan har du det, Åbenrå?&quot;</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;is_word&quot;</span><span class="p">]:</span>
-        <span class="n">word</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">is_word</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">interword_punctuation_and_spaces</span> <span class="o">=</span> <span class="n">token</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="n">interword_punctuation_and_spaces</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">text</span>
 </code></pre></div>
 <p>Note that selecting the tokenizer language is important to make sure punctuation-like letters are handled correctly. For example <code>:</code> and <code>'</code> are punctuation in English but they will be part of the word tokens in Kanien'kéha (moh):</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;moh&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Kanien&#39;kéha&quot;</span><span class="p">))</span>
