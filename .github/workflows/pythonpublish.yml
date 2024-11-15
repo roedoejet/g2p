@@ -1,4 +1,5 @@
 # To create a release:
+#  - make sure /.SETUPTOOLS_SCM_PRETEND_VERSION is up to date
 #  - commit the changes
 #  - create an annotated tag with the version number, e.g.: git tag -a v2.0.1 -m "v2.0.1"
 #  - push the tag, which will trigger this pythonpublish release workflow and hatch build will build and publish using the tag version
@@ -26,6 +27,11 @@ jobs:
     needs: tests
     steps:
       - uses: actions/checkout@v4
+      - name: Validate version consistency
+        run: |
+          echo .SETUPTOOLS_SCM_PRETEND_VERSION=$(cat .SETUPTOOLS_SCM_PRETEND_VERSION)
+          echo github.ref_name=${{ github.ref_name }}
+          test v$(cat .SETUPTOOLS_SCM_PRETEND_VERSION) == $(echo ${{ github.ref_name }} | cut -d. -f1-2)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
