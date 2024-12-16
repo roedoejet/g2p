@@ -1,5 +1,5 @@
 <<: &shared
-  language_name: Western Inuktut
+  language_name: Inuktut, Western
 mappings:
   - display_name: Western Inuktut to IPA
     in_lang: ikt
