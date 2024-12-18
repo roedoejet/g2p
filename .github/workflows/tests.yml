@@ -23,11 +23,11 @@ jobs:
           python-version: "3.8"
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
-          pip install pip-licenses
-          if pip-licenses | grep -v 'Artistic License' | grep -v LGPL | grep GNU; then echo 'Please avoid introducing *GPL dependencies'; false; fi
-          pip install coverage
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test] licensecheck
+      - name: Check licenses
+        # Automatically check that we don't introduce imcompatibly licensed dependencies
+        # text-unidecode is OK (Artistic License) but not detected automatically
+        run: licensecheck --zero --ignore-packages text-unidecode
       - name: Ensure browser is installed
         run: python -m playwright install --with-deps chromium
       - name: Launch the API
@@ -93,7 +93,6 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: |
-          python -m pip install --upgrade pip
           SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
       - name: Run tests on Windows
         run: python run_tests.py dev
