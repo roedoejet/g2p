@@ -720,7 +720,7 @@
 <h2 id="make_g2p"><code>make_g2p</code><a class="headerlink" href="#make_g2p" title="Permanent link">&para;</a></h2>
 <p>The easiest way to create a transducer programmatically is to use the <code>g2p.make_g2p</code> function.</p>
 <p>To use it, first import the function:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_g2p</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">g2p</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_g2p</span>
 </code></pre></div>
 <p>Then, call it with an argument for <code>in_lang</code> and <code>out_lang</code>. Both must be strings equal to the name of a particular mapping.</p>
 <div class="highlight"><pre><span></span><code><span class="o">&gt;&gt;&gt;</span> <span class="n">transducer</span> <span class="o">=</span> <span class="n">make_g2p</span><span class="p">(</span><span class="s2">&quot;dan&quot;</span><span class="p">,</span> <span class="s2">&quot;eng-arpabet&quot;</span><span class="p">)</span>
@@ -730,7 +730,7 @@
 <p>There must be a valid path between the <code>in_lang</code> and <code>out_lang</code> in order for this to work. If you've edited a mapping or added a custom mapping, you must update g2p to include it: <code>g2p update</code></p>
 <h2 id="make_tokenizer"><code>make_tokenizer</code><a class="headerlink" href="#make_tokenizer" title="Permanent link">&para;</a></h2>
 <p>Basic usage for the language-aware tokenizer:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">g2p</span> <span class="kn">import</span> <span class="n">make_tokenizer</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">g2p</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_tokenizer</span>
 <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">make_tokenizer</span><span class="p">(</span><span class="s2">&quot;dan&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize_text</span><span class="p">(</span><span class="s2">&quot;Åh, hvordan har du det, Åbenrå?&quot;</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">is_word</span>
