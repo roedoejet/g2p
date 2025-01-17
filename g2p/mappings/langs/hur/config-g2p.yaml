@@ -2,8 +2,8 @@
   language_name: Halkomelem
 mappings:
   - display_name: Halkomelem APA to Hul’q’umi’num’ (Island) practical orthography
-    in_lang: hur_apa
-    out_lang: hur_orthog
+    in_lang: hur-apa
+    out_lang: hur
     authors:
       - Zack Gilkison
     type: mapping
@@ -14,8 +14,8 @@ mappings:
     norm_form: NFD
     # <<: &shared
   - display_name: Halkomelem APA to Hul’q’umi’num’ (Island) practical orthography
-    in_lang: hur_orthog
-    out_lang: hur_apa
+    in_lang: hur
+    out_lang: hur-apa
     authors:
       - Zack Gilkison
     type: mapping
