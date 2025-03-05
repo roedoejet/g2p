@@ -629,3 +629,19 @@ mappings:
     reverse: false
     rule_ordering: apply-longest-first
     rules_path: sal-ipa_to_eng-ipa.json
+  - authors:
+      - Generated 2025-03-04 23:10:23.065420
+    case_equivalencies: {}
+    case_sensitive: true
+    display_name: kwk-ipa to eng-ipa
+    escape_special: false
+    in_lang: kwk-ipa
+    language_name: IPA
+    norm_form: NFC
+    out_delimiter: ''
+    out_lang: eng-ipa
+    preserve_case: false
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
+    rules_path: kwk-ipa_to_eng-ipa.json
