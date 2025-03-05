@@ -44,7 +44,8 @@ api = [
 test = [
   "g2p[api]; python_version >= '3.8'",
   "coverage[toml]>=6.5",
-  "playwright>=1.26.1",
+  "playwright>=1.26.1,<1.46; python_version < '3.9'",
+  "playwright>=1.26.1; python_version >= '3.9'",
   "jsonschema>=4.17.3",
   "pep440>=0.1.2",
   "httpx",
