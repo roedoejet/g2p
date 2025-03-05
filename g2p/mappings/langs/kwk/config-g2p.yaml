@@ -1,14 +1,6 @@
 <<: &shared
   language_name: Kwak'wala
 mappings:
-  - display_name: Kwak'wala IPA to English IPA
-    rules_path: kwk_ipa_to_eng_ipa.json
-    in_lang: kwk-ipa
-    out_lang: eng-ipa
-    case_sensitive: false
-    authors:
-      - Patrick Littell
-    <<: *shared
   - display_name: Kwak'wala (NAPA) to IPA
     rules_path: kwk_napa_to_ipa.csv
     in_lang: kwk-napa
