@@ -23,6 +23,7 @@ mappings:
     authors:
       - Patrick Littell
       - Eric Joanis
+      - Daisy Rosenblum
     <<: *shared
   - display_name: Kwak'wala (U'mista) Equivalencies
     rules_path: umista_equiv.csv
