@@ -630,7 +630,7 @@ mappings:
     rule_ordering: apply-longest-first
     rules_path: sal-ipa_to_eng-ipa.json
   - authors:
-      - Generated 2025-03-04 23:10:23.065420
+      - Generated 2025-03-10 20:56:15.368317
     case_equivalencies: {}
     case_sensitive: true
     display_name: kwk-ipa to eng-ipa
