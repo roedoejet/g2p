@@ -24,6 +24,8 @@ jobs:
       - name: Install dependencies
         run: |
           SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test] licensecheck
+      - run: pip list
+      - run: pip freeze
       - name: Check licenses
         # Automatically check that we don't introduce imcompatibly licensed dependencies
         # text-unidecode is OK (Artistic License) but not detected automatically
