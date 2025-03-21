@@ -285,7 +285,7 @@ async def change_table(sid, message) -> None:
         mappings: List[Mapping] = []
         for lang1, lang2 in zip(path[:-1], path[1:]):
             transducer = make_g2p(lang1, lang2, tokenize=False)
-            mappings.append(transducer.mapping)
+            mappings.append(transducer.mapping)  # type: ignore
         await SIO.emit(
             "table response",
             [
