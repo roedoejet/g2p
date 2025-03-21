@@ -25,16 +25,15 @@ mappings:
       - Eric Joanis
       - Daisy Rosenblum
     <<: *shared
-  - display_name: Kwak'wala (U'mista) to broad (phonemic) IPA
-    rules_path: kwk_umista_to_ipa_broad.json
-    in_lang: kwk-umista-equiv
+  - display_name: Kwak'wala broad (phonemic) IPA
+    rules_path: kwk_ipa_to_ipa_broad.json
+    in_lang: kwk-ipa
     out_lang: kwk-broad-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
     prevent_feeding: true
     norm_form: 'NFD'
     authors:
-      - Patrick Littell
       - Eric Joanis
       - Daisy Rosenblum
     <<: *shared
