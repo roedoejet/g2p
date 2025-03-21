@@ -12,10 +12,23 @@ mappings:
       - Patrick Littell
       - Fineen Davis
     language_name: Kwak'wala (NAPA orthography)
-  - display_name: Kwak'wala (U'mista) to IPA
+  - display_name: Kwak'wala (U'mista) to strict (phonetic) IPA
     rules_path: kwk_umista_to_ipa.json
     in_lang: kwk-umista-equiv
     out_lang: kwk-ipa
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    prevent_feeding: true
+    norm_form: 'NFD'
+    authors:
+      - Patrick Littell
+      - Eric Joanis
+      - Daisy Rosenblum
+    <<: *shared
+  - display_name: Kwak'wala (U'mista) to broad (phonemic) IPA
+    rules_path: kwk_umista_to_ipa_broad.json
+    in_lang: kwk-umista-equiv
+    out_lang: kwk-broad-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
     prevent_feeding: true
