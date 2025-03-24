@@ -145,6 +145,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                 output_el = page.locator("#output")
                 in_lang_selector = page.locator("#input-langselect")
                 out_lang_selector = page.locator("#output-langselect")
+                table_status_selector = page.locator("#table-status")
 
                 for i, test in enumerate(
                     langs_to_test[block_size * block : block_size * (block + 1)]
@@ -157,6 +158,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                         f"{i + block * block_size} {datetime.now()} "
                         f"{test_in_lang}->{test_out_lang} {test_input_text} -> {test_expected_output}"
                     )
+                    timed_out_count = 0
                     for attempt in range(1, 4):
                         if attempt > 1:
                             LOGGER.info(f"Attempt #{attempt}")
@@ -167,16 +169,29 @@ class StudioTest(IsolatedAsyncioTestCase):
                         output_text = ""
 
                         # Select the input language
-                        await in_lang_selector.select_option(value=test_in_lang)
+                        # descendants_promise = page.wait
+                        async with page.expect_request(
+                            "**/descendants/" + test_in_lang
+                        ) as req_info:
+                            await in_lang_selector.select_option(value=test_in_lang)
+                        await req_info.value
                         # wait up to max_action_delay ms for input lang to be set
                         # and for mappings to be populated
                         loop_time = 0
                         while loop_time <= max_action_delay:
                             input_lang = await in_lang_selector.input_value()
-                            if input_lang.strip() == test_in_lang:
-                                await page.wait_for_timeout(polling_period)
+                            out_lang_available = await out_lang_selector.locator(
+                                f"option[value={test_out_lang}]",
+                            ).count()
+                            table_status = await table_status_selector.get_attribute(
+                                "state"
+                            )
+                            if (
+                                input_lang.strip() == test_in_lang
+                                and out_lang_available == 1
+                                and table_status == "loaded"
+                            ):
                                 break
-                            await page.wait_for_timeout(polling_period)
                             loop_time += polling_period
                         else:
                             LOGGER.warning(
@@ -184,23 +199,33 @@ class StudioTest(IsolatedAsyncioTestCase):
                             )
                             continue
 
-                        # Select the output language
-                        await out_lang_selector.select_option(value=test_out_lang)
-                        # wait up to max_action_delay ms for output lang to be set
-                        # and for mappings to be populated
-                        loop_time = 0
-                        while loop_time <= max_action_delay:
-                            output_lang = await out_lang_selector.input_value()
-                            if output_lang.strip() == test_out_lang:
-                                await page.wait_for_timeout(polling_period)
-                                break
+                        # In CI, selecting the output language is usually where things
+                        # time out, so we'll try 3 times before giving up.
+                        for _ in range(3):
+                            # Select the output language
+                            await out_lang_selector.select_option(value=test_out_lang)
+                            # wait up to max_action_delay ms for output lang to be set
+                            # and for mappings to be populated
                             await page.wait_for_timeout(polling_period)
-                            loop_time += polling_period
-                        else:
-                            LOGGER.warning(
-                                f"Reached timeout setting out_lang for {test}"
-                            )
-                            continue
+                            loop_time = 0
+                            while loop_time <= max_action_delay:
+                                output_lang = await out_lang_selector.input_value()
+                                table_status = (
+                                    await table_status_selector.get_attribute("state")
+                                )
+                                if (
+                                    output_lang.strip() == test_out_lang
+                                    and table_status == "loaded"
+                                ):
+                                    break
+                                await page.wait_for_timeout(polling_period)
+                                loop_time += polling_period
+                            else:
+                                LOGGER.warning(
+                                    f"Reached timeout setting out_lang for {test}"
+                                )
+                                continue  # try again
+                            break  # break out of both loops when the inner loop breaks
 
                         # Type fill input, then trigger rendering with keyup event
                         # optimization: make sure there is only 1 keyup event
@@ -219,12 +244,18 @@ class StudioTest(IsolatedAsyncioTestCase):
                             LOGGER.warning(
                                 f"Reached timeout setting input text for {test}"
                             )
+                            timed_out_count += 1
                             continue
 
                         # We're done trying once an attempt succeeds
                         if output_text.strip() == test_expected_output:
                             break
 
+                    if (
+                        timed_out_count == 3
+                        and output_text.strip() != test_expected_output
+                    ):  # pragma: no cover
+                        output_text = output_text + " (TIMED OUT)"
                     # Check that output is correct after the first succesful attempt or
                     # after all the attempts have failed.
                     if not self.debug:

@@ -529,6 +529,7 @@ function showSettings(index) {
 }
 
 tableSocket.on('table response', function(msg) {
+    $('#table-status').attr('state', 'processing response')
     // msg arg is list of {
     //  mappings: io pairs to be applied to hot table
     //  abbs: abbreviations to be included in abbreviations table
@@ -566,6 +567,7 @@ tableSocket.on('table response', function(msg) {
     }
     // convert
     convert()
+    $('#table-status').attr('state', 'loaded')
 })
 
 $('#input').on('keyup', function(event) {
@@ -607,6 +609,7 @@ $('#export-rules').click(function(event) {
     TABLES[index].getPlugin("exportFile").downloadFile("csv", { filename: "rules" });
 })
 $('#langselect').change(function() {
+    $('#table-status').attr('state', 'loading')
     var selected = $("#langselect option:selected").val();
     var in_lang = selected;
     var out_lang = selected;
@@ -630,6 +633,7 @@ $(document).ready(function() {
     });
 
     $("#input-langselect").on('change', function(event) {
+        $('#table-status').attr('state', 'loading input language')
         let in_lang = $("#input-langselect option:selected").val()
         $.ajax({
             url: "/api/v1/descendants/" + in_lang,
@@ -659,6 +663,7 @@ $(document).ready(function() {
     }
 
     $("#output-langselect").on('change', function(event) {
+        $('#table-status').attr('state', 'loading output language')
         changeTable()
     })
 
