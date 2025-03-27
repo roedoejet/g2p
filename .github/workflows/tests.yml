@@ -29,7 +29,7 @@ jobs:
       - name: Check licenses
         # Automatically check that we don't introduce imcompatibly licensed dependencies
         # text-unidecode is OK (Artistic License) but not detected automatically
-        run: licensecheck --zero --ignore-packages text-unidecode
+        run: licensecheck --zero --ignore-packages text-unidecode --requirements-paths pyproject.toml
       - name: Ensure browser is installed
         run: python -m playwright install --with-deps chromium
       - name: Launch the API
