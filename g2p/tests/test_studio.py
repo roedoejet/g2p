@@ -29,11 +29,12 @@ from unittest import IsolatedAsyncioTestCase, main
 
 import socketio  # type: ignore
 from playwright.async_api import async_playwright  # type: ignore
+from playwright.async_api import expect
 
 from g2p.app import APP
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
-from playwright.async_api import expect
+
 
 class StudioTest(IsolatedAsyncioTestCase):
     def __init__(self, *args):
@@ -177,36 +178,18 @@ class StudioTest(IsolatedAsyncioTestCase):
                         await req_info.value
                         # wait up to max_action_delay ms for input lang to be set
                         # and for mappings to be populated give it maximum 20s to show up and fail
-                        await expect(table_status_selector).to_have_attribute("state","loaded",timeout=20000)
-                        
+                        await expect(table_status_selector).to_have_attribute(
+                            "state", "loaded", timeout=20000
+                        )
 
-                        # In CI, selecting the output language is usually where things
-                        # time out, so we'll try 3 times before giving up.
-                        for _ in range(3):
-                            # Select the output language
-                            await out_lang_selector.select_option(value=test_out_lang)
-                            # wait up to max_action_delay ms for output lang to be set
-                            # and for mappings to be populated
-                            await page.wait_for_timeout(polling_period)
-                            loop_time = 0
-                            while loop_time <= max_action_delay:
-                                output_lang = await out_lang_selector.input_value()
-                                table_status = (
-                                    await table_status_selector.get_attribute("state")
-                                )
-                                if (
-                                    output_lang.strip() == test_out_lang
-                                    and table_status == "loaded"
-                                ):
-                                    break
-                                await page.wait_for_timeout(polling_period)
-                                loop_time += polling_period
-                            else:
-                                LOGGER.warning(
-                                    f"Reached timeout setting out_lang for {test}"
-                                )
-                                continue  # try again
-                            break  # break out of both loops when the inner loop breaks
+                        # Select the output language
+                        await out_lang_selector.select_option(value=test_out_lang)
+                        # wait up to max_action_delay ms for output lang to be set
+                        # and for mappings to be populated
+                        await page.wait_for_timeout(polling_period)
+                        await expect(table_status_selector).to_have_attribute(
+                            "state", "loaded", timeout=20000
+                        )
 
                         # Type fill input, then trigger rendering with keyup event
                         # optimization: make sure there is only 1 keyup event
