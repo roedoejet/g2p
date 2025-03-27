@@ -33,7 +33,7 @@ from playwright.async_api import async_playwright  # type: ignore
 from g2p.app import APP
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
-
+from playwright.async_api import expect
 
 class StudioTest(IsolatedAsyncioTestCase):
     def __init__(self, *args):
@@ -176,28 +176,9 @@ class StudioTest(IsolatedAsyncioTestCase):
                             await in_lang_selector.select_option(value=test_in_lang)
                         await req_info.value
                         # wait up to max_action_delay ms for input lang to be set
-                        # and for mappings to be populated
-                        loop_time = 0
-                        while loop_time <= max_action_delay:
-                            input_lang = await in_lang_selector.input_value()
-                            out_lang_available = await out_lang_selector.locator(
-                                f"option[value={test_out_lang}]",
-                            ).count()
-                            table_status = await table_status_selector.get_attribute(
-                                "state"
-                            )
-                            if (
-                                input_lang.strip() == test_in_lang
-                                and out_lang_available == 1
-                                and table_status == "loaded"
-                            ):
-                                break
-                            loop_time += polling_period
-                        else:
-                            LOGGER.warning(
-                                f"Reached timeout setting in_lang for {test}"
-                            )
-                            continue
+                        # and for mappings to be populated give it maximum 20s to show up and fail
+                        await expect(table_status_selector).to_have_attribute("state","loaded",timeout=20000)
+                        
 
                         # In CI, selecting the output language is usually where things
                         # time out, so we'll try 3 times before giving up.
