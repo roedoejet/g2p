@@ -191,6 +191,10 @@ non_interactive = true
 [tool.isort]
 profile = "black"
 
+[tool.licensecheck]
+zero = true
+ignore_packages = ["text-unidecode"]
+
 [tool.pylint.main]
 # Unsure how to make pylint recursively ignore
 ignore = [
