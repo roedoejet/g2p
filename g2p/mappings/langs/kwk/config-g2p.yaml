@@ -12,7 +12,7 @@ mappings:
       - Patrick Littell
       - Fineen Davis
     language_name: Kwak'wala (NAPA orthography)
-  - display_name: Kwak'wala (U'mista) to strict (phonetic) IPA
+  - display_name: Kwak'wala (U'mista) to phonetic IPA
     rules_path: kwk_umista_to_ipa.json
     in_lang: kwk-umista-equiv
     out_lang: kwk-ipa
@@ -25,10 +25,10 @@ mappings:
       - Eric Joanis
       - Daisy Rosenblum
     <<: *shared
-  - display_name: Kwak'wala broad (phonemic) IPA
-    rules_path: kwk_ipa_to_ipa_broad.json
+  - display_name: Kwak'wala phonemic IPA
+    rules_path: kwk_ipa_to_phonemic_ipa.json
     in_lang: kwk-ipa
-    out_lang: kwk-broad-ipa
+    out_lang: kwk-phonemic-ipa
     rule_ordering: apply-longest-first
     case_sensitive: false
     prevent_feeding: true
