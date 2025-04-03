@@ -13,7 +13,7 @@ mappings:
     case_sensitive: false
     norm_form: NFD
     # <<: &shared
-  - display_name: Halkomelem APA to Hul’q’umi’num’ (Island) practical orthography
+  - display_name: Hul’q’umi’num’ (Island) practical orthography to Halkomelem APA
     in_lang: hur
     out_lang: hur-apa
     authors:
