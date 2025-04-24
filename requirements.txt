@@ -43,7 +43,7 @@ fastapi==0.115.2
     # via hatch.envs.prod
 gunicorn==23.0.0
     # via hatch.envs.prod
-h11==0.14.0
+h11==0.16.0
     # via
     #   uvicorn
     #   wsproto
