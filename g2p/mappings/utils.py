@@ -773,6 +773,8 @@ class RULE_ORDERING_ENUM(str, Enum):
 
 
 class _MappingModelDefinition(BaseModel):
+    processed: bool = Field(False, hidden=True)
+
     parent_dir: Optional[DirectoryPath] = None
     """Optionally resolve all paths to a parent directory"""
 

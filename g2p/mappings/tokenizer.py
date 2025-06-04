@@ -30,6 +30,7 @@ class Tokenizer(BaseTokenizer):
         self.case_sensitive = False
         # Hack for Tlingit where . is a letter when not word final:
         self.dot_is_letter = False
+        self.escape_special = False
 
     def tokenize_aux(self, text):
         return text
@@ -37,7 +38,8 @@ class Tokenizer(BaseTokenizer):
     def is_word_character(self, c):
         if not self.case_sensitive:
             c = c.lower()
-        if c in self.inventory:
+        inventory_check = re.escape(c) if self.escape_special else c
+        if inventory_check in self.inventory:
             return True
         if self.delim and c == self.delim:
             return True
@@ -63,6 +65,7 @@ class SpecializedTokenizer(Tokenizer):
         self.lang = mapping.language_name
         self.case_sensitive = mapping.case_sensitive
         self.dot_is_letter = False
+        self.escape_special = mapping.escape_special
         # create regex
         self._build_regex()
 
@@ -146,6 +149,7 @@ class MultiHopTokenizer(SpecializedTokenizer):
         self.lang = mappings[0].language_name
         self.case_sensitive = mappings[0].case_sensitive
         self.dot_is_letter = False
+        self.escape_special = mappings[0].escape_special
         self._build_regex()
         # LOGGER.warning(pprint.pformat([self.lang, self.delim, self.case_sensitive, self.inventory]))
 

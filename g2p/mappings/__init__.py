@@ -49,6 +49,7 @@ class Mapping(_MappingModelDefinition):
         """After the model is constructed, we process the model specs by
         applying all the configuration to the rules (ie prevent feeding,
         unicode normalization etc..)"""
+
         if self.type == MAPPING_TYPE.mapping or self.type is None:
             # load abbreviations from path
             if self.abbreviations_path is not None and not self.abbreviations:
@@ -216,7 +217,7 @@ class Mapping(_MappingModelDefinition):
                 rule.context_before = ""
                 rule.context_after = ""
             # Escape Special
-            if self.escape_special:
+            if not self.processed and self.escape_special:
                 rule = escape_special_characters(rule)
             # Unicode Normalization
             if self.norm_form != NORM_FORM_ENUM.none:
@@ -441,7 +442,7 @@ class MappingConfig(BaseModel):
 
     @staticmethod
     def load_mapping_config_from_path(
-        path_to_mapping_config: Union[str, Path]
+        path_to_mapping_config: Union[str, Path],
     ) -> "MappingConfig":
         """Loads a mapping configuration from a path, if you just want one specific mapping
         from the config, you can try Mapping.load_mapping_from_path instead.
