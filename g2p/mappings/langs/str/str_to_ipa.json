@@ -1,44 +1,267 @@
 [
-    {"in": "Á", "out": "e"},
-    {"in": "Ⱥ", "out": "eː"},
-    {"in": "A", "out": "æ"},
-    {"in": "B", "out": "pʼ"},
-    {"in": "Ć", "out": "t͡ʃ"},
-    {"in": "Ȼ", "out": "k̟ʷ"},
-    {"in": "C", "out": "k̟"},
-    {"in": "D", "out": "tʼ"},
-    {"in": "E", "out": "ʌ"},
-    {"in": "H", "out": "h"},
-    {"in": "Í", "out": "aɪ"},
-    {"in": "I", "out": "i"},
-    {"in": "J", "out": "t͡ʃʼ"},
-    {"in": "Ꝁ", "out": "qʷʼ"},
-    {"in": "₭", "out": "qʷʼ"},
-    {"in": "K\u0301", "out": "qʷ"},
-    {"in": "K\u0331", "out": "q"},
-    {"in": "K", "out": "qʼ"},
-    {"in": "L", "out": "l"},
-    {"in": "Ƚ", "out": "ɬ"},
-    {"in": "M", "out": "m"},
-    {"in": "N\u0331", "out": "ŋ"},
-    {"in": "N", "out": "n"},
-    {"in": "O", "out": "ɑ"},
-    {"in": "P", "out": "p"},
-    {"in": "Q", "out": "kʷʼ"},
-    {"in": "Ś", "out": "ʃ"},
-    {"in": "S", "out": "s"},
-    {"in": "Ⱦ", "out": "t͡s̪"},
-    {"in": "Ṯ", "out": "t͡ɬʼ"},
-    {"in": "Ŧ", "out": "θ"},
-    {"in": "T", "out": "t"},
-    {"in": "U", "out": "u"},
-    {"in": "W\u0331", "out": "xʷ"},
-    {"in": "W", "out": "w"},
-    {"in": "X\u0331", "out": "χʷ"},
-    {"in": "X", "out": "χ"},
-    {"in": "Y", "out": "j"},
-    {"in": "Z", "out": "d͡z"},
-    {"in": "¸", "out": "ʔ", "comment": "cedilla is now the community standard for glottal stop"},
-    {"in": ",", "out": "ʔ", "comment": "comma still occurs, though. TODO: disambiguate punctuation vs glottal stop"},
-    {"in": "s", "out": "s"}
+    {
+        "in": "Á",
+        "out": "e"
+    },
+    {
+        "in": "Ⱥ",
+        "out": "ej"
+    },
+    {
+        "in": "A",
+        "out": "æ"
+    },
+    {
+        "in": "B",
+        "out": "pʼ"
+    },
+    {
+        "in": "Ć",
+        "out": "t͡ʃ"
+    },
+    {
+        "in": "ȻȻ",
+        "out": "kʷʰkʷ"
+    },
+    {
+        "in": "Ȼ",
+        "out": "kʷ"
+    },
+    {
+        "in": "CC",
+        "out": "kʰk"
+    },
+    {
+        "in": "C",
+        "out": "k"
+    },
+    {
+        "in": "D",
+        "out": "tʼ"
+    },
+    {
+        "in": "IU¸",
+        "out": "iw¸"
+    },
+    {
+        "in": "EUE",
+        "out": "aʊwə"
+    },
+    {
+        "in": "EU¸E",
+        "out": "aʊ¸wə"
+    },
+    {
+        "in": "EU¸",
+        "out": "u¸"
+    },
+    {
+        "in": "E",
+        "out": "ə"
+    },
+    {
+        "in": "É",
+        "out": "ə́"
+    },
+    {
+        "in": "H",
+        "out": "h"
+    },
+    {
+        "in": "Í",
+        "out": "aɪ"
+    },
+    {
+        "in": "I",
+        "out": "i"
+    },
+    {
+        "in": "J",
+        "out": "t͡ʃʼ"
+    },
+    {
+        "in": "Ꝁ",
+        "out": "qʷʼ"
+    },
+    {
+        "in": "₭",
+        "out": "qʷʼ"
+    },
+    {
+        "in": "K\u0301K\u0301",
+        "out": "qʷʰqʷ"
+    },
+    {
+        "in": "K\u0301",
+        "out": "qʷ"
+    },
+    {
+        "in": "K\u0331K\u0331",
+        "out": "qʰq"
+    },
+    {
+        "in": "K\u0331",
+        "out": "q"
+    },
+    {
+        "in": "K",
+        "out": "qʼ"
+    },
+    {
+        "in": "L",
+        "out": "l"
+    },
+    {
+        "in": "Ƚ",
+        "out": "ɬ"
+    },
+    {
+        "in": "M",
+        "out": "m"
+    },
+    {
+        "in": "N\u0331",
+        "out": "ŋ"
+    },
+    {
+        "in": "N",
+        "out": "n"
+    },
+    {
+        "in": "O",
+        "out": "ɑ"
+    },
+    {
+        "in": "PP",
+        "out": "pʰp"
+    },
+    {
+        "in": "P",
+        "out": "p"
+    },
+    {
+        "in": "Q",
+        "out": "kʷʼ"
+    },
+    {
+        "in": "Ś",
+        "out": "ʃ"
+    },
+    {
+        "in": "S",
+        "out": "s"
+    },
+    {
+        "in": "ȾȾ",
+        "out": "t͡s̪ʰt͡s̪"
+    },
+    {
+        "in": "Ⱦ",
+        "out": "t͡s̪"
+    },
+    {
+        "in": "Ṯ",
+        "out": "t͡ɬʼ"
+    },
+    {
+        "in": "Ŧ",
+        "out": "θ"
+    },
+    {
+        "in": "TT",
+        "out": "tʰt",
+        "comment": "See Montler Grammar."
+    },
+    {
+        "in": "T",
+        "out": "t"
+    },
+    {
+        "in": "U",
+        "out": "u"
+    },
+    {
+        "in": "W\u0331",
+        "out": "xʷ"
+    },
+    {
+        "in": "W",
+        "out": "w"
+    },
+    {
+        "in": "X\u0331",
+        "out": "χʷ"
+    },
+    {
+        "in": "X",
+        "out": "χ"
+    },
+    {
+        "in": "Y",
+        "out": "j"
+    },
+    {
+        "in": "Z",
+        "out": "Z"
+    },
+    {
+        "in": "¸",
+        "out": "ʔ",
+        "comment": "cedilla is now the community standard for glottal stop"
+    },
+    {
+        "in": ",,",
+        "out": "ʔ,",
+        "comment": "cedilla is now the community standard for glottal stop"
+    },
+    {
+        "in": ",",
+        "out": "ʔ",
+        "comment": "comma still occurs, though. TODO: disambiguate punctuation vs glottal stop"
+    },
+    {
+        "in": "ə",
+        "out": "ɑ",
+        "context_after": "ʔ",
+        "comment": "turns to ɑ before glottal stop"
+    },
+    {
+        "in": "ə",
+        "out": "ɑ",
+        "context_after": "UVULARS_IPA",
+        "comment": "see montler 1986"
+    },
+    {
+        "in": "ə",
+        "out": "ɨ",
+        "context_after": "PALATALS_IPA",
+        "comment": "see Leonard 2019"
+    },
+    {
+        "in": "ə",
+        "out": "ɨ",
+        "context_after": "RESONANTS_IPA",
+        "comment": "see montler 1986"
+    },
+    {
+        "in": "ə",
+        "out": "ʊ",
+        "context_after": "LABIALIZED_IPA",
+        "comment": "see montler 1986"
+    },
+    {
+        "in": "i",
+        "out": "ɨ",
+        "context_before": "UVULARS_IPA",
+        "comment": "see montler 1986"
+    },
+    {
+        "in": "ʔʔ",
+        "out": "ʔ",
+        "comment": "two glottal stops get merged. See Montler Grammar."
+    },
+    {
+        "in": "s",
+        "out": "s"
+    }
 ]

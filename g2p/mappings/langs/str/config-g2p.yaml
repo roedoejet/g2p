@@ -18,6 +18,7 @@ mappings:
     rule_ordering: as-written
     norm_form: NFD
     case_sensitive: true
+    abbreviations_path: abbreviations.csv
     authors:
       - Aidan Pine
     <<: *shared

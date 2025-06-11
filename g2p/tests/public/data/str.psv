@@ -1,0 +1,32 @@
+str|eng-arpabet|X̱I¸ÁM¸|SH W IY HH EY M HH
+
+# Variants for cedilla: comma, space+combining cedilla, space+combining comma below
+str|eng-arpabet|X̱I,ÁM ̧|SH W IY HH EY M HH
+str|eng-arpabet|X̱I,ÁM ̦|SH W IY HH EY M HH
+
+# 2024 update: cedilla stays as such in equiv, but is turned into glottal stop in IPA
+# TODO: for comma, disambituate between glottal stop and punctuation
+str|str-equiv|X̱I¸ÁM ̦|X̱I¸ÁM¸
+str|str-equiv|X̱I,ÁM ̧|X̱I,ÁM¸
+str|str-ipa|X̱I¸ÁM ̦|χʷiʔemʔ
+str|str-ipa|X̱I,ÁM ̧|χʷiʔemʔ
+str|str-ipa|X̱I,ÁM ̧|χʷiʔemʔ
+str|str-ipa|HOȻTTEL|hɑkʷtʰtəl
+str|str-ipa|ÉMETTW̱|ə́mətʰtxʷ
+str|str-ipa|SĆȺ|st͡ʃej
+# ə -> ɑ / __ [ʔ]
+str|str-ipa|SḴAXE ̧|sqæχɑʔ
+# ə -> ɨ / __ [RESONANTS]
+str|str-ipa|SENĆOŦEN|sɨnt͡ʃɑθɨn
+# ə -> ɑ / __ [UVULARS]
+str|str-ipa|Á¸ĆEX|eʔt͡ʃɑχ
+# ə -> ɨ / __ [PALATALS] pg 13 Leonard Thesis
+str|str-ipa|MÁŦEĆ|meθɨt͡ʃ
+# ə -> ʊ / __ [LABIALIZED]
+str|str-ipa|SÁW̱SEW̱|sexʷsʊxʷ
+str|str-ipa|SWIU¸LES|swiwʔləs
+str|str-ipa|XEUES|χaʊwəs
+str|str-ipa|PITNEUEL|pitnaʊwəl
+str|str-ipa|SU¸|suʔ
+str|str-ipa|EU¸|uʔ
+str|str-ipa|TŦEU¸NIȽ|tθuʔniɬ
