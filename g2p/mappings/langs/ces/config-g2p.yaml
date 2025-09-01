@@ -1,0 +1,52 @@
+<<: &shared
+  language_name: Czech
+mappings:
+  - display_name: Czech pre-clean
+    in_lang: ces
+    out_lang: ces0
+    type: mapping
+    authors:
+      - Radek Kubica
+    rules_path: ces_pre_clean.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: "NFC"
+    <<: *shared
+
+  - display_name: Czech pre-normalization
+    in_lang: ces0
+    out_lang: ces
+    type: mapping
+    authors:
+      - Radek Kubica
+    rules_path: ces_pre.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: "NFC"
+    <<: *shared
+
+  - display_name: Czech grapheme to IPA
+    in_lang: ces
+    out_lang: ces-ipa0
+    type: mapping
+    authors:
+      - Radek Kubica
+    rules_path: ces_to_ces_ipa.json
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: "NFC"
+    <<: *shared
+
+  
+
+  - display_name: Czech contextual phonology
+    in_lang: ces-ipa0
+    out_lang: ces-ipa
+    type: mapping
+    authors:
+      - Radek Kubica
+    rules_path: ces_ipa_context.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: "NFC"
+    <<: *shared
