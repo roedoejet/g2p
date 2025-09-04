@@ -53,12 +53,14 @@ def make_g2p(  # noqa: C901
 
     By default, the input is tokenized using the path of mappings from in_lang
     to out_lang, because transducers are not guaranteed to deal with whitespace,
-    punctuation, etc, properly.
+    punctuation, and word boundaries properly.
 
     Args:
         in_lang (str): input language code
         out_lang (str): output language code
         tokenize (bool): whether tokenization should happen (default: True)
+                         Warning: only set this to False if you've already
+                         segmented your text into words without punctuation
         custom_tokenizer (Tokenizer): the tokenizer to use (default: a tokenizer
                                       built on the path from in_lang and out_lang)
 
