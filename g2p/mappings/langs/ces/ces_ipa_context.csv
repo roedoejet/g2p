@@ -1,4 +1,3 @@
-in,out,left_context_regex,right_context_regex,note
 s,z,,(?:b|d|ɟ|ɡ|z|ʒ|dʒ|dz|ɦ),s→z před znělou obstruentou/ɦ
 z,s,,(?:p|t|c|k|f|s|ʃ|ts|tʃ|x),z→s před neznělou obstruentou
 ɦ,x,,(?:p|t|c|k|f|s|ʃ|ts|tʃ|x),ɦ→x před neznělou

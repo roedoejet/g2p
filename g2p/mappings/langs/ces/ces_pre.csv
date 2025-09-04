@@ -1,4 +1,3 @@
-in,out,left_context_regex,right_context_regex,note
 q,kv,,,q→kv
 w,v,,,w→v
 x,ks,,,x→ks

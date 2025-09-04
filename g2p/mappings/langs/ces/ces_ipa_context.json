@@ -1,3 +1,4 @@
+#######is not used
 [
   { "in": "z(?=k)", "out": "s", "note": "z→s před k (explicit via lookahead)" },
 
