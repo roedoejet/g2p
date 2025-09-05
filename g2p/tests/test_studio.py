@@ -118,6 +118,8 @@ class StudioTest(IsolatedAsyncioTestCase):
         ]
         # Make sure we test at least one lexicon-based example
         langs_to_test.append(["eng", "eng-arpabet", "hello", "HH AH L OW "])
+        # Make sure case-insensitive lexicon-based mappings are applied case insensitive
+        langs_to_test.append(["eng", "eng-arpabet", "HELLO", "HH AH L OW "])
 
         error_count = 0
 

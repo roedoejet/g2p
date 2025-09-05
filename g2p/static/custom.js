@@ -369,8 +369,16 @@ var getKwargs = function(index) {
     if (type === "lexicon") {
         const in_lang = document.getElementById(`in_lang-${index}`).value
         const out_lang = document.getElementById(`out_lang-${index}`).value
-        // Lexicon G2P cannot be customized (FIXME: likewise for unidecode actually)
-        return { type, in_lang, out_lang }
+        // Lexicon G2P is only partially customizable
+        return {
+            case_sensitive,
+            preserve_case,
+            out_delimiter,
+            norm_form,
+            type,
+            in_lang,
+            out_lang,
+        }
     } else
         return {
             rule_ordering,
