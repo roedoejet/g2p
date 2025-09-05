@@ -99,9 +99,10 @@ function createSettings(index, data) {
     if (data['type']) {
         type = data['type']
     }
-    // For lexicon mappings, we can only use the built-in mapping
-    if (type == ['lexicon']) {
+    if (data['in_lang']) {
         in_lang = data['in_lang']
+    }
+    if (data['out_lang']) {
         out_lang = data['out_lang']
     }
     let settings_template = `
@@ -366,9 +367,9 @@ var getKwargs = function(index) {
     const prevent_feeding = document.getElementById(`prevent_feeding-${index}`).checked
     const norm_form = document.getElementById(`norm_form-${index}`).value
     const type = document.getElementById(`type-${index}`).value
+    const in_lang = document.getElementById(`in_lang-${index}`).value
+    const out_lang = document.getElementById(`out_lang-${index}`).value
     if (type === "lexicon") {
-        const in_lang = document.getElementById(`in_lang-${index}`).value
-        const out_lang = document.getElementById(`out_lang-${index}`).value
         // Lexicon G2P is only partially customizable
         return {
             case_sensitive,
@@ -390,7 +391,9 @@ var getKwargs = function(index) {
             out_delimiter,
             norm_form,
             prevent_feeding,
-            type
+            type,
+            in_lang,
+            out_lang,
         }
 }
 
