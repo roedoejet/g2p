@@ -31,7 +31,7 @@ mappings:
     type: mapping
     authors:
       - Radek Kubica
-    rules_path: ces_ipa_context.csv
+    rules_path: ces_ipa_context.json
     rule_ordering: as-written
     case_sensitive: false
     norm_form: "NFC"
