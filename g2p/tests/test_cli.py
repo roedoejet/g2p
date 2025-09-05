@@ -190,23 +190,26 @@ class CliTest(TestCase):
                 *_,
                 fileline,
             ) in langs_to_test:
-                output_string = self.runner.invoke(
+                result = self.runner.invoke(
                     convert, [*tok_option, word_to_convert, in_lang, out_lang]
-                ).stdout.strip()
-                if reference_string.strip() not in output_string:
-                    LOGGER.warning(
-                        f"test_cli.py for {fileline}: {in_lang}->{out_lang} mapping error: '{word_to_convert}' "
-                        f"should map to '{reference_string}', got '{output_string}' (with {tok_option})."
-                    )
-                    if error_count == 0:
-                        first_failed_test = (
-                            in_lang,
-                            out_lang,
-                            word_to_convert,
-                            tok_option,
-                            reference_string,
+                )
+                self.assertEqual(result.exit_code, 0)
+                if "--no-tok" not in tok_option:
+                    output_string = result.stdout.strip()
+                    if reference_string.strip() not in output_string:
+                        LOGGER.warning(
+                            f"test_cli.py for {fileline}: {in_lang}->{out_lang} mapping error: '{word_to_convert}' "
+                            f"should map to '{reference_string}', got '{output_string}' (with {tok_option})."
                         )
-                    error_count += 1
+                        if error_count == 0:
+                            first_failed_test = (
+                                in_lang,
+                                out_lang,
+                                word_to_convert,
+                                tok_option,
+                                reference_string,
+                            )
+                        error_count += 1
 
         if error_count > 0:
             (

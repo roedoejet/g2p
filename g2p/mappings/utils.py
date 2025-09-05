@@ -358,6 +358,9 @@ def load_from_csv(language, delimiter=","):
             work_sheet.append(line)
     # Create wordlist
     mapping = []
+    # Remove a well-formed header line
+    if work_sheet and work_sheet[0][0:2] == ["in", "out"]:
+        work_sheet = work_sheet[1:]
     # Loop through rows in worksheet, remove any stray BOMs
     # (zero-width non-breaking spaces), create if statements for
     # different columns and append mappings to self.mapping.
@@ -773,7 +776,7 @@ class RULE_ORDERING_ENUM(str, Enum):
 
 
 class _MappingModelDefinition(BaseModel):
-    processed: bool = Field(False, hidden=True)
+    processed: bool = Field(False, json_schema_extra={"hidden": True})
 
     parent_dir: Optional[DirectoryPath] = None
     """Optionally resolve all paths to a parent directory"""

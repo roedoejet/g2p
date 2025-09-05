@@ -141,7 +141,8 @@ class ConvertRequest(BaseModel):
     tokenize: Union[bool, None] = Field(
         True,
         description="Tokenize input and return a list of segments.  This is "
-        "the default behaviour, set this to `False` to treat input as a single segment",
+        "the default behaviour, set this to `False` to treat input as a single segment. "
+        "Warning: only use False if text is already a single word without punctuation.",
     )
     compose_from: Union[str, None] = Field(
         None,

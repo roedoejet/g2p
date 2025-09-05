@@ -568,7 +568,13 @@ def convert(  # noqa: C901
         transducer = make_g2p(
             in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
         )
+        no_tok_warning_printed = False
         for line in lines:
+            if not tok and " " in line and not no_tok_warning_printed:
+                LOGGER.warning(
+                    "You disabled tokenization but your text contains spaces. --no-tok is intended for use when you are supplying isolated words; rules meant to apply at word boundaries might not work correctly."
+                )
+                no_tok_warning_printed = True
             tg = transducer(line)
             if check:
                 transducer.check(tg, display_warnings=True)

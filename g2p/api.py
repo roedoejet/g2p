@@ -99,7 +99,10 @@ def g2p(
     text: str = Query(description="string to convert"),
     index: bool = Query(False, description="return indices"),
     debugger: bool = Query(False, description="return debugging information"),
-    tokenize: bool = Query(False, description="tokenize before transducing"),
+    tokenize: bool = Query(
+        False,
+        description="tokenize before transducing; warning: set this to true unless your text is already a single word without punctuation",
+    ),
 ) -> dict:
     """Get the converted version of a string, given an input and output lang"""
     try:
