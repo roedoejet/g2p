@@ -28,7 +28,7 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 
 import g2p
-from g2p import make_g2p
+from g2p import make_g2p, make_tokenizer
 from g2p.api import api as api_v1
 from g2p.api_v2 import api as api_v2
 from g2p.log import LOGGER
@@ -42,6 +42,7 @@ from g2p.mappings.utils import (
 from g2p.transducer import (
     CompositeTransducer,
     CompositeTransductionGraph,
+    TokenizingTransducer,
     Transducer,
     TransductionGraph,
 )
@@ -123,14 +124,14 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
         steps = 1
     for ind, tier in enumerate(tg.tiers):
         if ind == 0:
-            symbol_size = min(300 / len(tier.input_string), 40)
+            symbol_size = min(300 / max(1, len(tier.input_string)), 40)
             input_x = x + (ind * diff)
             input_y = 300
             x += diff
             inputs = [
                 {
                     "name": f"{x}",
-                    "id": f"(in{ind+index_offset}-in{i+index_offset})",
+                    "id": f"(in{ind + index_offset}-in{i + index_offset})",
                     "x": input_x,
                     "y": input_y + (i * 50),
                     "symbolSize": symbol_size,
@@ -159,7 +160,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
         outputs = [
             {
                 "name": f"{x}",
-                "id": f"({ind+index_offset}-{i+index_offset})",
+                "id": f"({ind + index_offset}-{i + index_offset})",
                 "x": output_x,
                 "y": output_y + (i * 50),
                 "symbolSize": symbol_size,
@@ -213,6 +214,14 @@ async def convert(sid, message):
         )
         return
     transducer = CompositeTransducer(transducers)
+    try:
+        in_lang = message["data"]["mappings"][0]["kwargs"]["in_lang"]
+        tokenizer = make_tokenizer(in_lang)
+        transducer = TokenizingTransducer(transducer, tokenizer)
+    except Exception:
+        # We tokenize by default when it works (see try block) but just skip
+        # tokenization in case of problem: it's not a bug, tokenization is optional.
+        pass
     if message["data"]["index"]:
         tg = transducer(message["data"]["input_string"])
         data, links = return_echart_data(tg)
@@ -290,11 +299,11 @@ async def change_table(sid, message) -> None:
             "table response",
             [
                 {
-                    "mappings": x.plain_mapping(),
-                    "abbs": expand_abbreviations_format(x.abbreviations),
-                    "kwargs": x.model_dump(exclude={"alignments"}),
+                    "mappings": mapping.plain_mapping(),
+                    "abbs": expand_abbreviations_format(mapping.abbreviations),
+                    "kwargs": mapping.model_dump(exclude={"alignments"}),
                 }
-                for x in mappings
+                for mapping in mappings
             ],
             sid,
             namespace="/table",

@@ -120,6 +120,17 @@ class StudioTest(IsolatedAsyncioTestCase):
         langs_to_test.append(["eng", "eng-arpabet", "hello", "HH AH L OW "])
         # Make sure case-insensitive lexicon-based mappings are applied case insensitive
         langs_to_test.append(["eng", "eng-arpabet", "HELLO", "HH AH L OW "])
+        # Exercise a multi-word lexicon-based example now that we tokenize in studio
+        langs_to_test.append(
+            [
+                "eng",
+                "eng-arpabet",
+                "Well, hello there!",
+                "W EH L , HH AH L OW  DH EH R !",
+            ]
+        )
+        # And with a Custom mapping with no rules in it, we just get passthrough
+        langs_to_test.append(["custom", "custom", "foo bar", "foo bar"])
 
         error_count = 0
 
