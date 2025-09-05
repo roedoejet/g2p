@@ -15,7 +15,7 @@ mappings:
 
   - display_name: Czech grapheme to IPA
     in_lang: ces-equiv
-    out_lang: ces-ipa0
+    out_lang: ces-pre-ipa
     type: mapping
     authors:
       - Radek Kubica
@@ -26,7 +26,7 @@ mappings:
     <<: *shared
 
   - display_name: Czech contextual phonology
-    in_lang: ces-ipa0
+    in_lang: ces-pre-ipa
     out_lang: ces-ipa
     type: mapping
     authors:
