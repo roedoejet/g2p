@@ -6,8 +6,8 @@
   { "in": "au", "out": "au̯", "left_context_regex": "", "right_context_regex": "", "note": "diftong" },
   { "in": "eu", "out": "ɛu̯", "left_context_regex": "", "right_context_regex": "", "note": "diftong" },
 
-  { "in": "dě", "out": "ɟɛ", "left_context_regex": "", "right_context_regex": "", "note": "" },
-  { "in": "tě", "out": "cɛ", "left_context_regex": "", "right_context_regex": "", "note": "" },
+  { "in": "dě", "out": "ɟɛ", "left_context_regex": "", "right_context_regex": "", "prevent_feeding": true, "note": "" },
+  { "in": "tě", "out": "cɛ", "left_context_regex": "", "right_context_regex": "", "prevent_feeding": true, "note": "" },
   { "in": "ně", "out": "ɲɛ", "left_context_regex": "", "right_context_regex": "", "note": "" },
   { "in": "mě", "out": "mɲɛ", "left_context_regex": "", "right_context_regex": "", "note": "" },
   { "in": "bě", "out": "bjɛ", "left_context_regex": "", "right_context_regex": "", "note": "" },

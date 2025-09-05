@@ -1,26 +1,23 @@
-#######is not used
 [
-  { "in": "z(?=k)", "out": "s", "note": "z→s před k (explicit via lookahead)" },
+  { "in": "v", "out": "v", "left_context_regex": "$", "right_context_regex": "$","prevent_feeding": true, "note": "v→v předložka" },
+  { "in": "v", "out": "f", "left_context_regex": "", "right_context_regex": "$", "note": "v→f finální odzneňování" },
+  { "in": "b", "out": "p", "left_context_regex": "", "right_context_regex": "\b", "note": "finální odzneňování" },
+  { "in": "d", "out": "t", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "ɟ", "out": "c", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "ɡ", "out": "k", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "z", "out": "s", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "ʒ", "out": "ʃ", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "dʒ", "out": "tʃ", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
+  { "in": "ɦ", "out": "x", "left_context_regex": "", "right_context_regex": "$", "note": "finální odzneňování" },
 
-  { "in": "s", "out": "z", "right_context_regex": "(?:b|d|ɟ|ɡ|z|ʒ|dʒ|dz|ɦ)", "note": "s→z před znělou obstruentou/ɦ" },
-  { "in": "z", "out": "s", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "z→s před neznělou obstruentou" },
+  { "in": "s", "out": "z", "left_context_regex": "", "right_context_regex": "(?:b|d|ɟ|ɡ|z|ʒ|dʒ|dz|ɦ)", "note": "s→z před znělou obstruentou/ɦ" },
+  { "in": "z", "out": "s", "left_context_regex": "", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "z→s před neznělou obstruentou" },
+  { "in": "ɦ", "out": "x", "left_context_regex": "", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "ɦ→x před neznělou" },
+  { "in": "ɦ", "out": "x", "left_context_regex": "", "right_context_regex": "x", "note": "ɦ→x před x" },
+  { "in": "r̝", "out": "r̝̊", "left_context_regex": "", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "ř odzneňuje před neznělou" },
+  { "in": "r̝", "out": "r̝̊", "left_context_regex": "", "right_context_regex": "$", "note": "ř odzneňuje na konci slova" },
 
-  { "in": "ɦ", "out": "x", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "ɦ→x před neznělou" },
-  { "in": "ɦ", "out": "x", "right_context_regex": "x", "note": "ɦ→x před x" },
-
-  { "in": "b",  "out": "p",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "d",  "out": "t",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "ɟ",  "out": "c",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "ɡ",  "out": "k",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "z",  "out": "s",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "ʒ",  "out": "ʃ",  "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "dʒ","out": "tʃ", "right_context_regex": "$", "note": "finální odzneňování" },
-  { "in": "ɦ",  "out": "x",  "right_context_regex": "$", "note": "finální odzneňování" },
-
-  { "in": "r̝", "out": "r̝̊", "right_context_regex": "(?:p|t|c|k|f|s|ʃ|ts|tʃ|x)", "note": "ř odzneňuje před neznělou" },
-  { "in": "r̝", "out": "r̝̊", "right_context_regex": "$", "note": "ř odzneňuje na konci slova" },
-
-  { "in": "n", "out": "m", "right_context_regex": "(?:p|b|m)", "note": "n→m před p/b/m" },
-  { "in": "n", "out": "ŋ", "right_context_regex": "(?:k|ɡ)", "note": "n→ŋ před k/g" },
-  { "in": "n", "out": "ɲ", "right_context_regex": "(?:j|ɟ|c|ɲ)", "note": "n→ɲ před j/ɟ/c/ɲ" }
+  { "in": "n", "out": "m", "left_context_regex": "", "right_context_regex": "(?:p|b|m)", "note": "n→m před p/b/m" },
+  { "in": "n", "out": "ŋ", "left_context_regex": "", "right_context_regex": "(?:k|ɡ)", "note": "n→ŋ před k/g" },
+  { "in": "n", "out": "ɲ", "left_context_regex": "", "right_context_regex": "(?:j|ɟ|c|ɲ)", "note": "n→ɲ před j/ɟ/c/ɲ" }
 ]
