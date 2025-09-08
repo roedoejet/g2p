@@ -1,4 +1,7 @@
 [
+  { "in": "q", "out": "kv", "note": "pre-filter equivalency applied first" },
+  { "in": "w", "out": "v", "note": "pre-filter equivalency applied first" },
+  { "in": "x", "out": "ks", "note": "pre-filter equivalency applied first" },
   { "in": "ch", "out": "x", "context_before": "", "context_after": "", "note": "české 'ch'" },
   { "in": "dž", "out": "dʒ", "context_before": "", "context_after": "", "note": "dž" },
   { "in": "dz", "out": "dz", "context_before": "", "context_after": "", "note": "dz (cizí slova)" },
