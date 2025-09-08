@@ -663,3 +663,20 @@ mappings:
     rule_ordering: apply-longest-first
     rules_path: deu-ipa_to_eng-ipa.json
     type: mapping
+  - authors:
+      - Generated 2025-09-08 17:50:55.531112
+      - Manually optimized by Eric Joanis
+    case_equivalencies: {}
+    case_sensitive: false
+    display_name: ces-ipa IPA to eng-ipa IPA
+    escape_special: false
+    in_lang: ces-ipa
+    language_name: IPA
+    norm_form: NFC
+    out_delimiter: ''
+    out_lang: eng-ipa
+    preserve_case: false
+    prevent_feeding: true
+    reverse: false
+    rule_ordering: apply-longest-first
+    rules_path: ces-ipa_to_eng-ipa.json
