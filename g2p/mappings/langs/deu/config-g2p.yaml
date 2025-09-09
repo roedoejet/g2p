@@ -11,5 +11,5 @@ mappings:
     abbreviations_path: deu_abbs.csv
     rule_ordering: as-written
     case_sensitive: false
-    norm_form: 'none'
+    norm_form: NFC
     <<: *shared
