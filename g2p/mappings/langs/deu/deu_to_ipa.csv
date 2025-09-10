@@ -13,8 +13,10 @@ a,ʔa,\b,
 b,pʰ,,\b
 b,b,,
 sch,ʃ,,
+öcht,œçt,,
+öch,œç,,
 ch,χ,BACK,
-ch,ç,MIDDLE,
+ch,χ,MIDDLE,
 ch,ç,FRONT,
 ch,ç,\b,
 ch,χ,,
@@ -45,7 +47,6 @@ ig,ɪkʰ,t,\b
 ig,ɪç,,\b
 ig,ɪç,CONSONANT,
 gl,kl,
-g,kʰ,,\b
 g,kʰ,,\b
 g,ɡ,,
 h,h,\b,
@@ -89,7 +90,6 @@ qu,kv,,
 q,kv,,
 r,ɐ̯,VOWEL,\b
 r,ʁ,,
-sch,ʃ,,
 st,ʃt,\b,
 sp,ʃp,\b,
 s,s,\b,\b
