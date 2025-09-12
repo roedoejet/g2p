@@ -257,7 +257,8 @@ class TokenizerLibrary:
                     )
 
             # Hack for Tlingit using dot as a letter when non word-final
-            if in_lang == "tli":
+            # We also apply it for sal-apa so it can work with Secwempetsín
+            if in_lang == "tli" or in_lang == "sal-apa":
                 self.tokenizers[tokenizer_key].dot_is_letter = True
 
         return self.tokenizers.get(tokenizer_key)
