@@ -105,3 +105,9 @@ sal-apa	sal-ipa	ʔ	ʔ
 sal-apa	sal-ipa	ˀ	ˀ
 sal-apa	sal-ipa	z'	zˀ
 sal-apa	sal-ipa	z̓	zˀ
+
+# Support for BC language with 7 as glottal stop and mid-word ., e.g., Secwepemctsín:
+sal-apa	sal-ipa	s7elk̓	sʔəlkʼ
+sal-apa	sal-ipa	wstsíllens	wstsˈilləns
+sal-apa	sal-ipa	sts7emét.ste	stsʔəmˈətstə
+sal-apa	sal-ipa	ts̓i7	tsʼiʔ
