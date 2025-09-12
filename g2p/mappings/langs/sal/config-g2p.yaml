@@ -12,6 +12,7 @@ mappings:
     prevent_feeding: true
     rule_ordering: apply-longest-first
     norm_form: NFD
+    case_sensitive: false
     <<: *shared
   - display_name: Unicode Equivalencies
     in_lang: sal-apa
