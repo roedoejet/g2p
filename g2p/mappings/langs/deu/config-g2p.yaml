@@ -1,0 +1,15 @@
+<<: &shared
+  language_name: German
+mappings:
+  - display_name: German to IPA
+    in_lang: deu
+    out_lang: deu-ipa
+    type: mapping
+    authors:
+      - Leonhard Behr, University of Applied Sciences Ansbach
+    rules_path: deu_to_ipa.csv
+    abbreviations_path: deu_abbs.csv
+    rule_ordering: as-written
+    case_sensitive: false
+    norm_form: NFC
+    <<: *shared
