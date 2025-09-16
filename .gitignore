@@ -14,7 +14,6 @@ g2p/tests/private
 
 .DS_Store
 .vscode
-.python-version
 
 *.log
 log.txt
