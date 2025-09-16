@@ -71,5 +71,6 @@
     { "in": "m", "out": "m", "comment": "occurs only in borrowed words" },
     { "in": "p", "out": "p", "comment": "occurs only in borrowed words" },
     { "in": "u", "out": "u", "comment": "occurs only in borrowed words" },
-    { "in": "ú", "out": "ú", "comment": "occurs only in borrowed words" }
+    { "in": "ú", "out": "ú", "comment": "occurs only in borrowed words" },
+    { "in": ":", "out": "", "comment": "remaining colons not mapped to ː (U+02D0) yet are not part of phonemes"}
 ]
