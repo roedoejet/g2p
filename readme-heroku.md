@@ -1,13 +1,30 @@
+### Production environment on Heroku
+
 Our production Heroku deployment is controlled by the following files:
  - `Procfile`: tells Heroku what command to launch in each Dyno;
- - `runtime.txt`: tells Heroku which run-time engine to use (i.e., which version of Python);
+ - `.python-version`: tells Heroku which run-time engine to use (i.e., which version of Python);
+ - `requirements.txt`: tells Heroku what our production dependencies are;
+ - `bin/post_compile`: Heroku builds run this after doing `pip install -r requirements.txt`.
 
-   Heroku detects Python by default, but `runtime.txt` lets us specify/bump the version as needed;
- - `requirements.txt`: tells Heroku what our production dependencies
-   are.  This is managed by `hatch` now.  You will need to make sure
-   the Python version in the `[tool.hatch.envs.prod]` section matches
-   the one in `runtime.txt`.  Now you can update the requirements with:
+### Updating dependencies
 
-        hatch env remove prod
-        rm -f requirements.txt
-        hatch env create prod
+Our dependencies are declared in `pyproject.toml`. This is where changes should be made first.
+
+`requirements.txt` is the generated "lock" file that Heroku uses. To update it,
+follow these steps on a **Linux** machine to match the Heroku context:
+
+ - Install `hatch` with `pip install hatch hatch-pip-compile`, or use
+   `uvx --with hatch-pip-compile hatch` instead of just `hatch`.
+
+ - Make sure `[tool.hatch.envs.prod]` is configured correctly, e.g., with the
+   desired Python version, i.e., the same major.minor as found in `.python-version`.
+
+ - Regenerate `requirements.txt`:
+
+       hatch env remove prod
+       rm requirements.txt
+       hatch env create prod
+
+It is also possible to edit `requirements.txt` manually, e.g., to handle a
+critical vulnerability report, but an occasional full rebuild is a good idea to
+keep things up to date.
