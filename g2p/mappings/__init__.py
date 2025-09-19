@@ -264,8 +264,8 @@ class Mapping(_MappingModelDefinition):
             rule = Rule(**rule)
         if not rule.rule_input:
             LOGGER.warning(
-                f"Rule with input '{rule.rule_input}' and output '{rule.rule_output}' has no input. "
-                "This is disallowed. Please check your mapping file for rules with null inputs."
+                f"Rule {rule} has no input. This is disallowed. "
+                "Please check your mapping file for rules with null inputs."
             )
             return None
         input_match = strip_index_notation(rule.rule_input)

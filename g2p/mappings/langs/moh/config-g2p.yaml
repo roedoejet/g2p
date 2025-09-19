@@ -13,19 +13,6 @@ mappings:
       - Aidan Pine
       - Akwiratékha' Martin
     <<: *shared
-  - display_name: IPA to Kanien'kéha
-    rules_path: moh_to_ipa.json
-    in_lang: moh-ipa
-    reverse: true
-    out_lang: moh
-    case_sensitive: false
-    norm_form: NFC
-    rule_ordering: as-written
-    abbreviations_path: abbreviations.csv
-    authors:
-      - Aidan Pine
-      - Akwiratékha' Martin
-    <<: *shared
   - display_name: Kanien'kéha Equivalencies
     rules_path: moh_equiv.json
     in_lang: moh
