@@ -77,6 +77,9 @@ LANGS_TESTS = [
     ]
 ]
 
+# We are excluding these tests from the dev suite because
+# they require torch and other heavy dependencies
+# and the tests also require downloading large g2p models
 NEURAL_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [NeuralTransducerTest]]
 
 INTEGRATION_TESTS = [

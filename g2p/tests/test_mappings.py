@@ -8,12 +8,12 @@ import unicodedata as ud
 from contextlib import redirect_stderr
 from tempfile import NamedTemporaryFile
 from typing import List
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
 from pydantic import ValidationError
 
 from g2p import exceptions, make_g2p
-from g2p.exceptions import InvalidNormalization
+from g2p.exceptions import InvalidNormalization, NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, Rule
 from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM, normalize
@@ -50,9 +50,10 @@ class MappingTest(TestCase):
 
     def test_find_mappings(self):
         rules_mapping = make_g2p("str", "str-ipa")
-        neural_mapping = make_g2p("str", "str-ipa", neural=True)
         self.assertIsNone(rules_mapping.transducers[-1].mapping.type)
-        self.assertIsNotNone(neural_mapping.transducers[-1].mapping.type)
+        with mock.patch("g2p.has_neural_support", return_value=False):
+            with self.assertRaises(NeuralDependencyError):
+                make_g2p("str", "str-ipa", neural=True)
 
     def test_normalization(self):
         self.assertEqual(

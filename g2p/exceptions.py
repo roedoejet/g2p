@@ -14,6 +14,18 @@ class CommandLineError(Exception):
         return msg % vars(self)
 
 
+class NeuralDependencyError(ImportError):
+    def __init__(self, func_name=None):
+        if func_name:
+            message = (
+                f"Function '{func_name}' requires neural dependencies. "
+                "Install with: pip install g2p[neural]"
+            )
+        else:
+            message = "This operation requires neural dependencies. Install with: pip install g2p[neural]"
+        super().__init__(message)
+
+
 class MappingMissing(CommandLineError):
     def __init__(self, in_lang, out_lang):
         super().__init__(self)
