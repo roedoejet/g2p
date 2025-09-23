@@ -479,7 +479,3 @@ class MappingConfig(BaseModel):
 
 
 LANGS: Dict[str, MappingConfig] = {k: MappingConfig(**v) for k, v in _LANGS.items()}
-
-
-def deep_phonemizer_handler(mapping: Mapping):
-    pass

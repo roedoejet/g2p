@@ -43,6 +43,7 @@ api = [
 ]
 test = [
   "g2p[api]; python_version >= '3.8'",
+  "g2p[neural]",
   "coverage[toml]>=6.5",
   "playwright>=1.26.1,<1.46; python_version < '3.9'",
   "playwright>=1.26.1; python_version >= '3.9'",
