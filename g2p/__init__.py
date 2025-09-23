@@ -31,9 +31,9 @@ from typing import Dict, Optional, Tuple, Union
 from g2p.exceptions import InvalidLanguageCode, NoPath
 from g2p.shared_types import BaseTokenizer, BaseTransducer, Token
 
-if sys.version_info < (3, 7):  # pragma: no cover
+if sys.version_info < (3, 8):  # pragma: no cover
     sys.exit(
-        "Python 3.7 or more recent is required by g2p.\n"
+        "Python 3.8 or more recent is required by g2p.\n"
         f"You are using Python {sys.version}.\n"
         "Please use a newer version of Python."
     )
