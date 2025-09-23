@@ -30,10 +30,6 @@ from g2p.mappings.utils import (
 )
 from g2p.shared_types import BaseTokenizer, BaseTransducer, BaseTransductionGraph
 
-# Avoid TypeError in Python < 3.7 (see
-# https://stackoverflow.com/questions/6279305/typeerror-cannot-deepcopy-this-pattern-object)
-copy._deepcopy_dispatch[type(re.compile(""))] = lambda r, _: r  # type: ignore
-
 # An Index is typed as follows:
 # {input_index: int, {'input_string': str, 'output': {output_index: int, str}}}
 # Example:
