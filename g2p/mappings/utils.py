@@ -41,6 +41,7 @@ from pydantic import (
 from typing_extensions import Literal
 
 from g2p import exceptions
+from g2p.exceptions import NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings import langs
 from g2p.shared_types import Token
@@ -67,10 +68,7 @@ def requires_neural(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         if not has_neural_support():
-            raise ImportError(
-                f"Function '{func.__name__}' requires neural dependencies. "
-                "Install with: pip install g2p[neural]"
-            )
+            raise NeuralDependencyError(func.__name__)
         return func(*args, **kwargs)
 
     return wrapper

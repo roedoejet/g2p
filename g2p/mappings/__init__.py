@@ -18,6 +18,7 @@ from pydantic import BaseModel
 
 from g2p import exceptions
 from g2p._version import version_tuple
+from g2p.exceptions import NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings.langs import _LANGS, _MAPPINGS_AVAILABLE
 from g2p.mappings.langs import __file__ as LANGS_FILE
@@ -32,6 +33,7 @@ from g2p.mappings.utils import (
     create_fixed_width_lookbehind,
     escape_special_characters,
     expand_abbreviations,
+    has_neural_support,
     load_abbreviations_from_file,
     load_alignments_from_file,
     load_from_file,
@@ -78,6 +80,10 @@ class Mapping(_MappingModelDefinition):
         neural: bool = False,
     ) -> "Mapping":
         """Given an input and an output language, find a mapping to get between them."""
+        # Early checking for if neural is available:
+        if neural and not has_neural_support():
+            raise NeuralDependencyError()
+
         if in_lang is None or out_lang is None:
             raise exceptions.MappingMissing(in_lang, out_lang)
         fallback_mapping = None

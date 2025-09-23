@@ -28,7 +28,7 @@ Basic Usage:
 import sys
 from typing import Dict, Optional, Tuple, Union
 
-from g2p.exceptions import InvalidLanguageCode, NoPath
+from g2p.exceptions import InvalidLanguageCode, NeuralDependencyError, NoPath
 from g2p.mappings.utils import has_neural_support
 from g2p.shared_types import BaseTokenizer, BaseTransducer, Token
 
@@ -82,9 +82,7 @@ def make_g2p(  # noqa: C901
 
     # Early checking for if neural is available:
     if neural and not has_neural_support():
-        sys.exit(
-            "It looks like you have not installed g2p with the required neural dependencies. Please either set neural=False when creating your g2p engine, or install g2p with the neural dependencies: pip install g2p[neural]"
-        )
+        raise NeuralDependencyError()
 
     if (in_lang, out_lang, tokenize, neural, id(custom_tokenizer)) in _g2p_cache:
         return _g2p_cache[(in_lang, out_lang, tokenize, neural, id(custom_tokenizer))]
