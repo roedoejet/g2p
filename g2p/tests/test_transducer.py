@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
 from g2p import make_g2p
 from g2p.exceptions import MalformedMapping
@@ -83,6 +83,14 @@ class TransducerTest(TestCase):
                 os.path.join(PUBLIC_DIR, "mappings", "deletion_config_json.yaml")
             )
         )
+
+    def test_no_neural_dependencies(self):
+        """This tests what happens if a user tries to create a neural g2p without installing the dependencies. Other neural tests (for when deps are installed are in test_neural.py module.)"""
+        with mock.patch("g2p.has_neural_support", return_value=False):
+            with self.assertRaises(SystemExit):
+                make_g2p("foo", "bar", neural=True)
+            with self.assertRaises(SystemExit):
+                make_g2p("str", "str-ipa", neural=True)
 
     def test_properties(self):
         """Test all the basic properties of transducers."""
@@ -200,14 +208,6 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_case_sensitive_transducer("'n").output_string, "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'N").output_string, "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'n").output_string, "n̓")
-
-    def test_neural(self):
-        rules_g2p = make_g2p("str", "str-ipa")
-        neural_g2p = make_g2p("str", "str-ipa", neural=True)
-        result_rules = rules_g2p("SENĆOŦEN")
-        self.assertEqual(result_rules.output_string, "sʌnt͡ʃɑθʌn")
-        result_neural = neural_g2p("SENĆOŦEN")
-        self.assertEqual(result_neural.output_string, "sənt͡ʃáθən")
 
     def test_regex_set(self):
         # https://github.com/roedoejet/g2p/issues/15

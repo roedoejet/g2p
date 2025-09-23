@@ -27,6 +27,7 @@ from g2p.tests.test_langs import LangTest
 from g2p.tests.test_lexicon_transducer import LexiconTransducerTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkLiteTest, NetworkTest
+from g2p.tests.test_neural import NeuralTransducerTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_transducer import TransducerTest
@@ -76,6 +77,8 @@ LANGS_TESTS = [
     ]
 ]
 
+NEURAL_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [NeuralTransducerTest]]
+
 INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test)
     for test in [
@@ -120,7 +123,7 @@ def describe_suite(suite: TestSuite):
     )
 
 
-SUITES = ("all", "dev", "integ", "langs", "mappings", "trans")
+SUITES = ("all", "dev", "integ", "langs", "mappings", "trans", "neural")
 
 
 def run_tests(suite: str, describe: bool = False, verbosity: int = 3) -> bool:
@@ -146,6 +149,8 @@ def run_tests(suite: str, describe: bool = False, verbosity: int = 3) -> bool:
         test_suite = TestSuite(MAPPINGS_TESTS)
     elif suite == "integ":
         test_suite = TestSuite(INTEGRATION_TESTS)
+    elif suite == "neural":
+        test_suite = TestSuite(NEURAL_TESTS)
     elif suite == "dev":
         test_suite = TestSuite(DEV_TESTS)
     else:
