@@ -5,6 +5,7 @@ Utilities used by other classes
 """
 
 import csv
+import functools
 import json
 import os
 import unicodedata as ud
@@ -46,6 +47,115 @@ from g2p.shared_types import Token
 
 GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
+
+
+def has_neural_support():
+    """Check if neural optional dependencies are installed."""
+    try:
+        import dp  # noqa: F401
+        import huggingface_hub  # noqa: F401
+        import torch  # noqa: F401
+
+        return True
+    except ImportError:
+        return False
+
+
+def requires_neural(func):
+    """Decorator to ensure neural dependencies are available."""
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if not has_neural_support():
+            raise ImportError(
+                f"Function '{func.__name__}' requires neural dependencies. "
+                "Install with: pip install g2p[neural]"
+            )
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@requires_neural
+def deep_phonemizer_handler(
+    model_path: Path,
+    config_kwargs: dict,
+    to_convert: str,
+) -> str:
+    from dp.phonemizer import Phonemizer
+
+    phonemizer = Phonemizer.from_checkpoint(model_path)
+    to_convert_list = to_convert.split()
+    result = phonemizer.phonemise_list(
+        to_convert_list, lang=config_kwargs.get("lang", "default")
+    )
+    return " ".join(result.phonemes)
+
+
+@requires_neural
+def download_huggingface_model(
+    model_id: str,
+    local_dir: Optional[Union[str, Path]] = None,
+    filename: Optional[str] = None,
+    cache_dir: Optional[Union[str, Path]] = None,
+    revision: str = "main",
+    force_download: bool = False,
+) -> Path:
+    """
+    Download a HuggingFace model or specific file from a model repository.
+
+    Args:
+        model_id: HuggingFace model identifier (e.g., "LOBOT-PENAC/g2p")
+        local_dir: Local directory to save the model. If None, uses HF cache.
+        filename: Specific file within the repo to download. If None, downloads entire repo.
+        cache_dir: Custom cache directory. If None, uses default HF cache.
+        revision: Git revision (branch, tag, or commit) to download from.
+        force_download: Whether to force re-download even if cached.
+
+    Returns:
+        Path to the downloaded model/file.
+
+    Raises:
+        ImportError: If huggingface_hub is not installed.
+        Exception: If download fails.
+    """
+    from huggingface_hub import (
+        hf_hub_download,
+        snapshot_download,
+        try_to_load_from_cache,
+    )
+
+    # if the model is already cached, just return that
+    if filename:
+        cached = try_to_load_from_cache(repo_id=model_id, filename=filename)
+        if not force_download and cached:
+            return cached
+
+    try:
+        if filename is not None:
+            # Download specific file
+            downloaded_path = hf_hub_download(
+                repo_id=model_id,
+                filename=filename,
+                local_dir=local_dir,
+                cache_dir=cache_dir,
+                revision=revision,
+                force_download=force_download,
+            )
+            return Path(downloaded_path)
+        else:
+            # Download entire repository
+            downloaded_path = snapshot_download(
+                repo_id=model_id,
+                local_dir=local_dir,
+                cache_dir=cache_dir,
+                revision=revision,
+                force_download=force_download,
+            )
+            return Path(downloaded_path)
+
+    except Exception as e:
+        raise Exception(f"Failed to download {model_id}: {str(e)}")
 
 
 class Rule(BaseModel):
@@ -760,6 +870,11 @@ class MAPPING_TYPE(str, Enum):
     mapping = "mapping"
     unidecode = "unidecode"
     lexicon = "lexicon"
+    neural = "neural"
+
+
+class NEURAL_MODEL_HANDLER(str, Enum):
+    deepphonemizer = "deepphonemizer"
 
 
 class NORM_FORM_ENUM(str, Enum):
@@ -837,8 +952,8 @@ class _MappingModelDefinition(BaseModel):
     """Converts each rule into an intermediary form in the Unicode PUA"""
 
     type: Optional[MAPPING_TYPE] = None
-    """Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing) or
-        "lexicon" (lookup in an aligned lexicon)."""
+    """Type of mapping, either "mapping" (rules), "unidecode" (magical Unicode guessing),
+        "lexicon" (lookup in an aligned lexicon), or "neural" (3rd party neural model, only available for some languages)."""
 
     alignments: List[str] = []
     """The alignments for a lexicon mapping"""
@@ -862,6 +977,16 @@ class _MappingModelDefinition(BaseModel):
 
     rules_path: Optional[Path] = None
     """A path to a file of a list of rules"""
+
+    hf_model_identifier: Optional[str] = None
+    """The identifier for a model hosted on HuggingFace, if applicable"""
+
+    hf_model_filepath: Optional[str] = None
+    """The path to the specific model on HuggingFace if downloading the entire repo is not needed"""
+
+    neural_model_handler: Optional[NEURAL_MODEL_HANDLER] = None
+
+    neural_kwargs: Optional[dict] = None
 
     model_config = ConfigDict(str_strip_whitespace=False, extra="allow")
 

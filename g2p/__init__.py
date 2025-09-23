@@ -38,7 +38,7 @@ if sys.version_info < (3, 7):  # pragma: no cover
         "Please use a newer version of Python."
     )
 
-_g2p_cache: Dict[Tuple[str, str, bool, int], BaseTransducer] = {}
+_g2p_cache: Dict[Tuple[str, str, bool, bool, int], BaseTransducer] = {}
 
 
 def make_g2p(  # noqa: C901
@@ -47,6 +47,7 @@ def make_g2p(  # noqa: C901
     *,
     tokenize: bool = True,
     custom_tokenizer: Optional[BaseTokenizer] = None,
+    neural: bool = False,
 ) -> BaseTransducer:
     """Make a g2p Transducer for mapping text from in_lang to out_lang via the
     shortest path between them.
@@ -63,6 +64,7 @@ def make_g2p(  # noqa: C901
                          segmented your text into words without punctuation
         custom_tokenizer (Tokenizer): the tokenizer to use (default: a tokenizer
                                       built on the path from in_lang and out_lang)
+        neural (bool): whether to use a neural model if it is available (default: False)
 
     Returns:
         Transducer from in_lang to out_lang, optionally with a tokenizer.
@@ -77,8 +79,8 @@ def make_g2p(  # noqa: C901
     from g2p.mappings.langs import LANGS_NETWORK
     from g2p.transducer import CompositeTransducer, TokenizingTransducer, Transducer
 
-    if (in_lang, out_lang, tokenize, id(custom_tokenizer)) in _g2p_cache:
-        return _g2p_cache[(in_lang, out_lang, tokenize, id(custom_tokenizer))]
+    if (in_lang, out_lang, tokenize, neural, id(custom_tokenizer)) in _g2p_cache:
+        return _g2p_cache[(in_lang, out_lang, tokenize, neural, id(custom_tokenizer))]
 
     # Check in_lang is a node in network
     if in_lang not in LANGS_NETWORK.nodes:
@@ -110,7 +112,7 @@ def make_g2p(  # noqa: C901
     # Find all mappings needed
     mappings_needed = []
     for lang1, lang2 in zip(path[:-1], path[1:]):
-        mapping = Mapping.find_mapping(in_lang=lang1, out_lang=lang2)
+        mapping = Mapping.find_mapping(in_lang=lang1, out_lang=lang2, neural=neural)
         LOGGER.debug(
             f"Adding mapping between {lang1} and {lang2} to composite transducer."
         )
@@ -130,7 +132,7 @@ def make_g2p(  # noqa: C901
         tokenizer = make_tokenizer(in_lang=in_lang, tok_path=path)
         transducer = TokenizingTransducer(transducer, tokenizer)
 
-    _g2p_cache[(in_lang, out_lang, tokenize, id(custom_tokenizer))] = transducer
+    _g2p_cache[(in_lang, out_lang, tokenize, neural, id(custom_tokenizer))] = transducer
     return transducer
 
 

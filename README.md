@@ -66,7 +66,6 @@ $ cd g2p
 $ pip install -e .
 ```
 
-
 ## Usage
 
 The easiest way to create a transducer is to use the `g2p.make_g2p` function.
@@ -163,6 +162,17 @@ transducer = Transducer(mapping)
 transducer('cad') # returns "cbd"
 ```
 
+### Neural G2P models
+
+The main functionality of this library is to provide lightweight, index-preserving g2p for many languages. However, we also support some neural g2p models. These can be accessed by first installing the necessary neural packages with `pip install g2p[neural]`. Then, when creating a g2p object, add the neural flag like so:
+
+```python
+>>> neural_transducer = make_g2p('str', 'str-ipa', neural=True)
+>>> transducer('SENĆOŦEN').output_string
+'sənt͡ʃáθən'
+```
+
+Note: neural models are not yet accessible via our API or the G2P Studio.
 
 ## CLI
 

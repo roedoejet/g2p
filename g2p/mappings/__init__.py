@@ -73,19 +73,31 @@ class Mapping(_MappingModelDefinition):
 
     @staticmethod
     def find_mapping(
-        in_lang: Union[None, str] = None, out_lang: Union[None, str] = None
+        in_lang: Union[None, str] = None,
+        out_lang: Union[None, str] = None,
+        neural: bool = False,
     ) -> "Mapping":
         """Given an input and an output language, find a mapping to get between them."""
         if in_lang is None or out_lang is None:
             raise exceptions.MappingMissing(in_lang, out_lang)
+        fallback_mapping = None
         for mapping in MAPPINGS_AVAILABLE:
+            # Don't return a neural mapping if neural is False
+            if not neural and mapping.type == MAPPING_TYPE.neural:
+                continue
             if mapping.in_lang == in_lang and mapping.out_lang == out_lang:
-                if mapping.type == "lexicon":
-                    # do *not* deep copy this, because alignments are big!
-                    return mapping.model_copy()
-                else:
+                if neural and mapping.type == MAPPING_TYPE.neural:
                     return deepcopy(mapping)
-        raise exceptions.MappingMissing(in_lang, out_lang)
+                if mapping.type == MAPPING_TYPE.lexicon:
+                    # do *not* deep copy this, because alignments are big!
+                    fallback_mapping = mapping.model_copy()
+                else:
+                    fallback_mapping = deepcopy(mapping)
+
+        if fallback_mapping is None:
+            raise exceptions.MappingMissing(in_lang, out_lang)
+        else:
+            return fallback_mapping
 
     @staticmethod
     def find_mapping_by_id(map_id: str) -> "Mapping":
@@ -467,3 +479,7 @@ class MappingConfig(BaseModel):
 
 
 LANGS: Dict[str, MappingConfig] = {k: MappingConfig(**v) for k, v in _LANGS.items()}
+
+
+def deep_phonemizer_handler(mapping: Mapping):
+    pass
