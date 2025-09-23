@@ -3,6 +3,7 @@
 import os
 from unittest import TestCase, main
 
+from g2p import make_g2p
 from g2p.exceptions import MalformedMapping
 from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
@@ -199,6 +200,14 @@ class TransducerTest(TestCase):
         self.assertEqual(self.test_case_sensitive_transducer("'n").output_string, "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'N").output_string, "n̓")
         self.assertEqual(self.test_case_insensitive_transducer("'n").output_string, "n̓")
+
+    def test_neural(self):
+        rules_g2p = make_g2p("str", "str-ipa")
+        neural_g2p = make_g2p("str", "str-ipa", neural=True)
+        result_rules = rules_g2p("SENĆOŦEN")
+        self.assertEqual(result_rules.output_string, "sʌnt͡ʃɑθʌn")
+        result_neural = neural_g2p("SENĆOŦEN")
+        self.assertEqual(result_neural.output_string, "sənt͡ʃáθən")
 
     def test_regex_set(self):
         # https://github.com/roedoejet/g2p/issues/15

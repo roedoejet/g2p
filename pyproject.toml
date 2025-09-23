@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling", "hatch-vcs", "setuptools>=61.0.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -9,39 +9,37 @@ description = "Module for creating context-aware, rule-based G2P mappings that p
 readme = "README.md"
 license = "MIT"
 requires-python = ">= 3.7"
-authors = [
-    { name = "Aidan Pine", email = "hello@aidanpine.ca" },
-]
+authors = [{ name = "Aidan Pine", email = "hello@aidanpine.ca" }]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    "click>=8.0.4,<8.2.0",
-    "coloredlogs>=15.0.1",
-    "openpyxl",
-    "panphon>=0.19",
-    "panphon<0.21; python_version<'3.9'",
-    "panphon<0.22; python_version<'3.10'",
-    "panphon<0.21; platform_system=='Windows'",
-    "pydantic>=2.4, <2.9",  # pydantic 2.9.0 changes our schema
-    "pyyaml>=5.2",
-    "regex",
-    "setuptools<80",
-    "text_unidecode",
-    "tqdm",
-    "typing_extensions",
+  "click>=8.0.4,<8.2.0",
+  "coloredlogs>=15.0.1",
+  "openpyxl",
+  "panphon>=0.19",
+  "panphon<0.21; python_version<'3.9'",
+  "panphon<0.22; python_version<'3.10'",
+  "panphon<0.21; platform_system=='Windows'",
+  "pydantic>=2.4, <2.9",                      # pydantic 2.9.0 changes our schema
+  "pyyaml>=5.2",
+  "regex",
+  "setuptools<80",
+  "text_unidecode",
+  "tqdm",
+  "typing_extensions",
 ]
 
 [project.optional-dependencies]
 api = [
-    # See https://github.com/encode/starlette/discussions/2413
-    "fastapi>=0.109.0",
-    "starlette>=0.40.0",
-    "python-socketio>=5.9.0",
-    "uvicorn",
-    "jinja2",
+  # See https://github.com/encode/starlette/discussions/2413
+  "fastapi>=0.109.0",
+  "starlette>=0.40.0",
+  "python-socketio>=5.9.0",
+  "uvicorn",
+  "jinja2",
 ]
 test = [
   "g2p[api]; python_version >= '3.8'",
@@ -68,15 +66,20 @@ dev = [
 # happen.
 # See https://github.com/jazzband/pip-tools/issues/2002
 # See https://github.com/juftin/hatch-pip-compile/issues/78
-prod = [
-  "gunicorn>=22.0.0",
-]
+prod = ["gunicorn>=22.0.0"]
 docs = [
   "mkdocs>=1.5.2",
   "mkdocs-click>=0.8.0",
   "mkdocs-material>=9.2.5",
   "mkdocstrings[python]>=0.22.0",
   "mike>=1.1.2",
+]
+neural = ["g2p[deep-phonemizer]"]
+
+deep-phonemizer = [
+  "torch>=2.1.0,<2.6.0",
+  "huggingface_hub>0.35.0",
+  "deep-phonemizer @ git+https://github.com/roedoejet/DeepPhonemizer", # Eventually we should publish this on PyPI
 ]
 
 [project.scripts]
@@ -93,6 +96,9 @@ include-package-data = true
 
 [tool.hatch.version]
 source = "vcs"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.hooks.vcs]
 version-file = "g2p/_version.py"
@@ -117,24 +123,20 @@ __version_tuple__ = version_tuple = {version_tuple!r}
 """
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "/g2p",
-]
+include = ["/g2p"]
 
 [tool.hatch.env]
-requires = [
-    "hatch-pip-compile"
-]
+requires = ["hatch-pip-compile"]
 
 [tool.hatch.envs.api]
-features = [ "api" ]
+features = ["api"]
 
 [tool.hatch.envs.api.scripts]
 serve = "uvicorn g2p.app:APP --reload --port 5000"
 
 [tool.hatch.envs.prod]
 template = "api"
-features = [ "api", "prod" ]
+features = ["api", "prod"]
 type = "pip-compile"
 python = "3.12"
 lock-filename = "requirements.txt"
@@ -144,7 +146,7 @@ pip-compile-verbose = false
 serve = "gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --bind 0.0.0.0:5000"
 
 [tool.hatch.envs.test]
-features = [ "test" ]
+features = ["test"]
 
 [[tool.hatch.envs.test.matrix]]
 python = ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -154,21 +156,12 @@ serve-cov = "coverage run run_studio.py"
 test = "python run_tests.py dev"
 test-cov = "coverage run run_tests.py dev"
 test-studio = "python g2p/tests/test_studio.py"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]
 
 [tool.hatch.envs.dev]
-features = [ "dev" ]
-post-install-commands = [
-  "pre-commit install",
-  "gitlint install-hook || true",
-]
+features = ["dev"]
+post-install-commands = ["pre-commit install", "gitlint install-hook || true"]
 
 [tool.hatch.envs.dev.scripts]
 check = "mypy {args:g2p}"
@@ -177,10 +170,7 @@ check = "mypy {args:g2p}"
 source_pkgs = ["g2p"]
 branch = true
 parallel = true
-omit = [
-  "g2p/_version.py",
-  "g2p/tests/**/*.py",
-]
+omit = ["g2p/_version.py", "g2p/tests/**/*.py"]
 
 [tool.coverage.report]
 precision = 2
@@ -199,24 +189,21 @@ ignore_packages = ["text-unidecode"]
 
 [tool.pylint.main]
 # Unsure how to make pylint recursively ignore
-ignore = [
-       "g2p/tests",
-       "g2p/tests/public",
-       "g2p/tests/public/data",
-]
+ignore = ["g2p/tests", "g2p/tests/public", "g2p/tests/public/data"]
 
 [tool.pylint.messages_control]
 # This is TOO LONG but the code is that way for the moment
 max-line-length = 120
 good-names = [
-    # We use single letter e for exception, f for file handles
-    "e", "f",
+  # We use single letter e for exception, f for file handles
+  "e",
+  "f",
 ]
 disable = [
-    # We do this to speed loading time, sorry pylint but not sorry
-    "import-outside-toplevel",
-    # We use isort for sorting our imports, so nevermind what pylint thinks
-    "wrong-import-order",
-    # I find the "unnecessary" else makes code more readable
-    "no-else-return",
+  # We do this to speed loading time, sorry pylint but not sorry
+  "import-outside-toplevel",
+  # We use isort for sorting our imports, so nevermind what pylint thinks
+  "wrong-import-order",
+  # I find the "unnecessary" else makes code more readable
+  "no-else-return",
 ]

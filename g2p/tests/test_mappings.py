@@ -12,7 +12,7 @@ from unittest import TestCase, main
 
 from pydantic import ValidationError
 
-from g2p import exceptions
+from g2p import exceptions, make_g2p
 from g2p.exceptions import InvalidNormalization
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, Rule
@@ -47,6 +47,12 @@ class MappingTest(TestCase):
             encoding="utf8",
         ) as f:
             self.json_map = json.load(f)
+
+    def test_find_mappings(self):
+        rules_mapping = make_g2p("str", "str-ipa")
+        neural_mapping = make_g2p("str", "str-ipa", neural=True)
+        self.assertIsNone(rules_mapping.transducers[-1].mapping.type)
+        self.assertIsNotNone(neural_mapping.transducers[-1].mapping.type)
 
     def test_normalization(self):
         self.assertEqual(
@@ -246,11 +252,11 @@ class MappingTest(TestCase):
         transducer_none = Transducer(mapping_none)
 
         self.assertEqual(transducer_nfc("a\u0301").output_string, "a")
-        self.assertEqual(transducer_nfc("\u00E1").output_string, "a")
+        self.assertEqual(transducer_nfc("\u00e1").output_string, "a")
         self.assertEqual(transducer_nfd("a\u0301").output_string, "a")
-        self.assertEqual(transducer_nfd("\u00E1").output_string, "a")
+        self.assertEqual(transducer_nfd("\u00e1").output_string, "a")
         self.assertEqual(transducer_none("a\u0301").output_string, "a")
-        self.assertEqual(transducer_none("\u00E1").output_string, "\u00E1")
+        self.assertEqual(transducer_none("\u00e1").output_string, "\u00e1")
 
     def test_reverse(self):
         mapping = Mapping(rules=[{"in": "a", "out": "b"}])

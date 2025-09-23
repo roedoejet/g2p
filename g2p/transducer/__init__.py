@@ -7,6 +7,7 @@ import copy
 import re
 import unicodedata
 from collections import OrderedDict, defaultdict
+from functools import partial
 from typing import DefaultDict, Dict, List, Optional, Set, Tuple, Union
 
 import text_unidecode  # type: ignore
@@ -15,8 +16,11 @@ from g2p.log import LOGGER
 from g2p.mappings import MAPPING_TYPE, Mapping
 from g2p.mappings.langs.utils import is_arpabet, is_panphon
 from g2p.mappings.utils import (
+    NEURAL_MODEL_HANDLER,
     Rule,
     compose_indices,
+    deep_phonemizer_handler,
+    download_huggingface_model,
     find_alignment,
     is_ipa,
     normalize,
@@ -429,6 +433,9 @@ class Transducer(BaseTransducer):
         self.out_delimiter = mapping.out_delimiter
         self._index_match_pattern = re.compile(r"(?<={)\d+(?=})")
         self._char_match_pattern = re.compile(r"[^0-9\{\}]+(?={\d+})", re.U)
+        self.neural_handlers = {
+            str(NEURAL_MODEL_HANDLER.deepphonemizer): deep_phonemizer_handler
+        }
 
     def __repr__(self):
         return f"{self.__class__} between {self.mapping.in_lang} and {self.mapping.out_lang}"
@@ -867,7 +874,7 @@ class Transducer(BaseTransducer):
             return self.apply_unidecode(to_convert)
         elif self.mapping.type == MAPPING_TYPE.lexicon:
             return self.apply_lexicon(to_convert)
-        # perform any normalization
+        # perform any normalization TODO-for-review: Are we sure we don't want to apply normalization to the string before the lexicon mapping?
         to_convert = unicode_escape(to_convert)
         saved_to_convert = to_convert
         if not self.case_sensitive:
@@ -881,6 +888,34 @@ class Transducer(BaseTransducer):
         tg = TransductionGraph(to_convert)
         tg.debugger.append([])
 
+        # apply neural transformation after normalization TODO-for-review: maybe the lexicon and unidecode should go here too.
+        if self.mapping.type == MAPPING_TYPE.neural:
+            neural_handler_id = "-".join(
+                [
+                    str(self.mapping.neural_model_handler),
+                    self.mapping.in_lang,
+                    self.mapping.out_lang,
+                ]
+            )
+            # check that the specific model handler is available, otherwise construct it.
+            if neural_handler_id not in self.neural_handlers:
+                ckpt = download_huggingface_model(
+                    self.mapping.hf_model_identifier,
+                    filename=self.mapping.hf_model_filepath,
+                )
+                self.neural_handlers[neural_handler_id] = partial(
+                    self.neural_handlers[str(self.mapping.neural_model_handler)],
+                    ckpt,
+                    self.mapping.neural_kwargs,
+                )
+            self.update_default_indices(
+                tg,
+                0,
+                defaultdict(int, {n: 0 for n in range(len(tg.output_string))}),
+                to_convert,
+                self.neural_handlers[neural_handler_id](to_convert),
+            )
+            return tg
         # initialize values
         intermediate_forms = False
         # iterate rules
