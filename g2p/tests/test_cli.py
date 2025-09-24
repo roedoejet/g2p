@@ -7,7 +7,7 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
 import jsonschema
 import yaml
@@ -23,6 +23,7 @@ from g2p.cli import (
     update,
     update_schema,
 )
+from g2p.exceptions import NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings import MappingConfig
 from g2p.mappings.langs import (
@@ -229,6 +230,14 @@ class CliTest(TestCase):
                 f"{in_lang}->{out_lang} mapping error for '{word_to_convert}'.\n"
                 "Look for warnings in the log for any more mapping errors",
             )
+
+    def test_convert_neural(self):
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
+            with self.assertRaises(NeuralDependencyError):
+                result = self.runner.invoke(
+                    convert, ["--neural", "hello world", "str", "str-ipa"]
+                )
+                raise result.exception
 
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")
