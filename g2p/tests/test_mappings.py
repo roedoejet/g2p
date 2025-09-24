@@ -6,6 +6,7 @@ import os
 import re
 import unicodedata as ud
 from contextlib import redirect_stderr
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List
 from unittest import TestCase, main, mock
@@ -51,9 +52,27 @@ class MappingTest(TestCase):
     def test_find_mappings(self):
         rules_mapping = make_g2p("str", "str-ipa")
         self.assertIsNone(rules_mapping.transducers[-1].mapping.type)
+
+    def test_neural_not_available_raises_exception(self):
+        from g2p.mappings.utils import (
+            deep_phonemizer_handler,
+            download_huggingface_model,
+            has_neural_support,
+        )
+
+        # Call things that need neural with a mock context simulating not having
+        # installed the dependencies, even when they are actually installed
         with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
             with self.assertRaises(NeuralDependencyError):
                 make_g2p("str", "str-ipa", neural=True)
+            with self.assertRaises(NeuralDependencyError):
+                deep_phonemizer_handler(Path(), {}, "foo")
+            with self.assertRaises(NeuralDependencyError):
+                download_huggingface_model("foo")
+
+        # calling has_neural_support should return a Bool without raising any exception,
+        # but we can't assert the value since we don't know if neural deps are installed
+        self.assertTrue(isinstance(has_neural_support(), bool))
 
     def test_normalization(self):
         self.assertEqual(
