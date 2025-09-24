@@ -51,7 +51,7 @@ class MappingTest(TestCase):
     def test_find_mappings(self):
         rules_mapping = make_g2p("str", "str-ipa")
         self.assertIsNone(rules_mapping.transducers[-1].mapping.type)
-        with mock.patch("g2p.has_neural_support", return_value=False):
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
             with self.assertRaises(NeuralDependencyError):
                 make_g2p("str", "str-ipa", neural=True)
 

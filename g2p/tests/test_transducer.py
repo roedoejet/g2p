@@ -86,7 +86,7 @@ class TransducerTest(TestCase):
 
     def test_no_neural_dependencies(self):
         """This tests what happens if a user tries to create a neural g2p without installing the dependencies. Other neural tests (for when deps are installed are in test_neural.py module.)"""
-        with mock.patch("g2p.has_neural_support", return_value=False):
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
             with self.assertRaises(NeuralDependencyError):
                 make_g2p("foo", "bar", neural=True)
             with self.assertRaises(NeuralDependencyError):
