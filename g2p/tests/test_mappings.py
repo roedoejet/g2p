@@ -6,14 +6,15 @@ import os
 import re
 import unicodedata as ud
 from contextlib import redirect_stderr
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import List
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
 from pydantic import ValidationError
 
-from g2p import exceptions
-from g2p.exceptions import InvalidNormalization
+from g2p import exceptions, make_g2p
+from g2p.exceptions import InvalidNormalization, NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings import Mapping, Rule
 from g2p.mappings.utils import NORM_FORM_ENUM, RULE_ORDERING_ENUM, normalize
@@ -47,6 +48,31 @@ class MappingTest(TestCase):
             encoding="utf8",
         ) as f:
             self.json_map = json.load(f)
+
+    def test_find_mappings(self):
+        rules_mapping = make_g2p("str", "str-ipa")
+        self.assertIsNone(rules_mapping.transducers[-1].mapping.type)
+
+    def test_neural_not_available_raises_exception(self):
+        from g2p.mappings.utils import (
+            deep_phonemizer_handler,
+            download_huggingface_model,
+            has_neural_support,
+        )
+
+        # Call things that need neural with a mock context simulating not having
+        # installed the dependencies, even when they are actually installed
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
+            with self.assertRaises(NeuralDependencyError):
+                make_g2p("str", "str-ipa", neural=True)
+            with self.assertRaises(NeuralDependencyError):
+                deep_phonemizer_handler(Path(), {}, "foo")
+            with self.assertRaises(NeuralDependencyError):
+                download_huggingface_model("foo")
+
+        # calling has_neural_support should return a Bool without raising any exception,
+        # but we can't assert the value since we don't know if neural deps are installed
+        self.assertTrue(isinstance(has_neural_support(), bool))
 
     def test_normalization(self):
         self.assertEqual(
@@ -246,11 +272,11 @@ class MappingTest(TestCase):
         transducer_none = Transducer(mapping_none)
 
         self.assertEqual(transducer_nfc("a\u0301").output_string, "a")
-        self.assertEqual(transducer_nfc("\u00E1").output_string, "a")
+        self.assertEqual(transducer_nfc("\u00e1").output_string, "a")
         self.assertEqual(transducer_nfd("a\u0301").output_string, "a")
-        self.assertEqual(transducer_nfd("\u00E1").output_string, "a")
+        self.assertEqual(transducer_nfd("\u00e1").output_string, "a")
         self.assertEqual(transducer_none("a\u0301").output_string, "a")
-        self.assertEqual(transducer_none("\u00E1").output_string, "\u00E1")
+        self.assertEqual(transducer_none("\u00e1").output_string, "\u00e1")
 
     def test_reverse(self):
         mapping = Mapping(rules=[{"in": "a", "out": "b"}])

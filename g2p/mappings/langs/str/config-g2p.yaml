@@ -20,4 +20,19 @@ mappings:
     case_sensitive: true
     authors:
       - Aidan Pine
+      - Marion Caldecott
+    <<: *shared
+  - display_name: SENĆOŦEN to IPA
+    in_lang: str-equiv
+    out_lang: str-ipa
+    type: neural
+    norm_form: NFC
+    hf_model_identifier: LOBOT-PENAC/g2p
+    hf_model_filepath: model_step_420k.pt
+    neural_kwargs:
+      lang: str
+    neural_model_handler: deepphonemizer
+    authors:
+      - Aidan Pine
+      - Timothy Montler
     <<: *shared

@@ -22,7 +22,12 @@ from g2p.constants import (
     LANGS_FILE_NAME,
     NETWORK_FILE_NAME,
 )
-from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
+from g2p.exceptions import (
+    InvalidLanguageCode,
+    MappingMissing,
+    NeuralDependencyError,
+    NoPath,
+)
 from g2p.static import __file__ as static_file
 
 PRINTER = pprint.PrettyPrinter(indent=4)
@@ -457,6 +462,13 @@ def generate_mapping(  # noqa: C901
     help="Check IPA outputs against panphon and/or eng-arpabet output against ARPABET",
 )
 @click.option(
+    "--neural/--no-neural",
+    "-n",
+    default=False,
+    is_flag=True,
+    help="Allow neural mappings if available. Requires installation of optional neural dependencies (pip install g2p[neural])",
+)
+@click.option(
     "--tok-lang",
     default=None,
     help="Override the tokenizing language. Implies --tok.",
@@ -489,6 +501,7 @@ def convert(  # noqa: C901
     file,
     debugger,
     pretty_edges,
+    neural,
     tok_lang,
     config,
     substring_alignments,
@@ -538,6 +551,13 @@ def convert(  # noqa: C901
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
+    # --neural requires neural dependencies
+    if neural:
+        from g2p.mappings.utils import has_neural_support
+
+        if not has_neural_support():
+            raise click.UsageError("--neural requested: " + NeuralDependencyError().msg)
+
     to_close = None
     try:
         if file:
@@ -566,7 +586,11 @@ def convert(  # noqa: C901
         # Transduce!!!
         assert in_lang and out_lang
         transducer = make_g2p(
-            in_lang, out_lang, tokenize=tok, custom_tokenizer=custom_tokenizer
+            in_lang,
+            out_lang,
+            tokenize=tok,
+            neural=neural,
+            custom_tokenizer=custom_tokenizer,
         )
         no_tok_warning_printed = False
         for line in lines:

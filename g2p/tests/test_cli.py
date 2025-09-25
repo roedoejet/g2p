@@ -7,7 +7,7 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
 import jsonschema
 import yaml
@@ -229,6 +229,14 @@ class CliTest(TestCase):
                 f"{in_lang}->{out_lang} mapping error for '{word_to_convert}'.\n"
                 "Look for warnings in the log for any more mapping errors",
             )
+
+    def test_convert_neural(self):
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
+            result = self.runner.invoke(
+                convert, ["--neural", "hello world", "str", "str-ipa"]
+            )
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("requires neural", result.stdout)
 
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")
