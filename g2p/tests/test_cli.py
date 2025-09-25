@@ -23,7 +23,6 @@ from g2p.cli import (
     update,
     update_schema,
 )
-from g2p.exceptions import NeuralDependencyError
 from g2p.log import LOGGER
 from g2p.mappings import MappingConfig
 from g2p.mappings.langs import (
@@ -233,11 +232,11 @@ class CliTest(TestCase):
 
     def test_convert_neural(self):
         with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
-            with self.assertRaises(NeuralDependencyError):
-                result = self.runner.invoke(
-                    convert, ["--neural", "hello world", "str", "str-ipa"]
-                )
-                raise result.exception
+            result = self.runner.invoke(
+                convert, ["--neural", "hello world", "str", "str-ipa"]
+            )
+        self.assertNotEqual(result.exit_code, 0)
+        self.assertIn("requires neural", result.stdout)
 
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")

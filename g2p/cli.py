@@ -22,7 +22,12 @@ from g2p.constants import (
     LANGS_FILE_NAME,
     NETWORK_FILE_NAME,
 )
-from g2p.exceptions import InvalidLanguageCode, MappingMissing, NoPath
+from g2p.exceptions import (
+    InvalidLanguageCode,
+    MappingMissing,
+    NeuralDependencyError,
+    NoPath,
+)
 from g2p.static import __file__ as static_file
 
 PRINTER = pprint.PrettyPrinter(indent=4)
@@ -546,6 +551,13 @@ def convert(  # noqa: C901
         raise click.UsageError(
             f"Path between '{in_lang}' and '{out_lang}' does not exist"
         )
+    # --neural requires neural dependencies
+    if neural:
+        from g2p.mappings.utils import has_neural_support
+
+        if not has_neural_support():
+            raise click.UsageError("--neural requested: " + NeuralDependencyError().msg)
+
     to_close = None
     try:
         if file:
