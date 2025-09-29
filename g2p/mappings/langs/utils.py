@@ -201,6 +201,7 @@ def network_to_echart(outfile: Optional[str] = None, layout: bool = False):
                 2, ((no_ancestors / no_nodes) * 100 + (no_descendants / no_nodes) * 100)
             ),
         )
+        size = round(size, 2)
         node = {"name": node, "symbolSize": size, "id": node, "category": lang_name}
         nodes.append(node)
     nodes.sort(key=lambda x: x["name"])

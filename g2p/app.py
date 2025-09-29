@@ -124,7 +124,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
         steps = 1
     for ind, tier in enumerate(tg.tiers):
         if ind == 0:
-            symbol_size = min(300 / max(1, len(tier.input_string)), 40)
+            symbol_size = round(min(300 / max(1, len(tier.input_string)), 40), 2)
             input_x = x + (ind * diff)
             input_y = 300
             x += diff
@@ -153,7 +153,7 @@ def return_echart_data(tg: Union[CompositeTransductionGraph, TransductionGraph])
             if x[1] is not None
         ]
         index_offset += len(tier.input_string)
-        symbol_size = min(300 / max(1, len(tier.output_string)), 40)
+        symbol_size = round(min(300 / max(1, len(tier.output_string)), 40), 2)
         colour = shade_colour(colour, (1 / steps) * 350, g=50, b=20)
         output_x = x + (ind * diff)
         output_y = 300
