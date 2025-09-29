@@ -28,6 +28,7 @@ dependencies = [
     "pydantic>=2.4, <2.9",  # pydantic 2.9.0 changes our schema
     "pyyaml>=5.2",
     "regex",
+    "setuptools<80",
     "text_unidecode",
     "tqdm",
     "typing_extensions",
