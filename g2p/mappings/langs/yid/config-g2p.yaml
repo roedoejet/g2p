@@ -6,12 +6,15 @@ mappings:
     out_lang: yid-ipa
     abbreviations_path: abbreviations.csv
     authors:
-      - Aidan Pine
       - Hannah Pandher
+      - Avery Ozburn
+      - Yanfei Lu
+      - Eric Joanis
+      - Aidan Pine
     type: mapping
     rules_path: yid_to_ipa.csv
     prevent_feeding: false
-    rule_ordering: as-written
+    rule_ordering: apply-longest-first
     case_sensitive: false
     norm_form: NFD
     <<: *shared
