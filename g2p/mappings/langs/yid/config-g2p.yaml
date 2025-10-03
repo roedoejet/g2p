@@ -1,0 +1,20 @@
+<<: &shared
+  language_name: Yiddish
+mappings:
+  - display_name: Yiddish to IPA
+    in_lang: yid
+    out_lang: yid-ipa
+    abbreviations_path: abbreviations.csv
+    authors:
+      - Hannah Pandher
+      - Avery Ozburn
+      - Yanfei Lu
+      - Eric Joanis
+      - Aidan Pine
+    type: mapping
+    rules_path: yid_to_ipa.csv
+    prevent_feeding: false
+    rule_ordering: apply-longest-first
+    case_sensitive: false
+    norm_form: NFD
+    <<: *shared
