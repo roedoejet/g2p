@@ -73,7 +73,7 @@ pydantic-core==2.20.1
     # via pydantic
 python-engineio==4.12.2
     # via python-socketio
-python-socketio==5.13.0
+python-socketio==5.14.0
     # via hatch.envs.prod
 pyyaml==6.0.2
     # via
