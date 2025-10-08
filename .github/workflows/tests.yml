@@ -90,8 +90,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          # Note: this is where we also test that the g2p library still works on 3.7
-          python-version: "3.7"
+          # Note: this is where we also test that the g2p library still works on 3.8
+          python-version: "3.8"
       - name: Install dependencies
         shell: bash
         run: |
@@ -106,7 +106,7 @@ jobs:
 
   test-heroku-env:
     # Replicate what heroku will run
-    runs-on: ubuntu-22.04  # https://devcenter.heroku.com/articles/heroku-22-stack
+    runs-on: ubuntu-22.04 # https://devcenter.heroku.com/articles/heroku-22-stack
     steps:
       - uses: actions/checkout@v4
       - name: Read the Heroku run time env and cmd

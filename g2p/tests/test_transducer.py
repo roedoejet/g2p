@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 import os
-from unittest import TestCase, main
+from unittest import TestCase, main, mock
 
-from g2p.exceptions import MalformedMapping
+from g2p import make_g2p
+from g2p.exceptions import MalformedMapping, NeuralDependencyError
 from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
 from g2p.transducer import CompositeTransducer, Transducer, normalize_edges
@@ -82,6 +83,14 @@ class TransducerTest(TestCase):
                 os.path.join(PUBLIC_DIR, "mappings", "deletion_config_json.yaml")
             )
         )
+
+    def test_no_neural_dependencies(self):
+        """This tests what happens if a user tries to create a neural g2p without installing the dependencies. Other neural tests (for when deps are installed are in test_neural.py module.)"""
+        with mock.patch("g2p.mappings.utils.has_neural_support", return_value=False):
+            with self.assertRaises(NeuralDependencyError):
+                make_g2p("foo", "bar", neural=True)
+            with self.assertRaises(NeuralDependencyError):
+                make_g2p("str", "str-ipa", neural=True)
 
     def test_properties(self):
         """Test all the basic properties of transducers."""

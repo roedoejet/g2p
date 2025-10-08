@@ -165,6 +165,7 @@ class TokenizeAndMapTest(TestCase):
             g2p.make_g2p("fra", "fra-ipa", tokenize=False),
             g2p.make_g2p("fra", "fra-ipa", tokenize=False),
         )
+
         self.assertIsNot(
             g2p.make_g2p("fra", "fra-ipa", tokenize=True),
             g2p.make_g2p("fra", "fra-ipa", tokenize=False),
