@@ -55,3 +55,16 @@ mappings:
     authors:
       - David Huggins-Daines
     <<: *shared
+  - display_name: English to IPA
+    type: neural
+    in_lang: eng
+    out_lang: eng-ipa
+    neural_model_handler: deepphonemizer
+    hf_model_identifier: NRC-CNRC/en_us_cmudict_ipa_forward_g2p
+    hf_model_filepath: en_us_cmudict_ipa_forward.pt
+    neural_kwargs:
+      lang: en_us
+    authors:
+      - Christian Schäfer
+      - Aidan Pine
+    <<: *shared

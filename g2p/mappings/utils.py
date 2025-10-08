@@ -82,12 +82,17 @@ def deep_phonemizer_handler(
 ) -> str:
     from deep_phonemizer.phonemizer import Phonemizer
 
+    from g2p.mappings import Mapping
+    from g2p.transducer import Transducer
+
     phonemizer = Phonemizer.from_checkpoint(model_path)
     to_convert_list = to_convert.split()
     result = phonemizer.phonemise_list(
         to_convert_list, lang=config_kwargs.get("lang", "default")
     )
-    return " ".join(result.phonemes)
+    phonemized_string = " ".join(result.phonemes)
+    normalizer = Transducer(Mapping.find_mapping_by_id("ipa_normalization"))
+    return normalizer(phonemized_string).output_string
 
 
 @requires_neural
