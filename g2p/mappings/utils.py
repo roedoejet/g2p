@@ -53,7 +53,7 @@ GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
 def has_neural_support():
     """Check if neural optional dependencies are installed."""
     try:
-        import dp  # noqa: F401
+        import deep_phonemizer  # noqa: F401
         import huggingface_hub  # noqa: F401
         import torch  # noqa: F401
 
@@ -80,7 +80,7 @@ def deep_phonemizer_handler(
     config_kwargs: dict,
     to_convert: str,
 ) -> str:
-    from dp.phonemizer import Phonemizer
+    from deep_phonemizer.phonemizer import Phonemizer
 
     phonemizer = Phonemizer.from_checkpoint(model_path)
     to_convert_list = to_convert.split()

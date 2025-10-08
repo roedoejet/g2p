@@ -79,7 +79,7 @@ neural = ["g2p[deep-phonemizer]"]
 deep-phonemizer = [
   "torch>=2.1.0,<2.6.0",
   "huggingface_hub>0.35.0",
-  "deep-phonemizer @ git+https://github.com/roedoejet/DeepPhonemizer", # Eventually we should publish this on PyPI
+  "ilt-deep-phonemizer",
 ]
 
 # cannot put g2p[prod] here because that would break windows compat
