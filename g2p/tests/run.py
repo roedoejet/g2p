@@ -27,7 +27,7 @@ from g2p.tests.test_langs import LangTest
 from g2p.tests.test_lexicon_transducer import LexiconTransducerTest
 from g2p.tests.test_mappings import MappingTest
 from g2p.tests.test_network import NetworkLiteTest, NetworkTest
-from g2p.tests.test_neural import NeuralTransducerTest
+from g2p.tests.test_neural import NeuralLangTest
 from g2p.tests.test_tokenize_and_map import TokenizeAndMapTest
 from g2p.tests.test_tokenizer import TokenizerTest
 from g2p.tests.test_transducer import TransducerTest
@@ -80,7 +80,7 @@ LANGS_TESTS = [
 # We are excluding these tests from the dev suite because
 # they require torch and other heavy dependencies
 # and the tests also require downloading large g2p models
-NEURAL_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [NeuralTransducerTest]]
+NEURAL_TESTS = [LOADER.loadTestsFromTestCase(test) for test in [NeuralLangTest]]
 
 INTEGRATION_TESTS = [
     LOADER.loadTestsFromTestCase(test)
