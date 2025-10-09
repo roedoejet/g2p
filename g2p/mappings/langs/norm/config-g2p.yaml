@@ -6,6 +6,7 @@ mappings:
     id: ipa_normalization
     in_lang: ipa
     out_lang: ipa
+    norm_form: NFC
     rule_ordering: as-written
     authors:
       - Aidan Pine

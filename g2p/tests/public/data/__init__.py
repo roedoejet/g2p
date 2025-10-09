@@ -21,6 +21,42 @@ DATA_DIR = os.path.dirname(__file__)
 loaded_langs_to_test = None
 
 
+def read_data_file(fn, delimiter):
+    rows = []
+    with open(fn, encoding="utf-8") as csvfile:
+        reader = csv.reader(csvfile, delimiter=delimiter)
+        for i, row in enumerate(reader):
+            if len(row) == 0 or (len(row) == 1 and row[0].strip() == ""):
+                # skip empty and comment lines
+                continue
+            elif row[0][:1] == "#":
+                # skip comments, but check them for stray quotes
+                if "\n" in "".join(row):
+                    raise Exception(
+                        f"Comment on line {i+1} of {fn} absorbed the next data line(s)."
+                        "Please remove stray double quotes."
+                    )
+                continue
+            elif len(row) < 4:
+                LOGGER.warning(
+                    f"Row in {fn} containing values {row} does not have the right values."
+                    f"Please check your data."
+                )
+            else:
+                row.append(f"{fn}:{i+1}")
+                rows.append(row)
+    return rows
+
+
+def load_neural_test_data() -> List[List[str]]:
+    """Load neural data for test data
+
+    Returns:
+        List[List[in_lang, out_lang, in_text, out_text, filename:lineno]]
+    """
+    return read_data_file(os.path.join(DATA_DIR, "neural.psv"), "|")
+
+
 def load_public_test_data() -> List[List[str]]:
     """Load public/data/*.?sv for test data in various languages
 
@@ -32,34 +68,16 @@ def load_public_test_data() -> List[List[str]]:
 
     langs_to_test = []
     for fn in sorted(glob(os.path.join(DATA_DIR, "*.*sv"))):
+        if "neural" in fn:
+            continue
         if fn.endswith("csv"):
             delimiter = ","
         elif fn.endswith("psv"):
             delimiter = "|"
         elif fn.endswith("tsv"):
             delimiter = "\t"
-        with open(fn, encoding="utf-8") as csvfile:
-            reader = csv.reader(csvfile, delimiter=delimiter)
-            for i, row in enumerate(reader):
-                if len(row) == 0 or (len(row) == 1 and row[0].strip() == ""):
-                    # skip empty and comment lines
-                    continue
-                elif row[0][:1] == "#":
-                    # skip comments, but check them for stray quotes
-                    if "\n" in "".join(row):
-                        raise Exception(
-                            f"Comment on line {i+1} of {fn} absorbed the next data line(s)."
-                            "Please remove stray double quotes."
-                        )
-                    continue
-                elif len(row) < 4:
-                    LOGGER.warning(
-                        f"Row in {fn} containing values {row} does not have the right values."
-                        f"Please check your data."
-                    )
-                else:
-                    row.append(f"{fn}:{i+1}")
-                    langs_to_test.append(row)
+        if data := read_data_file(fn, delimiter):
+            langs_to_test += data
 
     loaded_langs_to_test = langs_to_test
     return langs_to_test
