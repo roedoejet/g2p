@@ -16,9 +16,9 @@ jobs:
     # This is our main test job, exercising everything and uploading to coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.9"
       - name: Install dependencies
@@ -38,11 +38,25 @@ jobs:
         run: coverage run run_tests.py dev
       - name: Run test-studio
         run: coverage run g2p/tests/test_studio.py
+
+      # Neural tests, with huggingface models cached
+      - name: Get week id
+        id: weekid
+        run: echo "WEEK_ID=$(date -u +%Y-%V)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v4
+        with:
+          key: g2p-neural-${{ steps.weekid.outputs.WEEK_ID }}
+          path: ~/.cache/huggingface
+      - run: pip install -e .[neural]
+      - run: coverage run g2p/tests/test_neural.py
+
       - name: Run generate-mapping
         shell: bash
         run: |
           coverage run $(which g2p) generate-mapping --from crg --to eng
           git status --porcelain=v1 | grep 'M g2p/mappings/langs/generated/config-g2p.yaml' || { echo 'g2p generate-mapping did not update generated/config-g2p.yaml as expected'; false; }
+
       - name: Post test analyses
         run: |
           pkill -INT coverage
@@ -56,6 +70,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"
+
       - name: Make sure the CLI stays fast
         id: cli-load-time
         run: |
@@ -77,7 +92,7 @@ jobs:
       - name: Report help speed in a PR comment
         if: github.event_name == 'pull_request'
         continue-on-error: true
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           preformatted: true
           message-path: import-message.txt
@@ -86,9 +101,9 @@ jobs:
     # Make sure stuff stays compatible with Windows by testing there too.
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           # Note: this is where we also test that the g2p library still works on 3.8
           python-version: "3.8"
@@ -108,12 +123,12 @@ jobs:
     # Replicate what heroku will run
     runs-on: ubuntu-22.04 # https://devcenter.heroku.com/articles/heroku-22-stack
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Read the Heroku run time env and cmd
         run: |
           echo "PYTHON_VERSION=$(cat runtime.txt | sed 's/python-//')" >> $GITHUB_ENV
           echo "RUNTIME_CMD=$(cat Procfile | sed 's/web: *//')" >> $GITHUB_ENV
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: python -m pip install --upgrade pip
@@ -131,7 +146,7 @@ jobs:
           pip install -r requirements.txt
           bin/post_compile
       - name: Launch the API
-        run: ${{ env.RUNTIME_CMD }} --bind localhost:5000 &
+        run: ${RUNTIME_CMD} --bind localhost:5000 &
       - name: Run the regular dev suite
         run: python run_tests.py dev
       - name: Run test-studio

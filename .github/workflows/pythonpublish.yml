@@ -26,14 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Validate version consistency
         run: |
           echo .SETUPTOOLS_SCM_PRETEND_VERSION=$(cat .SETUPTOOLS_SCM_PRETEND_VERSION)
           echo github.ref_name=${{ github.ref_name }}
           test v$(cat .SETUPTOOLS_SCM_PRETEND_VERSION) == $(echo ${{ github.ref_name }} | cut -d. -f1-2)
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.x'
       - name: Install build tool
@@ -88,11 +88,11 @@ jobs:
     needs:
       - github-release
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # fetch all commits/branches
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.8"
       - name: Install dependencies

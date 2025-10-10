@@ -12,26 +12,13 @@ or robust server mode (*nix only, gunicorn does not work on Windows):
     gunicorn --worker-class uvicorn.workers.UvicornWorker -w 1 g2p.app:APP --bind 0.0.0.0:5000 --daemon
 """
 
-import sys
 from datetime import datetime
 from random import sample
-
-if sys.version_info < (3, 8):  # pragma: no cover
-    sys.exit(
-        "g2p/tests/test_studio.py relies on unittest.IsolatedAsyncioTestCase,\n"
-        "which is only available in Python 3.8 or later.\n"
-        f"You are using Python {sys.version}."
-        "Please use a newer version of Python."
-    )
-
-# flake8: noqa: C901
 from unittest import IsolatedAsyncioTestCase, main
 
-import socketio  # type: ignore
-from playwright.async_api import async_playwright  # type: ignore
-from playwright.async_api import expect
+import socketio
+from playwright.async_api import async_playwright, expect
 
-from g2p.app import APP
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
 
