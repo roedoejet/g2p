@@ -77,7 +77,7 @@ jobs:
       - name: Report help speed in a PR comment
         if: github.event_name == 'pull_request'
         continue-on-error: true
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2.8.2
         with:
           preformatted: true
           message-path: import-message.txt
@@ -131,7 +131,7 @@ jobs:
           pip install -r requirements.txt
           bin/post_compile
       - name: Launch the API
-        run: ${{ env.RUNTIME_CMD }} --bind localhost:5000 &
+        run: ${RUNTIME_CMD} --bind localhost:5000 &
       - name: Run the regular dev suite
         run: python run_tests.py dev
       - name: Run test-studio
