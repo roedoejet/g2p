@@ -34,7 +34,17 @@ jobs:
         # Automatically check that we don't introduce imcompatibly licensed dependencies
         # text-unidecode is OK (Artistic License) but not detected automatically
         run: licensecheck --zero --ignore-packages text-unidecode --requirements-paths pyproject.toml
+      - name: Get current week number
+        run: echo "WEEK_NUMBER=$(date -u +%Y-%V)" >> $GITHUB_OUTPUT
+        id: weekno
+      - name: Cache Playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ steps.weekno.outputs.WEEK_NUMBER }}
       - name: Ensure browser is installed
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: python -m playwright install --with-deps chromium
       - name: Launch the API
         run: coverage run run_studio.py &
@@ -128,10 +138,21 @@ jobs:
         # This is for optimization purposes, so that .[test] below doesn't install wrong
         # versions just to have them replaced by requirements.txt in the next step.
         run: pip install -r requirements.txt
-      - name: Install all test dependencies
+      - name: Get current week number
+        run: echo "WEEK_NUMBER=$(date -u +%Y-%V)" >> $GITHUB_OUTPUT
+        id: weekno
+      - name: Install test dependencies
         run: |
           SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
-          python -m playwright install --with-deps chromium
+      - name: Cache Playwright binaries
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-ms-playwright-${{ steps.weekno.outputs.WEEK_NUMBER }}
+      - name: Ensure browser is installed
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: python -m playwright install --with-deps chromium
       - name: Overwrite dependencies and g2p, the Heroku way, to replicate the production env
         run: |
           # Possibly redundant, but make sure installing .[test] did not override anything
