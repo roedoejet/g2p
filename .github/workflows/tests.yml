@@ -10,6 +10,7 @@ on:
 
 env:
   G2P_STUDIO_DEBUG: 1
+  UV_SYSTEM_PYTHON: 1
 
 jobs:
   test-all-on-linux:
@@ -21,11 +22,14 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.9"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
       - name: Install dependencies
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test] licensecheck
-      - run: pip list
-      - run: pip freeze
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` uv pip install -e .[test] licensecheck
+      - run: uv pip list
+      - run: uv pip freeze
       - name: Check licenses
         # Automatically check that we don't introduce imcompatibly licensed dependencies
         # text-unidecode is OK (Artistic License) but not detected automatically
@@ -48,7 +52,7 @@ jobs:
         with:
           key: g2p-neural-${{ steps.weekid.outputs.WEEK_ID }}
           path: ~/.cache/huggingface
-      - run: pip install -e .[neural]
+      - run: uv pip install -e .[neural]
       - run: coverage run g2p/tests/test_neural.py
 
       - name: Run generate-mapping
@@ -107,10 +111,13 @@ jobs:
         with:
           # Note: this is where we also test that the g2p library still works on 3.8
           python-version: "3.8"
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
       - name: Install dependencies
         shell: bash
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
+          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` uv pip install -e .[test]
       - name: Run tests on Windows
         run: python run_tests.py dev
       - name: Make sure the CLI outputs utf8 on Windows
@@ -142,7 +149,7 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Overwrite dependencies and g2p, the Heroku way, to replicate the production env
         run: |
-          # Possibly redundant, but make sure .[test] did not override anything
+          # Possibly redundant, but make sure installing .[test] did not override anything
           pip install -r requirements.txt
           bin/post_compile
       - name: Launch the API
