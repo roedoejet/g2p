@@ -21,10 +21,10 @@ class NeuralLangTest(TestCase):
 
         # go through each language declared in the test case set up
         # Instead of asserting immediately, we go through all the cases first, so that
-        # running test_langs.py prints all the errors at once, to help debugging a given g2p mapping.
+        # running test_neural.py prints all the errors at once, to help debugging a given g2p mapping.
         # Then we call assertEqual on the first failed case, to make unittest register the failure.
         error_count = 0
-        error_prefix = "test_langs.py: mapping error"
+        error_prefix = "test_neural.py: mapping error"
         for test in langs_to_test:
             transducer = make_g2p(test[0], test[1], neural=True)
             output_string = transducer(test[2]).output_string.strip()
