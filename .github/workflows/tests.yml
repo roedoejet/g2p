@@ -16,9 +16,9 @@ jobs:
     # This is our main test job, exercising everything and uploading to coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.9"
       - name: Install dependencies
@@ -86,9 +86,9 @@ jobs:
     # Make sure stuff stays compatible with Windows by testing there too.
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           # Note: this is where we also test that the g2p library still works on 3.8
           python-version: "3.8"
@@ -108,12 +108,12 @@ jobs:
     # Replicate what heroku will run
     runs-on: ubuntu-22.04 # https://devcenter.heroku.com/articles/heroku-22-stack
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Read the Heroku run time env and cmd
         run: |
           echo "PYTHON_VERSION=$(cat runtime.txt | sed 's/python-//')" >> $GITHUB_ENV
           echo "RUNTIME_CMD=$(cat Procfile | sed 's/web: *//')" >> $GITHUB_ENV
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - run: python -m pip install --upgrade pip
