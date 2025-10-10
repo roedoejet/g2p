@@ -38,11 +38,25 @@ jobs:
         run: coverage run run_tests.py dev
       - name: Run test-studio
         run: coverage run g2p/tests/test_studio.py
+
+      # Neural tests, with huggingface models cached
+      - name: Get week id
+        id: weekid
+        run: echo "WEEK_ID=$(date -u +%Y-%V)" >> $GITHUB_OUTPUT
+        shell: bash
+      - uses: actions/cache@v4
+        with:
+          key: g2p-neural-${{ steps.weekid.outputs.WEEK_ID }}
+          path: ~/.cache/huggingface
+      - run: pip install -e .[neural]
+      - run: coverage run g2p/tests/test_neural.py
+
       - name: Run generate-mapping
         shell: bash
         run: |
           coverage run $(which g2p) generate-mapping --from crg --to eng
           git status --porcelain=v1 | grep 'M g2p/mappings/langs/generated/config-g2p.yaml' || { echo 'g2p generate-mapping did not update generated/config-g2p.yaml as expected'; false; }
+
       - name: Post test analyses
         run: |
           pkill -INT coverage
@@ -56,6 +70,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false # too many upload errors to keep "true"
+
       - name: Make sure the CLI stays fast
         id: cli-load-time
         run: |
