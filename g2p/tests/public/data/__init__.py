@@ -76,8 +76,7 @@ def load_public_test_data() -> List[List[str]]:
             delimiter = "|"
         elif fn.endswith("tsv"):
             delimiter = "\t"
-        if data := read_data_file(fn, delimiter):
-            langs_to_test += data
+        langs_to_test += read_data_file(fn, delimiter)
 
     loaded_langs_to_test = langs_to_test
     return langs_to_test
