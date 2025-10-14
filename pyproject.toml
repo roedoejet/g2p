@@ -42,7 +42,7 @@ api = [
   "jinja2",
 ]
 test = [
-  "g2p[api]; python_version >= '3.8'",
+  "g2p[api]",
   "coverage[toml]>=6.5",
   "playwright>=1.26.1,<1.46; python_version < '3.9'",
   "playwright>=1.26.1; python_version >= '3.9'",
@@ -56,9 +56,8 @@ test = [
 dev = [
   "g2p[test]",
   "gitlint-core>=0.17.0",
-  "mypy>=1; python_version < '3.8'",
-  "mypy>=1.8.0; python_version >= '3.8'",
-  "pre-commit>=3.2.0; python_version >= '3.8'",
+  "mypy>=1.8.0",
+  "pre-commit>=3.2.0",
 ]
 # This one is a bit special and cannot depend on other features,
 # because if it depends on `g2p[api]` then we end up with
