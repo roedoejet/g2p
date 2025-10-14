@@ -128,13 +128,16 @@ def download_huggingface_model(
         try_to_load_from_cache,
     )
 
+    # We add no-cover pragmas below because we don't want the coverage report to
+    # ping-pong between cache hits and cache misses, which would report spurious
+    # changes to coverage.
     # if the model is already cached, just return that
     if filename:
         cached = try_to_load_from_cache(repo_id=model_id, filename=filename)
-        if not force_download and cached:
+        if not force_download and cached:  # pragma: no cover
             return cached
 
-    try:
+    try:  # pragma: no cover
         if filename is not None:
             # Download specific file
             downloaded_path = hf_hub_download(
