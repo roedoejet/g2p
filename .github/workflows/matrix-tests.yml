@@ -6,6 +6,8 @@ on:
     branches: main
 env:
   SETUPTOOLS_SCM_PRETEND_VERSION: "2.1"
+permissions:
+  contents: read
 jobs:
   pre-release-matrix-test:
     strategy:
@@ -16,6 +18,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:

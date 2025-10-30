@@ -12,12 +12,17 @@ env:
   G2P_STUDIO_DEBUG: 1
   UV_SYSTEM_PYTHON: 1
 
+permissions:
+  contents: read
+
 jobs:
   test-all-on-linux:
     # This is our main test job, exercising everything and uploading to coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -112,6 +117,8 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
