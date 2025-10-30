@@ -16,8 +16,8 @@ from datetime import datetime
 from random import sample
 from unittest import IsolatedAsyncioTestCase, main
 
-import socketio  # type: ignore[import-untyped]
-from playwright.async_api import async_playwright, expect
+import socketio  # type: ignore
+from playwright.async_api import async_playwright, expect  # type: ignore
 
 from g2p.log import LOGGER
 from g2p.tests.public.data import load_public_test_data
