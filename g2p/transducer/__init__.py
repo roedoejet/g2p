@@ -197,7 +197,7 @@ class TransductionGraph(BaseTransductionGraph):
         """
         edges = self._edges[:]
         edges.sort(key=lambda x: x[0])
-        out_edges = []
+        out_edges: List[Tuple[str, Optional[str]]] = []
         for edge in edges:
             assert edge[0] is not None  # Empty inputs are not allowed
             if edge[1] is None:
@@ -1006,7 +1006,7 @@ class Transducer(BaseTransducer):
             tg.input_string = saved_to_convert
         return tg
 
-    def check(
+    def check(  # type: ignore[override]
         self,
         tg: TransductionGraph,
         shallow=False,
@@ -1045,6 +1045,10 @@ class CompositeTransductionGraph(TransductionGraph):
     """
 
     def __init__(self, tg_list):
+        self._initialize(tg_list)
+
+    def _initialize(self, tg_list):
+        # Separated form __init
         # Plain strings
         self._input_string = tg_list[0].input_string
         self._output_string = tg_list[-1].output_string
@@ -1143,7 +1147,7 @@ class CompositeTransductionGraph(TransductionGraph):
         else:
             for tier in self._tiers:
                 tier.append(copy.deepcopy(tg))
-        self.__init__(self.tiers)
+        self._initialize(self.tiers)
 
     def __iadd__(self, tg):
         self.append(tg)
@@ -1195,9 +1199,9 @@ class CompositeTransducer(BaseTransducer):
             to_convert = tg.output_string
         return CompositeTransductionGraph(tg_list)
 
-    def check(
+    def check(  # type: ignore[override]
         self, tg: CompositeTransductionGraph, shallow=False, display_warnings=False
-    ):
+    ) -> bool:
         assert len(self._transducers) == len(tg._tiers)
         if shallow:
             return self._transducers[-1].check(
@@ -1279,7 +1283,9 @@ class TokenizingTransducer(BaseTransducer):
         """Output language node name"""
         return self._transducer.out_lang
 
-    def check(self, tg: TransductionGraph, shallow=False, display_warnings=False):
+    def check(  # type: ignore[override]
+        self, tg: TransductionGraph, shallow=False, display_warnings=False
+    ) -> bool:
         # The obvious implementation fails, because we need to check only the words, not
         # the text between the words!
         # return self._transducer.check(tg) # <- complains about characters between words

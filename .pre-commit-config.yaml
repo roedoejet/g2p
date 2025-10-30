@@ -24,5 +24,6 @@ repos:
     rev: v1.14.1
     hooks:
       - id: mypy
+        args: [--check-untyped-defs, --install-types]
         additional_dependencies:
-          [pydantic, types-requests, types-python-slugify, types-PyYAML]
+          [fastapi, pep440, pydantic, starlette, uvicorn]

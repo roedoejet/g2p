@@ -10,6 +10,7 @@ import re
 from collections import defaultdict
 from contextlib import redirect_stderr
 from pathlib import Path
+from typing import List
 from unittest import TestCase, main
 
 import yaml
@@ -76,7 +77,7 @@ class UtilsTest(TestCase):
         default_dict = defaultdict(list)
         default_dict["VOWEL"].extend(["a", "e", "i", "o", "u"])
         default_dict["OTHER"].extend(["t", "e", "s", "t"])
-        empty_rows = []
+        empty_rows: List[List[str]] = []
         while len(empty_rows) < 10:
             empty_rows.append(["", "", "", "", "", ""])
         self.assertEqual(utils.flatten_abbreviations_format(test_rows), default_dict)

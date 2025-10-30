@@ -34,8 +34,8 @@ def getPanphonDistanceSingleton1():
 
 def getPanphonDistanceSingleton2():
     if not hasattr(getPanphonDistanceSingleton2, "value"):
-        getPanphonDistanceSingleton2.value = panphon.distance.Distance()
-    return getPanphonDistanceSingleton2.value
+        getPanphonDistanceSingleton2.value = panphon.distance.Distance()  # type: ignore
+    return getPanphonDistanceSingleton2.value  # type: ignore
 
 
 for iters in (1, 1, 10, 100, 1000, 10000):

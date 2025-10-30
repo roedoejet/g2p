@@ -35,11 +35,14 @@ class TokenizeAndMapTest(TestCase):
         )
         self.assertEqual(string_ipa, self.contextualize(word_ipa))
 
-    def test_tokenizing_transducer(self):
+    def test_tokenizing_transducer(self) -> None:
+        from g2p.transducer import TokenizingTransducer
+
         ref_word_ipa = g2p.make_g2p("mic", "mic-ipa", tokenize=False)(
             "sq"
         ).output_string
         transducer = g2p.make_g2p("mic", "mic-ipa")  # tokenizes on "mic" via "path"
+        assert isinstance(transducer, TokenizingTransducer)
         self.assertEqual(transducer.transducer.in_lang, transducer.in_lang)
         self.assertEqual(transducer.transducer.out_lang, transducer.out_lang)
         self.assertEqual(transducer.transducer, transducer.transducers[0])
@@ -152,12 +155,12 @@ class TokenizeAndMapTest(TestCase):
         ]
         self.assertEqual(tier_edges, ref_tier_edges)
 
-    def test_removed_tok_langs_in_v2(self):
+    def test_removed_tok_langs_in_v2(self) -> None:
         # monkey patch to make sure we always exercise the TypeError pathway
         saved_version = g2p._version.VERSION
         g2p._version.VERSION = "2.0"
         with self.assertRaises(TypeError):
-            _ = g2p.make_g2p("iku-sro", "eng-ipa", "path")
+            _ = g2p.make_g2p("iku-sro", "eng-ipa", "path")  # type: ignore
         g2p._version.VERSION = saved_version
 
     def test_make_g2p_cache(self):

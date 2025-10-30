@@ -1,6 +1,7 @@
 from collections import deque
 from typing import (
     Any,
+    Deque,
     Dict,
     Generic,
     Hashable,
@@ -28,7 +29,7 @@ class DiGraph(Generic[T]):
         """Contructor, empty if no data, else load from data"""
         self._edges: Dict[T, List[T]] = {}
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the graph"""
         self._edges.clear()
 
@@ -133,7 +134,7 @@ class DiGraph(Generic[T]):
         visited: Dict[T, Union[T, None]] = {
             u: None
         }  # dict of {node: predecessor on shortest path from u}
-        queue: deque[T] = deque([u])
+        queue: Deque[T] = deque([u])
         while queue:
             u = queue.popleft()
             if u == v:

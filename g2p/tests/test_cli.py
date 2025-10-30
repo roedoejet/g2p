@@ -237,7 +237,7 @@ class CliTest(TestCase):
                 result = self.runner.invoke(
                     convert, ["--neural", "hello world", "str", "str-ipa"]
                 )
-                raise result.exception
+                raise result.exception  # type: ignore[misc]
 
     def test_doctor(self):
         result = self.runner.invoke(doctor, "-m fra")
@@ -298,11 +298,11 @@ class CliTest(TestCase):
         for c in unmapped_chars:
             self.assertIn(c, result.stdout)
 
-    def test_scan_str_case(self):
+    def test_scan_str_case(self) -> None:
         result = self.runner.invoke(
             scan, ["str", os.path.join(DATA_DIR, "str_un_human_rights.txt")]
         )
-        returned_set = re.search("{(.*)}", result.stdout).group(1)
+        returned_set = re.search("{(.*)}", result.stdout).group(1)  # type: ignore
         self.assertEqual(result.exit_code, 0)
         self.assertLogs(level="WARNING")
         unmapped_upper = "FGR"

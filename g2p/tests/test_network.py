@@ -2,6 +2,7 @@
 
 import gzip
 import json
+from typing import Any
 from unittest import TestCase, main
 
 from g2p import make_g2p
@@ -42,13 +43,15 @@ class NetworkTest(TestCase):
 
 
 class NetworkLiteTest(TestCase):
+    data: Any
+
     @classmethod
     def setUpClass(cls):
         with gzip.open(LANGS_NWORK_PATH, "rt", encoding="utf8") as f:
             cls.data = json.load(f)
 
     def test_has_path(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         graph.add_edge("b", "a")  # cycle
         graph.add_edge("a", "c")
@@ -72,7 +75,7 @@ class NetworkLiteTest(TestCase):
         self.assertFalse(graph.has_path("hei", "git"))
 
     def test_successors(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         graph.add_edge("b", "a")
         graph.add_edge("a", "c")
@@ -81,7 +84,7 @@ class NetworkLiteTest(TestCase):
         self.assertEqual(set(graph.successors("c")), set())
 
     def test_descendants(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         graph.add_edge("b", "a")  # cycle
         graph.add_edge("a", "c")
@@ -106,7 +109,7 @@ class NetworkLiteTest(TestCase):
         self.assertEqual(graph.descendants("eng-arpabet"), set())
 
     def test_ancestors(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         graph.add_edge("a", "c")
         graph.add_edge("d", "a")  # cycle
@@ -122,12 +125,12 @@ class NetworkLiteTest(TestCase):
             graph.ancestors("x")
 
     def test_g2p_ancestors(self):
-        graph = node_link_graph(self.data)
+        graph: DiGraph = node_link_graph(self.data)
         self.assertEqual(graph.ancestors("atj"), set())
         self.assertGreater(len(graph.ancestors("eng-ipa")), 50)
 
     def test_shortest_path(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "e")
         graph.add_edge("e", "f")
         graph.add_edge("f", "g")
@@ -157,7 +160,7 @@ class NetworkLiteTest(TestCase):
         )
 
     def test_contains(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         self.assertTrue("a" in graph)
         self.assertTrue("b" in graph)
@@ -169,13 +172,13 @@ class NetworkLiteTest(TestCase):
 
     def test_node_link_graph_errors(self):
         with self.assertRaises(ValueError):
-            node_link_graph({**self.data, "directed": False})
+            node_link_graph({**self.data, "directed": False})  # type: ignore
         with self.assertRaises(ValueError):
-            node_link_graph({**self.data, "multigraph": True})
+            node_link_graph({**self.data, "multigraph": True})  # type: ignore
         with self.assertRaises(ValueError):
-            node_link_graph({**self.data, "nodes": "not a list"})
+            node_link_graph({**self.data, "nodes": "not a list"})  # type: ignore
         with self.assertRaises(ValueError):
-            node_link_graph({**self.data, "links": "not a list"})
+            node_link_graph({**self.data, "links": "not a list"})  # type: ignore
         with self.assertRaises(ValueError):
             data = self.data.copy()
             del data["nodes"]
@@ -186,7 +189,7 @@ class NetworkLiteTest(TestCase):
             node_link_graph(data)
 
     def test_no_duplicates(self):
-        graph = DiGraph()
+        graph: DiGraph = DiGraph()
         graph.add_edge("a", "b")
         graph.add_edge("b", "c")
         graph.add_edge("a", "c")

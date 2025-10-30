@@ -6,6 +6,7 @@
 import json
 import os
 import re
+from typing import Dict, Union
 from unittest import TestCase, main
 
 from fastapi.testclient import TestClient
@@ -28,9 +29,9 @@ class ResourceIntegrationTest(TestCase):
         # routes
         self.conversion_route = "/g2p"
         for route in APP.routes:
-            if route.path == "/api/v1":
-                self.api = route.app
-                self.routes = route.routes
+            if route.path == "/api/v1":  # type: ignore
+                self.api = route.app  # type: ignore
+                self.routes = route.routes  # type: ignore
         self.routes_no_args = [
             route.path
             for route in self.routes
@@ -82,14 +83,14 @@ class ResourceIntegrationTest(TestCase):
         """
         Ensure conversion returns proper response
         """
-        params = {
+        params: Dict[str, Union[str, bool]] = {
             "in-lang": "dan",
             "out-lang": "eng-arpabet",
             "text": "hej",
             "debugger": True,
             "index": True,
         }
-        minimal_params = {
+        minimal_params: Dict[str, Union[str, bool]] = {
             "in-lang": "dan",
             "out-lang": "eng-arpabet",
             "text": "hej",
@@ -105,7 +106,7 @@ class ResourceIntegrationTest(TestCase):
         }
         self.maxDiff = None
         with self.assertLogs():
-            response = self.client.get(self.conversion_route, params=params)
+            response = self.client.get(self.conversion_route, params=params)  # type: ignore
         res_json = response.json()
         self.assertEqual(response.status_code, 200)
         with open(os.path.join(PUB_DIR, "sample_response.json")) as f:
@@ -145,7 +146,7 @@ class ResourceIntegrationTest(TestCase):
         self.assertEqual(invalid_response.status_code, 422)
 
     def test_g2p_conversion_with_tok(self):
-        params_with_tok = {
+        params_with_tok: Dict[str, Union[str, bool]] = {
             "in-lang": "fra",
             "out-lang": "eng-arpabet",
             "text": "ceci, celà",
@@ -159,7 +160,7 @@ class ResourceIntegrationTest(TestCase):
         res_json_tok = response.json()
         self.assertEqual(res_json_tok["debugger"][0][0][0]["input"], "ceci")
 
-        params_no_tok = {
+        params_no_tok: Dict[str, Union[str, bool]] = {
             "in-lang": "fra",
             "out-lang": "eng-arpabet",
             "text": "ceci, celà",
