@@ -261,7 +261,7 @@ class TokenizerLibrary:
             if in_lang == "tli" or in_lang == "sal-apa":
                 self.tokenizers[tokenizer_key].dot_is_letter = True
 
-        return self.tokenizers.get(tokenizer_key)
+        return self.tokenizers[tokenizer_key]
 
 
 _the_tokenizer_library = TokenizerLibrary()

@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import (
     Any,
     Dict,
+    Iterable,
     List,
     Optional,
     Pattern,
@@ -50,12 +51,12 @@ GEN_DIR = os.path.join(os.path.dirname(langs.__file__), "generated")
 GEN_CONFIG = os.path.join(GEN_DIR, "config-g2p.yaml")
 
 
-def has_neural_support():
+def has_neural_support() -> bool:
     """Check if neural optional dependencies are installed."""
-    try:
-        import deep_phonemizer  # noqa: F401
-        import huggingface_hub  # noqa: F401
-        import torch  # noqa: F401
+    try:  # type: ignore
+        import deep_phonemizer  # type: ignore[import-not-found]  # noqa: F401
+        import huggingface_hub  # type: ignore[import-not-found]  # noqa: F401
+        import torch  # type: ignore[import-not-found]  # noqa: F401
 
         return True
     except ImportError:
@@ -80,7 +81,7 @@ def deep_phonemizer_handler(
     config_kwargs: dict,
     to_convert: str,
 ) -> str:
-    from deep_phonemizer.phonemizer import Phonemizer
+    from deep_phonemizer.phonemizer import Phonemizer  # type: ignore[import-not-found]
 
     from g2p.mappings import Mapping
     from g2p.transducer import Transducer
@@ -410,7 +411,7 @@ def create_fixed_width_lookbehind(pattern):
     )
 
 
-def pattern_to_fixed_width_lookbehinds(match):
+def pattern_to_fixed_width_lookbehinds(match) -> str:
     """Python must have fixed-width lookbehinds."""
     pattern = match.group()
     pattern = sorted(pattern.split("|"), key=len, reverse=True)
@@ -418,7 +419,7 @@ def pattern_to_fixed_width_lookbehinds(match):
     # fixed-width lookbehinds
     null_length_characters = ["^", "$"]
     current_len = 0 if pattern[0] in null_length_characters else len(pattern[0])
-    all_lookbehinds = []
+    all_lookbehinds: List[Iterable[str]] = []
     current_list = []
     for item in pattern:
         item_length = 0 if item in null_length_characters else len(item)
@@ -430,11 +431,13 @@ def pattern_to_fixed_width_lookbehinds(match):
             current_list = [item]
         if pattern.index(item) == len(pattern) - 1:
             all_lookbehinds.append(current_list)
-    all_lookbehinds = [f"(?<={'|'.join(items)})" for items in all_lookbehinds]
-    return "(" + "|".join(all_lookbehinds) + ")"
+    all_lookbehinds_joined_by_length = [
+        f"(?<={'|'.join(items)})" for items in all_lookbehinds
+    ]
+    return "(" + "|".join(all_lookbehinds_joined_by_length) + ")"
 
 
-def load_from_workbook(language):
+def load_from_workbook(language: str) -> List[dict]:
     """Parse mapping from Excel workbook"""
     from openpyxl import load_workbook  # Expensive import, do it only when needed
 
@@ -442,10 +445,10 @@ def load_from_workbook(language):
         work_book = load_workbook(language, read_only=True)
         work_sheet = work_book.active
         # Create wordlist
-        mapping = []
+        mapping: List[dict] = []
         # Loop through rows in worksheet, create if statements for different columns
         # and append mappings to self.mapping.
-        for row in work_sheet:
+        for row in work_sheet:  # type: ignore
             new_io = {"in": "", "out": "", "context_before": "", "context_after": ""}
             for cell in row:
                 if cell.value is None:  # avoid tripping on empty cells
@@ -866,10 +869,10 @@ class CompactJSONMappingEncoder(json.JSONEncoder):
 
     @property
     def indent_str(self) -> str:
-        return " " * self.indentation_level * self.indent
+        return " " * self.indentation_level * self.indent  # type: ignore[operator]
 
-    def iterencode(self, obj, **kwargs):
-        return self.encode(obj)
+    def iterencode(self, o, *_args, **_kwargs):
+        return self.encode(o)
 
 
 class MAPPING_TYPE(str, Enum):

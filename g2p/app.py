@@ -40,6 +40,7 @@ from g2p.mappings.utils import (
     flatten_abbreviations_format,
 )
 from g2p.transducer import (
+    BaseTransducer,
     CompositeTransducer,
     CompositeTransductionGraph,
     TokenizingTransducer,
@@ -181,6 +182,7 @@ async def convert(sid, message):
     """Convert input text and return output"""
     transducers = []
     LOGGER.debug("/convert: %s", message)
+    transducer: BaseTransducer
     for mapping in message["data"]["mappings"]:
         mapping_args = {**mapping["kwargs"]}
         mapping_args["abbreviations"] = flatten_abbreviations_format(

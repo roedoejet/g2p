@@ -589,7 +589,7 @@ def convert(  # noqa: C901
                 no_tok_warning_printed = True
             tg = transducer(line)
             if check:
-                transducer.check(tg, display_warnings=True)
+                transducer.check(tg, display_warnings=True)  # type: ignore
             outputs = [tg.output_string]
             if substring_alignments:
                 outputs += [tg.substring_alignments()]
@@ -853,7 +853,7 @@ def show_mappings(lang1, lang2, verbose, csv):
     """
     # Defer expensive imports
     from g2p.mappings import MAPPINGS_AVAILABLE, Mapping
-    from g2p.transducer import Transducer
+    from g2p.transducer import CompositeTransducer, Transducer
 
     if lang1 is not None and lang2 is not None:
         try:
@@ -866,7 +866,8 @@ def show_mappings(lang1, lang2, verbose, csv):
         if isinstance(transducer, Transducer):
             mappings = [transducer.mapping]
         else:
-            mappings = (t.mapping for t in transducer._transducers)
+            assert isinstance(transducer, CompositeTransducer)
+            mappings = [t.mapping for t in transducer._transducers]
 
     elif lang1 is not None:
         mappings = [
@@ -880,10 +881,10 @@ def show_mappings(lang1, lang2, verbose, csv):
             )
 
     else:
-        mappings = (
+        mappings = [
             Mapping.find_mapping(in_lang=m.in_lang, out_lang=m.out_lang)
             for m in MAPPINGS_AVAILABLE
-        )
+        ]
 
     file_type = "csv" if csv else "json"
     if verbose:

@@ -1,6 +1,7 @@
 from collections import deque
 from typing import (
     Any,
+    Deque,
     Dict,
     Generic,
     Hashable,
@@ -133,7 +134,7 @@ class DiGraph(Generic[T]):
         visited: Dict[T, Union[T, None]] = {
             u: None
         }  # dict of {node: predecessor on shortest path from u}
-        queue: deque[T] = deque([u])
+        queue: Deque[T] = deque([u])
         while queue:
             u = queue.popleft()
             if u == v:
