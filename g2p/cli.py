@@ -589,7 +589,7 @@ def convert(  # noqa: C901
                 no_tok_warning_printed = True
             tg = transducer(line)
             if check:
-                transducer.check(tg, display_warnings=True)  # type: ignore
+                transducer.check(tg, display_warnings=True)
             outputs = [tg.output_string]
             if substring_alignments:
                 outputs += [tg.substring_alignments()]

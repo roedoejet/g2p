@@ -29,7 +29,7 @@ class DiGraph(Generic[T]):
         """Contructor, empty if no data, else load from data"""
         self._edges: Dict[T, List[T]] = {}
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the graph"""
         self._edges.clear()
 

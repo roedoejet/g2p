@@ -9,6 +9,9 @@ from g2p.mappings import Mapping
 from g2p.tests.public import PUBLIC_DIR
 from g2p.transducer import CompositeTransducer, Transducer, normalize_edges
 
+# Disable the attr-defined mypy error so that we can use setUpClass sanely
+# mypy: disable-error-code="attr-defined"
+
 
 class TransducerTest(TestCase):
     """Basic Transducer Test"""

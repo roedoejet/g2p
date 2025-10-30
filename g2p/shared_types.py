@@ -65,6 +65,12 @@ class BaseTransducer(ABC):
     def out_lang(self) -> str:
         """The output language code of the transducer."""
 
+    @abstractmethod
+    def check(
+        self, tg: "BaseTransductionGraph", shallow=False, display_warnings=False
+    ) -> bool:
+        """Check if the output is valid in the target symbol space"""
+
 
 class BaseTransductionGraph(ABC):
     """Base class to typecheck transduction graphs without having to import them."""

@@ -1006,7 +1006,7 @@ class Transducer(BaseTransducer):
             tg.input_string = saved_to_convert
         return tg
 
-    def check(
+    def check(  # type: ignore[override]
         self,
         tg: TransductionGraph,
         shallow=False,
@@ -1199,7 +1199,7 @@ class CompositeTransducer(BaseTransducer):
             to_convert = tg.output_string
         return CompositeTransductionGraph(tg_list)
 
-    def check(
+    def check(  # type: ignore[override]
         self, tg: CompositeTransductionGraph, shallow=False, display_warnings=False
     ) -> bool:
         assert len(self._transducers) == len(tg._tiers)
@@ -1283,7 +1283,7 @@ class TokenizingTransducer(BaseTransducer):
         """Output language node name"""
         return self._transducer.out_lang
 
-    def check(
+    def check(  # type: ignore[override]
         self, tg: TransductionGraph, shallow=False, display_warnings=False
     ) -> bool:
         # The obvious implementation fails, because we need to check only the words, not

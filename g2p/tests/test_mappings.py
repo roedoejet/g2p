@@ -110,9 +110,9 @@ class MappingTest(TestCase):
                 )
             )
 
-    def test_improperly_initialized(self):
+    def test_improperly_initialized(self) -> None:
         mapping = Mapping(rules=[Rule(rule_input="a", rule_output="b")])
-        mapping.rules = [{"rule_input": "something misguided"}]
+        mapping.rules = [{"rule_input": "something misguided"}]  # type: ignore
         with self.assertRaises(AttributeError):
             mapping.inventory()
 

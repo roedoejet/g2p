@@ -35,8 +35,8 @@ class LocalConfigTest(TestCase):
         self.runner = CliRunner()
         self.mappings_dir = Path(PUBLIC_DIR) / "mappings"
 
-    def test_local_config(self):
-        config_path = self.mappings_dir / "test.yaml"
+    def test_local_config(self) -> None:
+        config_path = str(self.mappings_dir / "test.yaml")
         result = self.runner.invoke(
             convert,
             [
@@ -60,7 +60,7 @@ class LocalConfigTest(TestCase):
         )
         self.assertIn("ɑ", result.stdout)
 
-    def test_case_insensitive_tokenizer(self):
+    def test_case_insensitive_tokenizer(self) -> None:
         # Unit testing for https://github.com/ReadAlongs/Studio/issues/40
         # That issue was raised in Studio when the tokenizer was there, but
         # the tokenizer has been migrated to g2p since then, so the test and
@@ -68,7 +68,7 @@ class LocalConfigTest(TestCase):
 
         # This test incidentally exercises passing --config a config file with
         # only one mapping in it, without the top-level "mappings:" list.
-        tok_config = self.mappings_dir / "tokenize_punct_config-g2p.yaml"
+        tok_config = str(self.mappings_dir / "tokenize_punct_config-g2p.yaml")
         results = self.runner.invoke(
             convert, ["--tok", "--config", tok_config, "AAA-BBB", "tok-in", "tok-out"]
         )
@@ -85,22 +85,22 @@ class LocalConfigTest(TestCase):
         self.assertEqual(results.exit_code, 0)
         self.assertIn("d_end-c", results.output)
 
-    def test_null_mapping(self):
+    def test_null_mapping(self) -> None:
         """Empty lines in a mapping should just get ignored"""
         # Unit test case for bug fix: as of 2021-12-01, an empty rule would
         # cause the next rule to not get its match pattern created, and raise
         # an exception later. The null.csv mapping has such an empty rule,
         # which should get ignored, with the next rule, d->e, still working.
-        null_config = self.mappings_dir / "null_config-g2p.yaml"
+        null_config = str(self.mappings_dir / "null_config-g2p.yaml")
         results = self.runner.invoke(
             convert, ["--config", null_config, "x-ad-x", "null-in", "null-out"]
         )
         self.assertEqual(results.exit_code, 0)
         self.assertIn("x-be-x", results.output)
 
-    def test_case_feeding_mapping(self):
+    def test_case_feeding_mapping(self) -> None:
         """Exercise the mapping using case to prevent feeding on in/out but not context"""
-        case_feeding_config = self.mappings_dir / "case-feed" / "config-g2p.yaml"
+        case_feeding_config = str(self.mappings_dir / "case-feed" / "config-g2p.yaml")
         results = self.runner.invoke(
             convert,
             [
@@ -116,7 +116,7 @@ class LocalConfigTest(TestCase):
         self.assertEqual(results.exit_code, 0)
         self.assertIn("ke-antinetin", results.output)
 
-    def test_missing_files(self):
+    def test_missing_files(self) -> None:
         """Nice error messages when the mapping file or abbreviations file are missing"""
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "mapping-file-not-found.yaml")
@@ -155,7 +155,7 @@ class LocalConfigTest(TestCase):
                 results.output + str(results.exception),
             )
 
-    def test_empty_rules(self):
+    def test_empty_rules(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             config_file = os.path.join(tmpdir, "empty-rules-file.yaml")
             with open(os.path.join(tmpdir, "empty.csv"), "wt", encoding="utf8") as f:
@@ -175,7 +175,7 @@ class LocalConfigTest(TestCase):
                 results.output + str(results.exception),
             )
 
-    def test_generate_mapping(self):
+    def test_generate_mapping(self) -> None:
         """Use a local config to test generate mapping with --from and --to"""
         # This test is rather hacky, because it relies on the fact that calling
         # g2p convert --config loads a config and keeps it in memory for the rest
@@ -191,7 +191,7 @@ class LocalConfigTest(TestCase):
         # factor out the repeated code to use it.
 
         # This first case has the side effect of loading gen-map_config-g2p.yaml
-        config_path = self.mappings_dir / "gen-map_config-g2p.yaml"
+        config_path = str(self.mappings_dir / "gen-map_config-g2p.yaml")
         result = self.runner.invoke(
             convert, ["uyoesnmklbdt", "gm2", "gm2-ipa", "--config", config_path]
         )
@@ -201,15 +201,15 @@ class LocalConfigTest(TestCase):
         self.assertIn("uyoesnmklbdt", result.stdout)
 
         # Now we do the real tests
-        with tempfile.TemporaryDirectory() as tmpdir:
-            output_dir = Path(tmpdir)
+        with tempfile.TemporaryDirectory() as output_dir_s:
+            output_dir = Path(output_dir_s)
             # for debugging:
             # output_dir = Path(".") / "gen-map-tests"
             # output_dir.mkdir(exist_ok=True)
             # 1 mapping in to 1 mapping out
             result = self.runner.invoke(
                 generate_mapping,
-                ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir],
+                ["--from", "gm1", "--to", "gm2", "--out-dir", output_dir_s],
             )
             self.assertEqual(result.exit_code, 0)
             with open(self.mappings_dir / "gm1-ipa_to_gm2-ipa.json", "r") as f:
@@ -221,7 +221,7 @@ class LocalConfigTest(TestCase):
             # 2 mappings in to 1 mapping out
             result = self.runner.invoke(
                 generate_mapping,
-                ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir],
+                ["--from", "gm3", "--to", "gm2", "--out-dir", output_dir_s],
             )
             self.assertEqual(result.exit_code, 0)
             with open(self.mappings_dir / "gm3-ipa_to_gm2-ipa.json", "r") as f:
@@ -233,7 +233,7 @@ class LocalConfigTest(TestCase):
             # 1 mapping in to 2 mappings out
             result = self.runner.invoke(
                 generate_mapping,
-                ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir],
+                ["--from", "gm2", "--to", "gm3", "--out-dir", output_dir_s],
             )
             self.assertEqual(result.exit_code, 0)
             with open(self.mappings_dir / "gm2-ipa_to_gm3-ipa.json", "r") as f:
@@ -242,8 +242,8 @@ class LocalConfigTest(TestCase):
                 output = json.load(f)
             self.assertEqual(output, ref)
 
-    def test_compose_NFC_NFD(self):
-        config_path = self.mappings_dir / "compose.yaml"
+    def test_compose_NFC_NFD(self) -> None:
+        config_path = str(self.mappings_dir / "compose.yaml")
         result = self.runner.invoke(
             convert,
             [
@@ -280,8 +280,8 @@ class LocalConfigTest(TestCase):
         self.assertIn("[[(0, 0)], [(0, 0), (0, 1)]]", result.output)
         self.assertIn("[[('é', 'ò')], [('ò', 'u'), ('ò', '̀')]]", result.output)
 
-    def test_nofeed_indices(self):
-        config_path = self.mappings_dir / "nofeed-indices.yaml"
+    def test_nofeed_indices(self) -> None:
+        config_path = str(self.mappings_dir / "nofeed-indices.yaml")
         args = ("nofeed-indices-in", "nofeed-indices-out")
         result = self.runner.invoke(convert, ["ab", *args, "--config", config_path])
         self.assertIn("ced", result.stdout)
@@ -292,15 +292,15 @@ class LocalConfigTest(TestCase):
         result = self.runner.invoke(convert, ["aātaāabtaā", *args, "-e"])
         self.assertIn("aʼataʼacedtaʼa", result.stdout)
 
-    def test_invalid_abbrev_path(self):
+    def test_invalid_abbrev_path(self) -> None:
         config = """
             mappings:
              - name: "invalid"
                abbreviations_path: {}
                rules: []
         """
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmpdir = Path(tmpdir)
+        with tempfile.TemporaryDirectory() as tmpdir_s:
+            tmpdir = Path(tmpdir_s)
             # type bool is not valid
             with open(tmpdir / "invalid.yaml", "w", encoding="utf8") as fh:
                 fh.write(config.format("true"))

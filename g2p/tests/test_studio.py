@@ -16,7 +16,7 @@ from datetime import datetime
 from random import sample
 from unittest import IsolatedAsyncioTestCase, main
 
-import socketio
+import socketio  # type: ignore[import-untyped]
 from playwright.async_api import async_playwright, expect
 
 from g2p.log import LOGGER
@@ -27,7 +27,7 @@ class StudioTest(IsolatedAsyncioTestCase):
     def __init__(self, *args):
         super().__init__(*args)
         self.port = 5000
-        self.debug = True
+        self.debug_convert = True
         self.timeout_delay = 500
 
     async def test_socket_connection(self):
@@ -243,7 +243,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                         output_text = output_text + " (TIMED OUT)"
                     # Check that output is correct after the first succesful attempt or
                     # after all the attempts have failed.
-                    if not self.debug:
+                    if not self.debug_convert:
                         self.assertEqual(output_text.strip(), test_expected_output)
                         LOGGER.info(
                             f"Successfully converted {test_input_text} from {test_in_lang} to {test_out_lang}"
@@ -265,7 +265,7 @@ class StudioTest(IsolatedAsyncioTestCase):
                 # manager scope) to explain why there's a delay here.
                 LOGGER.info("Closing browser")
 
-        if self.debug and error_count > 0:
+        if self.debug_convert and error_count > 0:
             self.assertEqual(
                 first_failed_test[0],
                 first_failed_test[1],
