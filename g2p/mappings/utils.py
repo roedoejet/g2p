@@ -314,21 +314,44 @@ def normalize_to_NFD_with_indices(
     assert norm_form in ("NFD", "NFKD")
     # Sadly mypy doesn't do narrowing to literals properly
     norm_form = cast(Literal["NFD", "NFKD"], norm_form)
-    # we create indices pretending that we can normalize to NF(K)D one character at a
-    # time, but that assumption does not always hold, e.g., if some graphemes combine
-    # multiple diacritics. So we decompose the string a whole, but to generate indices
-    # we pretend we could have done it character by character. This might sometimes
-    # generate inaccurate indices.
+    # decomposed is the valid NF(K)D decomposition, taking into account possible
+    # diacritic reordering
     decomposed = ud.normalize(norm_form, inp)
-    decomp_len = len(decomposed)
+    # decom
+    decomp_to_use = list(enumerate(decomposed))
     indices = []
-    j = 0
-    for i, c in enumerate(inp):
-        c_norm = ud.normalize(norm_form, c)
-        # When whole string and character decomposition disagree, we cap indices at
-        # decomp_len to guard from generating out of bound indices.
-        indices.extend([(i, j + k) for k in range(len(c_norm)) if j + k < decomp_len])
-        j += len(c_norm)
+    # To figure out indices from input characters, decompose them one at a time and
+    # look for each character in the jointly decomposed output, allowing for
+    # the potential reordering of
+    #  "Mn==Nonspacing_Mark==a nonspacing combining mark (zero advance width)"
+    # characters as idenfied by unicodedata.category().
+    # This handles this situation (I==input, L==letter, D==diacritic):
+    #  - input is I1+I2 where I1 is equiv to L+D1 and I2 is D2
+    #  - NFD(I1+I2) == L+D2+D1 because the canonical ordering wants D2 before D1
+    #  - NFD(I1)+NDF(I2) == L+D1+D2 != NDF(I1+I2)
+    # This also handles Input=L+D1+D2 going to output L+D2+D1
+    # See test_utils.py for a real example
+    for i, input_char in enumerate(inp):
+        input_char_decomposed = ud.normalize(norm_form, input_char)
+        for c in input_char_decomposed:
+            found = False
+            for j, (k, output_char) in enumerate(decomp_to_use):
+                if output_char == c:
+                    # Found c in the decomposed output, emit an arc and mark it consumed
+                    indices.append((i, k))
+                    decomp_to_use.pop(j)
+                    found = True
+                    break
+                elif ud.category(output_char) != "Mn":
+                    # No match, but got to a char that is not zero-width combining, so don't scan further
+                    break
+            if not found and decomp_to_use:  # pragma: no cover
+                # c itself not found, fall back to the next unused character.
+                # This should never happen, but it's here in case I missed something,
+                # to make sure we don't end up in an infinite loop.
+                k, _output_char = decomp_to_use.pop(0)
+                indices.append((i, k))
+
     return decomposed, indices
 
 

@@ -246,7 +246,12 @@ class UtilsTest(TestCase):
         print(list(o_graveabove_acutebelow_mixed), list(o_graveabove_acutebelow_nfd))
         self.assertEqual(
             utils.normalize_with_indices(o_graveabove_acutebelow_mixed, "NFD"),
-            (o_graveabove_acutebelow_nfd, [(0, 0), (0, 1), (1, 2)]),
+            (o_graveabove_acutebelow_nfd, [(0, 0), (0, 2), (1, 1)]),
+        )
+        o_graveabove_acutebelow_disordered = "o\u0300\u0317"
+        self.assertEqual(
+            utils.normalize_with_indices(o_graveabove_acutebelow_disordered, "NFD"),
+            (o_graveabove_acutebelow_nfd, [(0, 0), (1, 2), (2, 1)]),
         )
         # From https://en.wikipedia.org/wiki/Precomposed_character:
         # "\u1e53" (ṓ) == "\u014d\u0301" (ṓ) == "\u006f\u0304\u0301" (ṓ)
