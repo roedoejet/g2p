@@ -220,16 +220,8 @@ class UtilsTest(TestCase):
             utils.normalize_with_indices("test", "bad")
 
     def test_normalize_to_NFD_with_indices(self):
-        # Usefull site to get combining character code points:
+        # Useful site to get combining character code points:
         # http://www.alanwood.net/unicode/combining_diacritical_marks.html
-        yid_multi_diacritic = "'שָׂ'"
-        print(list(yid_multi_diacritic))
-        yid_nfd, _ = utils.normalize_with_indices(yid_multi_diacritic, "NFD")
-        print(list(yid_nfd))
-        self.assertEqual(
-            utils.normalize_with_indices("'שָׂ'", "NFD"),
-            ("'שָׂ'", [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)]),
-        )
         e_acute_nfd = "e\u0301"
         self.assertEqual(
             utils.normalize_with_indices("é", "NFD"),
@@ -243,7 +235,6 @@ class UtilsTest(TestCase):
         # TODO: this test case really should have indices (0,0),(0,2), (1,1)
         o_graveabove_acutebelow_mixed = "ò\u0317"  # 'ò̗'
         o_graveabove_acutebelow_nfd = "o\u0317\u0300"  # 'ò̗'
-        print(list(o_graveabove_acutebelow_mixed), list(o_graveabove_acutebelow_nfd))
         self.assertEqual(
             utils.normalize_with_indices(o_graveabove_acutebelow_mixed, "NFD"),
             (o_graveabove_acutebelow_nfd, [(0, 0), (0, 2), (1, 1)]),
@@ -262,6 +253,10 @@ class UtilsTest(TestCase):
         self.assertEqual(
             utils.normalize_with_indices("\u014d\u0301", "NFD"),
             ("\u006f\u0304\u0301", [(0, 0), (0, 1), (1, 2)]),
+        )
+        self.assertEqual(
+            utils.normalize_with_indices("'שָׂ'", "NFD"),
+            ("'שָׂ'", [(0, 0), (1, 1), (2, 3), (3, 2), (4, 4)]),
         )
 
     def test_compose_indices(self):
@@ -298,6 +293,10 @@ class UtilsTest(TestCase):
         self.assertEqual(
             utils.normalize_with_indices("\u014d\u0301", "none"),
             ("\u014d\u0301", [(0, 0), (1, 1)]),
+        )
+        self.assertEqual(
+            utils.normalize_with_indices("o\u0300\u0317", "NFC"),
+            ("\u00F2\u0317", [(0, 0), (1, 0), (2, 1)]),
         )
 
     def test_normalize_to_NFK_with_indices(self):

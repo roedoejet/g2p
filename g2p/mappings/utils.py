@@ -328,7 +328,7 @@ def normalize_to_NFD_with_indices(
     # This handles this situation (I==input, L==letter, D==diacritic):
     #  - input is I1+I2 where I1 is equiv to L+D1 and I2 is D2
     #  - NFD(I1+I2) == L+D2+D1 because the canonical ordering wants D2 before D1
-    #  - NFD(I1)+NDF(I2) == L+D1+D2 != NDF(I1+I2)
+    #  - NFD(I1)+NFD(I2) == L+D1+D2 != NFD(I1+I2)
     # This also handles Input=L+D1+D2 going to output L+D2+D1
     # See test_utils.py for a real example
     for i, input_char in enumerate(inp):
