@@ -314,14 +314,22 @@ def normalize_to_NFD_with_indices(
     assert norm_form in ("NFD", "NFKD")
     # Sadly mypy doesn't do narrowing to literals properly
     norm_form = cast(Literal["NFD", "NFKD"], norm_form)
-    result = ""
+    # we create indices pretending that we can normalize to NF(K)D one character at a
+    # time, but that assumption does not always hold, e.g., if some graphemes combine
+    # multiple diacritics. So we decompose the string a whole, but to generate indices
+    # we pretend we could have done it character by character. This might sometimes
+    # generate inaccurate indices.
+    decomposed = ud.normalize(norm_form, inp)
+    decomp_len = len(decomposed)
     indices = []
+    j = 0
     for i, c in enumerate(inp):
-        c_nfd = ud.normalize(norm_form, c)
-        result_pos = len(result)
-        result += c_nfd
-        indices.extend([(i, result_pos + n) for n in range(len(c_nfd))])
-    return result, indices
+        c_norm = ud.normalize(norm_form, c)
+        # When whole string and character decomposition disagree, we cap indices at
+        # decomp_len to guard from generating out of bound indices.
+        indices.extend([(i, j + k) for k in range(len(c_norm)) if j + k < decomp_len])
+        j += len(c_norm)
+    return decomposed, indices
 
 
 def normalize_to_NFC_with_indices(

@@ -222,6 +222,14 @@ class UtilsTest(TestCase):
     def test_normalize_to_NFD_with_indices(self):
         # Usefull site to get combining character code points:
         # http://www.alanwood.net/unicode/combining_diacritical_marks.html
+        yid_multi_diacritic = "'שָׂ'"
+        print(list(yid_multi_diacritic))
+        yid_nfd, _ = utils.normalize_with_indices(yid_multi_diacritic, "NFD")
+        print(list(yid_nfd))
+        self.assertEqual(
+            utils.normalize_with_indices("'שָׂ'", "NFD"),
+            ("'שָׂ'", [(0, 0), (1, 1), (2, 2), (3, 3), (4, 4)]),
+        )
         e_acute_nfd = "e\u0301"
         self.assertEqual(
             utils.normalize_with_indices("é", "NFD"),
@@ -232,8 +240,10 @@ class UtilsTest(TestCase):
             utils.normalize_with_indices("ò", "NFD"),
             (o_graveabove_nfd, [(0, 0), (0, 1)]),
         )
-        o_graveabove_acutebelow_mixed = "ò\u0317"
-        o_graveabove_acutebelow_nfd = "o\u0300\u0317"
+        # TODO: this test case really should have indices (0,0),(0,2), (1,1)
+        o_graveabove_acutebelow_mixed = "ò\u0317"  # 'ò̗'
+        o_graveabove_acutebelow_nfd = "o\u0317\u0300"  # 'ò̗'
+        print(list(o_graveabove_acutebelow_mixed), list(o_graveabove_acutebelow_nfd))
         self.assertEqual(
             utils.normalize_with_indices(o_graveabove_acutebelow_mixed, "NFD"),
             (o_graveabove_acutebelow_nfd, [(0, 0), (0, 1), (1, 2)]),
