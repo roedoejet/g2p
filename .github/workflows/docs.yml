@@ -7,11 +7,13 @@ jobs:
   docs:
     # Create latest docs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # to deploy to gh-pages
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # fetch all commits/branches
-          persist-credentials: false
+          fetch-depth: 0  # fetch all commits/branches
+          persist-credentials: true  # so we can deploy to gh-pages
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
