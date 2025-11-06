@@ -38,7 +38,8 @@ jobs:
       - name: Check licenses
         # Automatically check that we don't introduce imcompatibly licensed dependencies
         # text-unidecode is OK (Artistic License) but not detected automatically
-        run: licensecheck --zero --ignore-packages text-unidecode --requirements-paths pyproject.toml
+        # setuptools is OK (MIT License) but intermittently not detected automatically
+        run: licensecheck --zero --ignore-packages text-unidecode setuptools --requirements-paths pyproject.toml
       - name: Get current week number
         run: echo "WEEK_NUMBER=$(date -u +%Y-%V)" >> $GITHUB_OUTPUT
         id: weekno
