@@ -4,15 +4,10 @@
 # - click<8.2.0,>=8.0.4
 # - coloredlogs>=15.0.1
 # - openpyxl
-# - panphon<0.21; platform_system == "Windows"
-# - panphon<0.21; python_version < "3.9"
-# - panphon<0.22
-# - panphon<0.22; python_version < "3.10"
-# - panphon>=0.19
+# - ilt-panphon<0.22,>=0.21.2
 # - pydantic<2.9,>=2.4
 # - pyyaml>=5.2
 # - regex
-# - setuptools<80
 # - text-unidecode
 # - tqdm
 # - typing-extensions
@@ -38,8 +33,8 @@ click==8.1.8
     #   uvicorn
 coloredlogs==15.0.1
     # via hatch.envs.prod
-editdistance==0.8.1
-    # via panphon
+ilt-editdistance==0.8.2
+    # via ilt-panphon
 et-xmlfile==2.0.0
     # via openpyxl
 fastapi==0.120.2
@@ -59,14 +54,14 @@ jinja2==3.1.6
 markupsafe==3.0.3
     # via jinja2
 munkres==1.1.4
-    # via panphon
+    # via ilt-panphon
 numpy==2.3.4
-    # via panphon
+    # via ilt-panphon
 openpyxl==3.1.5
     # via hatch.envs.prod
 packaging==25.0
     # via gunicorn
-panphon==0.21.2
+ilt-panphon==0.21.3
     # via hatch.envs.prod
 pydantic==2.8.2
     # via
@@ -81,11 +76,11 @@ python-socketio==5.14.3
 pyyaml==6.0.3
     # via
     #   hatch.envs.prod
-    #   panphon
+    #   ilt-panphon
 regex==2025.10.23
     # via
     #   hatch.envs.prod
-    #   panphon
+    #   ilt-panphon
 simple-websocket==1.1.0
     # via python-engineio
 sniffio==1.3.1
@@ -107,7 +102,7 @@ typing-extensions==4.15.0
     #   pydantic-core
     #   starlette
 unicodecsv==0.14.1
-    # via panphon
+    # via ilt-panphon
 uvicorn==0.38.0
     # via hatch.envs.prod
 wsproto==1.2.0

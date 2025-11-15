@@ -3,9 +3,8 @@ on:
   workflow_call:
   workflow_dispatch:
   push:
-    branches: main
-env:
-  SETUPTOOLS_SCM_PRETEND_VERSION: "2.1"
+    branches:
+      - main
 permissions:
   contents: read
 jobs:
@@ -13,8 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, windows-latest, macos-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v5
@@ -28,6 +27,6 @@ jobs:
         shell: bash
         run: |
           python -m pip install --upgrade pip
-          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` pip install -e .[test]
+          SETUPTOOLS_SCM_PRETEND_VERSION=$(cat .SETUPTOOLS_SCM_PRETEND_VERSION) pip install -e .[test]
       - name: Run tests
         run: python run_tests.py dev
