@@ -32,7 +32,7 @@ jobs:
           enable-cache: true
       - name: Install dependencies
         run: |
-          SETUPTOOLS_SCM_PRETEND_VERSION=`cat .SETUPTOOLS_SCM_PRETEND_VERSION` uv pip install -e .[test] licensecheck
+          SETUPTOOLS_SCM_PRETEND_VERSION=$(cat .SETUPTOOLS_SCM_PRETEND_VERSION) uv pip install -e .[test] licensecheck
       - run: uv pip list
       - run: uv pip freeze
       - name: Check licenses
