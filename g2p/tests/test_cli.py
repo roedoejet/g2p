@@ -134,15 +134,22 @@ class CliTest(TestCase):
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
 
-    def test_update_schema(self):
+    def test_wont_update_schema_with_pydantic_ge29(self):
+        """Make sure schema update does nothing when Pydantic>=2.9"""
+        pydantic_major, pydantic_minor, _ = pydantic.VERSION.split(".", 3)
+        if (int(pydantic_major), int(pydantic_minor)) < (2, 9):
+            raise SkipTest("This test is only meaningful with pydantic>=2.9")
+
+        result = self.runner.invoke(update_schema)
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Please use Pydantic", result.output)
+
+    def test_update_schema_with_pydantic_lt29(self):
+        """Make sure schema update works (requires Pydantic<2.9)"""
         # Skip this test if the currently installed pydantic version is >= 2.9
         pydantic_major, pydantic_minor, _ = pydantic.VERSION.split(".", 3)
         if (int(pydantic_major), int(pydantic_minor)) >= (2, 9):
-            raise (
-                SkipTest(
-                    "Skipping schema test due to too recent version of pydantic. pip install 'pydantic<2.9' with Python<3.14 to activate this test."
-                )
-            )
+            raise SkipTest("This test is only meaningful with pydantic<2.9")
 
         # It's an error for the currently saved schema to be out of date
         result = self.runner.invoke(update_schema)

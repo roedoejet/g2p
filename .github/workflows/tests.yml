@@ -73,6 +73,13 @@ jobs:
           coverage run $(which g2p) generate-mapping --from crg --to eng
           git status --porcelain=v1 | grep 'M g2p/mappings/langs/generated/config-g2p.yaml' || { echo 'g2p generate-mapping did not update generated/config-g2p.yaml as expected'; false; }
 
+      - name: Make sure schemas are up to date, using pydantic<2.9
+        shell: bash
+        run: |
+          uv pip install 'pydantic<2.9'
+          coverage run -m unittest -v g2p.tests.test_cli.CliTest.test_update_schema_with_pydantic_lt29 |& tee schema-test.txt
+          ! grep -i skip schema-test.txt || ! echo "Error: Schema update test got skipped, something went wrong."
+
       - name: Post test analyses
         run: |
           pkill -INT coverage
