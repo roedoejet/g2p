@@ -129,9 +129,6 @@ jobs:
           path: dist/
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          verbose: true
 
   # Convertextract depends on g2p<2.0, maybe this is no longer relevant?
   # Or do we want to keep it because eventually convertextract will depend on g2p>=2.0?
