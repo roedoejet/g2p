@@ -61,7 +61,7 @@ openpyxl==3.1.5
     # via hatch.envs.prod
 packaging==25.0
     # via gunicorn
-ilt-panphon==0.21.3
+ilt-panphon @ git+https://github.com/NRC-ILT/panphon@dev.ej/pkg_resources
     # via hatch.envs.prod
 pydantic==2.8.2
     # via
