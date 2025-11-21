@@ -724,7 +724,15 @@ def update_schema(out_dir):
     But not every minor or major version bump requires a schema update.
     """
     # Defer expensive imports
+    import pydantic
+
     from g2p.mappings import MappingConfig
+
+    pydantic_major, pydantic_minor, _ = pydantic.VERSION.split(".", 3)
+    if (int(pydantic_major), int(pydantic_minor)) >= (2, 9):
+        print(f"Detected pydantic version {pydantic.VERSION} is greater than 2.8.")
+        print("Please use Pydantic < 2.9 with Python < 3.14 to update schemas.")
+        return
 
     # We shall not change the schema for patches, so only include major/minor version
     (major, minor, *_rest) = g2p._version.version_tuple

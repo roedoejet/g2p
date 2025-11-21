@@ -20,7 +20,7 @@ dependencies = [
   "coloredlogs>=15.0.1",
   "openpyxl",
   "ilt-panphon>=0.21.2,<0.22",
-  "pydantic>=2.4, <2.9",                      # pydantic 2.9.0 changes our schema
+  "pydantic>=2.4",
   "pyyaml>=5.2",
   "regex",
   "text_unidecode",

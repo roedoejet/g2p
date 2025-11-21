@@ -7,9 +7,10 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from unittest import TestCase, main, mock
+from unittest import SkipTest, TestCase, main, mock
 
 import jsonschema
+import pydantic
 import yaml
 from click.testing import CliRunner
 
@@ -45,6 +46,18 @@ def set_g2p_version(version_tuple, version_string=None):
     g2p._version.__version_tuple__ = g2p._version.version_tuple = tuple(version_tuple)
 
 
+def relaxed_int(int_or_str) -> int:
+    """Parse a version component returning only its numerical prefix.
+
+    Motivation: in CI, sometimes we end up with a version like 2.3.dev0
+    E.g.: 42 -> 42, 1dev2 -> 1, dev -> 0
+    """
+    if isinstance(int_or_str, int):
+        return int_or_str
+    m = re.search(r"^[0-9]+", int_or_str)
+    return int(m.group()) if m else 0
+
+
 @contextmanager
 def monkey_patch_g2p_version(increment_tuple):
     saved_version = g2p._version.VERSION
@@ -53,7 +66,7 @@ def monkey_patch_g2p_version(increment_tuple):
     while len(incremented_version) < len(increment_tuple):
         incremented_version.append(0)
     for part, increment in enumerate(increment_tuple):
-        incremented_version[part] += increment
+        incremented_version[part] = relaxed_int(incremented_version[part]) + increment
     set_g2p_version(incremented_version)
     yield
     set_g2p_version(saved_version_tuple, saved_version)
@@ -121,7 +134,23 @@ class CliTest(TestCase):
             result = self.runner.invoke(update, ["-i", bad_langs_dir, "-o", tmpdir])
             self.assertEqual(result.exit_code, 0)
 
-    def test_update_schema(self):
+    def test_wont_update_schema_with_pydantic_ge29(self):
+        """Make sure schema update does nothing when Pydantic>=2.9"""
+        pydantic_major, pydantic_minor, _ = pydantic.VERSION.split(".", 3)
+        if (int(pydantic_major), int(pydantic_minor)) < (2, 9):
+            raise SkipTest("This test is only meaningful with pydantic>=2.9")
+
+        result = self.runner.invoke(update_schema)
+        self.assertEqual(result.exit_code, 0)
+        self.assertIn("Please use Pydantic", result.output)
+
+    def test_update_schema_with_pydantic_lt29(self):
+        """Make sure schema update works (requires Pydantic<2.9)"""
+        # Skip this test if the currently installed pydantic version is >= 2.9
+        pydantic_major, pydantic_minor, _ = pydantic.VERSION.split(".", 3)
+        if (int(pydantic_major), int(pydantic_minor)) >= (2, 9):
+            raise SkipTest("This test is only meaningful with pydantic<2.9")
+
         # It's an error for the currently saved schema to be out of date
         result = self.runner.invoke(update_schema)
         self.assertEqual(result.exit_code, 0)
